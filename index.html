@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Financeiro - Boudoir</title>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- SheetJS para ler Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Reset apenas do container do dashboard */
+        .boudoir-dashboard-root {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.5;
+        }
+        
+        .boudoir-dashboard-root *,
+        .boudoir-dashboard-root *::before,
+        .boudoir-dashboard-root *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Container principal */
+        .boudoir-dashboard-root {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            z-index: 9999;
+            overflow: hidden;
+        }
+
+        /* Layout */
+        .bdr-layout {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Sidebar */
+        .bdr-sidebar {
+            width: 280px;
+            height: 100%;
+            background: rgba(15, 12, 41, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5);
+            transition: width 0.3s ease;
+        }
+
+        .bdr-sidebar.collapsed {
+            width: 80px;
+        }
+
+        .bdr-sidebar.collapsed .bdr-logo-text,
+        .bdr-sidebar.collapsed .bdr-menu-item span {
+            display: none;
+        }
+
+        .bdr-sidebar.collapsed .bdr-logo {
+            justify-content: center;
+        }
+
+        .bdr-sidebar.collapsed .bdr-menu-item {
+            justify-content: center;
+        }
+
+        .bdr-logo {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .bdr-toggle-btn {
+            position: absolute;
+            right: 1rem;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            font-size: 18px;
+        }
+
+        .bdr-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .bdr-sidebar.collapsed .bdr-toggle-btn {
+            right: 50%;
+            transform: translateX(50%);
+        }
+
+        .bdr-sidebar.collapsed .bdr-toggle-btn:hover {
+            transform: translateX(50%) scale(1.05);
+        }
+
+        .bdr-logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            font-weight: 700;
+        }
+
+        .bdr-logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .bdr-logo-text p {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 4px;
+        }
+
+        .bdr-menu {
+            flex: 1;
+            padding: 1.5rem 1rem;
+            overflow-y: auto;
+        }
+
+        .bdr-menu-item {
+            padding: 1rem 1.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            font-size: 1rem;
+            border: 1px solid transparent;
+        }
+
+        .bdr-menu-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .bdr-menu-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .bdr-menu-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Conteúdo */
+        .bdr-content {
+            flex: 1;
+            height: 100%;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .bdr-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .bdr-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .bdr-content::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.5);
+            border-radius: 10px;
+        }
+
+        /* Header */
+        .bdr-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .bdr-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .bdr-header-subtitle {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 0.5rem;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .bdr-header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .bdr-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+        }
+
+        .bdr-btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .bdr-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .bdr-btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .bdr-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* Métricas */
+        .bdr-metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1200px) {
+            .bdr-metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .bdr-metrics {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .bdr-sidebar {
+                width: 80px;
+            }
+            
+            .bdr-sidebar .bdr-logo-text,
+            .bdr-sidebar .bdr-menu-item span {
+                display: none !important;
+            }
+
+            .bdr-sidebar .bdr-logo {
+                justify-content: center;
+            }
+
+            .bdr-sidebar .bdr-menu-item {
+                justify-content: center;
+            }
+
+            .bdr-sidebar .bdr-toggle-btn {
+                right: 50%;
+                transform: translateX(50%);
+            }
+            
+            .bdr-content {
+                padding: 1rem;
+            }
+            
+            .bdr-charts-grid,
+            .bdr-charts {
+                grid-template-columns: 1fr !important;
+            }
+
+            .bdr-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .bdr-chart-full .bdr-chart-canvas {
+                height: 280px;
+            }
+        }
+
+        .bdr-metric-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+
+        .bdr-metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .bdr-metric-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .bdr-metric-info h3 {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.65rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            line-height: 1.2;
+        }
+
+        .bdr-metric-value {
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 700;
+            font-family: 'Space Mono', monospace;
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        .bdr-metric-change {
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .bdr-metric-change.positive {
+            color: #10b981;
+        }
+
+        /* Gráficos */
+        .bdr-charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+        }
+
+        .bdr-chart-full {
+            grid-column: 1 / -1;
+        }
+
+        .bdr-chart-box {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
+        }
+
+        .bdr-chart-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 70px rgba(102, 126, 234, 0.25);
+        }
+
+        .bdr-chart-title {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .bdr-chart-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+
+        .bdr-chart-canvas {
+            position: relative;
+            height: 300px;
+        }
+
+        .bdr-chart-full .bdr-chart-canvas {
+            height: 350px;
+        }
+
+        /* Loading */
+        .bdr-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 12, 41, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .bdr-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: bdr-spin 1s linear infinite;
+        }
+
+        @keyframes bdr-spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .bdr-loading-text {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="boudoir-dashboard-root">
+        <div class="bdr-loading" id="loading" style="display: none;">
+            <div class="bdr-spinner"></div>
+            <div class="bdr-loading-text">Carregando dados...</div>
+        </div>
+
+        <div class="bdr-layout">
+            <!-- SIDEBAR -->
+            <div class="bdr-sidebar" id="sidebar">
+                <div class="bdr-logo">
+                    <div class="bdr-logo-icon">B</div>
+                    <div class="bdr-logo-text">
+                        <h1>Boudoir</h1>
+                        <p>Dashboard</p>
+                    </div>
+                    <div class="bdr-toggle-btn" onclick="toggleSidebar()" title="Recolher/Expandir Menu">
+                        <span id="toggleIcon">◀</span>
+                    </div>
+                </div>
+
+                <div class="bdr-menu">
+                    <div class="bdr-menu-item active">
+                        <div class="bdr-menu-icon">📊</div>
+                        <span>Financeiro</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTEÚDO -->
+            <div class="bdr-content">
+                <div class="bdr-header">
+                    <div>
+                        <h1>Dashboard Financeiro</h1>
+                        <div class="bdr-header-subtitle" id="lastUpdate">
+                            Última atualização: --
+                        </div>
+                    </div>
+                    <div class="bdr-header-actions">
+                        <button class="bdr-btn bdr-btn-secondary" onclick="atualizarDados()">
+                            🔄 Atualizar
+                        </button>
+                        <button class="bdr-btn bdr-btn-primary" onclick="document.getElementById('fileInputFinanceiro').click()">
+                            📤 Carregar Financeiro
+                        </button>
+                        <button class="bdr-btn bdr-btn-primary" onclick="document.getElementById('fileInputFaturamento').click()">
+                            📊 Carregar Faturamento
+                        </button>
+                        <input type="file" id="fileInputFinanceiro" accept=".xlsx,.xls" style="display: none;" onchange="handleFileUploadFinanceiro(event)">
+                        <input type="file" id="fileInputFaturamento" accept=".xlsx,.xls" style="display: none;" onchange="handleFileUploadFaturamento(event)">
+                    </div>
+                </div>
+
+                <!-- MÉTRICAS -->
+                <div class="bdr-metrics" id="metricsGrid"></div>
+
+                <!-- GRÁFICOS -->
+                <div class="bdr-charts" id="chartsGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let dadosFinanceiros = {
+            resumo: { 
+                totalBancos: 0, 
+                totalCartoes: 0, 
+                chequesCompensasr: 0, 
+                totalCheques: 0, 
+                totalBoletos: 0, 
+                totalDuplicatas: 0, 
+                totalInadimplencia: 0, 
+                totalGeral: 0 
+            },
+            evolucao: [],
+            bancos: [],
+            cartoes: []
+        };
+        let charts = {};
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarDados();
+            setInterval(atualizarDados, 3600000); // 1 hora
+        });
+
+        function carregarDados() {
+            // Carregar dados financeiros (cards)
+            const savedDataFinanceiro = localStorage.getItem('boudoirDataFinanceiro');
+            if (savedDataFinanceiro) {
+                const parsed = JSON.parse(savedDataFinanceiro);
+                dadosFinanceiros.resumo = parsed.resumo || dadosFinanceiros.resumo;
+                dadosFinanceiros.bancos = parsed.bancos || dadosFinanceiros.bancos;
+                dadosFinanceiros.cartoes = parsed.cartoes || dadosFinanceiros.cartoes;
+            }
+
+            // Carregar dados de faturamento (evolução)
+            const savedDataFaturamento = localStorage.getItem('boudoirDataFaturamento');
+            if (savedDataFaturamento) {
+                const parsed = JSON.parse(savedDataFaturamento);
+                dadosFinanceiros.evolucao = parsed.evolucao || dadosFinanceiros.evolucao;
+            }
+
+            // Se não houver dados salvos, usar exemplo
+            if (!savedDataFinanceiro && !savedDataFaturamento) {
+                gerarDadosExemplo();
+            } else {
+                renderizarDashboard();
+            }
+        }
+
+        function handleFileUploadFinanceiro(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            mostrarLoading(true);
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    processarExcelFinanceiro(workbook);
+                    
+                    localStorage.setItem('boudoirDataFinanceiro', JSON.stringify({
+                        resumo: dadosFinanceiros.resumo,
+                        bancos: dadosFinanceiros.bancos,
+                        cartoes: dadosFinanceiros.cartoes
+                    }));
+                    localStorage.setItem('boudoirLastUpdate', new Date().toISOString());
+                    
+                    renderizarMetricas();
+                    criarGraficoResumo();
+                    criarGraficoCartoes();
+                    
+                    alert(`✅ Dados Financeiros carregados!\n\nTotal Geral: ${formatarMoeda(dadosFinanceiros.resumo.totalGeral)}`);
+                    
+                    mostrarLoading(false);
+                } catch (error) {
+                    console.error('Erro:', error);
+                    alert('❌ Erro ao processar Excel Financeiro!\n\n' + error.message);
+                    mostrarLoading(false);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function handleFileUploadFaturamento(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            mostrarLoading(true);
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    processarExcelFaturamento(workbook);
+                    
+                    // Verificar quantos valores válidos foram carregados
+                    const valoresValidos = dadosFinanceiros.evolucao.filter(d => d.valor > 0).length;
+                    
+                    localStorage.setItem('boudoirDataFaturamento', JSON.stringify({
+                        evolucao: dadosFinanceiros.evolucao
+                    }));
+                    localStorage.setItem('boudoirLastUpdate', new Date().toISOString());
+                    criarGraficoEvolucao();
+                    
+                    alert(`✅ Faturamento carregado!\n\n${valoresValidos} meses com dados.\n\nAbra o Console (F12) para ver os detalhes das linhas F32:F43`);
+                    
+                    mostrarLoading(false);
+                } catch (error) {
+                    console.error('Erro:', error);
+                    alert('❌ Erro ao processar Excel Faturamento!\n\n' + error.message);
+                    mostrarLoading(false);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function processarExcelFinanceiro(workbook) {
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+            // CARD 1: Total em Bancos = SOMA(J5:J15)
+            let totalBancos = 0;
+            for (let i = 4; i <= 14; i++) {
+                const valor = jsonData[i] && jsonData[i][9];
+                if (valor && typeof valor === 'number') {
+                    totalBancos += valor;
+                }
+            }
+
+            // Cheques a Compensar = J16
+            const chequesCompensasr = (jsonData[15] && jsonData[15][9]) || 0;
+
+            // CARD 2: Total em Cartões = SOMA(J20:J25)
+            let totalCartoes = 0;
+            for (let i = 19; i <= 24; i++) {
+                const valor = jsonData[i] && jsonData[i][9];
+                if (valor && typeof valor === 'number') {
+                    totalCartoes += valor;
+                }
+            }
+
+            // CARD 3: Cheques = J27
+            const totalCheques = (jsonData[26] && jsonData[26][9]) || 0;
+
+            // CARD 4: Boletos = SOMA(J28:J31)
+            let totalBoletos = 0;
+            for (let i = 27; i <= 30; i++) {
+                const valor = jsonData[i] && jsonData[i][9];
+                if (valor && typeof valor === 'number') {
+                    totalBoletos += valor;
+                }
+            }
+
+            // CARD 6: Duplicatas = J34
+            const totalDuplicatas = (jsonData[33] && jsonData[33][9]) || 0;
+
+            // CARD 8: Cobrança/Inadimplência = SOMA(J37:J46)
+            let totalInadimplencia = 0;
+            for (let i = 36; i <= 45; i++) {
+                const valor = jsonData[i] && jsonData[i][9];
+                if (valor && typeof valor === 'number') {
+                    totalInadimplencia += valor;
+                }
+            }
+
+            // Resetar arrays de bancos e cartões
+            dadosFinanceiros.bancos = [];
+            dadosFinanceiros.cartoes = [];
+
+            jsonData.forEach((row, index) => {
+                if (row[0] && typeof row[0] === 'string') {
+                    // Pegar bancos individuais para o gráfico
+                    if (row[0].includes('BANCO') && index >= 4 && index <= 14) {
+                        const valor = row[9] || 0;
+                        if (valor > 0) {
+                            dadosFinanceiros.bancos.push({ nome: row[0].replace('BANCO ', ''), valor: valor });
+                        }
+                    }
+                    
+                    // Pegar cartões individuais para o gráfico (J20:J25)
+                    if ((row[0].includes('CIELO') || row[0].includes('GETNET') || row[0].includes('STONE')) && index >= 19 && index <= 24) {
+                        const valor = row[9] || 0;
+                        if (valor > 0) {
+                            dadosFinanceiros.cartoes.push({ nome: row[0].replace('CIELO ', '').replace('GETNET ', '').replace('STONE - PAGAR.ME ', ''), valor });
+                        }
+                    }
+                }
+            });
+
+            dadosFinanceiros.resumo.totalBancos = totalBancos;
+            dadosFinanceiros.resumo.totalCartoes = totalCartoes;
+            dadosFinanceiros.resumo.chequesCompensasr = chequesCompensasr;
+            dadosFinanceiros.resumo.totalCheques = totalCheques;
+            dadosFinanceiros.resumo.totalBoletos = totalBoletos;
+            dadosFinanceiros.resumo.totalDuplicatas = totalDuplicatas;
+            dadosFinanceiros.resumo.totalInadimplencia = totalInadimplencia;
+            dadosFinanceiros.resumo.totalGeral = totalBancos + totalCartoes + chequesCompensasr + totalCheques + totalBoletos + totalDuplicatas - totalInadimplencia;
+        }
+
+        function processarExcelFaturamento(workbook) {
+            // Pegar primeira aba
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+            console.log('✅ Processando Faturamento - Aba:', sheetName);
+            console.log('Total de linhas:', jsonData.length);
+
+            // EVOLUÇÃO: F4:F15 (12 meses)
+            dadosFinanceiros.evolucao = [];
+            
+            for (let i = 3; i <= 14; i++) { // linhas 4 a 15 (índice 3 a 14)
+                const row = jsonData[i];
+                const valor = row ? row[5] : null; // coluna F (índice 5)
+                
+                console.log(`Linha ${i+1} (F${i+1}):`, valor);
+                
+                // Converter para número se for string
+                let valorNumerico = 0;
+                if (valor !== null && valor !== undefined && valor !== '') {
+                    valorNumerico = typeof valor === 'number' ? valor : parseFloat(valor);
+                    if (isNaN(valorNumerico)) {
+                        valorNumerico = 0;
+                    }
+                }
+                
+                dadosFinanceiros.evolucao.push({ 
+                    mes: i - 2, // mês 1 a 12
+                    valor: valorNumerico 
+                });
+            }
+
+            console.log('✅ Dados de evolução carregados (12 meses):', dadosFinanceiros.evolucao);
+        }
+
+        function gerarDadosExemplo() {
+            dadosFinanceiros = {
+                resumo: {
+                    totalBancos: 4137598.46,
+                    totalCartoes: 584675.44,
+                    chequesCompensasr: 41314.72,
+                    totalCheques: 1730862.85,
+                    totalBoletos: 1715443.58,
+                    totalDuplicatas: 355843.85,
+                    totalInadimplencia: 492973.73,
+                    totalGeral: 4992093.24
+                },
+                evolucao: [
+                    { mes: 1, valor: 1850000 },
+                    { mes: 2, valor: 1920000 },
+                    { mes: 3, valor: 2100000 },
+                    { mes: 4, valor: 2050000 },
+                    { mes: 5, valor: 2200000 },
+                    { mes: 6, valor: 2350000 },
+                    { mes: 7, valor: 2180000 },
+                    { mes: 8, valor: 2400000 },
+                    { mes: 9, valor: 2150000 },
+                    { mes: 10, valor: 2280000 },
+                    { mes: 11, valor: 2320000 },
+                    { mes: 12, valor: 2450000 }
+                ],
+                bancos: [
+                    { nome: 'Bradesco', valor: 196101.89 },
+                    { nome: 'C6 Bank', valor: 805201.64 },
+                    { nome: 'Santander', valor: 63953.22 },
+                    { nome: 'BNB', valor: 1036371.08 },
+                    { nome: 'Itaú', valor: 896678.84 }
+                ],
+                cartoes: [
+                    { nome: 'Cielo', valor: 153774.86 },
+                    { nome: 'Getnet', valor: 396282.09 },
+                    { nome: 'Stone', valor: 34634.49 }
+                ]
+            };
+
+            // Salvar separadamente
+            localStorage.setItem('boudoirDataFinanceiro', JSON.stringify({
+                resumo: dadosFinanceiros.resumo,
+                bancos: dadosFinanceiros.bancos,
+                cartoes: dadosFinanceiros.cartoes
+            }));
+
+            localStorage.setItem('boudoirDataFaturamento', JSON.stringify({
+                evolucao: dadosFinanceiros.evolucao
+            }));
+
+            renderizarDashboard();
+        }
+
+        function renderizarDashboard() {
+            renderizarMetricas();
+            renderizarGraficos();
+            atualizarDataHora();
+        }
+
+        function renderizarMetricas() {
+            const container = document.getElementById('metricsGrid');
+            const r = dadosFinanceiros.resumo;
+
+            container.innerHTML = `
+                <div class="bdr-metric-card">
+                    <div class="bdr-metric-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">💰</div>
+                    <div class="bdr-metric-info">
+                        <h3>Total em Bancos</h3>
+                        <div class="bdr-metric-value">${formatarMoeda(r.totalBancos)}</div>
+                        <div class="bdr-metric-change positive">↗ +8.5%</div>
+                    </div>
+                </div>
+                <div class="bdr-metric-card">
+                    <div class="bdr-metric-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">📋</div>
+                    <div class="bdr-metric-info">
+                        <h3>Total em Cheques</h3>
+                        <div class="bdr-metric-value">${formatarMoeda(r.totalCheques)}</div>
+                        <div class="bdr-metric-change positive">↗ +5.7%</div>
+                    </div>
+                </div>
+                <div class="bdr-metric-card">
+                    <div class="bdr-metric-icon" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">🔖</div>
+                    <div class="bdr-metric-info">
+                        <h3>Cheques à Compensar</h3>
+                        <div class="bdr-metric-value">${formatarMoeda(r.chequesCompensasr)}</div>
+                        <div class="bdr-metric-change positive">↗ +4.1%</div>
+                    </div>
+                </div>
+                <div class="bdr-metric-card">
+                    <div class="bdr-metric-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">📄</div>
+                    <div class="bdr-metric-info">
+                        <h3>Total em Boletos</h3>
+                        <div class="bdr-metric-value">${formatarMoeda(r.totalBoletos)}</div>
+                        <div class="bdr-metric-change positive">↗ +6.2%</div>
+                    </div>
+                </div>
+                <div class="bdr-metric-card">
+                    <div class="bdr-metric-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">💳</div>
+                    <div class="bdr-metric-info">
+                        <h3>Total em Cartões</h3>
+                        <div class="bdr-metric-value">${formatarMoeda(r.totalCartoes)}</div>
+                        <div class="bdr-metric-change positive">↗ +12.3%</div>
+                    </div>
+                </div>
+                <div class="bdr-metric-card">
+                    <div class="bdr-metric-icon" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">📝</div>
+                    <div class="bdr-metric-info">
+                        <h3>Duplicatas</h3>
+                        <div class="bdr-metric-value">${formatarMoeda(r.totalDuplicatas)}</div>
+                        <div class="bdr-metric-change positive">↗ +3.8%</div>
+                    </div>
+                </div>
+                <div class="bdr-metric-card">
+                    <div class="bdr-metric-icon" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);">⚠️</div>
+                    <div class="bdr-metric-info">
+                        <h3>Cobrança / Inadimplência</h3>
+                        <div class="bdr-metric-value">${formatarMoeda(r.totalInadimplencia)}</div>
+                        <div class="bdr-metric-change negative">↘ -2.1%</div>
+                    </div>
+                </div>
+                <div class="bdr-metric-card">
+                    <div class="bdr-metric-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">📊</div>
+                    <div class="bdr-metric-info">
+                        <h3>Total Geral na Carteira (Disponível)</h3>
+                        <div class="bdr-metric-value">${formatarMoeda(r.totalGeral)}</div>
+                        <div class="bdr-metric-change positive">↗ +9.8%</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderizarGraficos() {
+            const container = document.getElementById('chartsGrid');
+            
+            container.innerHTML = `
+                <div class="bdr-chart-box bdr-chart-full">
+                    <div class="bdr-chart-title">📊 Resumo Geral</div>
+                    <div class="bdr-chart-canvas"><canvas id="chartResumo"></canvas></div>
+                </div>
+                <div class="bdr-chart-box bdr-chart-full">
+                    <div class="bdr-chart-title">📈 Evolução do faturamento</div>
+                    <div class="bdr-chart-canvas"><canvas id="chartEvolucao"></canvas></div>
+                </div>
+                <div class="bdr-chart-box">
+                    <div class="bdr-chart-title">💳 Cartões de Crédito</div>
+                    <div class="bdr-chart-canvas"><canvas id="chartCartoes"></canvas></div>
+                </div>
+            `;
+
+            setTimeout(() => {
+                criarGraficoResumo();
+                criarGraficoEvolucao();
+                criarGraficoCartoes();
+            }, 100);
+        }
+
+        function criarGraficoEvolucao() {
+            const ctx = document.getElementById('chartEvolucao');
+            if (!ctx) return;
+            if (charts.evolucao) charts.evolucao.destroy();
+
+            // Meses do ano
+            const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+                          'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+            charts.evolucao = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: meses,
+                    datasets: [{
+                        label: 'Faturamento',
+                        data: dadosFinanceiros.evolucao.map(d => d.valor),
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 8,
+                        pointHoverRadius: 10,
+                        pointBackgroundColor: '#667eea',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 12, 41, 0.95)',
+                            padding: 12,
+                            callbacks: {
+                                label: (ctx) => 'Faturamento: ' + formatarMoeda(ctx.parsed.y)
+                            }
+                        },
+                        datalabels: {
+                            display: true,
+                            align: 'top',
+                            backgroundColor: 'rgba(102, 126, 234, 0.9)',
+                            borderRadius: 6,
+                            color: 'white',
+                            font: {
+                                weight: 'bold',
+                                size: 11
+                            },
+                            padding: 6,
+                            formatter: function(value) {
+                                if (value === 0) return '';
+                                return 'R$ ' + (value / 1000).toFixed(0) + 'k';
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 2500000,
+                            ticks: {
+                                stepSize: 500000,
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                callback: function(value) {
+                                    return 'R$ ' + (value / 1000000).toFixed(1) + 'M';
+                                }
+                            },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { 
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        }
+                    }
+                },
+                plugins: [{
+                    afterDatasetsDraw: function(chart) {
+                        const ctx = chart.ctx;
+                        chart.data.datasets.forEach(function(dataset, i) {
+                            const meta = chart.getDatasetMeta(i);
+                            if (!meta.hidden) {
+                                meta.data.forEach(function(element, index) {
+                                    const data = dataset.data[index];
+                                    if (data > 0) {
+                                        ctx.fillStyle = 'rgba(102, 126, 234, 0.95)';
+                                        ctx.strokeStyle = 'white';
+                                        ctx.lineWidth = 2;
+                                        
+                                        const fontSize = 10;
+                                        const fontStyle = 'bold';
+                                        const fontFamily = 'Space Mono, monospace';
+                                        ctx.font = fontStyle + ' ' + fontSize + 'px ' + fontFamily;
+                                        
+                                        // Formatar valor completo
+                                        const dataString = data.toLocaleString('pt-BR', { 
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2 
+                                        });
+                                        
+                                        const textWidth = ctx.measureText(dataString).width;
+                                        const position = element.tooltipPosition();
+                                        
+                                        const padding = 6;
+                                        const bgX = position.x - textWidth / 2 - padding;
+                                        const bgY = position.y - fontSize - padding * 2 - 5;
+                                        const bgWidth = textWidth + padding * 2;
+                                        const bgHeight = fontSize + padding * 2;
+                                        
+                                        // Desenhar fundo com bordinha
+                                        ctx.beginPath();
+                                        ctx.roundRect(bgX, bgY, bgWidth, bgHeight, 6);
+                                        ctx.fill();
+                                        ctx.stroke();
+                                        
+                                        // Desenhar texto
+                                        ctx.fillStyle = 'white';
+                                        ctx.textAlign = 'center';
+                                        ctx.textBaseline = 'middle';
+                                        ctx.fillText(dataString, position.x, bgY + bgHeight / 2);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }]
+            });
+        }
+
+        function criarGraficoBancos() {
+            const ctx = document.getElementById('chartBancos');
+            if (!ctx) return;
+            if (charts.bancos) charts.bancos.destroy();
+
+            const cores = ['#667eea', '#8b5cf6', '#ec4899', '#3b82f6', '#10b981'];
+
+            charts.bancos = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: dadosFinanceiros.bancos.map(b => b.nome),
+                    datasets: [{
+                        data: dadosFinanceiros.bancos.map(b => b.valor),
+                        backgroundColor: cores,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 12, 41, 0.95)',
+                            callbacks: { label: (ctx) => formatarMoeda(ctx.parsed.y) }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                callback: (v) => 'R$ ' + (v / 1000).toFixed(0) + 'k'
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: 'rgba(255, 255, 255, 0.7)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function criarGraficoCartoes() {
+            const ctx = document.getElementById('chartCartoes');
+            if (!ctx) return;
+            if (charts.cartoes) charts.cartoes.destroy();
+
+            charts.cartoes = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: dadosFinanceiros.cartoes.map(c => c.nome),
+                    datasets: [{
+                        data: dadosFinanceiros.cartoes.map(c => c.valor),
+                        backgroundColor: ['#f093fb', '#4facfe', '#43e97b']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: 'rgba(255, 255, 255, 0.8)', padding: 15 }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 12, 41, 0.95)',
+                            callbacks: {
+                                label: (ctx) => ctx.label + ': ' + formatarMoeda(ctx.parsed)
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function criarGraficoResumo() {
+            const ctx = document.getElementById('chartResumo');
+            if (!ctx) return;
+            if (charts.resumo) charts.resumo.destroy();
+
+            const r = dadosFinanceiros.resumo;
+
+            // Criar array com dados e ordenar do maior para o menor
+            const dados = [
+                { nome: 'Bancos', valor: r.totalBancos, cor: '#667eea' },
+                { nome: 'Cartões', valor: r.totalCartoes, cor: '#f093fb' },
+                { nome: 'Cheques', valor: r.totalCheques, cor: '#4facfe' },
+                { nome: 'Boletos', valor: r.totalBoletos, cor: '#fa709a' },
+                { nome: 'Duplicatas', valor: r.totalDuplicatas, cor: '#a8edea' },
+                { nome: 'Ch. Compensar', valor: r.chequesCompensasr, cor: '#ff9a9e' }
+            ];
+
+            // Ordenar do maior para o menor
+            dados.sort((a, b) => b.valor - a.valor);
+
+            const labels = dados.map(d => d.nome);
+            const valores = dados.map(d => d.valor);
+            const cores = dados.map(d => d.cor);
+
+            charts.resumo = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: valores,
+                        backgroundColor: cores,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 12, 41, 0.95)',
+                            callbacks: { label: (ctx) => formatarMoeda(ctx.parsed.y) }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                callback: (v) => 'R$ ' + (v / 1000000).toFixed(1) + 'M'
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: 'rgba(255, 255, 255, 0.7)' }
+                        }
+                    }
+                },
+                plugins: [{
+                    afterDatasetsDraw: function(chart) {
+                        const ctx = chart.ctx;
+                        chart.data.datasets.forEach(function(dataset, i) {
+                            const meta = chart.getDatasetMeta(i);
+                            if (!meta.hidden) {
+                                meta.data.forEach(function(element, index) {
+                                    const data = dataset.data[index];
+                                    if (data > 0) {
+                                        ctx.fillStyle = 'white';
+                                        ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+                                        ctx.lineWidth = 3;
+                                        
+                                        const fontSize = 12;
+                                        const fontStyle = 'bold';
+                                        const fontFamily = 'Space Mono, monospace';
+                                        ctx.font = fontStyle + ' ' + fontSize + 'px ' + fontFamily;
+                                        
+                                        // Formatar valor completo
+                                        const dataString = data.toLocaleString('pt-BR', { 
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2 
+                                        });
+                                        
+                                        const position = element.tooltipPosition();
+                                        
+                                        // Desenhar texto com sombra
+                                        ctx.textAlign = 'center';
+                                        ctx.textBaseline = 'bottom';
+                                        
+                                        // Sombra
+                                        ctx.strokeText(dataString, position.x, position.y - 5);
+                                        
+                                        // Texto
+                                        ctx.fillText(dataString, position.x, position.y - 5);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }]
+            });
+        }
+
+        function formatarMoeda(valor) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+        }
+
+        function atualizarDataHora() {
+            const lastUpdate = localStorage.getItem('boudoirLastUpdate');
+            const dataHora = lastUpdate ? new Date(lastUpdate) : new Date();
+            document.getElementById('lastUpdate').textContent = 'Última atualização: ' + dataHora.toLocaleString('pt-BR');
+        }
+
+        function mostrarLoading(show) {
+            document.getElementById('loading').style.display = show ? 'flex' : 'none';
+        }
+
+        function atualizarDados() {
+            mostrarLoading(true);
+            setTimeout(() => {
+                carregarDados();
+                mostrarLoading(false);
+            }, 500);
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            sidebar.classList.toggle('collapsed');
+            
+            if (sidebar.classList.contains('collapsed')) {
+                toggleIcon.textContent = '▶';
+            } else {
+                toggleIcon.textContent = '◀';
+            }
+            
+            // Salvar estado no localStorage
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        }
+
+        // Restaurar estado do sidebar ao carregar
+        window.addEventListener('load', function() {
+            const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            if (sidebarCollapsed) {
+                document.getElementById('sidebar').classList.add('collapsed');
+                document.getElementById('toggleIcon').textContent = '▶';
+            }
+        });
+    </script>
+</body>
+</html>
