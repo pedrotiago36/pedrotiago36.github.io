@@ -1,4 +1,5 @@
 unit Model.TConfiguracaoSistema;
+// Claude Code esteve aqui
 
 interface
 
