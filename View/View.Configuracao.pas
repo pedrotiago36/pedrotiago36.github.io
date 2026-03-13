@@ -1,4 +1,5 @@
 ﻿unit View.Configuracao;
+// Claude Code esteve aqui
 
 interface
 
