@@ -82,7 +82,6 @@ type
     procedure AplicarEstiloVisual;
     procedure ConfigurarComponentes;
   public
-    procedure AfterConstruction; override;
   end;
 
 var
@@ -110,16 +109,12 @@ const
 
 { TFrmConfiguracao }
 
-procedure TFrmConfiguracao.AfterConstruction;
+procedure TFrmConfiguracao.FormCreate(Sender: TObject);
 begin
-  inherited;
   FConfiguracao   := TConfiguracaoSistema.Criar;
   FGravarArquivos := TGravarArquivos.Criar;
   FRecuperar      := TRecuperarArquivos.Criar;
-end;
 
-procedure TFrmConfiguracao.FormCreate(Sender: TObject);
-begin
   AplicarEstiloVisual;
   ConfigurarComponentes;
   CarregarConfiguracao;

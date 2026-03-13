@@ -1,0 +1,31 @@
+# Delphi compiled files
+*.dcu
+*.dcuil
+*.drc
+*.map
+*.dsk
+*.identcache
+*.local
+*.projdata
+*.tvsconfig
+
+# Executables
+*.exe
+*.dll
+*.bpl
+*.so
+
+# Backup files
+*.~*
+*.bak
+*.old
+*.orig
+
+# Windows trash
+Thumbs.db
+desktop.ini
+
+# Temp files
+__history/
+__recovery/
+*.tmp

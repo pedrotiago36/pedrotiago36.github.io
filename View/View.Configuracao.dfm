@@ -20,7 +20,8 @@ object FrmConfiguracao: TFrmConfiguracao
     Height = 56
     Align = alTop
     BevelOuter = bvNone
-    Color = 11556896
+    Color = clNavy
+    ParentBackground = False
     TabOrder = 0
     object lblTitulo: TLabel
       Left = 8
@@ -60,7 +61,6 @@ object FrmConfiguracao: TFrmConfiguracao
     BevelOuter = bvNone
     Color = clWhitesmoke
     TabOrder = 1
-    ExplicitHeight = 456
     object grpWebService: TGroupBox
       Left = 16
       Top = 16
@@ -248,7 +248,6 @@ object FrmConfiguracao: TFrmConfiguracao
     BevelOuter = bvNone
     Color = 14737632
     TabOrder = 2
-    ExplicitTop = 512
     object lblStatus: TLabel
       Left = 4
       Top = 4
@@ -273,7 +272,6 @@ object FrmConfiguracao: TFrmConfiguracao
     BevelOuter = bvNone
     Color = 15263976
     TabOrder = 3
-    ExplicitTop = 536
     object btnSalvar: TBitBtn
       Left = 480
       Top = 2
