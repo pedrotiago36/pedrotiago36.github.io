@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2025/12/31 08:10:46.000.298,=C:\Users\Casa\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2026/01/02 16:57:30.000.319,=C:\Users\Casa\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2026/01/02 16:58:18.000.407,=C:\Users\Casa\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2026/01/18 07:17:39.000.981,=C:\Users\Casa\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2026/03/13 04:45:11.188,=C:\Users\Casa\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2026/03/13 04:46:42.404,C:\Users\Casa\Desktop\Nova NFs\Claude\v1 - Novo Emissor NFs Batista\Projeto\prjEmissorNFsPainel.dproj=C:\Users\Casa\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2026/03/13 04:53:27.938,=C:\Users\Casa\Desktop\Nova NFs\Claude\v1 - Novo Emissor NFs Batista\Model\Interfaces\Model.IConfiguracaoSistema.pas</Transaction>
+    <Transaction>2026/03/13 04:53:27.969,=C:\Users\Casa\Desktop\Nova NFs\Claude\v1 - Novo Emissor NFs Batista\Model\Interfaces\Model.IGravarArquivos.pas</Transaction>
+    <Transaction>2026/03/13 04:53:28.032,=C:\Users\Casa\Desktop\Nova NFs\Claude\v1 - Novo Emissor NFs Batista\Model\Interfaces\Model.IRecuperarArquivos.pas</Transaction>
+    <Transaction>2026/03/13 04:53:43.969,=C:\Users\Casa\Desktop\Nova NFs\Claude\v1 - Novo Emissor NFs Batista\Model\Classes\Model.TConfiguracaoSistema.pas</Transaction>
+    <Transaction>2026/03/13 04:53:44.000,=C:\Users\Casa\Desktop\Nova NFs\Claude\v1 - Novo Emissor NFs Batista\Model\Classes\Model.TGravarArquivos.pas</Transaction>
+    <Transaction>2026/03/13 04:53:44.094,=C:\Users\Casa\Desktop\Nova NFs\Claude\v1 - Novo Emissor NFs Batista\Model\Classes\Model.TRecuperarArquivos.pas</Transaction>
+    <Transaction>2026/03/13 04:53:53.406,=C:\Users\Casa\Desktop\Nova NFs\Claude\v1 - Novo Emissor NFs Batista\View\View.Configuracao.pas</Transaction>
+  </Transactions>
+</BorlandProject>

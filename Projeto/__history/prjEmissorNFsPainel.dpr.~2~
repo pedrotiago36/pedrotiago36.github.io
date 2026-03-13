@@ -1,0 +1,15 @@
+program prjEmissorNFsPainel;
+
+uses
+  Vcl.Forms,
+  Model.IConfiguracaoSistema in '..\Model\Interfaces\Model.IConfiguracaoSistema.pas',
+  Model.IGravarArquivos in '..\Model\Interfaces\Model.IGravarArquivos.pas',
+  Model.IRecuperarArquivos in '..\Model\Interfaces\Model.IRecuperarArquivos.pas';
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.Run;
+end.
