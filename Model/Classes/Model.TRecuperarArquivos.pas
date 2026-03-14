@@ -11,7 +11,6 @@ type
   public
     procedure RecuperarIni(const AConfiguracao: IConfiguracaoSistema;
       const ACaminhoIni: string);
-
     class function Criar: IRecuperarArquivos;
   end;
 
@@ -22,35 +21,27 @@ uses
   System.IniFiles,
   System.IOUtils;
 
-{ TRecuperarArquivos }
-
 class function TRecuperarArquivos.Criar: IRecuperarArquivos;
 begin
   Result := TRecuperarArquivos.Create;
 end;
 
-procedure TRecuperarArquivos.RecuperarIni(const AConfiguracao: IConfiguracaoSistema;
+procedure TRecuperarArquivos.RecuperarIni(
+  const AConfiguracao: IConfiguracaoSistema;
   const ACaminhoIni: string);
 var
-  LIni: TIniFile;
-  LCaminhoCompleto: string;
+  LIni  : TIniFile;
+  LDados: TDadosConfiguracao;
 begin
-  LCaminhoCompleto := TPath.Combine(ACaminhoIni, 'NFSe_Servico.ini');
-
-  LIni := TIniFile.Create(LCaminhoCompleto);
+  LIni := TIniFile.Create(TPath.Combine(ACaminhoIni, 'NFSe_Servico.ini'));
   try
-    AConfiguracao.AtualizarUrlHomologacao(
-      LIni.ReadString('WebService', 'UrlHomologacao', ''));
-    AConfiguracao.AtualizarUrlProducao(
-      LIni.ReadString('WebService', 'UrlProducao', ''));
-    AConfiguracao.AtualizarDiretorioRpsEnviados(
-      LIni.ReadString('Diretorios', 'RpsEnviados', ''));
-    AConfiguracao.AtualizarDiretorioRpsErro(
-      LIni.ReadString('Diretorios', 'RpsErro', ''));
-    AConfiguracao.AtualizarDiretorioArquivoIni(
-      LIni.ReadString('Diretorios', 'ArquivoIni', ''));
-    AConfiguracao.AtualizarThreadAtiva(
-      LIni.ReadBool('Thread', 'Ativa', False));
+    LDados.UrlHomologacao       := LIni.ReadString('WebService', 'UrlHomologacao', '');
+    LDados.UrlProducao          := LIni.ReadString('WebService', 'UrlProducao',    '');
+    LDados.DiretorioRpsEnviados := LIni.ReadString('Diretorios', 'RpsEnviados',    '');
+    LDados.DiretorioRpsErro     := LIni.ReadString('Diretorios', 'RpsErro',        '');
+    LDados.DiretorioArquivoIni  := LIni.ReadString('Diretorios', 'ArquivoIni',     '');
+    LDados.ThreadAtiva          := LIni.ReadBool  ('Thread',     'Ativa',          False);
+    AConfiguracao.Atualizar(LDados);
   finally
     LIni.Free;
   end;

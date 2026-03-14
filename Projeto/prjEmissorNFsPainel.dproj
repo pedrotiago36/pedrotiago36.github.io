@@ -137,6 +137,16 @@
             <Form>FrmConfiguracao</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\Model\Interfaces\Model.IEstatisticasUnidade.pas"/>
+        <DCCReference Include="..\Model\Interfaces\Model.ILeituraArquivos.pas"/>
+        <DCCReference Include="..\Model\Classes\Model.TEstatisticasUnidade.pas"/>
+        <DCCReference Include="..\Model\Classes\Model.TLeituraArquivos.pas"/>
+        <DCCReference Include="..\View\View.Principal.pas">
+            <Form>FrmPrincipal</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\Controller\Classes\Controller.IPrincipal.pas"/>
+        <DCCReference Include="..\Controller\Interfaces\Controller.TPrincipal.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

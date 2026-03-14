@@ -1,4 +1,4 @@
-﻿unit View.Configuracao;
+unit View.Configuracao;
 // Claude Code esteve aqui
 
 interface
@@ -241,24 +241,30 @@ begin
 end;
 
 procedure TFrmConfiguracao.PreencherTelaComConfiguracao;
+var
+  LDados: TDadosConfiguracao;
 begin
-  edtUrlHomologacao.Text := FConfiguracao.UrlHomologacao;
-  edtUrlProducao.Text    := FConfiguracao.UrlProducao;
-  edtDirEnviados.Text    := FConfiguracao.DiretorioRpsEnviados;
-  edtDirErro.Text        := FConfiguracao.DiretorioRpsErro;
-  edtDirIni.Text         := FConfiguracao.DiretorioArquivoIni;
-  chbLigDesl_Thread.Checked := FConfiguracao.ThreadAtiva;
+  FConfiguracao.PreencherDados(LDados);
+  edtUrlHomologacao.Text     := LDados.UrlHomologacao;
+  edtUrlProducao.Text        := LDados.UrlProducao;
+  edtDirEnviados.Text        := LDados.DiretorioRpsEnviados;
+  edtDirErro.Text            := LDados.DiretorioRpsErro;
+  edtDirIni.Text             := LDados.DiretorioArquivoIni;
+  chbLigDesl_Thread.Checked  := LDados.ThreadAtiva;
   AtualizarCaptionThread;
 end;
 
 procedure TFrmConfiguracao.PreencherConfiguracaoComTela;
+var
+  LDados: TDadosConfiguracao;
 begin
-  FConfiguracao.AtualizarUrlHomologacao(edtUrlHomologacao.Text);
-  FConfiguracao.AtualizarUrlProducao(edtUrlProducao.Text);
-  FConfiguracao.AtualizarDiretorioRpsEnviados(edtDirEnviados.Text);
-  FConfiguracao.AtualizarDiretorioRpsErro(edtDirErro.Text);
-  FConfiguracao.AtualizarDiretorioArquivoIni(edtDirIni.Text);
-  FConfiguracao.AtualizarThreadAtiva(chbLigDesl_Thread.Checked);
+  LDados.UrlHomologacao       := edtUrlHomologacao.Text;
+  LDados.UrlProducao          := edtUrlProducao.Text;
+  LDados.DiretorioRpsEnviados := edtDirEnviados.Text;
+  LDados.DiretorioRpsErro     := edtDirErro.Text;
+  LDados.DiretorioArquivoIni  := edtDirIni.Text;
+  LDados.ThreadAtiva          := chbLigDesl_Thread.Checked;
+  FConfiguracao.Atualizar(LDados);
 end;
 
 procedure TFrmConfiguracao.ExibirMensagemStatus(const AMensagem: string;

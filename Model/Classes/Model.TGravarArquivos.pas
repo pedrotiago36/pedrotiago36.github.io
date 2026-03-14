@@ -4,20 +4,19 @@ interface
 
 uses
   Model.IGravarArquivos,
-  Model.IConfiguracaoSistema, System.Classes;
+  Model.IConfiguracaoSistema;
 
 type
   TGravarArquivos = class(TInterfacedObject, IGravarArquivos)
   private
-    function MontarCaminhoAnualMensal(const ADiretorioBase: string;
+    function MontarCaminho(const ABase: string;
       const AAno, AMes: Word): string;
     procedure GarantirDiretorio(const ACaminho: string);
-    procedure EscreverArquivoTxt(const ACaminho, AConteudo: string);
+    procedure EscreverLinha(const ACaminho, AConteudo: string);
   public
     procedure GravarIni(const AConfiguracao: IConfiguracaoSistema);
     procedure GravarRpsEnviado(const AConteudo: string; const AAno, AMes: Word);
     procedure GravarRpsErro(const AConteudo: string; const AAno, AMes: Word);
-
     class function Criar: IGravarArquivos;
   end;
 
@@ -26,19 +25,18 @@ implementation
 uses
   System.SysUtils,
   System.IniFiles,
-  System.IOUtils;
-
-{ TGravarArquivos }
+  System.IOUtils,
+  System.Classes;
 
 class function TGravarArquivos.Criar: IGravarArquivos;
 begin
   Result := TGravarArquivos.Create;
 end;
 
-function TGravarArquivos.MontarCaminhoAnualMensal(const ADiretorioBase: string;
+function TGravarArquivos.MontarCaminho(const ABase: string;
   const AAno, AMes: Word): string;
 begin
-  Result := TPath.Combine(ADiretorioBase,
+  Result := TPath.Combine(ABase,
     Format('%d\%s', [AAno, FormatFloat('00', AMes)]));
 end;
 
@@ -47,41 +45,34 @@ begin
   TDirectory.CreateDirectory(ACaminho);
 end;
 
-procedure TGravarArquivos.EscreverArquivoTxt(const ACaminho, AConteudo: string);
+procedure TGravarArquivos.EscreverLinha(const ACaminho, AConteudo: string);
 var
-  LArquivo: TStreamWriter;
+  LWriter: TStreamWriter;
 begin
-  LArquivo := TStreamWriter.Create(ACaminho, True, TEncoding.UTF8);
+  LWriter := TStreamWriter.Create(ACaminho, True, TEncoding.UTF8);
   try
-    LArquivo.WriteLine(AConteudo);
+    LWriter.WriteLine(AConteudo);
   finally
-    LArquivo.Free;
+    LWriter.Free;
   end;
 end;
 
 procedure TGravarArquivos.GravarIni(const AConfiguracao: IConfiguracaoSistema);
 var
-  LIni: TIniFile;
-  LCaminhoIni: string;
+  LIni  : TIniFile;
+  LDados: TDadosConfiguracao;
 begin
-  LCaminhoIni := TPath.Combine(AConfiguracao.DiretorioArquivoIni,
-    'NFSe_Servico.ini');
-
-  GarantirDiretorio(AConfiguracao.DiretorioArquivoIni);
-
-  LIni := TIniFile.Create(LCaminhoIni);
+  AConfiguracao.PreencherDados(LDados);
+  GarantirDiretorio(LDados.DiretorioArquivoIni);
+  LIni := TIniFile.Create(
+    TPath.Combine(LDados.DiretorioArquivoIni, 'NFSe_Servico.ini'));
   try
-    LIni.WriteString('WebService', 'UrlHomologacao',
-      AConfiguracao.UrlHomologacao);
-    LIni.WriteString('WebService', 'UrlProducao',
-      AConfiguracao.UrlProducao);
-    LIni.WriteString('Diretorios', 'RpsEnviados',
-      AConfiguracao.DiretorioRpsEnviados);
-    LIni.WriteString('Diretorios', 'RpsErro',
-      AConfiguracao.DiretorioRpsErro);
-    LIni.WriteString('Diretorios', 'ArquivoIni',
-      AConfiguracao.DiretorioArquivoIni);
-    LIni.WriteBool('Thread', 'Ativa', AConfiguracao.ThreadAtiva);
+    LIni.WriteString('WebService', 'UrlHomologacao', LDados.UrlHomologacao);
+    LIni.WriteString('WebService', 'UrlProducao',    LDados.UrlProducao);
+    LIni.WriteString('Diretorios', 'RpsEnviados',    LDados.DiretorioRpsEnviados);
+    LIni.WriteString('Diretorios', 'RpsErro',        LDados.DiretorioRpsErro);
+    LIni.WriteString('Diretorios', 'ArquivoIni',     LDados.DiretorioArquivoIni);
+    LIni.WriteBool  ('Thread',     'Ativa',          LDados.ThreadAtiva);
   finally
     LIni.Free;
   end;
@@ -90,27 +81,27 @@ end;
 procedure TGravarArquivos.GravarRpsEnviado(const AConteudo: string;
   const AAno, AMes: Word);
 var
-  LDiretorio, LArquivo: string;
+  LDir, LArq: string;
 begin
-  LDiretorio := MontarCaminhoAnualMensal('', AAno, AMes);
-  GarantirDiretorio(LDiretorio);
-  LArquivo := TPath.Combine(LDiretorio,
+  LDir := MontarCaminho('', AAno, AMes);
+  GarantirDiretorio(LDir);
+  LArq := TPath.Combine(LDir,
     Format('rps_enviados_%s_%s.txt',
       [FormatFloat('0000', AAno), FormatFloat('00', AMes)]));
-  EscreverArquivoTxt(LArquivo, AConteudo);
+  EscreverLinha(LArq, AConteudo);
 end;
 
 procedure TGravarArquivos.GravarRpsErro(const AConteudo: string;
   const AAno, AMes: Word);
 var
-  LDiretorio, LArquivo: string;
+  LDir, LArq: string;
 begin
-  LDiretorio := MontarCaminhoAnualMensal('', AAno, AMes);
-  GarantirDiretorio(LDiretorio);
-  LArquivo := TPath.Combine(LDiretorio,
+  LDir := MontarCaminho('', AAno, AMes);
+  GarantirDiretorio(LDir);
+  LArq := TPath.Combine(LDir,
     Format('rps_erro_%s_%s.txt',
       [FormatFloat('0000', AAno), FormatFloat('00', AMes)]));
-  EscreverArquivoTxt(LArquivo, AConteudo);
+  EscreverLinha(LArq, AConteudo);
 end;
 
 end.
