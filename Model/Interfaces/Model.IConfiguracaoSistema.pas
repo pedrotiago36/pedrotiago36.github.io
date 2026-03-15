@@ -10,6 +10,7 @@ type
     DiretorioRpsErro    : string;
     DiretorioArquivoIni : string;
     ThreadAtiva         : Boolean;
+    DataEnvio           : string;
   end;
 
   IConfiguracaoSistema = interface

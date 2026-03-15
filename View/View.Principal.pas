@@ -1,4 +1,4 @@
-unit View.Principal;
+﻿unit View.Principal;
 
 interface
 
@@ -42,22 +42,11 @@ uses
 
 type
   TFrmPrincipal = class(TForm)
-    { Menu principal }
-    mnuPrincipal    : TMainMenu;
-    mnuSistema      : TMenuItem;
-    mnuConfiguracoes: TMenuItem;
-    mnuSeparador1   : TMenuItem;
-    mnuSair         : TMenuItem;
-    mnuFerramentas  : TMenuItem;
-    mnuAtualizar    : TMenuItem;
 
     { Topo }
     pnlTopo           : TPanel;
     lblTitulo         : TLabel;
     lblMesAno         : TLabel;
-    pnlModoEnvio      : TPanel;
-    rbEnviarLote      : TRadioButton;
-    rbEnviarIndividual: TRadioButton;
     btnAtualizar      : TSpeedButton;
 
     { Cards }
@@ -339,23 +328,17 @@ begin
   DesativarTema(pnlCardVarjota);
   DesativarTema(pnlCardSeisBocas);
   DesativarTema(pnlStatus);
-  DesativarTema(pnlModoEnvio);
 
   pnlTopo.BevelOuter      := bvNone;
-  pnlModoEnvio.BevelOuter := bvNone;
   pnlCards.BevelOuter     := bvNone;
   pnlStatus.BevelOuter    := bvNone;
 
   lblTitulo.Caption  := 'Monitor de Emissão de RPS';
   lblMesAno.Caption  := FormatDateTime('MMMM/YYYY', Now);
 
-  rbEnviarLote.Caption       := '  Enviar em Lote';
-  rbEnviarLote.Checked       := True;
-  rbEnviarIndividual.Caption := '  Enviar Individual';
 
   btnAtualizar.Caption    := #$2635 + '  Atualizar';
   btnAtualizar.Flat       := True;
-  btnAtualizar.Font.Color := clWhite;
   btnAtualizar.Font.Style := [fsBold];
 
   lblStatus.Caption      := 'Pronto.';
@@ -762,8 +745,6 @@ begin
   pnlCardVarjota.SetBounds(LMargemLeft + 2 * (CARD_W + GAP),   LTop, CARD_W, CARD_H);
   pnlCardSeisBocas.SetBounds(LMargemLeft + 3 * (CARD_W + GAP), LTop, CARD_W, CARD_H);
 
-  { Centralizar pnlModoEnvio no topo igual aos cards }
-  pnlModoEnvio.Left := (pnlTopo.Width - pnlModoEnvio.Width) div 2;
 end;
 
 procedure TFrmPrincipal.FormResize(Sender: TObject);

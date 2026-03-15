@@ -229,6 +229,9 @@ object FrmPrincipal: TFrmPrincipal
     BevelOuter = bvNone
     Color = clWhite
     TabOrder = 0
+    DesignSize = (
+      1440
+      60)
     object lblTitulo: TLabel
       Left = 20
       Top = 8
@@ -256,58 +259,20 @@ object FrmPrincipal: TFrmPrincipal
       ParentFont = False
     end
     object btnAtualizar: TSpeedButton
-      Left = 1108
-      Top = 14
-      Width = 100
-      Height = 32
+      Left = 1316
+      Top = 12
+      Width = 112
+      Height = 36
+      Anchors = [akTop, akRight]
       Caption = #8635'  Atualizar'
       Flat = True
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
+      Font.Color = clGreen
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
       OnClick = btnAtualizarClick
-    end
-    object pnlModoEnvio: TPanel
-      Left = 580
-      Top = 10
-      Width = 420
-      Height = 40
-      BevelOuter = bvNone
-      Color = clWhite
-      TabOrder = 0
-      object rbEnviarLote: TRadioButton
-        Left = 8
-        Top = 10
-        Width = 180
-        Height = 22
-        Caption = '  Enviar em Lote'
-        Checked = True
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = 3552822
-        Font.Height = -13
-        Font.Name = 'Segoe UI'
-        Font.Style = [fsBold]
-        ParentFont = False
-        TabOrder = 0
-        TabStop = True
-      end
-      object rbEnviarIndividual: TRadioButton
-        Left = 200
-        Top = 10
-        Width = 210
-        Height = 22
-        Caption = '  Enviar Individual'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = 8026746
-        Font.Height = -13
-        Font.Name = 'Segoe UI'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 1
-      end
     end
   end
   object pnlCards: TPanel
