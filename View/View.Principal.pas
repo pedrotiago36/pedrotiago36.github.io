@@ -1,4 +1,4 @@
-﻿unit View.Principal;
+unit View.Principal;
 
 interface
 
@@ -38,7 +38,8 @@ uses
   Controller.IPrincipal,
   Controller.TPrincipal,
   { Model }
-  Model.IEstatisticasUnidade, DBGridEhGrouping, DBGridEhToolCtrls, DynVarsEh;
+  Model.IEstatisticasUnidade, DBGridEhGrouping, DBGridEhToolCtrls, DynVarsEh,
+  System.ImageList, Vcl.ImgList;
 
 type
   TFrmPrincipal = class(TForm)
@@ -87,12 +88,12 @@ type
     tabSeisBocas: TTabSheet;
 
     { PageControl 2 - Tipo - SEDE }
-    pgcTipoSede      : TPageControl;
+    pgcTipoEnvio     : TPageControl;
     tabLoteSede      : TTabSheet;
     tabIndividualSede: TTabSheet;
 
     { PageControl 3 - Situacao Lote - SEDE }
-    pgcSitLoteSede : TPageControl;
+    pgcSituacao      : TPageControl;
     tabEnvLoteSede : TTabSheet;
     tabCancLoteSede: TTabSheet;
 
@@ -207,11 +208,18 @@ type
     { StatusBar }
     pnlStatus: TPanel;
     lblStatus: TLabel;
+    imgl_BotoesGrid: TImageList;
 
     { Eventos }
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormResize(Sender: TObject);
+    procedure pgcUnidadesDrawTab(Control: TCustomTabControl;
+      TabIndex: Integer; const Rect: TRect; Active: Boolean);
+    procedure pgcTipoEnvioDrawTab(Control: TCustomTabControl;
+      TabIndex: Integer; const Rect: TRect; Active: Boolean);
+    procedure pgcSituacaoDrawTab(Control: TCustomTabControl;
+      TabIndex: Integer; const Rect: TRect; Active: Boolean);
     procedure lblMenuConfigClick(Sender: TObject);
     procedure lblMenuSairClick(Sender: TObject);
     procedure btnAtualizarClick(Sender: TObject);
@@ -241,7 +249,7 @@ type
     procedure AbrirUnidadeESituacao(const AUnidade: TNomeUnidade;
       const ASituacao: string);
     procedure AcionarCelula(const AGrid: TDBGridEh;
-      const AUnidade: TNomeUnidade; const AColuna: TColumnEh);
+      const AUnidade: TNomeUnidade; const ABotaoIndex: Integer);
     procedure AbrirTelaConfiguracoes;
     procedure InicializarMemTable(const AMt: TFDMemTable;
       const AComBotoes: Boolean);
@@ -486,50 +494,86 @@ begin
   case AComBotoes of
     True: begin
       LCol := AGrid.Columns.Add;
-      LCol.FieldName := 'CodVerificacao'; LCol.Title.Caption := 'Cod. Verif.'; LCol.Width := 110;
+      LCol.FieldName     := 'CodVerificacao';
+      LCol.Title.Caption := 'Cod. Verif.';
+      LCol.Width         := 110;
+
+      { Coluna de ações — 2 botões lado a lado }
       LCol := AGrid.Columns.Add;
-      LCol.FieldName := 'AcaoCancelar';   LCol.Title.Caption := 'Cancelar';    LCol.Width := 90;
-      LCol.CellButtons.Add;
-      LCol := AGrid.Columns.Add;
-      LCol.FieldName := 'AcaoDANFSe';     LCol.Title.Caption := 'DANFE';       LCol.Width := 90;
-      LCol.CellButtons.Add;
+      LCol.FieldName     := '';
+      LCol.Title.Caption := 'A'#231#245'es';
+      LCol.Width         := 64;
+      LCol.ReadOnly      := True;
+      LCol.TextEditing   := False;
+
+      { Botão 0 — Cancelar NFSe: ícone índice 0 do ImageList }
+      with LCol.CellButtons.Add do
+      begin
+        Style                := ebsGlyphEh;
+        Hint                 := 'Cancelar NFSe';
+        Width                := 28;
+        HorzPlacement        := ebhpLeftEh;
+        Images.NormalImages  := imgl_BotoesGrid;
+        Images.NormalIndex   := 0;
+      end;
+      { Botão 1 — Imprimir DANFE: ícone índice 1 do ImageList }
+      with LCol.CellButtons.Add do
+      begin
+        Style                := ebsGlyphEh;
+        Hint                 := 'Imprimir DANFE';
+        Width                := 28;
+        HorzPlacement        := ebhpLeftEh;
+        Images.NormalImages  := imgl_BotoesGrid;
+        Images.NormalIndex   := 1;
+      end;
     end;
     False: begin
       LCol := AGrid.Columns.Add;
-      LCol.FieldName := 'Situacao'; LCol.Title.Caption := 'Situacao'; LCol.Width := 110;
+      LCol.FieldName     := 'Situacao';
+      LCol.Title.Caption := 'Situa'#231#227'o';
+      LCol.Width         := 110;
     end;
   end;
 end;
 
 procedure TFrmPrincipal.ConfigurarGrids;
+{ Coluna 6 = 'Ações' com CellButtons[0]=Cancelar e CellButtons[1]=DANFE }
 begin
   VincularGrid(grdEnvLoteSede,      dsEnvLoteSede,      mtEnvLoteSede,      True);
   grdEnvLoteSede.Columns[6].CellButtons[0].OnMouseClick := grdEnvLoteSedeCellButtonClick;
-  grdEnvLoteSede.Columns[7].CellButtons[0].OnMouseClick := grdEnvLoteSedeCellButtonClick;
+  grdEnvLoteSede.Columns[6].CellButtons[1].OnMouseClick := grdEnvLoteSedeCellButtonClick;
 
   VincularGrid(grdCancLoteSede,     dsCancLoteSede,     mtCancLoteSede,     False);
   VincularGrid(grdEnvIndivSede,     dsEnvIndivSede,     mtEnvIndivSede,     True);
+  grdEnvIndivSede.Columns[6].CellButtons[0].OnMouseClick := grdEnvLoteSedeCellButtonClick;
+  grdEnvIndivSede.Columns[6].CellButtons[1].OnMouseClick := grdEnvLoteSedeCellButtonClick;
 
   VincularGrid(grdEnvLoteUEQ,       dsEnvLoteUEQ,       mtEnvLoteUEQ,       True);
   grdEnvLoteUEQ.Columns[6].CellButtons[0].OnMouseClick := grdEnvLoteUEQCellButtonClick;
-  grdEnvLoteUEQ.Columns[7].CellButtons[0].OnMouseClick := grdEnvLoteUEQCellButtonClick;
+  grdEnvLoteUEQ.Columns[6].CellButtons[1].OnMouseClick := grdEnvLoteUEQCellButtonClick;
 
   VincularGrid(grdCancLoteUEQ,      dsCancLoteUEQ,      mtCancLoteUEQ,      False);
   VincularGrid(grdEnvIndivUEQ,      dsEnvIndivUEQ,      mtEnvIndivUEQ,      True);
+  grdEnvIndivUEQ.Columns[6].CellButtons[0].OnMouseClick := grdEnvLoteUEQCellButtonClick;
+  grdEnvIndivUEQ.Columns[6].CellButtons[1].OnMouseClick := grdEnvLoteUEQCellButtonClick;
 
   VincularGrid(grdEnvLoteVarjota,   dsEnvLoteVarjota,   mtEnvLoteVarjota,   True);
   grdEnvLoteVarjota.Columns[6].CellButtons[0].OnMouseClick := grdEnvLoteVarjotaCellButtonClick;
-  grdEnvLoteVarjota.Columns[7].CellButtons[0].OnMouseClick := grdEnvLoteVarjotaCellButtonClick;
+  grdEnvLoteVarjota.Columns[6].CellButtons[1].OnMouseClick := grdEnvLoteVarjotaCellButtonClick;
 
   VincularGrid(grdCancLoteVarjota,  dsCancLoteVarjota,  mtCancLoteVarjota,  False);
   VincularGrid(grdEnvIndivVarjota,  dsEnvIndivVarjota,  mtEnvIndivVarjota,  True);
+  grdEnvIndivVarjota.Columns[6].CellButtons[0].OnMouseClick := grdEnvLoteVarjotaCellButtonClick;
+  grdEnvIndivVarjota.Columns[6].CellButtons[1].OnMouseClick := grdEnvLoteVarjotaCellButtonClick;
 
   VincularGrid(grdEnvLoteSeisBocas,  dsEnvLoteSeisBocas,  mtEnvLoteSeisBocas,  True);
   grdEnvLoteSeisBocas.Columns[6].CellButtons[0].OnMouseClick := grdEnvLoteSeisBocasCellButtonClick;
-  grdEnvLoteSeisBocas.Columns[7].CellButtons[0].OnMouseClick := grdEnvLoteSeisBocasCellButtonClick;
+  grdEnvLoteSeisBocas.Columns[6].CellButtons[1].OnMouseClick := grdEnvLoteSeisBocasCellButtonClick;
 
   VincularGrid(grdCancLoteSeisBocas, dsCancLoteSeisBocas, mtCancLoteSeisBocas, False);
   VincularGrid(grdEnvIndivSeisBocas, dsEnvIndivSeisBocas, mtEnvIndivSeisBocas, True);
+  grdEnvIndivSeisBocas.Columns[6].CellButtons[0].OnMouseClick := grdEnvLoteSeisBocasCellButtonClick;
+  grdEnvIndivSeisBocas.Columns[6].CellButtons[1].OnMouseClick := grdEnvLoteSeisBocasCellButtonClick;
 end;
 
 { ── Atualizar ───────────────────────────────────────────────── }
@@ -557,7 +601,7 @@ procedure TFrmPrincipal.AbrirUnidadeESituacao(const AUnidade: TNomeUnidade;
 var
   LPgcSit: array[TNomeUnidade] of TPageControl;
 begin
-  LPgcSit[nuSede]      := pgcSitLoteSede;
+  LPgcSit[nuSede]      := pgcSituacao;
   LPgcSit[nuUEQ]       := pgcSitLoteUEQ;
   LPgcSit[nuVarjota]   := pgcSitLoteVarjota;
   LPgcSit[nuSeisBocas] := pgcSitLoteSeisBocas;
@@ -586,16 +630,15 @@ begin AbrirUnidadeESituacao(nuSeisBocas, 'CANCELADA'); end;
 { ── CellButtons ─────────────────────────────────────────────── }
 
 procedure TFrmPrincipal.AcionarCelula(const AGrid: TDBGridEh;
-  const AUnidade: TNomeUnidade; const AColuna: TColumnEh);
+  const AUnidade: TNomeUnidade; const ABotaoIndex: Integer);
+{ Index 0 = Cancelar NFSe   Index 1 = Imprimir DANFE }
 var
   LNumRps: string;
 begin
   LNumRps := AGrid.DataSource.DataSet.FieldByName('NumeroRps').AsString;
-  case AColuna.FieldName = 'AcaoCancelar' of
-    True: FController.ExecutarCancelarRps(LNumRps, NOMES_UNIDADE[AUnidade]);
-  end;
-  case AColuna.FieldName = 'AcaoDANFSe' of
-    True: FController.ExecutarBaixarDANFSe(LNumRps);
+  case ABotaoIndex of
+    0: FController.ExecutarCancelarRps(LNumRps, NOMES_UNIDADE[AUnidade]);
+    1: FController.ExecutarBaixarDANFSe(LNumRps);
   end;
 end;
 
@@ -604,7 +647,7 @@ procedure TFrmPrincipal.grdEnvLoteSedeCellButtonClick(Grid: TCustomDBGridEh;
   MouseButton: TMouseButton; Shift: TShiftState; InButtonPos: TPoint;
   ButtonMouseParams: TCellButtonMouseParamsEh; var Handled: Boolean);
 begin
-  AcionarCelula(grdEnvLoteSede, nuSede, Column);
+  AcionarCelula(grdEnvLoteSede, nuSede, CellButton.Index);
   Handled := True;
 end;
 
@@ -613,7 +656,7 @@ procedure TFrmPrincipal.grdEnvLoteUEQCellButtonClick(Grid: TCustomDBGridEh;
   MouseButton: TMouseButton; Shift: TShiftState; InButtonPos: TPoint;
   ButtonMouseParams: TCellButtonMouseParamsEh; var Handled: Boolean);
 begin
-  AcionarCelula(grdEnvLoteUEQ, nuUEQ, Column);
+  AcionarCelula(grdEnvLoteUEQ, nuUEQ, CellButton.Index);
   Handled := True;
 end;
 
@@ -622,7 +665,7 @@ procedure TFrmPrincipal.grdEnvLoteVarjotaCellButtonClick(Grid: TCustomDBGridEh;
   MouseButton: TMouseButton; Shift: TShiftState; InButtonPos: TPoint;
   ButtonMouseParams: TCellButtonMouseParamsEh; var Handled: Boolean);
 begin
-  AcionarCelula(grdEnvLoteVarjota, nuVarjota, Column);
+  AcionarCelula(grdEnvLoteVarjota, nuVarjota, CellButton.Index);
   Handled := True;
 end;
 
@@ -631,7 +674,7 @@ procedure TFrmPrincipal.grdEnvLoteSeisBocasCellButtonClick(Grid: TCustomDBGridEh
   MouseButton: TMouseButton; Shift: TShiftState; InButtonPos: TPoint;
   ButtonMouseParams: TCellButtonMouseParamsEh; var Handled: Boolean);
 begin
-  AcionarCelula(grdEnvLoteSeisBocas, nuSeisBocas, Column);
+  AcionarCelula(grdEnvLoteSeisBocas, nuSeisBocas, CellButton.Index);
   Handled := True;
 end;
 
@@ -750,6 +793,116 @@ end;
 procedure TFrmPrincipal.FormResize(Sender: TObject);
 begin
   CentralizarCards;
+end;
+
+{ ── Cores das abas ──────────────────────────────────────────── }
+
+procedure TFrmPrincipal.pgcUnidadesDrawTab(Control: TCustomTabControl;
+  TabIndex: Integer; const Rect: TRect; Active: Boolean);
+const
+  BARRA  = 4;
+  CORES: array[0..3] of TColor = (6382321, 961001, 1096065, 16498468);
+  NOMES: array[0..3] of string = ('SEDE', 'UEQ', 'Varjota', 'Seis Bocas');
+var
+  C: TCanvas;
+  RBarra, RTexto: TRect;
+  Idx: Integer;
+begin
+  Idx := TabIndex mod 4;
+  C   := Control.Canvas;
+  case Active of
+    True : C.Brush.Color := clWhite;
+    False: C.Brush.Color := 15921906;
+  end;
+  C.FillRect(Rect);
+  RBarra        := Rect;
+  RBarra.Bottom := RBarra.Top + BARRA;
+  C.Brush.Color := CORES[Idx];
+  C.FillRect(RBarra);
+  RTexto     := Rect;
+  Inc(RTexto.Top, BARRA);
+  C.Brush.Style := bsClear;
+  C.Font.Name   := 'Segoe UI';
+  C.Font.Size   := 9;
+  C.Font.Style  := [fsBold];
+  case Active of
+    True : C.Font.Color := CORES[Idx];
+    False: C.Font.Color := 9868950;
+  end;
+  DrawText(C.Handle, PChar(NOMES[Idx]), -1, RTexto,
+    DT_SINGLELINE or DT_VCENTER or DT_CENTER);
+end;
+
+procedure TFrmPrincipal.pgcTipoEnvioDrawTab(Control: TCustomTabControl;
+  TabIndex: Integer; const Rect: TRect; Active: Boolean);
+const
+  BARRA  = 4;
+  CORES: array[0..1] of TColor = (7040122, 14120960);
+  NOMES: array[0..1] of string = ('Lotes', 'Individual');
+var
+  C: TCanvas;
+  RBarra, RTexto: TRect;
+  Idx: Integer;
+begin
+  Idx := TabIndex mod 2;
+  C   := Control.Canvas;
+  case Active of
+    True : C.Brush.Color := clWhite;
+    False: C.Brush.Color := 15921906;
+  end;
+  C.FillRect(Rect);
+  RBarra        := Rect;
+  RBarra.Bottom := RBarra.Top + BARRA;
+  C.Brush.Color := CORES[Idx];
+  C.FillRect(RBarra);
+  RTexto     := Rect;
+  Inc(RTexto.Top, BARRA);
+  C.Brush.Style := bsClear;
+  C.Font.Name   := 'Segoe UI';
+  C.Font.Size   := 9;
+  C.Font.Style  := [fsBold];
+  case Active of
+    True : C.Font.Color := CORES[Idx];
+    False: C.Font.Color := 9868950;
+  end;
+  DrawText(C.Handle, PChar(NOMES[Idx]), -1, RTexto,
+    DT_SINGLELINE or DT_VCENTER or DT_CENTER);
+end;
+
+procedure TFrmPrincipal.pgcSituacaoDrawTab(Control: TCustomTabControl;
+  TabIndex: Integer; const Rect: TRect; Active: Boolean);
+const
+  BARRA  = 4;
+  CORES: array[0..1] of TColor = (961001, 13382400);
+  NOMES: array[0..1] of string = ('Enviadas', 'Canceladas');
+var
+  C: TCanvas;
+  RBarra, RTexto: TRect;
+  Idx: Integer;
+begin
+  Idx := TabIndex mod 2;
+  C   := Control.Canvas;
+  case Active of
+    True : C.Brush.Color := clWhite;
+    False: C.Brush.Color := 15921906;
+  end;
+  C.FillRect(Rect);
+  RBarra        := Rect;
+  RBarra.Bottom := RBarra.Top + BARRA;
+  C.Brush.Color := CORES[Idx];
+  C.FillRect(RBarra);
+  RTexto     := Rect;
+  Inc(RTexto.Top, BARRA);
+  C.Brush.Style := bsClear;
+  C.Font.Name   := 'Segoe UI';
+  C.Font.Size   := 9;
+  C.Font.Style  := [fsBold];
+  case Active of
+    True : C.Font.Color := CORES[Idx];
+    False: C.Font.Color := 9868950;
+  end;
+  DrawText(C.Handle, PChar(NOMES[Idx]), -1, RTexto,
+    DT_SINGLELINE or DT_VCENTER or DT_CENTER);
 end;
 
 end.

@@ -1,4 +1,4 @@
-unit View.Configuracao;
+﻿unit View.Configuracao;
 // Claude Code esteve aqui
 
 interface
@@ -65,6 +65,8 @@ type
     lblGrpModoEnvio  : TLabel;
     rbEnviarLote     : TRadioButton;
     rbEnviarIndividual: TRadioButton;
+    lblDataEnvio     : TLabel;
+    edtDataEnvio     : TEdit;
 
     { Thread }
     pnlThread        : TPanel;
@@ -221,6 +223,7 @@ begin
   edtDirErro.Text            := LDados.DiretorioRpsErro;
   edtDirIni.Text             := LDados.DiretorioArquivoIni;
   chbLigDesl_Thread.Checked  := LDados.ThreadAtiva;
+  edtDataEnvio.Text          := LDados.DataEnvio;
   AtualizarCaptionThread;
 end;
 
@@ -234,6 +237,7 @@ begin
   LDados.DiretorioRpsErro     := edtDirErro.Text;
   LDados.DiretorioArquivoIni  := edtDirIni.Text;
   LDados.ThreadAtiva          := chbLigDesl_Thread.Checked;
+  LDados.DataEnvio            := edtDataEnvio.Text;
   FConfiguracao.Atualizar(LDados);
 end;
 

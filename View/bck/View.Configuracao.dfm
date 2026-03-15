@@ -14,7 +14,7 @@ object FrmConfiguracao: TFrmConfiguracao
   Font.Style = []
   Position = poScreenCenter
   OnCreate = FormCreate
-  TextHeight = 16
+  TextHeight = 17
   object pnlTopo: TPanel
     Left = 0
     Top = 0
@@ -28,8 +28,8 @@ object FrmConfiguracao: TFrmConfiguracao
     object lblTitulo: TLabel
       Left = 20
       Top = 10
-      Width = 300
-      Height = 28
+      Width = 246
+      Height = 30
       Caption = 'Configura'#231#227'o do Sistema'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWhite
@@ -41,8 +41,8 @@ object FrmConfiguracao: TFrmConfiguracao
     object lblVersao: TLabel
       Left = 22
       Top = 44
-      Width = 200
-      Height = 16
+      Width = 107
+      Height = 15
       Caption = 'NFSe Emissor  '#183'  v1.0'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = 7107965
@@ -65,8 +65,8 @@ object FrmConfiguracao: TFrmConfiguracao
     object lblStatus: TLabel
       Left = 12
       Top = 4
-      Width = 60
-      Height = 16
+      Width = 39
+      Height = 15
       Caption = 'Pronto.'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = 7368816
@@ -128,35 +128,11 @@ object FrmConfiguracao: TFrmConfiguracao
       Color = clWhite
       ParentBackground = False
       TabOrder = 0
-      object pnlWebServiceTopo: TPanel
-        Left = 0
-        Top = 0
-        Width = 688
-        Height = 32
-        Align = alTop
-        BevelOuter = bvNone
-        Color = 14737479
-        ParentBackground = False
-        TabOrder = 0
-        object lblGrpWebService: TLabel
-          Left = 14
-          Top = 8
-          Width = 200
-          Height = 16
-          Caption = '#9881  Endere'#231'os dos WebServices'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = 1977147
-          Font.Height = -13
-          Font.Name = 'Segoe UI'
-          Font.Style = [fsBold]
-          ParentFont = False
-        end
-      end
       object lblHomologacao: TLabel
         Left = 14
         Top = 44
-        Width = 96
-        Height = 16
+        Width = 79
+        Height = 15
         Caption = 'Homologa'#231#227'o:'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = 5987163
@@ -168,8 +144,8 @@ object FrmConfiguracao: TFrmConfiguracao
       object lblProducao: TLabel
         Left = 14
         Top = 76
-        Width = 60
-        Height = 16
+        Width = 54
+        Height = 15
         Caption = 'Produ'#231#227'o:'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = 5987163
@@ -178,11 +154,35 @@ object FrmConfiguracao: TFrmConfiguracao
         Font.Style = []
         ParentFont = False
       end
+      object pnlWebServiceTopo: TPanel
+        Left = 0
+        Top = 0
+        Width = 688
+        Height = 32
+        Align = alTop
+        BevelOuter = bvNone
+        Color = clSilver
+        ParentBackground = False
+        TabOrder = 0
+        object lblGrpWebService: TLabel
+          Left = 14
+          Top = 8
+          Width = 170
+          Height = 17
+          Caption = 'Endere'#231'os dos WebServices'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = 1977147
+          Font.Height = -13
+          Font.Name = 'Segoe UI'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+      end
       object edtUrlHomologacao: TEdit
         Left = 120
         Top = 40
         Width = 554
-        Height = 24
+        Height = 23
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
@@ -196,7 +196,7 @@ object FrmConfiguracao: TFrmConfiguracao
         Left = 120
         Top = 72
         Width = 554
-        Height = 24
+        Height = 23
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
@@ -216,35 +216,11 @@ object FrmConfiguracao: TFrmConfiguracao
       Color = clWhite
       ParentBackground = False
       TabOrder = 1
-      object pnlDiretoiriosTopo: TPanel
-        Left = 0
-        Top = 0
-        Width = 688
-        Height = 32
-        Align = alTop
-        BevelOuter = bvNone
-        Color = 14737479
-        ParentBackground = False
-        TabOrder = 0
-        object lblGrpDiretorios: TLabel
-          Left = 14
-          Top = 8
-          Width = 220
-          Height = 16
-          Caption = '#128193  Diret'#243'rios de Armazenamento'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = 1977147
-          Font.Height = -13
-          Font.Name = 'Segoe UI'
-          Font.Style = [fsBold]
-          ParentFont = False
-        end
-      end
       object lblDirEnviados: TLabel
         Left = 14
         Top = 44
-        Width = 82
-        Height = 16
+        Width = 73
+        Height = 15
         Caption = 'RPS Enviados:'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = 5987163
@@ -256,8 +232,8 @@ object FrmConfiguracao: TFrmConfiguracao
       object lblDirErro: TLabel
         Left = 14
         Top = 76
-        Width = 80
-        Height = 16
+        Width = 74
+        Height = 15
         Caption = 'RPS com Erro:'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = 5987163
@@ -269,8 +245,8 @@ object FrmConfiguracao: TFrmConfiguracao
       object lblDirIni: TLabel
         Left = 14
         Top = 108
-        Width = 68
-        Height = 16
+        Width = 64
+        Height = 15
         Caption = 'Arquivo .ini:'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = 5987163
@@ -278,48 +254,6 @@ object FrmConfiguracao: TFrmConfiguracao
         Font.Name = 'Segoe UI'
         Font.Style = []
         ParentFont = False
-      end
-      object edtDirEnviados: TEdit
-        Left = 120
-        Top = 40
-        Width = 532
-        Height = 24
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -12
-        Font.Name = 'Segoe UI'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 1
-        TextHint = 'Ex: C:\NFSe\Enviados'
-      end
-      object edtDirErro: TEdit
-        Left = 120
-        Top = 72
-        Width = 532
-        Height = 24
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -12
-        Font.Name = 'Segoe UI'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 2
-        TextHint = 'Ex: C:\NFSe\Erros'
-      end
-      object edtDirIni: TEdit
-        Left = 120
-        Top = 104
-        Width = 532
-        Height = 24
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -12
-        Font.Name = 'Segoe UI'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 3
-        TextHint = 'Ex: C:\NFSe\Config'
       end
       object btnDirEnviados: TSpeedButton
         Left = 656
@@ -348,16 +282,97 @@ object FrmConfiguracao: TFrmConfiguracao
         Flat = True
         OnClick = btnDirIniClick
       end
+      object pnlDiretoiriosTopo: TPanel
+        Left = 0
+        Top = 0
+        Width = 688
+        Height = 32
+        Align = alTop
+        BevelOuter = bvNone
+        Color = 13303807
+        ParentBackground = False
+        TabOrder = 0
+        object lblGrpDiretorios: TLabel
+          Left = 14
+          Top = 8
+          Width = 186
+          Height = 17
+          Caption = 'Diret'#243'rios de Armazenamento'
+          Color = -1
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = 1977147
+          Font.Height = -13
+          Font.Name = 'Segoe UI'
+          Font.Style = [fsBold]
+          ParentColor = False
+          ParentFont = False
+        end
+      end
+      object edtDirEnviados: TEdit
+        Left = 120
+        Top = 40
+        Width = 532
+        Height = 23
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 1
+        TextHint = 'Ex: C:\NFSe\Enviados'
+      end
+      object edtDirErro: TEdit
+        Left = 120
+        Top = 72
+        Width = 532
+        Height = 23
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 2
+        TextHint = 'Ex: C:\NFSe\Erros'
+      end
+      object edtDirIni: TEdit
+        Left = 120
+        Top = 104
+        Width = 532
+        Height = 23
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 3
+        TextHint = 'Ex: C:\NFSe\Config'
+      end
     end
     object pnlModoEnvio: TPanel
       Left = 16
       Top = 300
       Width = 336
-      Height = 80
+      Height = 120
       BevelOuter = bvNone
       Color = clWhite
       ParentBackground = False
       TabOrder = 2
+      object lblDataEnvio: TLabel
+        Left = 16
+        Top = 73
+        Width = 75
+        Height = 15
+        Caption = 'Data de Envio:'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 5987163
+        Font.Height = -12
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ParentFont = False
+      end
       object pnlModoEnvioTopo: TPanel
         Left = 0
         Top = 0
@@ -365,20 +380,22 @@ object FrmConfiguracao: TFrmConfiguracao
         Height = 32
         Align = alTop
         BevelOuter = bvNone
-        Color = 14737479
+        Color = 4227200
         ParentBackground = False
         TabOrder = 0
         object lblGrpModoEnvio: TLabel
           Left = 14
           Top = 8
-          Width = 120
-          Height = 16
-          Caption = '#128228  Modo de Envio'
+          Width = 93
+          Height = 17
+          Caption = 'Modo de Envio'
+          Color = clWhite
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 1977147
+          Font.Color = clWhite
           Font.Height = -13
           Font.Name = 'Segoe UI'
           Font.Style = [fsBold]
+          ParentColor = False
           ParentFont = False
         end
       end
@@ -412,12 +429,25 @@ object FrmConfiguracao: TFrmConfiguracao
         ParentFont = False
         TabOrder = 2
       end
+      object edtDataEnvio: TEdit
+        Left = 172
+        Top = 69
+        Width = 55
+        Height = 23
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 3
+      end
     end
     object pnlThread: TPanel
       Left = 368
       Top = 300
       Width = 336
-      Height = 80
+      Height = 120
       BevelOuter = bvNone
       Color = clWhite
       ParentBackground = False
@@ -429,20 +459,22 @@ object FrmConfiguracao: TFrmConfiguracao
         Height = 32
         Align = alTop
         BevelOuter = bvNone
-        Color = 14737479
+        Color = clMaroon
         ParentBackground = False
         TabOrder = 0
         object lblGrpThread: TLabel
           Left = 14
           Top = 8
-          Width = 160
-          Height = 16
-          Caption = '#9881  Controle de Thread'
+          Width = 119
+          Height = 17
+          Caption = 'Controle de Thread'
+          Color = clWhite
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 1977147
+          Font.Color = clWhite
           Font.Height = -13
           Font.Name = 'Segoe UI'
           Font.Style = [fsBold]
+          ParentColor = False
           ParentFont = False
         end
       end
