@@ -18,7 +18,7 @@ uses
   Vcl.ComCtrls,
   Vcl.Menus,
   Data.DB,
-  { EHLib }
+  { EhLib }
   GridsEh,
   DBGridEh,
   ToolCtrlsEh,
@@ -35,10 +35,12 @@ uses
   FireDAC.Comp.DataSet,
   FireDAC.Comp.Client,
   { Controller }
-  Controller.IPrincipal,
   Controller.TPrincipal,
   { Model }
-  Model.IEstatisticasUnidade, DBGridEhGrouping, DBGridEhToolCtrls, DynVarsEh,
+  Model.IEstatisticasUnidade,
+  { Utils }
+  View.Utils.Principal,
+  DBGridEhGrouping, DBGridEhToolCtrls, DynVarsEh,
   System.ImageList, Vcl.ImgList;
 
 type
@@ -93,14 +95,14 @@ type
     tabIndividualSede: TTabSheet;
 
     { PageControl 3 - Situacao Lote - SEDE }
-    pgcSituacao      : TPageControl;
-    tabEnvLoteSede : TTabSheet;
-    tabCancLoteSede: TTabSheet;
+    pgcSituacao     : TPageControl;
+    tabEnvLoteSede  : TTabSheet;
+    tabCancLoteSede : TTabSheet;
 
     { PageControl 3 - Situacao Individual - SEDE }
-    pgcSitIndivSede : TPageControl;
-    tabEnvIndivSede : TTabSheet;
-    tabCancIndivSede: TTabSheet;
+    pgcSitIndivSede  : TPageControl;
+    tabEnvIndivSede  : TTabSheet;
+    tabCancIndivSede : TTabSheet;
 
     { PageControl 2 - Tipo - UEQ }
     pgcTipoUEQ      : TPageControl;
@@ -108,14 +110,14 @@ type
     tabIndividualUEQ: TTabSheet;
 
     { PageControl 3 - Situacao Lote - UEQ }
-    pgcSitLoteUEQ : TPageControl;
-    tabEnvLoteUEQ : TTabSheet;
-    tabCancLoteUEQ: TTabSheet;
+    pgcSitLoteUEQ  : TPageControl;
+    tabEnvLoteUEQ  : TTabSheet;
+    tabCancLoteUEQ : TTabSheet;
 
     { PageControl 3 - Situacao Individual - UEQ }
-    pgcSitIndivUEQ : TPageControl;
-    tabEnvIndivUEQ : TTabSheet;
-    tabCancIndivUEQ: TTabSheet;
+    pgcSitIndivUEQ  : TPageControl;
+    tabEnvIndivUEQ  : TTabSheet;
+    tabCancIndivUEQ : TTabSheet;
 
     { PageControl 2 - Tipo - Varjota }
     pgcTipoVarjota      : TPageControl;
@@ -123,14 +125,14 @@ type
     tabIndividualVarjota: TTabSheet;
 
     { PageControl 3 - Situacao Lote - Varjota }
-    pgcSitLoteVarjota : TPageControl;
-    tabEnvLoteVarjota : TTabSheet;
-    tabCancLoteVarjota: TTabSheet;
+    pgcSitLoteVarjota  : TPageControl;
+    tabEnvLoteVarjota  : TTabSheet;
+    tabCancLoteVarjota : TTabSheet;
 
     { PageControl 3 - Situacao Individual - Varjota }
-    pgcSitIndivVarjota : TPageControl;
-    tabEnvIndivVarjota : TTabSheet;
-    tabCancIndivVarjota: TTabSheet;
+    pgcSitIndivVarjota  : TPageControl;
+    tabEnvIndivVarjota  : TTabSheet;
+    tabCancIndivVarjota : TTabSheet;
 
     { PageControl 2 - Tipo - SeisBocas }
     pgcTipoSeisBocas      : TPageControl;
@@ -138,14 +140,14 @@ type
     tabIndividualSeisBocas: TTabSheet;
 
     { PageControl 3 - Situacao Lote - SeisBocas }
-    pgcSitLoteSeisBocas : TPageControl;
-    tabEnvLoteSeisBocas : TTabSheet;
-    tabCancLoteSeisBocas: TTabSheet;
+    pgcSitLoteSeisBocas  : TPageControl;
+    tabEnvLoteSeisBocas  : TTabSheet;
+    tabCancLoteSeisBocas : TTabSheet;
 
     { PageControl 3 - Situacao Individual - SeisBocas }
-    pgcSitIndivSeisBocas : TPageControl;
-    tabEnvIndivSeisBocas : TTabSheet;
-    tabCancIndivSeisBocas: TTabSheet;
+    pgcSitIndivSeisBocas  : TPageControl;
+    tabEnvIndivSeisBocas  : TTabSheet;
+    tabCancIndivSeisBocas : TTabSheet;
 
     { Grids }
     grdEnvLoteSede      : TDBGridEh;
@@ -206,23 +208,29 @@ type
     lblMenuSair     : TLabel;
 
     { StatusBar }
-    pnlStatus: TPanel;
-    lblStatus: TLabel;
+    pnlStatus      : TPanel;
+    lblStatus      : TLabel;
     imgl_BotoesGrid: TImageList;
 
-    { Eventos }
+    { Eventos de form }
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormResize(Sender: TObject);
+
+    { Eventos de tab }
     procedure pgcUnidadesDrawTab(Control: TCustomTabControl;
       TabIndex: Integer; const Rect: TRect; Active: Boolean);
     procedure pgcTipoEnvioDrawTab(Control: TCustomTabControl;
       TabIndex: Integer; const Rect: TRect; Active: Boolean);
     procedure pgcSituacaoDrawTab(Control: TCustomTabControl;
       TabIndex: Integer; const Rect: TRect; Active: Boolean);
+
+    { Eventos de menu }
     procedure lblMenuConfigClick(Sender: TObject);
     procedure lblMenuSairClick(Sender: TObject);
     procedure btnAtualizarClick(Sender: TObject);
+
+    { Eventos de cards }
     procedure lblCardQtdEnvSedeClick(Sender: TObject);
     procedure lblCardQtdCancSedeClick(Sender: TObject);
     procedure lblCardQtdEnvUEQClick(Sender: TObject);
@@ -231,34 +239,19 @@ type
     procedure lblCardQtdCancVarjotaClick(Sender: TObject);
     procedure lblCardQtdEnvSeisBocasClick(Sender: TObject);
     procedure lblCardQtdCancSeisBocasClick(Sender: TObject);
+
+    { Eventos de grid }
     procedure grdEnvLoteSedeCellButtonClick(Grid: TCustomDBGridEh; Column: TColumnEh; CellButton: TDBGridCellButtonEh; MouseButton: TMouseButton; Shift: TShiftState; InButtonPos: TPoint; ButtonMouseParams: TCellButtonMouseParamsEh; var Handled: Boolean);
     procedure grdEnvLoteUEQCellButtonClick(Grid: TCustomDBGridEh; Column: TColumnEh; CellButton: TDBGridCellButtonEh; MouseButton: TMouseButton; Shift: TShiftState; InButtonPos: TPoint; ButtonMouseParams: TCellButtonMouseParamsEh; var Handled: Boolean);
     procedure grdEnvLoteVarjotaCellButtonClick(Grid: TCustomDBGridEh; Column: TColumnEh; CellButton: TDBGridCellButtonEh; MouseButton: TMouseButton; Shift: TShiftState; InButtonPos: TPoint; ButtonMouseParams: TCellButtonMouseParamsEh; var Handled: Boolean);
     procedure grdEnvLoteSeisBocasCellButtonClick(Grid: TCustomDBGridEh; Column: TColumnEh; CellButton: TDBGridCellButtonEh; MouseButton: TMouseButton; Shift: TShiftState; InButtonPos: TPoint; ButtonMouseParams: TCellButtonMouseParamsEh; var Handled: Boolean);
 
-  private
-    FController: IControllerPrincipal;
-
-    procedure ConfigurarVisual;
-    procedure ConfigurarCards;
-    procedure ConfigurarMemTables;
-    procedure ConfigurarGrids;
-    procedure AtualizarCards;
-    procedure AtualizarTodasAsGrids;
-    procedure ExibirStatus(const AMensagem: string; const ACor: TColor);
-    procedure AbrirUnidadeESituacao(const AUnidade: TNomeUnidade;
-      const ASituacao: string);
-    procedure AcionarCelula(const AGrid: TDBGridEh;
-      const AUnidade: TNomeUnidade; const ABotaoIndex: Integer);
-    procedure AbrirTelaConfiguracoes;
-    procedure InicializarMemTable(const AMt: TFDMemTable;
-      const AComBotoes: Boolean);
-    procedure VincularGrid(const AGrid: TDBGridEh; const ADs: TDataSource;
-      const AMt: TFDMemTable; const AComBotoes: Boolean);
-    procedure AplicarHoverMenu(const ALbl: TLabel; const AAtivo: Boolean);
+    { Eventos de sidebar }
     procedure SidebarMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure SidebarMouseLeave(Sender: TObject);
-    procedure CentralizarCards;
+
+  private
+    FController: TControllerPrincipal;
   end;
 
 var
@@ -274,85 +267,131 @@ uses
 {$R *.dfm}
 
 const
-  COR_TOPO    : TColor = $00B05820;
-  COR_FUNDO   : TColor = $00F0F2F5;
-  COR_CARD    : TColor = $00FFFFFF;
-  COR_VERDE   : TColor = $002E7D32;
-  COR_VERM    : TColor = $00C62828;
-  COR_GRID_ODD: TColor = $00F8FAFC;
-  COR_GRID_HDR: TColor = $00EEF2FF;
-  COR_OK      : TColor = $00007700;
+  COR_OK: TColor = $00007700;
 
   NOMES_UNIDADE: array[TNomeUnidade] of string = (
     'SEDE', 'UEQ', 'Varjota', 'Seis Bocas');
 
-  IDX_UNIDADE: array[TNomeUnidade] of Integer = (0, 1, 2, 3);
+{ ── Helpers internos de arquivo ────────────────────────────────── }
 
-{ TFrmPrincipal }
+procedure AtualizarTudo(const AController: TControllerPrincipal;
+  const AForm: TFrmPrincipal);
+begin
+  TViewUtilsPrincipal.AtualizarCards(AController,
+    AForm.lblCardQtdEnvSede,      AForm.lblCardQtdCancSede,
+    AForm.lblCardQtdEnvUEQ,       AForm.lblCardQtdCancUEQ,
+    AForm.lblCardQtdEnvVarjota,   AForm.lblCardQtdCancVarjota,
+    AForm.lblCardQtdEnvSeisBocas, AForm.lblCardQtdCancSeisBocas);
+
+  TViewUtilsPrincipal.AtualizarTodasAsGrids(AController,
+    [AForm.mtEnvLoteSede,    AForm.mtCancLoteSede,    AForm.mtEnvIndivSede,
+     AForm.mtEnvLoteUEQ,     AForm.mtCancLoteUEQ,     AForm.mtEnvIndivUEQ,
+     AForm.mtEnvLoteVarjota, AForm.mtCancLoteVarjota, AForm.mtEnvIndivVarjota,
+     AForm.mtEnvLoteSeisBocas, AForm.mtCancLoteSeisBocas, AForm.mtEnvIndivSeisBocas],
+    [nuSede,    nuSede,    nuSede,
+     nuUEQ,     nuUEQ,     nuUEQ,
+     nuVarjota, nuVarjota, nuVarjota,
+     nuSeisBocas, nuSeisBocas, nuSeisBocas],
+    ['ENVIADA', 'CANCELADA', 'ENVIADA',
+     'ENVIADA', 'CANCELADA', 'ENVIADA',
+     'ENVIADA', 'CANCELADA', 'ENVIADA',
+     'ENVIADA', 'CANCELADA', 'ENVIADA']);
+end;
+
+procedure Navegar(const AUnidade: TNomeUnidade; const ASituacao: string;
+  const AForm: TFrmPrincipal);
+begin
+  TViewUtilsPrincipal.AbrirUnidadeESituacao(AUnidade, ASituacao,
+    AForm.pgcUnidades,
+    AForm.pgcSituacao,    AForm.pgcSitLoteUEQ,
+    AForm.pgcSitLoteVarjota, AForm.pgcSitLoteSeisBocas);
+end;
+
+{ ── Form ───────────────────────────────────────────────────────── }
 
 procedure TFrmPrincipal.FormCreate(Sender: TObject);
 begin
   FController := TControllerPrincipal.Criar;
   FController.Inicializar;
-  ConfigurarVisual;
-  ConfigurarCards;
-  ConfigurarMemTables;
-  ConfigurarGrids;
-  AtualizarCards;
-  AtualizarTodasAsGrids;
-  Self.OnResize := FormResize;
-  ExibirStatus('Sistema iniciado. ' +
-    FormatDateTime('dd/mm/yyyy hh:nn', Now), COR_OK);
-end;
 
-procedure TFrmPrincipal.FormDestroy(Sender: TObject);
-begin
-  FController := nil;
-end;
-
-{ ── Visual ──────────────────────────────────────────────────── }
-
-procedure TFrmPrincipal.ConfigurarVisual;
-
-  procedure DesativarTema(const ACtrl: TWinControl);
-  begin
-    SetWindowTheme(ACtrl.Handle, '', '');
-  end;
-
-begin
-  { Cores definidas no DFM - nao sobrescrever aqui }
   Self.Font.Name := 'Segoe UI';
   Self.Font.Size := 9;
 
-  { Desativar tema do Windows nos panels coloridos para as cores aparecerem }
-  DesativarTema(pnlSidebar);
-  DesativarTema(pnlSidebarTopo);
-  DesativarTema(pnlSidebarMenu);
-  DesativarTema(pnlSidebarRodape);
-  DesativarTema(pnlTopo);
-  DesativarTema(pnlCards);
-  DesativarTema(pnlCardSede);
-  DesativarTema(pnlCardUEQ);
-  DesativarTema(pnlCardVarjota);
-  DesativarTema(pnlCardSeisBocas);
-  DesativarTema(pnlStatus);
+  TViewUtilsPrincipal.DesativarTemasGerais(Self, [
+    pnlSidebar, pnlSidebarTopo, pnlSidebarMenu, pnlSidebarRodape,
+    pnlTopo, pnlCards,
+    pnlCardSede, pnlCardUEQ, pnlCardVarjota, pnlCardSeisBocas,
+    pnlStatus
+  ]);
 
-  pnlTopo.BevelOuter      := bvNone;
-  pnlCards.BevelOuter     := bvNone;
-  pnlStatus.BevelOuter    := bvNone;
+  pnlTopo.BevelOuter   := bvNone;
+  pnlCards.BevelOuter  := bvNone;
+  pnlStatus.BevelOuter := bvNone;
 
-  lblTitulo.Caption  := 'Monitor de Emissão de RPS';
-  lblMesAno.Caption  := FormatDateTime('MMMM/YYYY', Now);
-
-
+  lblTitulo.Caption       := 'Monitor de Emiss' + #227 + 'o de RPS';
+  lblMesAno.Caption       := FormatDateTime('MMMM/YYYY', Now);
   btnAtualizar.Caption    := #$2635 + '  Atualizar';
   btnAtualizar.Flat       := True;
   btnAtualizar.Font.Style := [fsBold];
+  lblStatus.Caption       := 'Pronto.';
+  pgcUnidades.Font.Style  := [fsBold];
 
-  lblStatus.Caption      := 'Pronto.';
-  pgcUnidades.Font.Style := [fsBold];
+  TViewUtilsPrincipal.MontarCard(pnlCardSede,
+    lblCardNomeSede, lblCardEnvSede, lblCardQtdEnvSede,
+    lblCardCancSede, lblCardQtdCancSede, 'SEDE');
+  TViewUtilsPrincipal.MontarCard(pnlCardUEQ,
+    lblCardNomeUEQ, lblCardEnvUEQ, lblCardQtdEnvUEQ,
+    lblCardCancUEQ, lblCardQtdCancUEQ, 'UEQ');
+  TViewUtilsPrincipal.MontarCard(pnlCardVarjota,
+    lblCardNomeVarjota, lblCardEnvVarjota, lblCardQtdEnvVarjota,
+    lblCardCancVarjota, lblCardQtdCancVarjota, 'Varjota');
+  TViewUtilsPrincipal.MontarCard(pnlCardSeisBocas,
+    lblCardNomeSeisBocas, lblCardEnvSeisBocas, lblCardQtdEnvSeisBocas,
+    lblCardCancSeisBocas, lblCardQtdCancSeisBocas, 'Seis Bocas');
 
-  { Hover: atribuir em cada label pois labels consomem evento do panel }
+  TViewUtilsPrincipal.InicializarMemTable(mtEnvLoteSede,       True);
+  TViewUtilsPrincipal.InicializarMemTable(mtCancLoteSede,      False);
+  TViewUtilsPrincipal.InicializarMemTable(mtEnvIndivSede,      True);
+  TViewUtilsPrincipal.InicializarMemTable(mtEnvLoteUEQ,        True);
+  TViewUtilsPrincipal.InicializarMemTable(mtCancLoteUEQ,       False);
+  TViewUtilsPrincipal.InicializarMemTable(mtEnvIndivUEQ,       True);
+  TViewUtilsPrincipal.InicializarMemTable(mtEnvLoteVarjota,    True);
+  TViewUtilsPrincipal.InicializarMemTable(mtCancLoteVarjota,   False);
+  TViewUtilsPrincipal.InicializarMemTable(mtEnvIndivVarjota,   True);
+  TViewUtilsPrincipal.InicializarMemTable(mtEnvLoteSeisBocas,  True);
+  TViewUtilsPrincipal.InicializarMemTable(mtCancLoteSeisBocas, False);
+  TViewUtilsPrincipal.InicializarMemTable(mtEnvIndivSeisBocas, True);
+
+  TViewUtilsPrincipal.VincularGrid(grdEnvLoteSede,      dsEnvLoteSede,      mtEnvLoteSede,      True,  imgl_BotoesGrid);
+  TViewUtilsPrincipal.VincularGrid(grdCancLoteSede,     dsCancLoteSede,     mtCancLoteSede,     False, imgl_BotoesGrid);
+  TViewUtilsPrincipal.VincularGrid(grdEnvIndivSede,     dsEnvIndivSede,     mtEnvIndivSede,     True,  imgl_BotoesGrid);
+  TViewUtilsPrincipal.VincularGrid(grdEnvLoteUEQ,       dsEnvLoteUEQ,       mtEnvLoteUEQ,       True,  imgl_BotoesGrid);
+  TViewUtilsPrincipal.VincularGrid(grdCancLoteUEQ,      dsCancLoteUEQ,      mtCancLoteUEQ,      False, imgl_BotoesGrid);
+  TViewUtilsPrincipal.VincularGrid(grdEnvIndivUEQ,      dsEnvIndivUEQ,      mtEnvIndivUEQ,      True,  imgl_BotoesGrid);
+  TViewUtilsPrincipal.VincularGrid(grdEnvLoteVarjota,   dsEnvLoteVarjota,   mtEnvLoteVarjota,   True,  imgl_BotoesGrid);
+  TViewUtilsPrincipal.VincularGrid(grdCancLoteVarjota,  dsCancLoteVarjota,  mtCancLoteVarjota,  False, imgl_BotoesGrid);
+  TViewUtilsPrincipal.VincularGrid(grdEnvIndivVarjota,  dsEnvIndivVarjota,  mtEnvIndivVarjota,  True,  imgl_BotoesGrid);
+  TViewUtilsPrincipal.VincularGrid(grdEnvLoteSeisBocas,  dsEnvLoteSeisBocas,  mtEnvLoteSeisBocas,  True,  imgl_BotoesGrid);
+  TViewUtilsPrincipal.VincularGrid(grdCancLoteSeisBocas, dsCancLoteSeisBocas, mtCancLoteSeisBocas, False, imgl_BotoesGrid);
+  TViewUtilsPrincipal.VincularGrid(grdEnvIndivSeisBocas, dsEnvIndivSeisBocas, mtEnvIndivSeisBocas, True,  imgl_BotoesGrid);
+
+  grdEnvLoteSede.Columns[6].CellButtons[0].OnMouseClick      := grdEnvLoteSedeCellButtonClick;
+  grdEnvLoteSede.Columns[6].CellButtons[1].OnMouseClick      := grdEnvLoteSedeCellButtonClick;
+  grdEnvIndivSede.Columns[6].CellButtons[0].OnMouseClick     := grdEnvLoteSedeCellButtonClick;
+  grdEnvIndivSede.Columns[6].CellButtons[1].OnMouseClick     := grdEnvLoteSedeCellButtonClick;
+  grdEnvLoteUEQ.Columns[6].CellButtons[0].OnMouseClick       := grdEnvLoteUEQCellButtonClick;
+  grdEnvLoteUEQ.Columns[6].CellButtons[1].OnMouseClick       := grdEnvLoteUEQCellButtonClick;
+  grdEnvIndivUEQ.Columns[6].CellButtons[0].OnMouseClick      := grdEnvLoteUEQCellButtonClick;
+  grdEnvIndivUEQ.Columns[6].CellButtons[1].OnMouseClick      := grdEnvLoteUEQCellButtonClick;
+  grdEnvLoteVarjota.Columns[6].CellButtons[0].OnMouseClick   := grdEnvLoteVarjotaCellButtonClick;
+  grdEnvLoteVarjota.Columns[6].CellButtons[1].OnMouseClick   := grdEnvLoteVarjotaCellButtonClick;
+  grdEnvIndivVarjota.Columns[6].CellButtons[0].OnMouseClick  := grdEnvLoteVarjotaCellButtonClick;
+  grdEnvIndivVarjota.Columns[6].CellButtons[1].OnMouseClick  := grdEnvLoteVarjotaCellButtonClick;
+  grdEnvLoteSeisBocas.Columns[6].CellButtons[0].OnMouseClick  := grdEnvLoteSeisBocasCellButtonClick;
+  grdEnvLoteSeisBocas.Columns[6].CellButtons[1].OnMouseClick  := grdEnvLoteSeisBocasCellButtonClick;
+  grdEnvIndivSeisBocas.Columns[6].CellButtons[0].OnMouseClick := grdEnvLoteSeisBocasCellButtonClick;
+  grdEnvIndivSeisBocas.Columns[6].CellButtons[1].OnMouseClick := grdEnvLoteSeisBocasCellButtonClick;
+
   lblMenuSede.OnMouseMove       := SidebarMouseMove;
   lblMenuSede.OnMouseLeave      := SidebarMouseLeave;
   lblMenuUEQ.OnMouseMove        := SidebarMouseMove;
@@ -365,289 +404,55 @@ begin
   lblMenuConfig.OnMouseLeave    := SidebarMouseLeave;
   lblMenuSair.OnMouseMove       := SidebarMouseMove;
   lblMenuSair.OnMouseLeave      := SidebarMouseLeave;
+
+  TViewUtilsPrincipal.CentralizarCards(pnlCards,
+    [pnlCardSede, pnlCardUEQ, pnlCardVarjota, pnlCardSeisBocas]);
+
+  AtualizarTudo(FController, Self);
+
+  Self.OnResize := FormResize;
+  TViewUtilsPrincipal.ExibirStatus(lblStatus,
+    'Sistema iniciado. ' + FormatDateTime('dd/mm/yyyy hh:nn', Now), COR_OK);
 end;
 
-{ ── Cards ───────────────────────────────────────────────────── }
-
-procedure TFrmPrincipal.ConfigurarCards;
-
-  procedure Montar(const APnl: TPanel;
-    const ANome, AEnvLbl, AEnvQtd, ACancLbl, ACancQtd: TLabel;
-    const ATit: string);
-  begin
-    { Cor dos cards vem do DFM - nao sobrescrever }
-    APnl.BevelOuter := bvNone;
-    APnl.BevelInner := bvNone;
-    ANome.Caption    := ATit;
-    AEnvLbl.Caption  := 'Enviadas';
-    AEnvQtd.Caption  := '0';
-    AEnvQtd.Cursor   := crHandPoint;
-    ACancLbl.Caption := 'Canceladas';
-    ACancQtd.Caption := '0';
-    ACancQtd.Cursor  := crHandPoint;
-  end;
-
+procedure TFrmPrincipal.FormDestroy(Sender: TObject);
 begin
-  Montar(pnlCardSede,
-    lblCardNomeSede,      lblCardEnvSede,      lblCardQtdEnvSede,
-    lblCardCancSede,      lblCardQtdCancSede,      'SEDE');
-  Montar(pnlCardUEQ,
-    lblCardNomeUEQ,       lblCardEnvUEQ,       lblCardQtdEnvUEQ,
-    lblCardCancUEQ,       lblCardQtdCancUEQ,       'UEQ');
-  Montar(pnlCardVarjota,
-    lblCardNomeVarjota,   lblCardEnvVarjota,   lblCardQtdEnvVarjota,
-    lblCardCancVarjota,   lblCardQtdCancVarjota,   'Varjota');
-  Montar(pnlCardSeisBocas,
-    lblCardNomeSeisBocas, lblCardEnvSeisBocas, lblCardQtdEnvSeisBocas,
-    lblCardCancSeisBocas, lblCardQtdCancSeisBocas, 'Seis Bocas');
+  FController := nil;
 end;
 
-procedure TFrmPrincipal.AtualizarCards;
-var
-  LEst: TArrayEstatisticas;
-begin
-  FController.AtualizarCards;
-  FController.ObterEstatisticas(LEst);
-  lblCardQtdEnvSede.Caption       := LEst[nuSede].TotalEnviadas.ToString;
-  lblCardQtdCancSede.Caption      := LEst[nuSede].TotalCanceladas.ToString;
-  lblCardQtdEnvUEQ.Caption        := LEst[nuUEQ].TotalEnviadas.ToString;
-  lblCardQtdCancUEQ.Caption       := LEst[nuUEQ].TotalCanceladas.ToString;
-  lblCardQtdEnvVarjota.Caption    := LEst[nuVarjota].TotalEnviadas.ToString;
-  lblCardQtdCancVarjota.Caption   := LEst[nuVarjota].TotalCanceladas.ToString;
-  lblCardQtdEnvSeisBocas.Caption  := LEst[nuSeisBocas].TotalEnviadas.ToString;
-  lblCardQtdCancSeisBocas.Caption := LEst[nuSeisBocas].TotalCanceladas.ToString;
-end;
-
-{ ── MemTables ───────────────────────────────────────────────── }
-
-procedure TFrmPrincipal.InicializarMemTable(const AMt: TFDMemTable;
-  const AComBotoes: Boolean);
-begin
-  AMt.Close;
-  AMt.FieldDefs.Clear;
-  AMt.FieldDefs.Add('NumeroRps',      ftString, 20);
-  AMt.FieldDefs.Add('SerieRps',       ftString,  5);
-  AMt.FieldDefs.Add('DataEmissao',    ftString, 20);
-  AMt.FieldDefs.Add('Tomador',        ftString, 80);
-  AMt.FieldDefs.Add('ValorServico',   ftString, 20);
-  AMt.FieldDefs.Add('NumeroNFSe',     ftString, 20);
-  AMt.FieldDefs.Add('CodVerificacao', ftString, 20);
-  AMt.FieldDefs.Add('Situacao',       ftString, 15);
-  case AComBotoes of
-    True: begin
-      AMt.FieldDefs.Add('AcaoCancelar', ftString, 15);
-      AMt.FieldDefs.Add('AcaoDANFSe',   ftString, 15);
-    end;
-  end;
-  AMt.CreateDataSet;
-end;
-
-procedure TFrmPrincipal.ConfigurarMemTables;
-begin
-  InicializarMemTable(mtEnvLoteSede,       True);
-  InicializarMemTable(mtCancLoteSede,      False);
-  InicializarMemTable(mtEnvIndivSede,      True);
-  InicializarMemTable(mtEnvLoteUEQ,        True);
-  InicializarMemTable(mtCancLoteUEQ,       False);
-  InicializarMemTable(mtEnvIndivUEQ,       True);
-  InicializarMemTable(mtEnvLoteVarjota,    True);
-  InicializarMemTable(mtCancLoteVarjota,   False);
-  InicializarMemTable(mtEnvIndivVarjota,   True);
-  InicializarMemTable(mtEnvLoteSeisBocas,  True);
-  InicializarMemTable(mtCancLoteSeisBocas, False);
-  InicializarMemTable(mtEnvIndivSeisBocas, True);
-end;
-
-{ ── Grids ───────────────────────────────────────────────────── }
-
-procedure TFrmPrincipal.VincularGrid(const AGrid: TDBGridEh;
-  const ADs: TDataSource; const AMt: TFDMemTable; const AComBotoes: Boolean);
-var
-  LCol: TColumnEh;
-begin
-  AGrid.Align        := alClient;
-  AGrid.Font.Name    := 'Segoe UI';
-  AGrid.Font.Size    := 9;
-  AGrid.RowHeight    := 26;
-  AGrid.TitleHeight  := 28;
-  AGrid.OddRowColor  := COR_GRID_ODD;
-  AGrid.EvenRowColor := COR_CARD;
-  AGrid.FixedColor   := COR_GRID_HDR;
-  AGrid.ReadOnly     := True;
-  AGrid.OptionsEh    := AGrid.OptionsEh + [dghHighlightFocus];
-  ADs.DataSet        := AMt;
-  AGrid.DataSource   := ADs;
-  AGrid.Columns.Clear;
-
-  LCol := AGrid.Columns.Add;
-  LCol.FieldName := 'NumeroRps';    LCol.Title.Caption := 'N. RPS';     LCol.Width := 80;
-  LCol := AGrid.Columns.Add;
-  LCol.FieldName := 'DataEmissao';  LCol.Title.Caption := 'Data';       LCol.Width := 90;
-  LCol := AGrid.Columns.Add;
-  LCol.FieldName := 'Tomador';      LCol.Title.Caption := 'Tomador';    LCol.Width := 220;
-  LCol := AGrid.Columns.Add;
-  LCol.FieldName := 'ValorServico'; LCol.Title.Caption := 'Valor (R$)'; LCol.Width := 100;
-  LCol.Alignment := taRightJustify;
-  LCol := AGrid.Columns.Add;
-  LCol.FieldName := 'NumeroNFSe';   LCol.Title.Caption := 'N. NFSe';    LCol.Width := 90;
-
-  case AComBotoes of
-    True: begin
-      LCol := AGrid.Columns.Add;
-      LCol.FieldName     := 'CodVerificacao';
-      LCol.Title.Caption := 'Cod. Verif.';
-      LCol.Width         := 110;
-
-      { Coluna de ações — 2 botões lado a lado }
-      LCol := AGrid.Columns.Add;
-      LCol.FieldName     := '';
-      LCol.Title.Caption := 'A'#231#245'es';
-      LCol.Width         := 64;
-      LCol.ReadOnly      := True;
-      LCol.TextEditing   := False;
-
-      { Botão 0 — Cancelar NFSe: ícone índice 0 do ImageList }
-      with LCol.CellButtons.Add do
-      begin
-        Style                := ebsGlyphEh;
-        Hint                 := 'Cancelar NFSe';
-        Width                := 28;
-        HorzPlacement        := ebhpLeftEh;
-        Images.NormalImages  := imgl_BotoesGrid;
-        Images.NormalIndex   := 0;
-      end;
-      { Botão 1 — Imprimir DANFE: ícone índice 1 do ImageList }
-      with LCol.CellButtons.Add do
-      begin
-        Style                := ebsGlyphEh;
-        Hint                 := 'Imprimir DANFE';
-        Width                := 28;
-        HorzPlacement        := ebhpLeftEh;
-        Images.NormalImages  := imgl_BotoesGrid;
-        Images.NormalIndex   := 1;
-      end;
-    end;
-    False: begin
-      LCol := AGrid.Columns.Add;
-      LCol.FieldName     := 'Situacao';
-      LCol.Title.Caption := 'Situa'#231#227'o';
-      LCol.Width         := 110;
-    end;
-  end;
-end;
-
-procedure TFrmPrincipal.ConfigurarGrids;
-{ Coluna 6 = 'Ações' com CellButtons[0]=Cancelar e CellButtons[1]=DANFE }
-begin
-  VincularGrid(grdEnvLoteSede,      dsEnvLoteSede,      mtEnvLoteSede,      True);
-  grdEnvLoteSede.Columns[6].CellButtons[0].OnMouseClick := grdEnvLoteSedeCellButtonClick;
-  grdEnvLoteSede.Columns[6].CellButtons[1].OnMouseClick := grdEnvLoteSedeCellButtonClick;
-
-  VincularGrid(grdCancLoteSede,     dsCancLoteSede,     mtCancLoteSede,     False);
-  VincularGrid(grdEnvIndivSede,     dsEnvIndivSede,     mtEnvIndivSede,     True);
-  grdEnvIndivSede.Columns[6].CellButtons[0].OnMouseClick := grdEnvLoteSedeCellButtonClick;
-  grdEnvIndivSede.Columns[6].CellButtons[1].OnMouseClick := grdEnvLoteSedeCellButtonClick;
-
-  VincularGrid(grdEnvLoteUEQ,       dsEnvLoteUEQ,       mtEnvLoteUEQ,       True);
-  grdEnvLoteUEQ.Columns[6].CellButtons[0].OnMouseClick := grdEnvLoteUEQCellButtonClick;
-  grdEnvLoteUEQ.Columns[6].CellButtons[1].OnMouseClick := grdEnvLoteUEQCellButtonClick;
-
-  VincularGrid(grdCancLoteUEQ,      dsCancLoteUEQ,      mtCancLoteUEQ,      False);
-  VincularGrid(grdEnvIndivUEQ,      dsEnvIndivUEQ,      mtEnvIndivUEQ,      True);
-  grdEnvIndivUEQ.Columns[6].CellButtons[0].OnMouseClick := grdEnvLoteUEQCellButtonClick;
-  grdEnvIndivUEQ.Columns[6].CellButtons[1].OnMouseClick := grdEnvLoteUEQCellButtonClick;
-
-  VincularGrid(grdEnvLoteVarjota,   dsEnvLoteVarjota,   mtEnvLoteVarjota,   True);
-  grdEnvLoteVarjota.Columns[6].CellButtons[0].OnMouseClick := grdEnvLoteVarjotaCellButtonClick;
-  grdEnvLoteVarjota.Columns[6].CellButtons[1].OnMouseClick := grdEnvLoteVarjotaCellButtonClick;
-
-  VincularGrid(grdCancLoteVarjota,  dsCancLoteVarjota,  mtCancLoteVarjota,  False);
-  VincularGrid(grdEnvIndivVarjota,  dsEnvIndivVarjota,  mtEnvIndivVarjota,  True);
-  grdEnvIndivVarjota.Columns[6].CellButtons[0].OnMouseClick := grdEnvLoteVarjotaCellButtonClick;
-  grdEnvIndivVarjota.Columns[6].CellButtons[1].OnMouseClick := grdEnvLoteVarjotaCellButtonClick;
-
-  VincularGrid(grdEnvLoteSeisBocas,  dsEnvLoteSeisBocas,  mtEnvLoteSeisBocas,  True);
-  grdEnvLoteSeisBocas.Columns[6].CellButtons[0].OnMouseClick := grdEnvLoteSeisBocasCellButtonClick;
-  grdEnvLoteSeisBocas.Columns[6].CellButtons[1].OnMouseClick := grdEnvLoteSeisBocasCellButtonClick;
-
-  VincularGrid(grdCancLoteSeisBocas, dsCancLoteSeisBocas, mtCancLoteSeisBocas, False);
-  VincularGrid(grdEnvIndivSeisBocas, dsEnvIndivSeisBocas, mtEnvIndivSeisBocas, True);
-  grdEnvIndivSeisBocas.Columns[6].CellButtons[0].OnMouseClick := grdEnvLoteSeisBocasCellButtonClick;
-  grdEnvIndivSeisBocas.Columns[6].CellButtons[1].OnMouseClick := grdEnvLoteSeisBocasCellButtonClick;
-end;
-
-{ ── Atualizar ───────────────────────────────────────────────── }
-
-procedure TFrmPrincipal.AtualizarTodasAsGrids;
-begin
-  FController.PreencherMemTable(mtEnvLoteSede,       nuSede,      'ENVIADA');
-  FController.PreencherMemTable(mtCancLoteSede,      nuSede,      'CANCELADA');
-  FController.PreencherMemTable(mtEnvIndivSede,      nuSede,      'ENVIADA');
-  FController.PreencherMemTable(mtEnvLoteUEQ,        nuUEQ,       'ENVIADA');
-  FController.PreencherMemTable(mtCancLoteUEQ,       nuUEQ,       'CANCELADA');
-  FController.PreencherMemTable(mtEnvIndivUEQ,       nuUEQ,       'ENVIADA');
-  FController.PreencherMemTable(mtEnvLoteVarjota,    nuVarjota,   'ENVIADA');
-  FController.PreencherMemTable(mtCancLoteVarjota,   nuVarjota,   'CANCELADA');
-  FController.PreencherMemTable(mtEnvIndivVarjota,   nuVarjota,   'ENVIADA');
-  FController.PreencherMemTable(mtEnvLoteSeisBocas,  nuSeisBocas, 'ENVIADA');
-  FController.PreencherMemTable(mtCancLoteSeisBocas, nuSeisBocas, 'CANCELADA');
-  FController.PreencherMemTable(mtEnvIndivSeisBocas, nuSeisBocas, 'ENVIADA');
-end;
-
-{ ── Navegacao ───────────────────────────────────────────────── }
-
-procedure TFrmPrincipal.AbrirUnidadeESituacao(const AUnidade: TNomeUnidade;
-  const ASituacao: string);
-var
-  LPgcSit: array[TNomeUnidade] of TPageControl;
-begin
-  LPgcSit[nuSede]      := pgcSituacao;
-  LPgcSit[nuUEQ]       := pgcSitLoteUEQ;
-  LPgcSit[nuVarjota]   := pgcSitLoteVarjota;
-  LPgcSit[nuSeisBocas] := pgcSitLoteSeisBocas;
-
-  pgcUnidades.ActivePageIndex          := IDX_UNIDADE[AUnidade];
-  LPgcSit[AUnidade].ActivePageIndex    := Ord(not (ASituacao = 'ENVIADA'));
-end;
+{ ── Cards ──────────────────────────────────────────────────────── }
 
 procedure TFrmPrincipal.lblCardQtdEnvSedeClick(Sender: TObject);
-begin AbrirUnidadeESituacao(nuSede,      'ENVIADA');   end;
+begin Navegar(nuSede,      'ENVIADA',   Self); end;
 procedure TFrmPrincipal.lblCardQtdCancSedeClick(Sender: TObject);
-begin AbrirUnidadeESituacao(nuSede,      'CANCELADA'); end;
+begin Navegar(nuSede,      'CANCELADA', Self); end;
 procedure TFrmPrincipal.lblCardQtdEnvUEQClick(Sender: TObject);
-begin AbrirUnidadeESituacao(nuUEQ,       'ENVIADA');   end;
+begin Navegar(nuUEQ,       'ENVIADA',   Self); end;
 procedure TFrmPrincipal.lblCardQtdCancUEQClick(Sender: TObject);
-begin AbrirUnidadeESituacao(nuUEQ,       'CANCELADA'); end;
+begin Navegar(nuUEQ,       'CANCELADA', Self); end;
 procedure TFrmPrincipal.lblCardQtdEnvVarjotaClick(Sender: TObject);
-begin AbrirUnidadeESituacao(nuVarjota,   'ENVIADA');   end;
+begin Navegar(nuVarjota,   'ENVIADA',   Self); end;
 procedure TFrmPrincipal.lblCardQtdCancVarjotaClick(Sender: TObject);
-begin AbrirUnidadeESituacao(nuVarjota,   'CANCELADA'); end;
+begin Navegar(nuVarjota,   'CANCELADA', Self); end;
 procedure TFrmPrincipal.lblCardQtdEnvSeisBocasClick(Sender: TObject);
-begin AbrirUnidadeESituacao(nuSeisBocas, 'ENVIADA');   end;
+begin Navegar(nuSeisBocas, 'ENVIADA',   Self); end;
 procedure TFrmPrincipal.lblCardQtdCancSeisBocasClick(Sender: TObject);
-begin AbrirUnidadeESituacao(nuSeisBocas, 'CANCELADA'); end;
+begin Navegar(nuSeisBocas, 'CANCELADA', Self); end;
 
-{ ── CellButtons ─────────────────────────────────────────────── }
-
-procedure TFrmPrincipal.AcionarCelula(const AGrid: TDBGridEh;
-  const AUnidade: TNomeUnidade; const ABotaoIndex: Integer);
-{ Index 0 = Cancelar NFSe   Index 1 = Imprimir DANFE }
-var
-  LNumRps: string;
-begin
-  LNumRps := AGrid.DataSource.DataSet.FieldByName('NumeroRps').AsString;
-  case ABotaoIndex of
-    0: FController.ExecutarCancelarRps(LNumRps, NOMES_UNIDADE[AUnidade]);
-    1: FController.ExecutarBaixarDANFSe(LNumRps);
-  end;
-end;
+{ ── CellButtons ─────────────────────────────────────────────────── }
 
 procedure TFrmPrincipal.grdEnvLoteSedeCellButtonClick(Grid: TCustomDBGridEh;
   Column: TColumnEh; CellButton: TDBGridCellButtonEh;
   MouseButton: TMouseButton; Shift: TShiftState; InButtonPos: TPoint;
   ButtonMouseParams: TCellButtonMouseParamsEh; var Handled: Boolean);
+var
+  LNumRps: string;
 begin
-  AcionarCelula(grdEnvLoteSede, nuSede, CellButton.Index);
+  LNumRps := Grid.DataSource.DataSet.FieldByName('NumeroRps').AsString;
+  case CellButton.Index of
+    0: FController.ExecutarCancelarRps(LNumRps, NOMES_UNIDADE[nuSede]);
+    1: FController.ExecutarBaixarDANFSe(LNumRps);
+  end;
   Handled := True;
 end;
 
@@ -655,8 +460,14 @@ procedure TFrmPrincipal.grdEnvLoteUEQCellButtonClick(Grid: TCustomDBGridEh;
   Column: TColumnEh; CellButton: TDBGridCellButtonEh;
   MouseButton: TMouseButton; Shift: TShiftState; InButtonPos: TPoint;
   ButtonMouseParams: TCellButtonMouseParamsEh; var Handled: Boolean);
+var
+  LNumRps: string;
 begin
-  AcionarCelula(grdEnvLoteUEQ, nuUEQ, CellButton.Index);
+  LNumRps := Grid.DataSource.DataSet.FieldByName('NumeroRps').AsString;
+  case CellButton.Index of
+    0: FController.ExecutarCancelarRps(LNumRps, NOMES_UNIDADE[nuUEQ]);
+    1: FController.ExecutarBaixarDANFSe(LNumRps);
+  end;
   Handled := True;
 end;
 
@@ -664,8 +475,14 @@ procedure TFrmPrincipal.grdEnvLoteVarjotaCellButtonClick(Grid: TCustomDBGridEh;
   Column: TColumnEh; CellButton: TDBGridCellButtonEh;
   MouseButton: TMouseButton; Shift: TShiftState; InButtonPos: TPoint;
   ButtonMouseParams: TCellButtonMouseParamsEh; var Handled: Boolean);
+var
+  LNumRps: string;
 begin
-  AcionarCelula(grdEnvLoteVarjota, nuVarjota, CellButton.Index);
+  LNumRps := Grid.DataSource.DataSet.FieldByName('NumeroRps').AsString;
+  case CellButton.Index of
+    0: FController.ExecutarCancelarRps(LNumRps, NOMES_UNIDADE[nuVarjota]);
+    1: FController.ExecutarBaixarDANFSe(LNumRps);
+  end;
   Handled := True;
 end;
 
@@ -673,14 +490,20 @@ procedure TFrmPrincipal.grdEnvLoteSeisBocasCellButtonClick(Grid: TCustomDBGridEh
   Column: TColumnEh; CellButton: TDBGridCellButtonEh;
   MouseButton: TMouseButton; Shift: TShiftState; InButtonPos: TPoint;
   ButtonMouseParams: TCellButtonMouseParamsEh; var Handled: Boolean);
+var
+  LNumRps: string;
 begin
-  AcionarCelula(grdEnvLoteSeisBocas, nuSeisBocas, CellButton.Index);
+  LNumRps := Grid.DataSource.DataSet.FieldByName('NumeroRps').AsString;
+  case CellButton.Index of
+    0: FController.ExecutarCancelarRps(LNumRps, NOMES_UNIDADE[nuSeisBocas]);
+    1: FController.ExecutarBaixarDANFSe(LNumRps);
+  end;
   Handled := True;
 end;
 
-{ ── Menu ─────────────────────────────────────────────────────── }
+{ ── Menu ────────────────────────────────────────────────────────── }
 
-procedure TFrmPrincipal.AbrirTelaConfiguracoes;
+procedure TFrmPrincipal.lblMenuConfigClick(Sender: TObject);
 var
   LFrm: TFrmConfiguracao;
 begin
@@ -688,221 +511,69 @@ begin
   try
     LFrm.ShowModal;
     FController.RecarregarConfiguracao;
-    AtualizarCards;
-    AtualizarTodasAsGrids;
+    AtualizarTudo(FController, Self);
   finally
     LFrm.Free;
   end;
 end;
 
-procedure TFrmPrincipal.lblMenuConfigClick(Sender: TObject);
-begin AbrirTelaConfiguracoes; end;
-
 procedure TFrmPrincipal.lblMenuSairClick(Sender: TObject);
-begin Close; end;
-
+begin
+  Close;
+end;
 
 procedure TFrmPrincipal.btnAtualizarClick(Sender: TObject);
 begin
-  AtualizarCards;
-  AtualizarTodasAsGrids;
-  ExibirStatus('Atualizado em ' + TimeToStr(Now), COR_OK);
+  AtualizarTudo(FController, Self);
+  TViewUtilsPrincipal.ExibirStatus(lblStatus,
+    'Atualizado em ' + TimeToStr(Now), COR_OK);
 end;
 
-procedure TFrmPrincipal.ExibirStatus(const AMensagem: string;
-  const ACor: TColor);
-begin
-  lblStatus.Caption    := '  ' + AMensagem;
-  lblStatus.Font.Color := ACor;
-end;
-
-{ ── Hover menus laterais ─────────────────────────────────────── }
-
-procedure TFrmPrincipal.AplicarHoverMenu(const ALbl: TLabel;
-  const AAtivo: Boolean);
-const
-  COR_SIDEBAR = 3359061; { slate-700 }
-begin
-  case AAtivo of
-    True: begin
-      ALbl.Transparent := False;
-      ALbl.Color       := clWhite;
-      ALbl.Font.Color  := COR_SIDEBAR;
-    end;
-    False: begin
-      ALbl.Transparent := True;
-      ALbl.Font.Color  := clWhite;
-    end;
-  end;
-end;
+{ ── Sidebar ─────────────────────────────────────────────────────── }
 
 procedure TFrmPrincipal.SidebarMouseMove(Sender: TObject;
   Shift: TShiftState; X, Y: Integer);
-var
-  LMenus: array[0..5] of TLabel;
-  I: Integer;
 begin
-  { Sender É o label sob o mouse - ativar ele, desativar os outros }
-  LMenus[0] := lblMenuSede;
-  LMenus[1] := lblMenuUEQ;
-  LMenus[2] := lblMenuVarjota;
-  LMenus[3] := lblMenuSeisBocas;
-  LMenus[4] := lblMenuConfig;
-  LMenus[5] := lblMenuSair;
-  for I := 0 to 5 do
-    AplicarHoverMenu(LMenus[I], LMenus[I] = Sender);
+  TViewUtilsPrincipal.SidebarAtivarLabel(Sender,
+    TViewUtilsPrincipal.MenuLabels(
+      lblMenuSede, lblMenuUEQ, lblMenuVarjota,
+      lblMenuSeisBocas, lblMenuConfig, lblMenuSair));
 end;
 
 procedure TFrmPrincipal.SidebarMouseLeave(Sender: TObject);
-var
-  LMenus: array[0..5] of TLabel;
-  I: Integer;
 begin
-  LMenus[0] := lblMenuSede;
-  LMenus[1] := lblMenuUEQ;
-  LMenus[2] := lblMenuVarjota;
-  LMenus[3] := lblMenuSeisBocas;
-  LMenus[4] := lblMenuConfig;
-  LMenus[5] := lblMenuSair;
-  for I := 0 to 5 do
-    AplicarHoverMenu(LMenus[I], False);
+  TViewUtilsPrincipal.SidebarDesativarTodos(
+    TViewUtilsPrincipal.MenuLabels(
+      lblMenuSede, lblMenuUEQ, lblMenuVarjota,
+      lblMenuSeisBocas, lblMenuConfig, lblMenuSair));
 end;
 
-{ ── Centralizar Cards ───────────────────────────────────────── }
-
-procedure TFrmPrincipal.CentralizarCards;
-const
-  CARD_W = 278;
-  CARD_H = 116;
-  GAP    = 16;
-  N      = 4;
-var
-  LTotalW, LMargemLeft, LTop: Integer;
-begin
-  LTotalW     := N * CARD_W + (N - 1) * GAP;
-  LMargemLeft := (pnlCards.Width - LTotalW) div 2;
-  LTop        := (pnlCards.Height - CARD_H) div 2;
-
-  pnlCardSede.SetBounds(LMargemLeft,                            LTop, CARD_W, CARD_H);
-  pnlCardUEQ.SetBounds(LMargemLeft + (CARD_W + GAP),           LTop, CARD_W, CARD_H);
-  pnlCardVarjota.SetBounds(LMargemLeft + 2 * (CARD_W + GAP),   LTop, CARD_W, CARD_H);
-  pnlCardSeisBocas.SetBounds(LMargemLeft + 3 * (CARD_W + GAP), LTop, CARD_W, CARD_H);
-
-end;
+{ ── Resize ──────────────────────────────────────────────────────── }
 
 procedure TFrmPrincipal.FormResize(Sender: TObject);
 begin
-  CentralizarCards;
+  TViewUtilsPrincipal.CentralizarCards(pnlCards,
+    [pnlCardSede, pnlCardUEQ, pnlCardVarjota, pnlCardSeisBocas]);
 end;
 
-{ ── Cores das abas ──────────────────────────────────────────── }
+{ ── DrawTab ─────────────────────────────────────────────────────── }
 
 procedure TFrmPrincipal.pgcUnidadesDrawTab(Control: TCustomTabControl;
   TabIndex: Integer; const Rect: TRect; Active: Boolean);
-const
-  BARRA  = 4;
-  CORES: array[0..3] of TColor = (6382321, 961001, 1096065, 16498468);
-  NOMES: array[0..3] of string = ('SEDE', 'UEQ', 'Varjota', 'Seis Bocas');
-var
-  C: TCanvas;
-  RBarra, RTexto: TRect;
-  Idx: Integer;
 begin
-  Idx := TabIndex mod 4;
-  C   := Control.Canvas;
-  case Active of
-    True : C.Brush.Color := clWhite;
-    False: C.Brush.Color := 15921906;
-  end;
-  C.FillRect(Rect);
-  RBarra        := Rect;
-  RBarra.Bottom := RBarra.Top + BARRA;
-  C.Brush.Color := CORES[Idx];
-  C.FillRect(RBarra);
-  RTexto     := Rect;
-  Inc(RTexto.Top, BARRA);
-  C.Brush.Style := bsClear;
-  C.Font.Name   := 'Segoe UI';
-  C.Font.Size   := 9;
-  C.Font.Style  := [fsBold];
-  case Active of
-    True : C.Font.Color := CORES[Idx];
-    False: C.Font.Color := 9868950;
-  end;
-  DrawText(C.Handle, PChar(NOMES[Idx]), -1, RTexto,
-    DT_SINGLELINE or DT_VCENTER or DT_CENTER);
+  TViewUtilsPrincipal.DrawTabUnidades(Control, TabIndex, Rect, Active);
 end;
 
 procedure TFrmPrincipal.pgcTipoEnvioDrawTab(Control: TCustomTabControl;
   TabIndex: Integer; const Rect: TRect; Active: Boolean);
-const
-  BARRA  = 4;
-  CORES: array[0..1] of TColor = (7040122, 14120960);
-  NOMES: array[0..1] of string = ('Lotes', 'Individual');
-var
-  C: TCanvas;
-  RBarra, RTexto: TRect;
-  Idx: Integer;
 begin
-  Idx := TabIndex mod 2;
-  C   := Control.Canvas;
-  case Active of
-    True : C.Brush.Color := clWhite;
-    False: C.Brush.Color := 15921906;
-  end;
-  C.FillRect(Rect);
-  RBarra        := Rect;
-  RBarra.Bottom := RBarra.Top + BARRA;
-  C.Brush.Color := CORES[Idx];
-  C.FillRect(RBarra);
-  RTexto     := Rect;
-  Inc(RTexto.Top, BARRA);
-  C.Brush.Style := bsClear;
-  C.Font.Name   := 'Segoe UI';
-  C.Font.Size   := 9;
-  C.Font.Style  := [fsBold];
-  case Active of
-    True : C.Font.Color := CORES[Idx];
-    False: C.Font.Color := 9868950;
-  end;
-  DrawText(C.Handle, PChar(NOMES[Idx]), -1, RTexto,
-    DT_SINGLELINE or DT_VCENTER or DT_CENTER);
+  TViewUtilsPrincipal.DrawTabTipoEnvio(Control, TabIndex, Rect, Active);
 end;
 
 procedure TFrmPrincipal.pgcSituacaoDrawTab(Control: TCustomTabControl;
   TabIndex: Integer; const Rect: TRect; Active: Boolean);
-const
-  BARRA  = 4;
-  CORES: array[0..1] of TColor = (961001, 13382400);
-  NOMES: array[0..1] of string = ('Enviadas', 'Canceladas');
-var
-  C: TCanvas;
-  RBarra, RTexto: TRect;
-  Idx: Integer;
 begin
-  Idx := TabIndex mod 2;
-  C   := Control.Canvas;
-  case Active of
-    True : C.Brush.Color := clWhite;
-    False: C.Brush.Color := 15921906;
-  end;
-  C.FillRect(Rect);
-  RBarra        := Rect;
-  RBarra.Bottom := RBarra.Top + BARRA;
-  C.Brush.Color := CORES[Idx];
-  C.FillRect(RBarra);
-  RTexto     := Rect;
-  Inc(RTexto.Top, BARRA);
-  C.Brush.Style := bsClear;
-  C.Font.Name   := 'Segoe UI';
-  C.Font.Size   := 9;
-  C.Font.Style  := [fsBold];
-  case Active of
-    True : C.Font.Color := CORES[Idx];
-    False: C.Font.Color := 9868950;
-  end;
-  DrawText(C.Handle, PChar(NOMES[Idx]), -1, RTexto,
-    DT_SINGLELINE or DT_VCENTER or DT_CENTER);
+  TViewUtilsPrincipal.DrawTabSituacao(Control, TabIndex, Rect, Active);
 end;
 
 end.

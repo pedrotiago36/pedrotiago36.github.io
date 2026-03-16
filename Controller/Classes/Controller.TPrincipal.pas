@@ -3,7 +3,6 @@ unit Controller.TPrincipal;
 interface
 
 uses
-  Controller.IPrincipal,
   Model.IConfiguracaoSistema,
   Model.IRecuperarArquivos,
   Model.ILeituraArquivos,
@@ -16,7 +15,7 @@ uses
   System.DateUtils;
 
 type
-  TControllerPrincipal = class(TInterfacedObject, IControllerPrincipal)
+  TControllerPrincipal = class(TInterfacedObject)
   private
     FConfiguracao : IConfiguracaoSistema;
     FRecuperar    : IRecuperarArquivos;
@@ -37,12 +36,13 @@ type
     procedure RecarregarConfiguracao;
     procedure ExecutarCancelarRps(const ANumeroRps, ANomeUnidade: string);
     procedure ExecutarBaixarDANFSe(const ANumeroRps: string);
-    class function Criar: IControllerPrincipal;
+    class function Criar: TControllerPrincipal;
   end;
 
 implementation
 
 uses
+  Controller.IPrincipal,
   System.SysUtils,
   System.IOUtils,
   Vcl.Dialogs;
@@ -51,12 +51,9 @@ const
   SUBPASTAS: array[TNomeUnidade] of string = (
     'SEDE', 'UEQ', 'Varjota', 'SeisBocas');
 
-  NOMES_UNIDADE: array[TNomeUnidade] of string = (
-    'SEDE', 'UEQ', 'Varjota', 'Seis Bocas');
-
   TIPOS_ARQUIVO: array[Boolean] of string = ('erro', 'enviados');
 
-class function TControllerPrincipal.Criar: IControllerPrincipal;
+class function TControllerPrincipal.Criar: TControllerPrincipal;
 begin
   Result := TControllerPrincipal.Create;
 end;

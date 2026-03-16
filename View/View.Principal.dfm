@@ -642,9 +642,9 @@ object FrmPrincipal: TFrmPrincipal
     Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = [fsBold]
+    OwnerDraw = True
     ParentFont = False
     TabOrder = 3
-    OwnerDraw = True
     OnDrawTab = pgcUnidadesDrawTab
     object tabSede: TTabSheet
       Caption = '  SEDE  '
@@ -660,9 +660,9 @@ object FrmPrincipal: TFrmPrincipal
         Font.Height = -13
         Font.Name = 'Segoe UI'
         Font.Style = []
+        OwnerDraw = True
         ParentFont = False
         TabOrder = 0
-        OwnerDraw = True
         OnDrawTab = pgcTipoEnvioDrawTab
         object tabLoteSede: TTabSheet
           Caption = '  Lotes  '
@@ -673,8 +673,8 @@ object FrmPrincipal: TFrmPrincipal
             Height = 612
             ActivePage = tabEnvLoteSede
             Align = alClient
-            TabOrder = 0
             OwnerDraw = True
+            TabOrder = 0
             OnDrawTab = pgcSituacaoDrawTab
             object tabEnvLoteSede: TTabSheet
               Caption = '  Enviadas  '
@@ -715,8 +715,8 @@ object FrmPrincipal: TFrmPrincipal
             Height = 612
             ActivePage = tabEnvIndivSede
             Align = alClient
-            TabOrder = 0
             OwnerDraw = True
+            TabOrder = 0
             OnDrawTab = pgcSituacaoDrawTab
             object tabEnvIndivSede: TTabSheet
               Caption = '  Enviadas  '
@@ -753,9 +753,9 @@ object FrmPrincipal: TFrmPrincipal
         Font.Height = -13
         Font.Name = 'Segoe UI'
         Font.Style = []
+        OwnerDraw = True
         ParentFont = False
         TabOrder = 0
-        OwnerDraw = True
         OnDrawTab = pgcTipoEnvioDrawTab
         object tabLoteUEQ: TTabSheet
           Caption = '  Lotes  '
@@ -766,8 +766,8 @@ object FrmPrincipal: TFrmPrincipal
             Height = 612
             ActivePage = tabEnvLoteUEQ
             Align = alClient
-            TabOrder = 0
             OwnerDraw = True
+            TabOrder = 0
             OnDrawTab = pgcSituacaoDrawTab
             object tabEnvLoteUEQ: TTabSheet
               Caption = '  Enviadas  '
@@ -808,8 +808,8 @@ object FrmPrincipal: TFrmPrincipal
             Height = 612
             ActivePage = tabEnvIndivUEQ
             Align = alClient
-            TabOrder = 0
             OwnerDraw = True
+            TabOrder = 0
             OnDrawTab = pgcSituacaoDrawTab
             object tabEnvIndivUEQ: TTabSheet
               Caption = '  Enviadas  '
@@ -846,9 +846,9 @@ object FrmPrincipal: TFrmPrincipal
         Font.Height = -13
         Font.Name = 'Segoe UI'
         Font.Style = []
+        OwnerDraw = True
         ParentFont = False
         TabOrder = 0
-        OwnerDraw = True
         OnDrawTab = pgcTipoEnvioDrawTab
         object tabLoteVarjota: TTabSheet
           Caption = '  Lotes  '
@@ -859,8 +859,8 @@ object FrmPrincipal: TFrmPrincipal
             Height = 612
             ActivePage = tabEnvLoteVarjota
             Align = alClient
-            TabOrder = 0
             OwnerDraw = True
+            TabOrder = 0
             OnDrawTab = pgcSituacaoDrawTab
             object tabEnvLoteVarjota: TTabSheet
               Caption = '  Enviadas  '
@@ -901,8 +901,8 @@ object FrmPrincipal: TFrmPrincipal
             Height = 612
             ActivePage = tabEnvIndivVarjota
             Align = alClient
-            TabOrder = 0
             OwnerDraw = True
+            TabOrder = 0
             OnDrawTab = pgcSituacaoDrawTab
             object tabEnvIndivVarjota: TTabSheet
               Caption = '  Enviadas  '
@@ -939,9 +939,9 @@ object FrmPrincipal: TFrmPrincipal
         Font.Height = -13
         Font.Name = 'Segoe UI'
         Font.Style = []
+        OwnerDraw = True
         ParentFont = False
         TabOrder = 0
-        OwnerDraw = True
         OnDrawTab = pgcTipoEnvioDrawTab
         object tabLoteSeisBocas: TTabSheet
           Caption = '  Lotes  '
@@ -952,8 +952,8 @@ object FrmPrincipal: TFrmPrincipal
             Height = 612
             ActivePage = tabEnvLoteSeisBocas
             Align = alClient
-            TabOrder = 0
             OwnerDraw = True
+            TabOrder = 0
             OnDrawTab = pgcSituacaoDrawTab
             object tabEnvLoteSeisBocas: TTabSheet
               Caption = '  Enviadas  '
@@ -994,8 +994,8 @@ object FrmPrincipal: TFrmPrincipal
             Height = 612
             ActivePage = tabEnvIndivSeisBocas
             Align = alClient
-            TabOrder = 0
             OwnerDraw = True
+            TabOrder = 0
             OnDrawTab = pgcSituacaoDrawTab
             object tabEnvIndivSeisBocas: TTabSheet
               Caption = '  Enviadas  '
@@ -1155,7 +1155,7 @@ object FrmPrincipal: TFrmPrincipal
     Left = 8
     Top = 8
     Bitmap = {
-      494C010102000800040010001000FFFFFFFFFF00FFFFFFFFFFFFFFFF424D3600
+      494C010102000800040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1291,6 +1291,7 @@ object FrmPrincipal: TFrmPrincipal
       F3E1000000000000F1C3000000000000F887000000000000F807000000000000
       FC0F000000000000FE1F000000000000FC1F000000000000F80F000000000000
       F007C00300000000E0C3C00300000000C0E1C00700000000C1F3C00700000000
-      83FFC00F00000000FFFFE01F00000000}
+      83FFC00F00000000FFFFE01F0000000000000000000000000000000000000000
+      000000000000}
   end
 end
