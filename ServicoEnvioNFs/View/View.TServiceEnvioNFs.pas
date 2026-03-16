@@ -31,7 +31,7 @@ uses
   Model.IConfiguracaoModel,
   Model.TNotificadorModel,
   Model.INotificadorModel,
-  Shared.Tipos;
+  Shared.Tipos, System.Classes;
 
 const
   SUBPASTA_CONFIG     = 'Config\';

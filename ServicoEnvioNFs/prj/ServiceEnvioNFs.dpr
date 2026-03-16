@@ -2,7 +2,16 @@ program ServiceEnvioNFs;
 
 uses
   Vcl.SvcMgr,
-  View.ServiceEnvioNFs in '..\View\View.ServiceEnvioNFs.pas' {Service1: TService};
+  View.TServiceEnvioNFs in '..\View\View.TServiceEnvioNFs.pas',
+  Shared.Tipos in '..\Shared\Shared.Tipos.pas',
+  Service in '..\Service\Service.pas' {Service1: TService},
+  Service.TWorkerThread in '..\Service\Service.TWorkerThread.pas',
+  Model.TConfiguracaoModel in '..\Model\Classes\Model.TConfiguracaoModel.pas',
+  Model.TNotificadorModel in '..\Model\Classes\Model.TNotificadorModel.pas',
+  Model.IConfiguracaoModel in '..\Model\Interfaces\Model.IConfiguracaoModel.pas',
+  Model.INotificadorModel in '..\Model\Interfaces\Model.INotificadorModel.pas',
+  Controller.TAgendamento in '..\Controller\Classes\Controller.TAgendamento.pas',
+  Controller.IAgendamento in '..\Controller\Interfaces\Controller.IAgendamento.pas';
 
 {$R *.RES}
 
