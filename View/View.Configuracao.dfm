@@ -4,7 +4,7 @@ object FrmConfiguracao: TFrmConfiguracao
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'NFSe '#8212' Configura'#231#227'o'
-  ClientHeight = 620
+  ClientHeight = 684
   ClientWidth = 720
   Color = 15921906
   Font.Charset = DEFAULT_CHARSET
@@ -54,7 +54,7 @@ object FrmConfiguracao: TFrmConfiguracao
   end
   object pnlStatusBar: TPanel
     Left = 0
-    Top = 596
+    Top = 660
     Width = 720
     Height = 24
     Align = alBottom
@@ -62,6 +62,7 @@ object FrmConfiguracao: TFrmConfiguracao
     Color = 15261872
     ParentBackground = False
     TabOrder = 1
+    ExplicitTop = 628
     object lblStatus: TLabel
       Left = 12
       Top = 4
@@ -78,7 +79,7 @@ object FrmConfiguracao: TFrmConfiguracao
   end
   object pnlRodape: TPanel
     Left = 0
-    Top = 556
+    Top = 620
     Width = 720
     Height = 40
     Align = alBottom
@@ -86,6 +87,7 @@ object FrmConfiguracao: TFrmConfiguracao
     Color = 15921906
     ParentBackground = False
     TabOrder = 2
+    ExplicitTop = 588
     object btnSalvar: TBitBtn
       Left = 504
       Top = 6
@@ -113,24 +115,25 @@ object FrmConfiguracao: TFrmConfiguracao
     Left = 0
     Top = 72
     Width = 720
-    Height = 484
+    Height = 548
     Align = alClient
     BevelOuter = bvNone
     Color = 15921906
     ParentBackground = False
     TabOrder = 3
+    ExplicitHeight = 516
     object pnlWebService: TPanel
       Left = 16
       Top = 16
       Width = 688
-      Height = 104
+      Height = 136
       BevelOuter = bvNone
       Color = clWhite
       ParentBackground = False
       TabOrder = 0
       object lblHomologacao: TLabel
         Left = 14
-        Top = 44
+        Top = 48
         Width = 79
         Height = 15
         Caption = 'Homologa'#231#227'o:'
@@ -143,7 +146,7 @@ object FrmConfiguracao: TFrmConfiguracao
       end
       object lblProducao: TLabel
         Left = 14
-        Top = 76
+        Top = 100
         Width = 54
         Height = 15
         Caption = 'Produ'#231#227'o:'
@@ -178,40 +181,78 @@ object FrmConfiguracao: TFrmConfiguracao
           ParentFont = False
         end
       end
-      object edtUrlHomologacao: TEdit
-        Left = 120
-        Top = 40
-        Width = 554
-        Height = 23
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -12
-        Font.Name = 'Segoe UI'
-        Font.Style = []
-        ParentFont = False
+      object rbHomologacao: TRadioButton
+        Left = 96
+        Top = 45
+        Width = 20
+        Height = 20
+        Checked = True
         TabOrder = 1
-        TextHint = 'https://homologacao.sefin.fortaleza.ce.gov.br/...'
+        TabStop = True
+        OnClick = rbHomologacaoClick
       end
-      object edtUrlProducao: TEdit
-        Left = 120
-        Top = 72
-        Width = 554
-        Height = 23
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -12
-        Font.Name = 'Segoe UI'
-        Font.Style = []
-        ParentFont = False
+      object pnlBordaHomolog: TPanel
+        Left = 119
+        Top = 40
+        Width = 558
+        Height = 27
+        BevelOuter = bvNone
+        Color = 52224
+        ParentBackground = False
         TabOrder = 2
-        TextHint = 'https://iss.fortaleza.ce.gov.br/...'
+        object edtUrlHomologacao: TEdit
+          Left = 2
+          Top = 2
+          Width = 554
+          Height = 23
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -12
+          Font.Name = 'Segoe UI'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          TextHint = 'https://homologacao.sefin.fortaleza.ce.gov.br/...'
+        end
+      end
+      object rbProducao: TRadioButton
+        Left = 96
+        Top = 97
+        Width = 20
+        Height = 20
+        TabOrder = 3
+        OnClick = rbProducaoClick
+      end
+      object pnlBordaProducao: TPanel
+        Left = 119
+        Top = 92
+        Width = 558
+        Height = 27
+        BevelOuter = bvNone
+        Color = 52
+        ParentBackground = False
+        TabOrder = 4
+        object edtUrlProducao: TEdit
+          Left = 2
+          Top = 2
+          Width = 554
+          Height = 23
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -12
+          Font.Name = 'Segoe UI'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          TextHint = 'https://iss.fortaleza.ce.gov.br/...'
+        end
       end
     end
     object pnlDiretorios: TPanel
       Left = 16
-      Top = 136
+      Top = 168
       Width = 688
-      Height = 148
+      Height = 180
       BevelOuter = bvNone
       Color = clWhite
       ParentBackground = False
@@ -242,9 +283,22 @@ object FrmConfiguracao: TFrmConfiguracao
         Font.Style = []
         ParentFont = False
       end
-      object lblDirIni: TLabel
+      object lblDirCancelados: TLabel
         Left = 14
         Top = 108
+        Width = 87
+        Height = 15
+        Caption = 'RPS Cancelados:'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 5987163
+        Font.Height = -12
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ParentFont = False
+      end
+      object lblDirIni: TLabel
+        Left = 14
+        Top = 140
         Width = 64
         Height = 15
         Caption = 'Arquivo .ini:'
@@ -273,9 +327,18 @@ object FrmConfiguracao: TFrmConfiguracao
         Flat = True
         OnClick = btnDirErroClick
       end
-      object btnDirIni: TSpeedButton
+      object btnDirCancelados: TSpeedButton
         Left = 656
         Top = 104
+        Width = 28
+        Height = 24
+        Caption = '...'
+        Flat = True
+        OnClick = btnDirCanceladosClick
+      end
+      object btnDirIni: TSpeedButton
+        Left = 656
+        Top = 136
         Width = 28
         Height = 24
         Caption = '...'
@@ -336,7 +399,7 @@ object FrmConfiguracao: TFrmConfiguracao
         TabOrder = 2
         TextHint = 'Ex: C:\NFSe\Erros'
       end
-      object edtDirIni: TEdit
+      object edtDirCancelados: TEdit
         Left = 120
         Top = 104
         Width = 532
@@ -348,12 +411,26 @@ object FrmConfiguracao: TFrmConfiguracao
         Font.Style = []
         ParentFont = False
         TabOrder = 3
+        TextHint = 'Ex: C:\NFSe\Cancelados'
+      end
+      object edtDirIni: TEdit
+        Left = 120
+        Top = 136
+        Width = 532
+        Height = 23
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 4
         TextHint = 'Ex: C:\NFSe\Config'
       end
     end
     object pnlModoEnvio: TPanel
       Left = 16
-      Top = 300
+      Top = 364
       Width = 336
       Height = 120
       BevelOuter = bvNone
@@ -445,7 +522,7 @@ object FrmConfiguracao: TFrmConfiguracao
     end
     object pnlThread: TPanel
       Left = 368
-      Top = 300
+      Top = 364
       Width = 336
       Height = 120
       BevelOuter = bvNone
@@ -496,7 +573,7 @@ object FrmConfiguracao: TFrmConfiguracao
     end
     object pnlSeparador: TPanel
       Left = 16
-      Top = 396
+      Top = 460
       Width = 688
       Height = 1
       BevelOuter = bvNone

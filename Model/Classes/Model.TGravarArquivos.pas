@@ -42,7 +42,9 @@ end;
 
 procedure TGravarArquivos.GarantirDiretorio(const ACaminho: string);
 begin
-  TDirectory.CreateDirectory(ACaminho);
+  case ACaminho.IsEmpty of
+    False: ForceDirectories(ACaminho);
+  end;
 end;
 
 procedure TGravarArquivos.EscreverLinha(const ACaminho, AConteudo: string);
@@ -59,20 +61,52 @@ end;
 
 procedure TGravarArquivos.GravarIni(const AConfiguracao: IConfiguracaoSistema);
 var
-  LIni  : TIniFile;
-  LDados: TDadosConfiguracao;
+  LIni    : TMemIniFile;
+  LDados  : TDadosConfiguracao;
+  LArquivo: string;
 begin
   AConfiguracao.PreencherDados(LDados);
-  GarantirDiretorio(LDados.DiretorioArquivoIni);
-  LIni := TIniFile.Create(
-    TPath.Combine(LDados.DiretorioArquivoIni, 'NFSe_Servico.ini'));
+
+  case LDados.DiretorioArquivoIni.IsEmpty of
+    True : LArquivo := 'NFSe_Servico.ini';
+    False: begin
+      GarantirDiretorio(LDados.DiretorioArquivoIni);
+      LArquivo := TPath.Combine(LDados.DiretorioArquivoIni, 'NFSe_Servico.ini');
+    end;
+  end;
+
+  LIni := TMemIniFile.Create(LArquivo);
   try
-    LIni.WriteString('WebService', 'UrlHomologacao', LDados.UrlHomologacao);
-    LIni.WriteString('WebService', 'UrlProducao',    LDados.UrlProducao);
-    LIni.WriteString('Diretorios', 'RpsEnviados',    LDados.DiretorioRpsEnviados);
+    { Ambiente ativo }
+    LIni.WriteString('WebService', 'AmbienteAtivo', LDados.AmbienteAtivo);
+
+    { Seções com indicador visual de ativo/inativo }
+    case LDados.AmbienteAtivo = 'Homologacao' of
+      True: begin
+        LIni.WriteString('Homologacao', 'Url',    LDados.UrlHomologacao);
+        LIni.WriteString('Homologacao', 'Status', '>>> ATIVO <<<');
+        LIni.WriteString('Producao',    'Url',    LDados.UrlProducao);
+        LIni.WriteString('Producao',    'Status', '--- inativo ---');
+      end;
+      False: begin
+        LIni.WriteString('Homologacao', 'Url',    LDados.UrlHomologacao);
+        LIni.WriteString('Homologacao', 'Status', '--- inativo ---');
+        LIni.WriteString('Producao',    'Url',    LDados.UrlProducao);
+        LIni.WriteString('Producao',    'Status', '>>> ATIVO <<<');
+      end;
+    end;
+
+    { Diretórios }
+    LIni.WriteString('Diretorios', 'RpsEnviados',   LDados.DiretorioRpsEnviados);
     LIni.WriteString('Diretorios', 'RpsErro',        LDados.DiretorioRpsErro);
+    LIni.WriteString('Diretorios', 'RpsCancelados',  LDados.DiretorioRpsCancelados);
     LIni.WriteString('Diretorios', 'ArquivoIni',     LDados.DiretorioArquivoIni);
-    LIni.WriteBool  ('Thread',     'Ativa',          LDados.ThreadAtiva);
+
+    { Thread }
+    LIni.WriteBool  ('Thread',  'Ativa',     LDados.ThreadAtiva);
+    LIni.WriteString('Config',  'DiaEnvio',  LDados.DataEnvio);
+
+    LIni.UpdateFile;
   finally
     LIni.Free;
   end;

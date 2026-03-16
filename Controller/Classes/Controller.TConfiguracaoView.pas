@@ -17,22 +17,29 @@ uses
 type
   TControllerConfiguracaoView = class(TInterfacedObject, IControllerConfiguracaoView)
   private
-    FConfiguracao  : IConfiguracaoSistema;
-    FGravar        : IGravarArquivos;
-    FRecuperar     : IRecuperarArquivos;
-    FCaminhoIni    : string;
+    FConfiguracao : IConfiguracaoSistema;
+    FGravar       : IGravarArquivos;
+    FRecuperar    : IRecuperarArquivos;
+    FCaminhoIni   : string;
   public
     constructor Create(const ACaminhoIni: string);
     procedure Inicializar;
     procedure Salvar;
     procedure SelecionarDiretorio(const AEdit: TEdit);
     procedure AtualizarCaptionThread(const ACheck: TCheckBox);
+    procedure AtualizarAmbiente(const ARbHomologacao, ARbProducao: TRadioButton;
+      const APnlHomologacao, APnlProducao: TPanel);
     procedure PreencherTela(const AEdtUrlHomologacao, AEdtUrlProducao,
-      AEdtDirEnviados, AEdtDirErro, AEdtDirIni, AEdtDataEnvio: TEdit;
-      const AChbThread: TCheckBox);
+      AEdtDirEnviados, AEdtDirErro, AEdtDirCancelados,
+      AEdtDirIni, AEdtDataEnvio: TEdit;
+      const AChbThread: TCheckBox;
+      const ARbHomologacao, ARbProducao: TRadioButton;
+      const APnlHomologacao, APnlProducao: TPanel);
     procedure ColetarTela(const AEdtUrlHomologacao, AEdtUrlProducao,
-      AEdtDirEnviados, AEdtDirErro, AEdtDirIni, AEdtDataEnvio: TEdit;
-      const AChbThread: TCheckBox);
+      AEdtDirEnviados, AEdtDirErro, AEdtDirCancelados,
+      AEdtDirIni, AEdtDataEnvio: TEdit;
+      const AChbThread: TCheckBox;
+      const ARbHomologacao: TRadioButton);
     procedure ExibirMensagemStatus(const ALbl: TLabel;
       const AMensagem: string; const ACor: TColor);
     class function Criar(const ACaminhoIni: string): IControllerConfiguracaoView;
@@ -47,15 +54,10 @@ uses
 const
   CAPTION_THREAD_LIGADA    = '  ' + #9679 + ' Thread Ligada';
   CAPTION_THREAD_DESLIGADA = '  ' + #9675 + ' Thread Desligada';
-
-  CAPTIONS_THREAD: array[Boolean] of string = (
-    CAPTION_THREAD_DESLIGADA,
-    CAPTION_THREAD_LIGADA
-  );
-  CORES_THREAD: array[Boolean] of TColor = (
-    clGray,
-    $00007700
-  );
+  CAPTIONS_THREAD: array[Boolean] of string = (CAPTION_THREAD_DESLIGADA, CAPTION_THREAD_LIGADA);
+  CORES_THREAD   : array[Boolean] of TColor = (clGray, $00007700);
+  COR_ATIVO      = $0000CC00;
+  COR_INATIVO    = $000000CC;
 
 class function TControllerConfiguracaoView.Criar(
   const ACaminhoIni: string): IControllerConfiguracaoView;
@@ -78,7 +80,18 @@ begin
 end;
 
 procedure TControllerConfiguracaoView.Salvar;
+var
+  LDados: TDadosConfiguracao;
 begin
+  FConfiguracao.PreencherDados(LDados);
+  case LDados.DiretorioArquivoIni.IsEmpty of
+    True: begin
+      LDados.DiretorioArquivoIni := FCaminhoIni;
+      FConfiguracao.Atualizar(LDados);
+    end;
+  end;
+  { Garante que o diretorio existe antes de gravar }
+  ForceDirectories(LDados.DiretorioArquivoIni);
   FGravar.GravarIni(FConfiguracao);
 end;
 
@@ -99,41 +112,81 @@ begin
   ACheck.Font.Color := CORES_THREAD[ACheck.Checked];
 end;
 
+procedure TControllerConfiguracaoView.AtualizarAmbiente(
+  const ARbHomologacao, ARbProducao: TRadioButton;
+  const APnlHomologacao, APnlProducao: TPanel);
+begin
+  case ARbHomologacao.Checked of
+    True: begin
+      APnlHomologacao.Color := COR_ATIVO;
+      APnlProducao.Color    := COR_INATIVO;
+    end;
+    False: begin
+      APnlHomologacao.Color := COR_INATIVO;
+      APnlProducao.Color    := COR_ATIVO;
+    end;
+  end;
+end;
+
 procedure TControllerConfiguracaoView.PreencherTela(
-  const AEdtUrlHomologacao, AEdtUrlProducao, AEdtDirEnviados, AEdtDirErro,
-  AEdtDirIni, AEdtDataEnvio: TEdit; const AChbThread: TCheckBox);
+  const AEdtUrlHomologacao, AEdtUrlProducao,
+  AEdtDirEnviados, AEdtDirErro, AEdtDirCancelados,
+  AEdtDirIni, AEdtDataEnvio: TEdit;
+  const AChbThread: TCheckBox;
+  const ARbHomologacao, ARbProducao: TRadioButton;
+  const APnlHomologacao, APnlProducao: TPanel);
 var
   LDados: TDadosConfiguracao;
 begin
   FConfiguracao.PreencherDados(LDados);
+
+  { Preenche as duas URLs }
   AEdtUrlHomologacao.Text := LDados.UrlHomologacao;
   AEdtUrlProducao.Text    := LDados.UrlProducao;
-  AEdtDirEnviados.Text    := LDados.DiretorioRpsEnviados;
-  AEdtDirErro.Text        := LDados.DiretorioRpsErro;
-  AEdtDirIni.Text         := LDados.DiretorioArquivoIni;
-  AChbThread.Checked      := LDados.ThreadAtiva;
-  AEdtDataEnvio.Text      := LDados.DataEnvio;
+
+  AEdtDirEnviados.Text   := LDados.DiretorioRpsEnviados;
+  AEdtDirErro.Text       := LDados.DiretorioRpsErro;
+  AEdtDirCancelados.Text := LDados.DiretorioRpsCancelados;
+  AEdtDirIni.Text        := LDados.DiretorioArquivoIni;
+  AEdtDataEnvio.Text     := LDados.DataEnvio;
+  AChbThread.Checked     := LDados.ThreadAtiva;
+
+  ARbHomologacao.Checked := LDados.AmbienteAtivo <> 'Producao';
+  ARbProducao.Checked    := LDados.AmbienteAtivo =  'Producao';
+
   AtualizarCaptionThread(AChbThread);
+  AtualizarAmbiente(ARbHomologacao, ARbProducao, APnlHomologacao, APnlProducao);
 end;
 
 procedure TControllerConfiguracaoView.ColetarTela(
-  const AEdtUrlHomologacao, AEdtUrlProducao, AEdtDirEnviados, AEdtDirErro,
-  AEdtDirIni, AEdtDataEnvio: TEdit; const AChbThread: TCheckBox);
+  const AEdtUrlHomologacao, AEdtUrlProducao,
+  AEdtDirEnviados, AEdtDirErro, AEdtDirCancelados,
+  AEdtDirIni, AEdtDataEnvio: TEdit;
+  const AChbThread: TCheckBox;
+  const ARbHomologacao: TRadioButton);
 var
   LDados: TDadosConfiguracao;
 begin
-  LDados.UrlHomologacao       := AEdtUrlHomologacao.Text;
-  LDados.UrlProducao          := AEdtUrlProducao.Text;
-  LDados.DiretorioRpsEnviados := AEdtDirEnviados.Text;
-  LDados.DiretorioRpsErro     := AEdtDirErro.Text;
-  LDados.DiretorioArquivoIni  := AEdtDirIni.Text;
-  LDados.ThreadAtiva          := AChbThread.Checked;
-  LDados.DataEnvio            := AEdtDataEnvio.Text;
+  { Coleta as duas URLs — AmbienteAtivo define qual sera usada no servico }
+  case ARbHomologacao.Checked of
+    True : LDados.AmbienteAtivo := 'Homologacao';
+    False: LDados.AmbienteAtivo := 'Producao';
+  end;
+  LDados.UrlHomologacao := AEdtUrlHomologacao.Text;
+  LDados.UrlProducao    := AEdtUrlProducao.Text;
+
+  LDados.DiretorioRpsEnviados   := AEdtDirEnviados.Text;
+  LDados.DiretorioRpsErro       := AEdtDirErro.Text;
+  LDados.DiretorioRpsCancelados := AEdtDirCancelados.Text;
+  LDados.DiretorioArquivoIni    := AEdtDirIni.Text;
+  LDados.ThreadAtiva            := AChbThread.Checked;
+  LDados.DataEnvio              := AEdtDataEnvio.Text;
+
   FConfiguracao.Atualizar(LDados);
 end;
 
-procedure TControllerConfiguracaoView.ExibirMensagemStatus(const ALbl: TLabel;
-  const AMensagem: string; const ACor: TColor);
+procedure TControllerConfiguracaoView.ExibirMensagemStatus(
+  const ALbl: TLabel; const AMensagem: string; const ACor: TColor);
 begin
   ALbl.Caption    := '  ' + AMensagem;
   ALbl.Font.Color := ACor;

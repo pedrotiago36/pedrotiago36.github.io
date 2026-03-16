@@ -14,12 +14,19 @@ type
     procedure Salvar;
     procedure SelecionarDiretorio(const AEdit: TEdit);
     procedure AtualizarCaptionThread(const ACheck: TCheckBox);
+    procedure AtualizarAmbiente(const ARbHomologacao, ARbProducao: TRadioButton;
+      const APnlHomologacao, APnlProducao: TPanel);
     procedure PreencherTela(const AEdtUrlHomologacao, AEdtUrlProducao,
-      AEdtDirEnviados, AEdtDirErro, AEdtDirIni, AEdtDataEnvio: TEdit;
-      const AChbThread: TCheckBox);
+      AEdtDirEnviados, AEdtDirErro, AEdtDirCancelados,
+      AEdtDirIni, AEdtDataEnvio: TEdit;
+      const AChbThread: TCheckBox;
+      const ARbHomologacao, ARbProducao: TRadioButton;
+      const APnlHomologacao, APnlProducao: TPanel);
     procedure ColetarTela(const AEdtUrlHomologacao, AEdtUrlProducao,
-      AEdtDirEnviados, AEdtDirErro, AEdtDirIni, AEdtDataEnvio: TEdit;
-      const AChbThread: TCheckBox);
+      AEdtDirEnviados, AEdtDirErro, AEdtDirCancelados,
+      AEdtDirIni, AEdtDataEnvio: TEdit;
+      const AChbThread: TCheckBox;
+      const ARbHomologacao: TRadioButton);
     procedure ExibirMensagemStatus(const ALbl: TLabel;
       const AMensagem: string; const ACor: TColor);
   end;

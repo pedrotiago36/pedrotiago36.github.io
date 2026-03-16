@@ -30,17 +30,20 @@ procedure TRecuperarArquivos.RecuperarIni(
   const AConfiguracao: IConfiguracaoSistema;
   const ACaminhoIni: string);
 var
-  LIni  : TIniFile;
+  LIni  : TMemIniFile;
   LDados: TDadosConfiguracao;
 begin
-  LIni := TIniFile.Create(TPath.Combine(ACaminhoIni, 'NFSe_Servico.ini'));
+  LIni := TMemIniFile.Create(TPath.Combine(ACaminhoIni, 'NFSe_Servico.ini'));
   try
-    LDados.UrlHomologacao       := LIni.ReadString('WebService', 'UrlHomologacao', '');
-    LDados.UrlProducao          := LIni.ReadString('WebService', 'UrlProducao',    '');
-    LDados.DiretorioRpsEnviados := LIni.ReadString('Diretorios', 'RpsEnviados',    '');
-    LDados.DiretorioRpsErro     := LIni.ReadString('Diretorios', 'RpsErro',        '');
-    LDados.DiretorioArquivoIni  := LIni.ReadString('Diretorios', 'ArquivoIni',     '');
-    LDados.ThreadAtiva          := LIni.ReadBool  ('Thread',     'Ativa',          False);
+    LDados.AmbienteAtivo          := LIni.ReadString('WebService',  'AmbienteAtivo',  'Homologacao');
+    LDados.UrlHomologacao         := LIni.ReadString('Homologacao', 'Url',             '');
+    LDados.UrlProducao            := LIni.ReadString('Producao',    'Url',             '');
+    LDados.DiretorioRpsEnviados   := LIni.ReadString('Diretorios',  'RpsEnviados',     '');
+    LDados.DiretorioRpsErro       := LIni.ReadString('Diretorios',  'RpsErro',         '');
+    LDados.DiretorioRpsCancelados := LIni.ReadString('Diretorios',  'RpsCancelados',   '');
+    LDados.DiretorioArquivoIni    := LIni.ReadString('Diretorios',  'ArquivoIni',      '');
+    LDados.ThreadAtiva            := LIni.ReadBool  ('Thread',      'Ativa',           False);
+    LDados.DataEnvio              := LIni.ReadString('Config',      'DiaEnvio',        '');
     AConfiguracao.Atualizar(LDados);
   finally
     LIni.Free;

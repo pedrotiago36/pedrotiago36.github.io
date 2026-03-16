@@ -4,13 +4,15 @@ interface
 
 type
   TDadosConfiguracao = record
-    UrlHomologacao      : string;
-    UrlProducao         : string;
-    DiretorioRpsEnviados: string;
-    DiretorioRpsErro    : string;
-    DiretorioArquivoIni : string;
-    ThreadAtiva         : Boolean;
-    DataEnvio           : string;
+    UrlHomologacao        : string;
+    UrlProducao           : string;
+    AmbienteAtivo         : string;   { 'Homologacao' | 'Producao' }
+    DiretorioRpsEnviados  : string;
+    DiretorioRpsErro      : string;
+    DiretorioRpsCancelados: string;
+    DiretorioArquivoIni   : string;
+    ThreadAtiva           : Boolean;
+    DataEnvio             : string;
   end;
 
   IConfiguracaoSistema = interface

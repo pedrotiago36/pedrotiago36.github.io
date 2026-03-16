@@ -11,6 +11,7 @@ uses
   Model.TRecuperarArquivos,
   Model.TLeituraArquivos,
   Model.TEstatisticasUnidade,
+  Controller.IPrincipal,
   FireDAC.Comp.Client,
   System.DateUtils;
 
@@ -42,9 +43,9 @@ type
 implementation
 
 uses
-  Controller.IPrincipal,
   System.SysUtils,
   System.IOUtils,
+  Vcl.Forms,
   Vcl.Dialogs;
 
 const
@@ -70,9 +71,33 @@ begin
 end;
 
 procedure TControllerPrincipal.CarregarConfiguracao;
+var
+  LBase, LTentativa, LConfig: string;
+  I: Integer;
 begin
-  FRecuperar.RecuperarIni(FConfiguracao,
-    TPath.Combine(ExtractFilePath(ParamStr(0)), 'Config'));
+  LConfig := '';
+  LBase   := ExtractFilePath(ParamStr(0));
+
+  for I := 0 to 5 do
+  begin
+    LTentativa := TPath.Combine(TPath.Combine(LBase, 'exe'), 'Config');
+    case TFile.Exists(TPath.Combine(LTentativa, 'NFSe_Servico.ini')) of
+      True: begin LConfig := LTentativa; Break; end;
+    end;
+
+    LTentativa := TPath.Combine(LBase, 'Config');
+    case TFile.Exists(TPath.Combine(LTentativa, 'NFSe_Servico.ini')) of
+      True: begin LConfig := LTentativa; Break; end;
+    end;
+
+    LBase := TPath.GetFullPath(TPath.Combine(LBase, '..'));
+  end;
+
+  case LConfig.IsEmpty of
+    True: LConfig := TPath.Combine(ExtractFilePath(ParamStr(0)), 'Config');
+  end;
+
+  FRecuperar.RecuperarIni(FConfiguracao, LConfig);
 end;
 
 procedure TControllerPrincipal.Inicializar;
