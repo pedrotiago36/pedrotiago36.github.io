@@ -140,6 +140,7 @@ begin
   FWorker := TWorkerThread.Create(
     FIntervaloMs,
     FAgendamentoController,
+    FConfigModel,
     FNotificadorModel
   );
   FWorker.Start;
