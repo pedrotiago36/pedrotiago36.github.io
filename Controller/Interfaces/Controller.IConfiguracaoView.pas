@@ -21,12 +21,13 @@ type
       AEdtDirIni, AEdtDataEnvio: TEdit;
       const AChbThread: TCheckBox;
       const ARbHomologacao, ARbProducao: TRadioButton;
-      const APnlHomologacao, APnlProducao: TPanel);
+      const APnlHomologacao, APnlProducao: TPanel;
+      const ARbEnviarLote, ARbEnviarIndividual: TRadioButton);
     procedure ColetarTela(const AEdtUrlHomologacao, AEdtUrlProducao,
       AEdtDirEnviados, AEdtDirErro, AEdtDirCancelados,
       AEdtDirIni, AEdtDataEnvio: TEdit;
       const AChbThread: TCheckBox;
-      const ARbHomologacao: TRadioButton);
+      const ARbHomologacao, ARbEnviarLote: TRadioButton);
     procedure ExibirMensagemStatus(const ALbl: TLabel;
       const AMensagem: string; const ACor: TColor);
   end;

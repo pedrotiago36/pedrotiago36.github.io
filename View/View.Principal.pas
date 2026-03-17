@@ -38,6 +38,8 @@ uses
   Controller.TPrincipal,
   { Model }
   Model.IEstatisticasUnidade,
+  Model.IMonitorNotificacao,
+  Model.TMonitorNotificacao,
   { Utils }
   View.Utils.Principal,
   DBGridEhGrouping, DBGridEhToolCtrls, DynVarsEh,
@@ -252,6 +254,7 @@ type
 
   private
     FController: TControllerPrincipal;
+    FMonitor   : IMonitorNotificacao;
   end;
 
 var
@@ -410,6 +413,10 @@ begin
 
   AtualizarTudo(FController, Self);
 
+  { Inicia monitor de notificacao do servico de envio }
+  FMonitor := TMonitorNotificacao.Criar;
+  FMonitor.Iniciar;
+
   Self.OnResize := FormResize;
   TViewUtilsPrincipal.ExibirStatus(lblStatus,
     'Sistema iniciado. ' + FormatDateTime('dd/mm/yyyy hh:nn', Now), COR_OK);
@@ -417,6 +424,8 @@ end;
 
 procedure TFrmPrincipal.FormDestroy(Sender: TObject);
 begin
+  FMonitor.Parar;
+  FMonitor   := nil;
   FController := nil;
 end;
 

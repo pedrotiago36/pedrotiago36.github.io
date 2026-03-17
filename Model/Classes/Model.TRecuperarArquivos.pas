@@ -42,8 +42,9 @@ begin
     LDados.DiretorioRpsErro       := LIni.ReadString('Diretorios',  'RpsErro',         '');
     LDados.DiretorioRpsCancelados := LIni.ReadString('Diretorios',  'RpsCancelados',   '');
     LDados.DiretorioArquivoIni    := LIni.ReadString('Diretorios',  'ArquivoIni',      '');
-    LDados.ThreadAtiva            := LIni.ReadBool  ('Thread',      'Ativa',           False);
-    LDados.DataEnvio              := LIni.ReadString('Config',      'DiaEnvio',        '');
+    LDados.ThreadAtiva            := LIni.ReadBool   ('Thread',    'Ativa',        False);
+    LDados.EnviarEmLote           := LIni.ReadBool   ('ModoEnvio', 'EnviarEmLote', True);
+    LDados.DataEnvio              := LIni.ReadString ('Config',    'DiaEnvio',     '');
     AConfiguracao.Atualizar(LDados);
   finally
     LIni.Free;

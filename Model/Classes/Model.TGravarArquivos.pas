@@ -102,9 +102,10 @@ begin
     LIni.WriteString('Diretorios', 'RpsCancelados',  LDados.DiretorioRpsCancelados);
     LIni.WriteString('Diretorios', 'ArquivoIni',     LDados.DiretorioArquivoIni);
 
-    { Thread }
-    LIni.WriteBool  ('Thread',  'Ativa',     LDados.ThreadAtiva);
-    LIni.WriteString('Config',  'DiaEnvio',  LDados.DataEnvio);
+    { Thread — grava 0/1 para compatibilidade com o servico Windows }
+    LIni.WriteInteger('Thread',    'Ativa',       Ord(LDados.ThreadAtiva));
+    LIni.WriteInteger('ModoEnvio', 'EnviarEmLote', Ord(LDados.EnviarEmLote));
+    LIni.WriteString ('Config',    'DiaEnvio',    LDados.DataEnvio);
 
     LIni.UpdateFile;
   finally

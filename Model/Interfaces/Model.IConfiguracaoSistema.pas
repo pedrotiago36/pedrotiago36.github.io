@@ -12,6 +12,7 @@ type
     DiretorioRpsCancelados: string;
     DiretorioArquivoIni   : string;
     ThreadAtiva           : Boolean;
+    EnviarEmLote          : Boolean;  { True=Lote | False=Individual }
     DataEnvio             : string;
   end;
 

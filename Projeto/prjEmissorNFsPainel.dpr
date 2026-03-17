@@ -1,4 +1,4 @@
-program prjEmissorNFsPainel;
+﻿program prjEmissorNFsPainel;
 
 uses
   Vcl.Forms,
@@ -14,6 +14,8 @@ uses
   Model.IGravarArquivos in '..\Model\Interfaces\Model.IGravarArquivos.pas',
   Model.ILeituraArquivos in '..\Model\Interfaces\Model.ILeituraArquivos.pas',
   Model.IRecuperarArquivos in '..\Model\Interfaces\Model.IRecuperarArquivos.pas',
+  Model.IMonitorNotificacao in '..\Model\Interfaces\Model.IMonitorNotificacao.pas',
+  Model.TMonitorNotificacao in '..\Model\Classes\Model.TMonitorNotificacao.pas',
   Controller.TConfiguracaoView in '..\Controller\Classes\Controller.TConfiguracaoView.pas',
   Controller.TPrincipal in '..\Controller\Classes\Controller.TPrincipal.pas',
   Controller.IConfiguracaoView in '..\Controller\Interfaces\Controller.IConfiguracaoView.pas',

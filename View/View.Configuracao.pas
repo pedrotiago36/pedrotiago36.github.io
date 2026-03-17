@@ -162,7 +162,8 @@ begin
     edtDirEnviados, edtDirErro, edtDirCancelados, edtDirIni, edtDataEnvio,
     chbLigDesl_Thread,
     rbHomologacao, rbProducao,
-    pnlBordaHomolog, pnlBordaProducao);
+    pnlBordaHomolog, pnlBordaProducao,
+    rbEnviarLote, rbEnviarIndividual);
   case TFile.Exists(TPath.Combine(LCaminhoConfig, 'NFSe_Servico.ini')) of
     True : FController.ExibirMensagemStatus(lblStatus,
              'Configura' + #231 + #227 + 'o carregada com sucesso.', COR_STATUS_OK);
@@ -176,7 +177,7 @@ begin
   FController.ColetarTela(
     edtUrlHomologacao, edtUrlProducao,
     edtDirEnviados, edtDirErro, edtDirCancelados, edtDirIni, edtDataEnvio,
-    chbLigDesl_Thread, rbHomologacao);
+    chbLigDesl_Thread, rbHomologacao, rbEnviarLote);
   FController.Salvar;
   FController.ExibirMensagemStatus(lblStatus,
     'Configura' + #231 + #227 + 'o salva com sucesso!', COR_STATUS_OK);
