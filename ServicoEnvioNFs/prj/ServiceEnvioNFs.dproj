@@ -93,6 +93,7 @@
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
         <SanitizedProjectName>ServiceEnvioNFs</SanitizedProjectName>
+        <DCC_UnitSearchPath>..\View;..\Controller;..\Controller\Classes;..\Controller\Interfaces;..\Service;..\Model\Classes;..\Model\Interfaces;..\Shared;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android)'!=''">
         <DCC_UsePackage>FireDACIBDriver;fmx;DbxCommonDriver;bindengine;IndyIPCommon;emsclient;IndyProtocols;dbxcds;FmxTeeUI;FireDACSqliteDriver;DbxClientDriver;soapmidas;dbexpress;inet;FireDACDBXDriver;CustomIPTransport;IndySystem;FireDACCommon;emsserverresource;bindcompdbx;rtl;DBXSqliteDriver;DataSnapFireDAC;FireDAC;xmlrtl;dsnap;DataSnapNativeClient;emshosting;FireDACCommonDriver;CurrencyEditVCLDelphi12Athenas;IndyIPClient;emsedge;bindcompfmx;fmxFireDAC;DataSnapCommon;fmxase;dbrtl;DBXInterBaseDriver;bindcomp;inetstn;IndyCore;RESTBackendComponents;RESTComponents;IndyIPServer;dsnapxml;DataSnapClient;DataSnapProviderClient;emsclientfiredac;FireDACDSDriver;tethering;CloudService;FMXTee;soaprtl;soapserver;$(DCC_UsePackage)</DCC_UsePackage>
@@ -157,19 +158,16 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="..\View\View.TServiceEnvioNFs.pas"/>
-        <DCCReference Include="..\Shared\Shared.Tipos.pas"/>
-        <DCCReference Include="..\Service\Service.pas">
-            <Form>Service1</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TService</DesignClass>
-        </DCCReference>
+        <DCCReference Include="..\View\View.TInstalador.pas"/>
+        <DCCReference Include="..\Controller\Classes\Controller.TInstalador.pas"/>
         <DCCReference Include="..\Service\Service.TWorkerThread.pas"/>
-        <DCCReference Include="..\Model\Classes\Model.TConfiguracaoModel.pas"/>
-        <DCCReference Include="..\Model\Classes\Model.TNotificadorModel.pas"/>
-        <DCCReference Include="..\Model\Interfaces\Model.IConfiguracaoModel.pas"/>
-        <DCCReference Include="..\Model\Interfaces\Model.INotificadorModel.pas"/>
         <DCCReference Include="..\Controller\Classes\Controller.TAgendamento.pas"/>
         <DCCReference Include="..\Controller\Interfaces\Controller.IAgendamento.pas"/>
+        <DCCReference Include="..\Model\Classes\Model.TConfiguracaoModel.pas"/>
+        <DCCReference Include="..\Model\Interfaces\Model.IConfiguracaoModel.pas"/>
+        <DCCReference Include="..\Model\Classes\Model.TNotificadorModel.pas"/>
+        <DCCReference Include="..\Model\Interfaces\Model.INotificadorModel.pas"/>
+        <DCCReference Include="..\Shared\Shared.Tipos.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -192,6 +190,12 @@
                 </Source>
             </Delphi.Personality>
             <Deployment Version="5">
+                <DeployFile LocalName="Win32\Debug\ServiceEnvioNFs.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>ServiceEnvioNFs.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="Win32\Debug\ServiceEnvioNFs.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>ServiceEnvioNFs.exe</RemoteName>

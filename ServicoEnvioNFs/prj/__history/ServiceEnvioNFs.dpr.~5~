@@ -7,7 +7,7 @@ uses
   Vcl.SvcMgr,
   View.TServiceEnvioNFs  in '..\View\View.TServiceEnvioNFs.pas',
   View.TInstalador       in '..\View\View.TInstalador.pas',
-  Controller.TInstalador in '..\Controller\Classes\Controller.TInstalador.pas',
+  Controller.TInstalador in '..\Controller\Controller.TInstalador.pas',
   Service.TWorkerThread  in '..\Service\Service.TWorkerThread.pas',
   Controller.TAgendamento  in '..\Controller\Classes\Controller.TAgendamento.pas',
   Controller.IAgendamento  in '..\Controller\Interfaces\Controller.IAgendamento.pas',
@@ -33,6 +33,13 @@ begin
   end;
 end;
 
+procedure IniciarComoServico;
+begin
+  Application.Initialize;
+  Application.CreateForm(TServiceEnvioNFs, ServiceEnvioNFs);
+  Application.Run;
+end;
+
 var
   LEhParametroServico: Boolean;
 begin
@@ -41,12 +48,7 @@ begin
                          Application.Installing;
 
   case LEhParametroServico of
-    True:
-    begin
-      Vcl.SvcMgr.Application.Initialize;
-      Vcl.SvcMgr.Application.CreateForm(TServiceEnvioNFs, ServicoNFs);
-      Vcl.SvcMgr.Application.Run;
-    end;
+    True : IniciarComoServico;
     False: AbrirInstalador;
   end;
 end.

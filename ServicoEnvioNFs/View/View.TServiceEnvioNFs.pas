@@ -65,7 +65,7 @@ type
   end;
 
 var
-  ServiceEnvioNFs: TServiceEnvioNFs;
+  ServicoNFs: TServiceEnvioNFs;
 
 implementation
 
@@ -73,7 +73,7 @@ implementation
 
 procedure ServiceController(CtrlCode: DWord); stdcall;
 begin
-  ServiceEnvioNFs.Controller(CtrlCode);
+  ServicoNFs.Controller(CtrlCode);
 end;
 
 function TServiceEnvioNFs.GetServiceController: TServiceController;
