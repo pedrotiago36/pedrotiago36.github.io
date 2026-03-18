@@ -69,7 +69,7 @@ var
 
 implementation
 
-// Sem {$R *.dfm} - servico nao tem form, nao tem DFM
+{$R *.dfm}
 
 procedure ServiceController(CtrlCode: DWord); stdcall;
 begin
@@ -196,5 +196,9 @@ procedure TServiceEnvioNFs.ServiceAfterInstall(Sender: TService);
 begin
   GravarDescricaoRegistry;
 end;
+
+
+initialization
+  RegisterClass(TServiceEnvioNFs);
 
 end.

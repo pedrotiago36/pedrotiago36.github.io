@@ -44,7 +44,7 @@ begin
     True:
     begin
       Vcl.SvcMgr.Application.Initialize;
-      Vcl.SvcMgr.Application.CreateForm(TServiceEnvioNFs, ServicoNFs);
+      ServicoNFs := TServiceEnvioNFs.Create(Vcl.SvcMgr.Application);
       Vcl.SvcMgr.Application.Run;
     end;
     False: AbrirInstalador;
