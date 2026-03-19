@@ -103,6 +103,10 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+        <DCC_ExeOutput>..\exe</DCC_ExeOutput>
+        <DCC_DcuOutput>..\exe\dcu</DCC_DcuOutput>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
@@ -141,11 +145,17 @@
         <DCCReference Include="..\Model\Interfaces\Model.IGravarArquivos.pas"/>
         <DCCReference Include="..\Model\Interfaces\Model.ILeituraArquivos.pas"/>
         <DCCReference Include="..\Model\Interfaces\Model.IRecuperarArquivos.pas"/>
+        <DCCReference Include="..\Model\Interfaces\Model.IMonitorNotificacao.pas"/>
+        <DCCReference Include="..\Model\Classes\Model.TMonitorNotificacao.pas"/>
         <DCCReference Include="..\Controller\Classes\Controller.TConfiguracaoView.pas"/>
         <DCCReference Include="..\Controller\Classes\Controller.TPrincipal.pas"/>
         <DCCReference Include="..\Controller\Interfaces\Controller.IConfiguracaoView.pas"/>
         <DCCReference Include="..\Controller\Interfaces\Controller.IPrincipal.pas"/>
         <DCCReference Include="..\View\Utils\View.Utils.Principal.pas"/>
+        <DCCReference Include="..\Model\Interfaces\Model.IAgendamentoNotificacao.pas"/>
+        <DCCReference Include="..\Model\Classes\Model.TAgendamentoNotificacao.pas"/>
+        <DCCReference Include="..\View\View.DialogoAgendamento.pas"/>
+        <DCCReference Include="..\View\View.ToastAgendamento.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -166,6 +176,10 @@
                 <Source>
                     <Source Name="MainSource">prjEmissorNFsPainel.dpr</Source>
                 </Source>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k290.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp290.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="5">
                 <DeployFile LocalName="Win32\Debug\prjEmissorNFsPainel.exe" Configuration="Debug" Class="ProjectOutput">

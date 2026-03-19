@@ -20,7 +20,11 @@ uses
   Controller.TPrincipal in '..\Controller\Classes\Controller.TPrincipal.pas',
   Controller.IConfiguracaoView in '..\Controller\Interfaces\Controller.IConfiguracaoView.pas',
   Controller.IPrincipal in '..\Controller\Interfaces\Controller.IPrincipal.pas',
-  View.Utils.Principal in '..\View\Utils\View.Utils.Principal.pas';
+  View.Utils.Principal in '..\View\Utils\View.Utils.Principal.pas',
+  Model.IAgendamentoNotificacao in '..\Model\Interfaces\Model.IAgendamentoNotificacao.pas',
+  Model.TAgendamentoNotificacao in '..\Model\Classes\Model.TAgendamentoNotificacao.pas',
+  View.DialogoAgendamento in '..\View\View.DialogoAgendamento.pas',
+  View.ToastAgendamento in '..\View\View.ToastAgendamento.pas';
 
 {$R *.res}
 

@@ -1,4 +1,4 @@
-unit View.Principal;
+﻿unit View.Principal;
 
 interface
 
@@ -17,6 +17,7 @@ uses
   Vcl.Buttons,
   Vcl.ComCtrls,
   Vcl.Menus,
+  Winapi.ShellAPI,
   Data.DB,
   { EhLib }
   GridsEh,
@@ -36,6 +37,10 @@ uses
   FireDAC.Comp.Client,
   { Controller }
   Controller.TPrincipal,
+  { Agendamento }
+  Model.IAgendamentoNotificacao,
+  Model.TAgendamentoNotificacao,
+  View.ToastAgendamento,
   { Model }
   Model.IEstatisticasUnidade,
   Model.IMonitorNotificacao,
@@ -253,8 +258,17 @@ type
     procedure SidebarMouseLeave(Sender: TObject);
 
   private
-    FController: TControllerPrincipal;
-    FMonitor   : IMonitorNotificacao;
+    FController  : TControllerPrincipal;
+    FMonitor     : IMonitorNotificacao;
+    FAgendamento : IAgendamentoNotificacao;
+    FTrayIcon    : TTrayIcon;
+    FTrayMenu    : TPopupMenu;
+    function ResolverCaminhoIni: string;
+    procedure InicializarTray;
+    procedure TrayDblClick(Sender: TObject);
+    procedure TrayMenuAbrir(Sender: TObject);
+    procedure TrayMenuFechar(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   end;
 
 var
@@ -311,6 +325,31 @@ begin
 end;
 
 { ── Form ───────────────────────────────────────────────────────── }
+
+function TFrmPrincipal.ResolverCaminhoIni: string;
+var
+  LBase, LTentativa, LConfig: string;
+  LI: Integer;
+begin
+  LConfig := '';
+  LBase   := ExtractFilePath(ParamStr(0));
+  for LI := 0 to 5 do
+  begin
+    LTentativa := TPath.Combine(TPath.Combine(LBase, 'exe'), 'Config');
+    case TFile.Exists(TPath.Combine(LTentativa, 'NFSe_Servico.ini')) of
+      True: begin LConfig := LTentativa; Break; end;
+    end;
+    LTentativa := TPath.Combine(LBase, 'Config');
+    case TFile.Exists(TPath.Combine(LTentativa, 'NFSe_Servico.ini')) of
+      True: begin LConfig := LTentativa; Break; end;
+    end;
+    LBase := TPath.GetFullPath(TPath.Combine(LBase, '..'));
+  end;
+  case LConfig.IsEmpty of
+    True: LConfig := TPath.Combine(ExtractFilePath(ParamStr(0)), 'Config');
+  end;
+  Result := TPath.Combine(LConfig, 'NFSe_Servico.ini');
+end;
 
 procedure TFrmPrincipal.FormCreate(Sender: TObject);
 begin
@@ -413,9 +452,23 @@ begin
 
   AtualizarTudo(FController, Self);
 
+  InicializarTray;
+
   { Inicia monitor de notificacao do servico de envio }
   FMonitor := TMonitorNotificacao.Criar;
   FMonitor.Iniciar;
+
+  { Inicia thread de agendamento de envio }
+  FAgendamento := TAgendamentoNotificacao.Criar;
+  FAgendamento.Iniciar(
+    ResolverCaminhoIni,
+    procedure(const ADiaEnvio, AMes, AAno: Integer;
+              const ADataFmt: string)
+    begin
+      ExibirToastAgendamento(
+        ADiaEnvio, AMes, AAno, ADataFmt,
+        ResolverCaminhoIni);
+    end);
 
   Self.OnResize := FormResize;
   TViewUtilsPrincipal.ExibirStatus(lblStatus,
@@ -425,8 +478,10 @@ end;
 procedure TFrmPrincipal.FormDestroy(Sender: TObject);
 begin
   FMonitor.Parar;
-  FMonitor   := nil;
-  FController := nil;
+  FMonitor     := nil;
+  FAgendamento.Parar;
+  FAgendamento := nil;
+  FController  := nil;
 end;
 
 { ── Cards ──────────────────────────────────────────────────────── }
@@ -584,5 +639,68 @@ procedure TFrmPrincipal.pgcSituacaoDrawTab(Control: TCustomTabControl;
 begin
   TViewUtilsPrincipal.DrawTabSituacao(Control, TabIndex, Rect, Active);
 end;
+
+{ ?? System Tray ???????????????????????????????????????????????????? }
+
+procedure TFrmPrincipal.InicializarTray;
+var
+  LItemAbrir : TMenuItem;
+  LItemSep   : TMenuItem;
+  LItemFechar: TMenuItem;
+begin
+  FTrayMenu := TPopupMenu.Create(Self);
+
+  LItemAbrir         := TMenuItem.Create(FTrayMenu);
+  LItemAbrir.Caption := 'Abrir Monitor';
+  LItemAbrir.Default := True;
+  LItemAbrir.OnClick := TrayMenuAbrir;
+  FTrayMenu.Items.Add(LItemAbrir);
+
+  LItemSep         := TMenuItem.Create(FTrayMenu);
+  LItemSep.Caption := '-';
+  FTrayMenu.Items.Add(LItemSep);
+
+  LItemFechar         := TMenuItem.Create(FTrayMenu);
+  LItemFechar.Caption := 'Fechar';
+  LItemFechar.OnClick := TrayMenuFechar;
+  FTrayMenu.Items.Add(LItemFechar);
+
+  FTrayIcon            := TTrayIcon.Create(Self);
+  FTrayIcon.PopupMenu  := FTrayMenu;
+  FTrayIcon.Hint       := 'Monitor de Emiss' + #227 + 'o NFS-e';
+  FTrayIcon.Visible    := True;
+  FTrayIcon.OnDblClick := TrayDblClick;
+
+  Application.ShowMainForm := False;
+  Self.Hide;
+  Self.OnClose := FormClose;
+end;
+
+procedure TFrmPrincipal.TrayDblClick(Sender: TObject);
+begin
+  TrayMenuAbrir(Sender);
+end;
+
+procedure TFrmPrincipal.TrayMenuAbrir(Sender: TObject);
+begin
+  Self.Show;
+  Self.WindowState := wsNormal;
+  Application.ShowMainForm := True;
+  Self.BringToFront;
+end;
+
+procedure TFrmPrincipal.TrayMenuFechar(Sender: TObject);
+begin
+  FTrayIcon.Visible := False;
+  Application.Terminate;
+end;
+
+procedure TFrmPrincipal.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caNone;
+  Self.Hide;
+  Application.ShowMainForm := False;
+end;
+
 
 end.
