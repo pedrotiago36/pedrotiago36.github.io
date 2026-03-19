@@ -1,0 +1,61 @@
+# Pastas de compilação/binários (IGNORAR)
+dcu/
+exe/
+__history/
+__recovery/
+bin/
+obj/
+lib/
+dll/
+
+# Arquivos de backup (IGNORAR)
+*.rar
+*.zip
+*.7z
+*.bak
+*.old
+*.backup
+*.~*
+
+# Documentação (se não quiser versionar)
+Documentação Funcionamento/
+Documentação técnica/
+Documentacao/
+docs/
+Help/
+
+# Arquivos temporários
+*.tmp
+*.temp
+*.log
+*.cache
+*.local
+*.pid
+*.seed
+*.pid.lock
+
+# Pastas do sistema
+Desktop.ini
+Thumbs.db
+*.db
+*.sqlite
+*.sqlite3
+
+# Arquivos específicos do projeto (se houver)
+*.dcu
+*.exe
+*.dll
+*.so
+*.dylib
+*.obj
+*.o
+*.a
+*.lib
+*.so.*
+*.dSYM/
+
+# Arquivos de configuração locais
+*.local
+*.user
+*.userosscache
+*.userprefs
