@@ -353,19 +353,9 @@ end;
 
 procedure TFrmPrincipal.FormCreate(Sender: TObject);
 begin
+
   FController := TControllerPrincipal.Criar;
   FController.Inicializar;
-
-  Self.Font.Name := 'Segoe UI';
-  Self.Font.Size := 9;
-
-  TViewUtilsPrincipal.DesativarTemasGerais(Self, [
-    pnlSidebar, pnlSidebarTopo, pnlSidebarMenu, pnlSidebarRodape,
-    pnlTopo, pnlCards,
-    pnlCardSede, pnlCardUEQ, pnlCardVarjota, pnlCardSeisBocas,
-    pnlStatus
-  ]);
-
   pnlTopo.BevelOuter   := bvNone;
   pnlCards.BevelOuter  := bvNone;
   pnlStatus.BevelOuter := bvNone;
@@ -450,7 +440,7 @@ begin
   TViewUtilsPrincipal.CentralizarCards(pnlCards,
     [pnlCardSede, pnlCardUEQ, pnlCardVarjota, pnlCardSeisBocas]);
 
-  AtualizarTudo(FController, Self);
+  AtualizarTudo(FController, Self);   //AV ocorre aqui
 
   InicializarTray;
 

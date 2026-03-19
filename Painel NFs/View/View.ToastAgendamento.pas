@@ -1,4 +1,4 @@
-﻿unit View.ToastAgendamento;
+unit View.ToastAgendamento;
 
 interface
 
@@ -16,26 +16,24 @@ uses
   System.SysUtils,
   System.IniFiles,
   System.SyncObjs,
+  System.Classes,
   Vcl.Forms,
   Vcl.Controls,
   Vcl.StdCtrls,
   Vcl.ExtCtrls,
-  Vcl.Graphics,
-  Winapi.MultiMon;
+  Vcl.Graphics;
 
 const
-  TOAST_W      = 380;
-  TOAST_H      = 180;
-  MARGEM       = 20;
-  COR_FUNDO    = $00252525;
-  COR_TOPO     = $00C45000;
-  COR_TITULO   = $00FFFFFF;
-  COR_TEXTO    = $00D0D0D0;
-  COR_DESTAQUE = $0055DDFF;
-  COR_SEP      = $00404040;
-  COR_CAMPO    = $00303030;
-  COR_BTN_SIM  = $00226622;
-  COR_BTN_NAO  = $00884400;
+  TOAST_W   = 340;
+  TOAST_H   = 160;
+  MARGEM    = 12;
+  COR_FUNDO = $00FFFFFF;
+  COR_TOPO  = $00C45000;
+  COR_LINHA = $0064D747;
+  COR_TIT   = $003F3F3F;
+  COR_TEXTO = $00616161;
+  COR_DEST  = $00C45000;
+  COR_CAMPO = $00F5F5F5;
 
 function EhBissexto(const AAno: Integer): Boolean;
 begin
@@ -67,66 +65,92 @@ begin
   end;
 end;
 
-procedure AnimarSubida(const AForm: TForm;
-  const AXFinal, AYFinal: Integer);
+{ Posiciona acima do relogio — usa GetMonitorInfo do monitor da taskbar }
+procedure ObterPosicaoRelogio(out AX, AY: Integer);
 var
-  LY: Integer;
+  LTray    : HWND;
+  LTrayRect: TRect;
 begin
-  LY := AYFinal + TOAST_H + 20;
-  AForm.SetBounds(AXFinal, LY, TOAST_W, TOAST_H);
-  AForm.Visible := True;
-  while LY > AYFinal do
-  begin
-    Dec(LY, 8);
-    case LY < AYFinal of
-      True: LY := AYFinal;
-    end;
-    AForm.Top := LY;
-    AForm.Update;
-    Sleep(6);
-  end;
+  LTray := FindWindow('Shell_TrayWnd', nil);
+  GetWindowRect(LTray, LTrayRect);
+  { A taskbar ocupa toda a largura inferior — Right e o limite direito da tela }
+  { X: posiciona pelo Right da taskbar menos a largura do toast                }
+  { Y: posiciona acima do topo da taskbar                                      }
+  AX := LTrayRect.Right - TOAST_W - MARGEM;
+  AY := LTrayRect.Top   - TOAST_H - MARGEM;
 end;
 
-{ ── Controlador ────────────────────────────────────────────────────── }
+{ ── Form customizado com posicao forcada via CreateParams ───────────── }
+
+type
+  TFormToast = class(TForm)
+  private
+    FX: Integer;
+    FY: Integer;
+  protected
+    procedure CreateParams(var Params: TCreateParams); override;
+  public
+    constructor CriarNaPosicao(const AX, AY, AW, AH: Integer);
+  end;
+
+constructor TFormToast.CriarNaPosicao(const AX, AY, AW, AH: Integer);
+begin
+  FX := AX;
+  FY := AY;
+  inherited CreateNew(nil);
+  Width  := AW;
+  Height := AH;
+end;
+
+procedure TFormToast.CreateParams(var Params: TCreateParams);
+begin
+  inherited CreateParams(Params);
+  Params.X      := FX;
+  Params.Y      := FY;
+  Params.Style  := WS_POPUP or WS_VISIBLE;
+  Params.ExStyle := WS_EX_TOPMOST or WS_EX_TOOLWINDOW;
+end;
+
+{ ── Controlador ─────────────────────────────────────────────────────── }
 
 type
   TToastCtrl = class
   private
-    FDiaEnvio  : Integer;
-    FMes       : Integer;
-    FAno       : Integer;
-    FCaminho   : string;
-    FMax       : Integer;
-    FFechado   : TEvent;
-    FPnlCampo  : TPanel;
-    FEdtDia    : TEdit;
-    FBtnSim    : TButton;
-    FBtnNao    : TButton;
+    FDiaEnvio : Integer;
+    FMes      : Integer;
+    FAno      : Integer;
+    FCaminho  : string;
+    FMax      : Integer;
+    FFechado  : TEvent;
+    FPnlCampo : TPanel;
+    FEdtDia   : TEdit;
+    FBtnSim   : TButton;
+    FBtnNao   : TButton;
   public
     constructor Create(
-      const ADia, AMes, AAno: Integer;
-      const ACaminho: string;
-      const AMax: Integer;
-      const AFechado: TEvent;
-      const APnlCampo: TPanel;
-      const AEdtDia: TEdit;
-      const ABtnSim, ABtnNao: TButton);
+      const ADia, AMes, AAno : Integer;
+      const ACaminho         : string;
+      const AMax             : Integer;
+      const AFechado         : TEvent;
+      const APnlCampo        : TPanel;
+      const AEdtDia          : TEdit;
+      const ABtnSim, ABtnNao : TButton);
     procedure SimClick(Sender: TObject);
     procedure NaoClick(Sender: TObject);
   end;
 
 constructor TToastCtrl.Create(
-  const ADia, AMes, AAno: Integer;
-  const ACaminho: string;
-  const AMax: Integer;
-  const AFechado: TEvent;
-  const APnlCampo: TPanel;
-  const AEdtDia: TEdit;
-  const ABtnSim, ABtnNao: TButton);
+  const ADia, AMes, AAno : Integer;
+  const ACaminho         : string;
+  const AMax             : Integer;
+  const AFechado         : TEvent;
+  const APnlCampo        : TPanel;
+  const AEdtDia          : TEdit;
+  const ABtnSim, ABtnNao : TButton);
 begin
   inherited Create;
-  FDiaEnvio := ADia;   FMes := AMes;  FAno := AAno;
-  FCaminho  := ACaminho; FMax := AMax;
+  FDiaEnvio := ADia;  FMes := AMes;  FAno := AAno;
+  FCaminho  := ACaminho;  FMax := AMax;
   FFechado  := AFechado;
   FPnlCampo := APnlCampo;
   FEdtDia   := AEdtDia;
@@ -176,11 +200,11 @@ procedure ExibirToastAgendamento(
   const ACaminhoIni: string);
 var
   LFrm       : TForm;
-  LPnlTopo   : TPanel;
-  LPnlCorpo  : TPanel;
-  LPnlCampo  : TPanel;
-  LPnlBotoes : TPanel;
-  LLblIcon   : TLabel;
+  LPnlBox    : TPanel;   { painel principal igual ao exemplo }
+  LPnlLinha  : TPanel;   { linha colorida lateral esquerda   }
+  LPnlMsg    : TPanel;   { area da mensagem                  }
+  LPnlCampo  : TPanel;   { campo novo dia                    }
+  LPnlBotoes : TPanel;   { botoes                            }
   LLblTitulo : TLabel;
   LLblMsg1   : TLabel;
   LLblMsg2   : TLabel;
@@ -192,144 +216,172 @@ var
   LFechado   : TEvent;
   LCtrl      : TToastCtrl;
   LMax       : Integer;
-  LX, LY     : Integer;
-  LTaskbar   : HWND;
-  LTaskRect  : TRect;
-  LMonitor   : HMONITOR;
-  LMonInfo   : TMonitorInfo;
+  LXFinal    : Integer;
+  LYFinal    : Integer;
 begin
   LMax     := MaxDiaMes(AMes, AAno);
   LFechado := TEvent.Create(nil, True, False, '');
   LCtrl    := nil;
-  LFrm     := TForm.CreateNew(nil);
+
+  ObterPosicaoRelogio(LXFinal, LYFinal);
+
+  { Form invisivel apenas como container TOPMOST }
+  LFrm := TForm.CreateNew(nil);
   try
-    { ── Form base ── }
     LFrm.BorderStyle     := bsNone;
     LFrm.Width           := TOAST_W;
     LFrm.Height          := TOAST_H;
+    LFrm.Color           := clNone;
+    LFrm.FormStyle       := fsStayOnTop;
     LFrm.Font.Name       := 'Segoe UI';
     LFrm.Font.Size       := 9;
-    LFrm.Color           := COR_FUNDO;
     LFrm.AlphaBlend      := True;
-    LFrm.AlphaBlendValue := 248;
-    LFrm.FormStyle       := fsStayOnTop;
+    LFrm.AlphaBlendValue := 252;
 
-    { ── Faixa topo colorida ── }
-    LPnlTopo             := TPanel.Create(LFrm);
-    LPnlTopo.Parent      := LFrm;
-    LPnlTopo.Align       := alTop;
-    LPnlTopo.Height      := 36;
-    LPnlTopo.BevelOuter  := bvNone;
-    LPnlTopo.Color       := COR_TOPO;
-    LPnlTopo.ParentColor := False;
+    { PanelBox — igual ao TToastMessage do exemplo }
+    LPnlBox              := TPanel.Create(LFrm);
+    LPnlBox.Parent       := LFrm;
+    LPnlBox.Align        := alClient;
+    LPnlBox.BevelOuter   := bvNone;
+    LPnlBox.BevelInner   := bvNone;
+    LPnlBox.BevelKind    := bkNone;
+    LPnlBox.Color        := COR_FUNDO;
+    LPnlBox.ParentColor  := False;
+    LPnlBox.Ctl3D        := False;
 
-    LLblIcon             := TLabel.Create(LFrm);
-    LLblIcon.Parent      := LPnlTopo;
-    LLblIcon.Caption     := #$1F4C5;
-    LLblIcon.Font.Size   := 14;
-    LLblIcon.Top         := 6;
-    LLblIcon.Left        := 10;
+    { Linha colorida lateral esquerda — igual ao exemplo }
+    LPnlLinha              := TPanel.Create(LFrm);
+    LPnlLinha.Parent       := LPnlBox;
+    LPnlLinha.Align        := alLeft;
+    LPnlLinha.Width        := 5;
+    LPnlLinha.BevelOuter   := bvNone;
+    LPnlLinha.BevelInner   := bvNone;
+    LPnlLinha.BevelKind    := bkNone;
+    LPnlLinha.Color        := COR_TOPO;
+    LPnlLinha.ParentColor  := False;
+    LPnlLinha.Ctl3D        := False;
 
+    { Area da mensagem }
+    LPnlMsg              := TPanel.Create(LFrm);
+    LPnlMsg.Parent       := LPnlBox;
+    LPnlMsg.Align        := alClient;
+    LPnlMsg.BevelOuter   := bvNone;
+    LPnlMsg.BevelInner   := bvNone;
+    LPnlMsg.BevelKind    := bkNone;
+    LPnlMsg.Color        := COR_FUNDO;
+    LPnlMsg.ParentColor  := False;
+    LPnlMsg.Ctl3D        := False;
+
+    { Titulo }
     LLblTitulo            := TLabel.Create(LFrm);
-    LLblTitulo.Parent     := LPnlTopo;
-    LLblTitulo.Caption    := 'Lembrete  —  Envio de NFS-e';
+    LLblTitulo.Parent     := LPnlMsg;
+    LLblTitulo.Caption    := 'Lembrete de Envio NFS-e';
     LLblTitulo.Font.Style := [fsBold];
-    LLblTitulo.Font.Size  := 10;
-    LLblTitulo.Font.Color := COR_TITULO;
-    LLblTitulo.Top        := 9;
-    LLblTitulo.Left       := 38;
+    LLblTitulo.Font.Size  := 11;
+    LLblTitulo.Font.Color := COR_TIT;
+    LLblTitulo.Font.Name  := 'Segoe UI';
+    LLblTitulo.Align      := alTop;
+    LLblTitulo.Alignment  := taCenter;
+    LLblTitulo.Layout     := tlCenter;
+    LLblTitulo.Top        := 0;
+    LLblTitulo.AutoSize   := False;
+    LLblTitulo.Height     := 30;
 
-    { ── Corpo ── }
-    LPnlCorpo            := TPanel.Create(LFrm);
-    LPnlCorpo.Parent     := LFrm;
-    LPnlCorpo.Align      := alClient;
-    LPnlCorpo.BevelOuter := bvNone;
-    LPnlCorpo.Color      := COR_FUNDO;
-    LPnlCorpo.ParentColor := False;
+    { Mensagem linha 1 }
+    LLblMsg1              := TLabel.Create(LFrm);
+    LLblMsg1.Parent       := LPnlMsg;
+    LLblMsg1.Caption      := 'Faltam 1 dia pros envios das notas fiscais pra SEFIN.';
+    LLblMsg1.Font.Color   := COR_TEXTO;
+    LLblMsg1.Font.Size    := 9;
+    LLblMsg1.Font.Name    := 'Segoe UI';
+    LLblMsg1.WordWrap     := True;
+    LLblMsg1.AutoSize     := False;
+    LLblMsg1.Width        := TOAST_W - 30;
+    LLblMsg1.Alignment    := taCenter;
+    LLblMsg1.Top          := 34;
+    LLblMsg1.Left         := 4;
+    LLblMsg1.Height       := 32;
 
-    LLblMsg1             := TLabel.Create(LFrm);
-    LLblMsg1.Parent      := LPnlCorpo;
-    LLblMsg1.Caption     := 'Faltam 1 dia pros envios das notas fiscais pra SEFIN.';
-    LLblMsg1.Font.Color  := COR_TEXTO;
-    LLblMsg1.Font.Size   := 9;
-    LLblMsg1.Top         := 12;
-    LLblMsg1.Left        := 14;
-    LLblMsg1.Width       := TOAST_W - 28;
-    LLblMsg1.WordWrap    := True;
+    { Mensagem linha 2 — data destacada }
+    LLblMsg2              := TLabel.Create(LFrm);
+    LLblMsg2.Parent       := LPnlMsg;
+    LLblMsg2.Caption      := 'Deseja que o envio ocorra em ' + ADataFmt + '?';
+    LLblMsg2.Font.Color   := COR_DEST;
+    LLblMsg2.Font.Style   := [fsBold];
+    LLblMsg2.Font.Size    := 10;
+    LLblMsg2.Font.Name    := 'Segoe UI';
+    LLblMsg2.AutoSize     := False;
+    LLblMsg2.Width        := TOAST_W - 30;
+    LLblMsg2.Alignment    := taCenter;
+    LLblMsg2.Top          := 66;
+    LLblMsg2.Left         := 4;
+    LLblMsg2.Height       := 22;
 
-    LLblMsg2             := TLabel.Create(LFrm);
-    LLblMsg2.Parent      := LPnlCorpo;
-    LLblMsg2.Caption     := 'Deseja que o envio ocorra em  ' + ADataFmt + '?';
-    LLblMsg2.Font.Color  := COR_DESTAQUE;
-    LLblMsg2.Font.Style  := [fsBold];
-    LLblMsg2.Font.Size   := 10;
-    LLblMsg2.Top         := 34;
-    LLblMsg2.Left        := 14;
-
-    { ── Painel campo novo dia ── }
-    LPnlCampo            := TPanel.Create(LFrm);
-    LPnlCampo.Parent     := LPnlCorpo;
-    LPnlCampo.BevelOuter := bvNone;
-    LPnlCampo.Color      := COR_CAMPO;
+    { Campo novo dia }
+    LPnlCampo             := TPanel.Create(LFrm);
+    LPnlCampo.Parent      := LPnlMsg;
+    LPnlCampo.BevelOuter  := bvNone;
+    LPnlCampo.Color       := COR_CAMPO;
     LPnlCampo.ParentColor := False;
-    LPnlCampo.Top        := 62;
-    LPnlCampo.Left       := 0;
-    LPnlCampo.Width      := TOAST_W;
-    LPnlCampo.Height     := 32;
-    LPnlCampo.Visible    := False;
+    LPnlCampo.Top         := 92;
+    LPnlCampo.Left        := 4;
+    LPnlCampo.Width       := TOAST_W - 30;
+    LPnlCampo.Height      := 28;
+    LPnlCampo.Visible     := False;
 
-    LLblNovoDia          := TLabel.Create(LFrm);
-    LLblNovoDia.Parent   := LPnlCampo;
-    LLblNovoDia.Caption  := 'Novo dia de envio  (1 – ' + IntToStr(LMax) + '):';
-    LLblNovoDia.Font.Color := COR_TEXTO;
-    LLblNovoDia.Top      := 8;
-    LLblNovoDia.Left     := 14;
+    LLblNovoDia           := TLabel.Create(LFrm);
+    LLblNovoDia.Parent    := LPnlCampo;
+    LLblNovoDia.Caption   := 'Novo dia (1-' + IntToStr(LMax) + '):';
+    LLblNovoDia.Font.Color:= COR_TEXTO;
+    LLblNovoDia.Top       := 7;
+    LLblNovoDia.Left      := 8;
 
-    LEdtDia              := TEdit.Create(LFrm);
-    LEdtDia.Parent       := LPnlCampo;
-    LEdtDia.Top          := 4;
-    LEdtDia.Left         := 200;
-    LEdtDia.Width        := 40;
-    LEdtDia.MaxLength    := 2;
-    LEdtDia.Text         := IntToStr(ADiaEnvio);
-    LEdtDia.Font.Size    := 11;
-    LEdtDia.Font.Style   := [fsBold];
+    LEdtDia               := TEdit.Create(LFrm);
+    LEdtDia.Parent        := LPnlCampo;
+    LEdtDia.Top           := 3;
+    LEdtDia.Left          := 110;
+    LEdtDia.Width         := 40;
+    LEdtDia.MaxLength     := 2;
+    LEdtDia.Text          := IntToStr(ADiaEnvio);
+    LEdtDia.Font.Style    := [fsBold];
+    LEdtDia.Font.Size     := 10;
 
-    LLblDica             := TLabel.Create(LFrm);
-    LLblDica.Parent      := LPnlCampo;
-    LLblDica.Caption     := '  e clique  SALVAR';
-    LLblDica.Font.Color  := $00888888;
-    LLblDica.Font.Size   := 8;
-    LLblDica.Top         := 9;
-    LLblDica.Left        := 246;
+    LLblDica              := TLabel.Create(LFrm);
+    LLblDica.Parent       := LPnlCampo;
+    LLblDica.Caption      := 'e clique SALVAR';
+    LLblDica.Font.Color   := clGray;
+    LLblDica.Font.Size    := 8;
+    LLblDica.Top          := 7;
+    LLblDica.Left         := 158;
 
-    { ── Botoes ── }
-    LPnlBotoes            := TPanel.Create(LFrm);
-    LPnlBotoes.Parent     := LFrm;
-    LPnlBotoes.Align      := alBottom;
-    LPnlBotoes.Height     := 46;
-    LPnlBotoes.BevelOuter := bvNone;
-    LPnlBotoes.Color      := $001E1E1E;
+    { Botoes }
+    LPnlBotoes             := TPanel.Create(LFrm);
+    LPnlBotoes.Parent      := LPnlMsg;
+    LPnlBotoes.Align       := alBottom;
+    LPnlBotoes.Height      := 38;
+    LPnlBotoes.BevelOuter  := bvNone;
+    LPnlBotoes.Color       := COR_FUNDO;
     LPnlBotoes.ParentColor := False;
 
-    LBtnSim              := TButton.Create(LFrm);
-    LBtnSim.Parent       := LPnlBotoes;
-    LBtnSim.Caption      := #$2714 + '  SIM';
-    LBtnSim.Width        := 110;
-    LBtnSim.Height       := 30;
-    LBtnSim.Top          := 8;
-    LBtnSim.Left         := 14;
-    LBtnSim.Font.Style   := [fsBold];
-    LBtnSim.Font.Size    := 9;
+    { Botoes centralizados: total 2x110 + gap 10 = 230, centro em (TOAST_W-5)/2 }
+    LBtnSim               := TButton.Create(LFrm);
+    LBtnSim.Parent        := LPnlBotoes;
+    LBtnSim.Caption       := #$2714 + '  SIM';
+    LBtnSim.Width         := 110;
+    LBtnSim.Height        := 26;
+    LBtnSim.Top           := 3;
+    LBtnSim.Left          := ((TOAST_W - 5) div 2) - 115;
+    LBtnSim.Font.Style    := [fsBold];
+    LBtnSim.Font.Size     := 9;
 
-    LBtnNao              := TButton.Create(LFrm);
-    LBtnNao.Parent       := LPnlBotoes;
-    LBtnNao.Caption      := #$2718 + '  N' + #195 + 'O';
-    LBtnNao.Width        := 110;
-    LBtnNao.Height       := 30;
-    LBtnNao.Top          := 8;
-    LBtnNao.Left         := 134;
-    LBtnNao.Font.Size    := 9;
+    LBtnNao               := TButton.Create(LFrm);
+    LBtnNao.Parent        := LPnlBotoes;
+    LBtnNao.Caption       := #$2718 + '  N' + #195 + 'O';
+    LBtnNao.Width         := 110;
+    LBtnNao.Height        := 26;
+    LBtnNao.Top           := 3;
+    LBtnNao.Left          := ((TOAST_W - 5) div 2) + 5;
+    LBtnNao.Font.Size     := 9;
 
     LCtrl := TToastCtrl.Create(
       ADiaEnvio, AMes, AAno, ACaminhoIni, LMax,
@@ -338,17 +390,32 @@ begin
     LBtnSim.OnClick := LCtrl.SimClick;
     LBtnNao.OnClick := LCtrl.NaoClick;
 
-    { ── Posiciona no monitor onde esta a taskbar (lado do relogio) ── }
-    LTaskbar := FindWindow('Shell_TrayWnd', nil);
-    GetWindowRect(LTaskbar, LTaskRect);
-    LMonitor := MonitorFromWindow(LTaskbar, MONITOR_DEFAULTTONEAREST);
-    FillChar(LMonInfo, SizeOf(LMonInfo), 0);
-    LMonInfo.cbSize := SizeOf(LMonInfo);
-    GetMonitorInfo(LMonitor, @LMonInfo);
-    LX := LMonInfo.rcWork.Right  - TOAST_W - MARGEM;
-    LY := LMonInfo.rcWork.Bottom - TOAST_H - MARGEM;
+    { Exibe abaixo da tela e anima subindo }
+    LFrm.Show;
+    MoveWindow(LFrm.Handle, LXFinal, LYFinal + TOAST_H + 10, TOAST_W, TOAST_H, False);
 
-    AnimarSubida(LFrm, LX, LY);
+    TThread.CreateAnonymousThread(
+      procedure
+      var
+        LY   : Integer;
+        LHwnd: HWND;
+      begin
+        LHwnd := LFrm.Handle;
+        LY    := LYFinal + TOAST_H + 10;
+        while LY > LYFinal do
+        begin
+          Dec(LY, 7);
+          case LY < LYFinal of
+            True: LY := LYFinal;
+          end;
+          TThread.Synchronize(nil,
+            procedure
+            begin
+              MoveWindow(LHwnd, LXFinal, LY, TOAST_W, TOAST_H, False);
+            end);
+          Sleep(5);
+        end;
+      end).Start;
 
     while LFechado.WaitFor(50) = wrTimeout do
       Application.ProcessMessages;
