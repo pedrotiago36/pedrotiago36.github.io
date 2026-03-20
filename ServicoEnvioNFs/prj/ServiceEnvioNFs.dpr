@@ -1,52 +1,28 @@
 program ServiceEnvioNFs;
 
 uses
-  Winapi.Windows,
-  System.SysUtils,
-  Vcl.Forms,
   Vcl.SvcMgr,
-  View.TServiceEnvioNFs  in '..\View\View.TServiceEnvioNFs.pas',
-  View.TInstalador       in '..\View\View.TInstalador.pas',
-  Controller.TInstalador in '..\Controller\Classes\Controller.TInstalador.pas',
-  Service.TWorkerThread  in '..\Service\Service.TWorkerThread.pas',
-  Controller.TAgendamento  in '..\Controller\Classes\Controller.TAgendamento.pas',
-  Controller.IAgendamento  in '..\Controller\Interfaces\Controller.IAgendamento.pas',
-  Model.TConfiguracaoModel in '..\Model\Classes\Model.TConfiguracaoModel.pas',
-  Model.IConfiguracaoModel in '..\Model\Interfaces\Model.IConfiguracaoModel.pas',
-  Model.TNotificadorModel  in '..\Model\Classes\Model.TNotificadorModel.pas',
-  Model.INotificadorModel  in '..\Model\Interfaces\Model.INotificadorModel.pas',
-  Shared.Tipos             in '..\Shared\Shared.Tipos.pas';
+  View.DM in '..\View\View.DM.pas' {Service1: TService};
 
-{$R *.res}
+{$R *.RES}
 
-procedure AbrirInstalador;
-var
-  LFrm: TFrmInstalador;
 begin
-  Application.Initialize;
-  Application.Title := 'Servico NFSe - Instalador';
-  LFrm := TFrmInstalador.Create(Application);
-  try
-    LFrm.ShowModal;
-  finally
-    LFrm.Free;
-  end;
-end;
-
-var
-  LEhParametroServico: Boolean;
-begin
-  LEhParametroServico := FindCmdLineSwitch('install') or
-                         FindCmdLineSwitch('uninstall') or
-                         Application.Installing;
-
-  case LEhParametroServico of
-    True:
-    begin
-      Vcl.SvcMgr.Application.Initialize;
-      ServicoNFs := TServiceEnvioNFs.Create(Vcl.SvcMgr.Application);
-      Vcl.SvcMgr.Application.Run;
-    end;
-    False: AbrirInstalador;
-  end;
+  // Windows 2003 Server requires StartServiceCtrlDispatcher to be
+  // called before CoRegisterClassObject, which can be called indirectly
+  // by Application.Initialize. TServiceApplication.DelayInitialize allows
+  // Application.Initialize to be called from TService.Main (after
+  // StartServiceCtrlDispatcher has been called).
+  //
+  // Delayed initialization of the Application object may affect
+  // events which then occur prior to initialization, such as
+  // TService.OnCreate. It is only recommended if the ServiceApplication
+  // registers a class object with OLE and is intended for use with
+  // Windows 2003 Server.
+  //
+  // Application.DelayInitialize := True;
+  //
+  if not Application.DelayInitialize or Application.Installing then
+    Application.Initialize;
+  Application.CreateForm(TService1, Service1);
+  Application.Run;
 end.
