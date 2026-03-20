@@ -30,6 +30,10 @@ Help/
 *.log
 *.cache
 *.local
+*.dsk
+*.dsv
+*.identcache
+*.res
 *.pid
 *.seed
 *.pid.lock
