@@ -1,5 +1,10 @@
-object Service1: TService1
-  DisplayName = 'Service1'
-  Height = 480
-  Width = 640
+object DMServico: TDMServico
+  DisplayName = 'Servico Envio NFs - SEFIN Fortaleza'
+  AfterInstall = ServiceAfterInstall
+  OnExecute = ServiceExecute
+  OnShutdown = ServiceShutdown
+  OnStart = ServiceStart
+  OnStop = ServiceStop
+  Height = 39
+  Width = 136
 end

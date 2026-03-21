@@ -1,15 +1,10 @@
 unit Controller.TGeracaoXml;
 
-{
-  Controller de geracao de XML NFSe.
-  Orquestra: Repositorio -> Montador -> Resultado.
-}
-
 interface
 
 uses
   Controller.IGeracaoXml,
-  Model.IConfiguracaoEnvio,
+  Model.IConexaoDB,
   Model.IRepositorioRps,
   Model.IMontadorXml,
   Model.TRepositorioRps,
@@ -24,6 +19,7 @@ type
   public
     constructor Create;
     procedure Executar(
+      const AConexao    : IConexaoDB;
       const AConfig     : TDadosConfiguracaoEnvio;
       const ACallbackLog: TCallbackProgresso;
       out   AResultados : TArray<TResultadoXml>);
@@ -48,6 +44,7 @@ begin
 end;
 
 procedure TGeracaoXml.Executar(
+  const AConexao    : IConexaoDB;
   const AConfig     : TDadosConfiguracaoEnvio;
   const ACallbackLog: TCallbackProgresso;
   out   AResultados : TArray<TResultadoXml>);
@@ -59,7 +56,7 @@ begin
   ACallbackLog(Format('Buscando RPS no banco — %d/%d...', [AConfig.Mes, AConfig.Ano]), False);
 
   FRepositorio.BuscarRps(
-    AConfig.StringConexaoBD,
+    AConexao,
     AConfig.Mes,
     AConfig.Ano,
     AConfig.CnpjUnidade,

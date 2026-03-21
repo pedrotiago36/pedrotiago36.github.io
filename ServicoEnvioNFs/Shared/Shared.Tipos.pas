@@ -1,16 +1,10 @@
 unit Shared.Tipos;
 
-{
-  Tipos compartilhados entre todas as camadas do servico de emissao NFSe.
-}
-
 interface
 
 type
-  { Modo de envio configurado no .ini }
   TModoEnvio = (meIndividual, meLote);
 
-  { Dados de um RPS lidos do banco }
   TDadosRps = record
     NumeroLote               : string;
     Rps                      : string;
@@ -36,13 +30,29 @@ type
 
   TListaDadosRps = TArray<TDadosRps>;
 
-  { Resultado da montagem de um XML }
   TResultadoXml = record
     Sucesso        : Boolean;
     CaminhoArquivo : string;
     MensagemErro   : string;
     QuantidadeRps  : Integer;
   end;
+
+  TDadosConfiguracaoEnvio = record
+    Servidor          : string;
+    Banco             : string;
+    Login             : string;
+    Senha             : string;
+    CnpjUnidade       : string;
+    InscricaoMunicipal: string;
+    DiretorioBase     : string;
+    ModoEnvio         : TModoEnvio;
+    Mes               : Integer;
+    Ano               : Integer;
+  end;
+
+  TCallbackProgresso = reference to procedure(
+    const AMensagem: string;
+    const AErro    : Boolean);
 
 implementation
 

@@ -1,26 +1,21 @@
 unit Model.TRepositorioRps;
 
-{
-  Repositorio de RPS — busca dados do SQL Server via FireDAC.
-  Parametros: Mes, Ano e CNPJ da unidade.
-  Retorna lista de TDadosRps pronta para o montador.
-}
-
 interface
 
 uses
   Model.IRepositorioRps,
+  Model.IConexaoDB,
   Shared.Tipos;
 
 type
   TRepositorioRps = class(TInterfacedObject, IRepositorioRps)
   public
     procedure BuscarRps(
-      const AStringConexao : string;
-      const AMes           : Integer;
-      const AAno           : Integer;
-      const ACnpjUnidade   : string;
-      out   ALista         : TListaDadosRps);
+      const AConexao     : IConexaoDB;
+      const AMes         : Integer;
+      const AAno         : Integer;
+      const ACnpjUnidade : string;
+      out   ALista       : TListaDadosRps);
     class function Criar: IRepositorioRps;
   end;
 
@@ -28,11 +23,7 @@ implementation
 
 uses
   System.SysUtils,
-  FireDAC.Comp.Client,
-  FireDAC.Stan.Def,
-  FireDAC.Stan.Async,
-  FireDAC.Phys.MSSQL,
-  FireDAC.Phys.MSSQLDef;
+  FireDAC.Comp.Client;
 
 const
   SQL_BUSCAR_RPS =
@@ -69,28 +60,23 @@ begin
 end;
 
 procedure TRepositorioRps.BuscarRps(
-  const AStringConexao : string;
-  const AMes           : Integer;
-  const AAno           : Integer;
-  const ACnpjUnidade   : string;
-  out   ALista         : TListaDadosRps);
+  const AConexao     : IConexaoDB;
+  const AMes         : Integer;
+  const AAno         : Integer;
+  const ACnpjUnidade : string;
+  out   ALista       : TListaDadosRps);
 var
-  LConn  : TFDConnection;
-  LQuery : TFDQuery;
-  LDados : TDadosRps;
-  LIdx   : Integer;
+  LQuery: TFDQuery;
+  LDados: TDadosRps;
+  LIdx  : Integer;
 begin
   ALista := [];
-  LConn  := TFDConnection.Create(nil);
+  AConexao.Conectar;
+
   LQuery := TFDQuery.Create(nil);
   try
-    LConn.DriverName    := 'MSSQL';
-    LConn.Params.Text   := AStringConexao;
-    LConn.LoginPrompt   := False;
-    LConn.Connected     := True;
-
-    LQuery.Connection   := LConn;
-    LQuery.SQL.Text     := SQL_BUSCAR_RPS;
+    LQuery.Connection         := AConexao.Conexao;
+    LQuery.SQL.Text           := SQL_BUSCAR_RPS;
     LQuery.ParamByName('pMes').AsInteger  := AMes;
     LQuery.ParamByName('pAno').AsInteger  := AAno;
     LQuery.ParamByName('pCnpj').AsString  := ACnpjUnidade;
@@ -126,7 +112,6 @@ begin
     end;
   finally
     LQuery.Free;
-    LConn.Free;
   end;
 end;
 

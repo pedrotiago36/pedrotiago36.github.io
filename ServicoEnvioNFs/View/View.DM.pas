@@ -3,32 +3,125 @@ unit View.DM;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.SvcMgr, Vcl.Dialogs;
+  Winapi.Windows,
+  System.SysUtils,
+  System.Classes,
+  Vcl.SvcMgr,
+  Service.WorkerThread;
 
 type
-  TService1 = class(TService)
+  TDMServico = class(TService)
+    procedure ServiceStart(Sender: TService; var Started: Boolean);
+    procedure ServiceStop(Sender: TService; var Stopped: Boolean);
+    procedure ServiceExecute(Sender: TService);
+    procedure ServiceShutdown(Sender: TService);
+    procedure ServiceAfterInstall(Sender: TService);
   private
-    { Private declarations }
+    FWorker: TWorkerThread;
+    procedure PararWorker;
   public
     function GetServiceController: TServiceController; override;
-    { Public declarations }
+    constructor Create(AOwner: TComponent); override;
   end;
 
 var
-  Service1: TService1;
+  DMServico: TDMServico;
 
 implementation
 
+uses
+System.Win.Registry;
+
 {$R *.dfm}
+
+const
+  INTERVALO_MS = 60 * 60 * 1000;  { 1 hora }
 
 procedure ServiceController(CtrlCode: DWord); stdcall;
 begin
-  Service1.Controller(CtrlCode);
+  DMServico.Controller(CtrlCode);
 end;
 
-function TService1.GetServiceController: TServiceController;
+function TDMServico.GetServiceController: TServiceController;
 begin
   Result := ServiceController;
+end;
+
+constructor TDMServico.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  Name        := 'ServicoEnvioNFs';
+  DisplayName := 'Servico Envio NFs - SEFIN Fortaleza';
+  AllowPause  := False;
+  AllowStop   := True;
+  OnStart     := ServiceStart;
+  OnStop      := ServiceStop;
+  OnExecute   := ServiceExecute;
+  OnShutdown  := ServiceShutdown;
+  AfterInstall := ServiceAfterInstall;
+end;
+
+procedure TDMServico.PararWorker;
+begin
+  case Assigned(FWorker) of
+    True:
+    begin
+      FWorker.Parar;
+      FWorker.WaitFor;
+      FreeAndNil(FWorker);
+    end;
+  end;
+end;
+
+procedure TDMServico.ServiceStart(Sender: TService; var Started: Boolean);
+begin
+  Started := False;
+  try
+    FWorker := TWorkerThread.Criar(ParamStr(0), INTERVALO_MS);
+    FWorker.Start;
+    Started := True;
+  except
+    on E: Exception do
+      LogMessage('ERRO ao iniciar: ' + E.Message, EVENTLOG_ERROR_TYPE, 0, 1);
+  end;
+end;
+
+procedure TDMServico.ServiceStop(Sender: TService; var Stopped: Boolean);
+begin
+  PararWorker;
+  Stopped := True;
+end;
+
+procedure TDMServico.ServiceShutdown(Sender: TService);
+begin
+  PararWorker;
+end;
+
+procedure TDMServico.ServiceExecute(Sender: TService);
+begin
+  while not Terminated do
+    ServiceThread.ProcessRequests(False);
+end;
+
+procedure TDMServico.ServiceAfterInstall(Sender: TService);
+var
+  LReg: TRegistry;
+begin
+  LReg := TRegistry.Create(KEY_READ or KEY_WRITE);
+  try
+    LReg.RootKey := HKEY_LOCAL_MACHINE;
+    case LReg.OpenKey(
+      'SYSTEM\CurrentControlSet\Services\ServicoEnvioNFs', False) of
+      True:
+      begin
+        LReg.WriteString('Description',
+          'Gera e envia XMLs de NFS-e para SEFIN Fortaleza automaticamente.');
+        LReg.CloseKey;
+      end;
+    end;
+  finally
+    LReg.Free;
+  end;
 end;
 
 end.

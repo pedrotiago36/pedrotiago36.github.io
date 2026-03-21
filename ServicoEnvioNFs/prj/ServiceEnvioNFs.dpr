@@ -2,37 +2,28 @@ program ServiceEnvioNFs;
 
 uses
   Vcl.SvcMgr,
-  View.DM in '..\View\View.DM.pas' {Service1: TService},
-  Shared.Tipos in '..\Shared\Shared.Tipos.pas',
-  Model.TConfiguracaoEnvio in '..\Model\Classes\Model.TConfiguracaoEnvio.pas',
-  Model.TMontadorXml in '..\Model\Classes\Model.TMontadorXml.pas',
-  Model.TRepositorioRps in '..\Model\Classes\Model.TRepositorioRps.pas',
+  View.DM in '..\View\View.DM.pas' {DMServico: TService},
+  Service.WorkerThread in '..\Service\Service.WorkerThread.pas',
+  Model.TConexaoDB in '..\Model\Classes\Model.TConexaoDB.pas',
   Model.IConfiguracaoEnvio in '..\Model\Interfaces\Model.IConfiguracaoEnvio.pas',
+  Model.TConfiguracaoEnvio in '..\Model\Classes\Model.TConfiguracaoEnvio.pas',
   Model.IMontadorXml in '..\Model\Interfaces\Model.IMontadorXml.pas',
+  Model.TMontadorXml in '..\Model\Classes\Model.TMontadorXml.pas',
   Model.IRepositorioRps in '..\Model\Interfaces\Model.IRepositorioRps.pas',
+  Model.TRepositorioRps in '..\Model\Classes\Model.TRepositorioRps.pas',
+  Model.TLeituraIni in '..\Model\Classes\Model.TLeituraIni.pas',
+  Controller.IGeracaoXml in '..\Controller\Interfaces\Controller.IGeracaoXml.pas',
   Controller.TGeracaoXml in '..\Controller\Classes\Controller.TGeracaoXml.pas',
-  Controller.IGeracaoXml in '..\Controller\Interfaces\Controller.IGeracaoXml.pas';
+  Shared.Tipos in '..\Shared\Shared.Tipos.pas',
+  Service.IWorkerThread in '..\Service\Service.IWorkerThread.pas',
+  Model.ILeituraIni in '..\Model\Interfaces\Model.ILeituraIni.pas',
+  Model.IConexaoDB in '..\Model\Interfaces\Model.IConexaoDB.pas';
 
-{$R *.RES}
+{$R *.res}
 
 begin
-  // Windows 2003 Server requires StartServiceCtrlDispatcher to be
-  // called before CoRegisterClassObject, which can be called indirectly
-  // by Application.Initialize. TServiceApplication.DelayInitialize allows
-  // Application.Initialize to be called from TService.Main (after
-  // StartServiceCtrlDispatcher has been called).
-  //
-  // Delayed initialization of the Application object may affect
-  // events which then occur prior to initialization, such as
-  // TService.OnCreate. It is only recommended if the ServiceApplication
-  // registers a class object with OLE and is intended for use with
-  // Windows 2003 Server.
-  //
-  // Application.DelayInitialize := True;
-  //
   if not Application.DelayInitialize or Application.Installing then
     Application.Initialize;
-  Application.CreateForm(TService1, Service1);
-  Application.CreateForm(TService1, Service1);
+  Application.CreateForm(TDMServico, DMServico);
   Application.Run;
 end.
