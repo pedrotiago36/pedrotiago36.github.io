@@ -4,9 +4,7 @@ unit Shared.Tipos;
   ============================================================
   Shared.Tipos — Tipos compartilhados do ServicoEnvioNFs
   ============================================================
-  Centraliza todos os records, enums e delegates usados pelas
-  camadas Model, Controller, Service e View.
-
+  Centraliza records, enums, constantes e delegates.
   Regra: nenhuma outra unit redefine tipos aqui declarados.
   ============================================================
 }
@@ -21,69 +19,105 @@ type
     meLote         { Ate 50 RPS por arquivo XML }
   );
 
-  { Dados de um RPS lidos da view vw_NFSe_GeracaoXML no SQL Server }
+  {
+    Unidades emissoras do Colegio Batista Santos Dumont.
+    CNPJs fixos — nunca mudam.
+  }
+  TUnidade = (
+    unSede,       { SEDE       — 07199060000124 }
+    unUEQ,        { UEQ        — 07199060000396 }
+    unVarjota,    { Varjota    — 07199060001015 }
+    unSeisBocas   { Seis Bocas — 07199060001287 }
+  );
+
+  { Dados de um RPS lidos da view vw_NFSe_GeracaoXML }
   TDadosRps = record
-    NumeroLote               : string;   { Numero do lote de envio }
-    Rps                      : string;   { Numero do RPS }
-    Serie                    : string;   { Serie do RPS }
-    DataEmissao              : TDateTime;{ Data de emissao }
-    ValorServicos            : Currency; { Valor total dos servicos }
-    IssRetido                : Currency; { Valor do ISS retido }
-    ItemListaServico         : string;   { Codigo do item da lista de servicos }
-    CodigoCnaeNovo           : string;   { Codigo CNAE (7 digitos) }
-    CodigoTributacaoMunicipio: string;   { Codigo tributacao municipal (9 digitos) }
-    Discriminacao            : string;   { Descricao do servico prestado }
-    CodigoMunicipioGerador   : string;   { Codigo IBGE do municipio gerador }
-    NBS                      : string;   { Nomenclatura Brasileira de Servicos }
-    CpfTomador               : string;   { CPF do tomador }
-    Tomador                  : string;   { Nome / Razao Social do tomador }
-    EnderecoTomador          : string;   { Logradouro do tomador }
-    BairroTomador            : string;   { Bairro do tomador }
-    CepTomador               : string;   { CEP do tomador }
-    CodigoIndicadorOperacao  : string;   { Indicador operacao IBS/CBS (6 digitos) }
-    CST                      : string;   { Codigo de Situacao Tributaria }
-    cClassTrib               : string;   { Codigo de Classificacao Tributaria }
+    NumeroLote               : string;
+    Rps                      : string;
+    Serie                    : string;
+    DataEmissao              : TDateTime;
+    ValorServicos            : Currency;
+    IssRetido                : Currency;
+    ItemListaServico         : string;
+    CodigoCnaeNovo           : string;
+    CodigoTributacaoMunicipio: string;
+    Discriminacao            : string;
+    CodigoMunicipioGerador   : string;
+    NBS                      : string;
+    CpfTomador               : string;
+    Tomador                  : string;
+    EnderecoTomador          : string;
+    BairroTomador            : string;
+    CepTomador               : string;
+    CodigoIndicadorOperacao  : string;
+    CST                      : string;
+    cClassTrib               : string;
   end;
 
   { Lista dinamica de TDadosRps retornada pelo repositorio }
   TListaDadosRps = TArray<TDadosRps>;
 
-  { Resultado da geracao de um arquivo XML pelo montador }
+  { Resultado da geracao de um arquivo XML }
   TResultadoXml = record
-    Sucesso        : Boolean; { True se gerado com sucesso }
-    CaminhoArquivo : string;  { Caminho completo do arquivo gerado }
-    MensagemErro   : string;  { Descricao do erro quando Sucesso = False }
-    QuantidadeRps  : Integer; { Quantidade de RPS no arquivo }
+    Sucesso        : Boolean;  { True se gerado com sucesso }
+    CaminhoArquivo : string;   { Caminho completo do arquivo gerado }
+    MensagemErro   : string;   { Descricao do erro quando Sucesso = False }
+    QuantidadeRps  : Integer;  { Quantidade de RPS no arquivo }
+    Unidade        : TUnidade; { Unidade a que pertence este XML }
   end;
 
   { Configuracoes de envio lidas do NFSe_Servico.ini }
   TDadosConfiguracaoEnvio = record
-    { [Banco] }
-    Servidor          : string;     { IP ou hostname do SQL Server }
-    Banco             : string;     { Nome do banco de dados }
-    Login             : string;     { Usuario do banco }
-    Senha             : string;     { Senha do banco }
-    { [Emitente] }
-    CnpjUnidade       : string;     { CNPJ da unidade emissora }
-    InscricaoMunicipal: string;     { Inscricao Municipal }
-    { [Diretorios] }
-    DiretorioBase     : string;     { Pasta raiz para salvar os XMLs }
-    { [ModoEnvio] }
-    ModoEnvio         : TModoEnvio; { Individual (1 RPS/XML) ou Lote (50 RPS/XML) }
-    { Calculado em runtime }
-    Mes               : Integer;    { Mes de referencia }
-    Ano               : Integer;    { Ano de referencia }
+    Servidor          : string;     { [Banco] IP ou hostname }
+    Banco             : string;     { [Banco] Nome do banco }
+    Login             : string;     { [Banco] Usuario }
+    Senha             : string;     { [Banco] Senha }
+    CnpjUnidade       : string;     { Preenchido por unidade em runtime }
+    InscricaoMunicipal: string;     { Preenchido por unidade em runtime }
+    DiretorioBase     : string;     { [Diretorios] Pasta raiz dos XMLs }
+    ModoEnvio         : TModoEnvio; { [ModoEnvio] Individual ou Lote }
+    Mes               : Integer;    { Mes de referencia (runtime) }
+    Ano               : Integer;    { Ano de referencia (runtime) }
   end;
 
-  {
-    Delegate de progresso — reporta cada passo do processamento
-    sem acoplamento entre camadas.
-    AMensagem : descricao do passo executado
-    AErro     : True indica mensagem de erro
-  }
+  { Delegate de progresso sem acoplamento entre camadas }
   TCallbackProgresso = reference to procedure(
     const AMensagem: string;
     const AErro    : Boolean);
+
+const
+  { Nomes das unidades — usados para criar as pastas }
+  NOME_UNIDADE: array[TUnidade] of string = (
+    'SEDE',       { unSede }
+    'UEQ',        { unUEQ }
+    'Varjota',    { unVarjota }
+    'SeisBocas'   { unSeisBocas }
+  );
+
+  { CNPJs fixos das 4 unidades }
+  CNPJ_UNIDADE: array[TUnidade] of string = (
+    '07199060000124',  { SEDE }
+    '07199060000396',  { UEQ }
+    '07199060001015',  { Varjota }
+    '07199060001287'   { Seis Bocas }
+  );
+
+  {
+    Inscricoes Municipais das unidades.
+    ATENCAO: confirmar com a SEFIN os IMs de UEQ, Varjota e Seis Bocas
+    e atualizar antes de enviar para producao.
+  }
+  IM_UNIDADE: array[TUnidade] of string = (
+    '13371',  { SEDE }
+    '13371',  { UEQ        — CONFIRMAR }
+    '13371',  { Varjota    — CONFIRMAR }
+    '13371'   { Seis Bocas — CONFIRMAR }
+  );
+
+  { Subpastas criadas dentro de cada pasta de dia/unidade }
+  PASTA_ENVIADAS   = 'Enviadas';   { DANFEs dos arquivos enviados com sucesso }
+  PASTA_CANCELADAS = 'Canceladas'; { Comprovantes de cancelamento }
+  PASTA_ERRO       = 'Erro';       { XMLs que retornaram erro do servidor SEFIN }
 
 implementation
 

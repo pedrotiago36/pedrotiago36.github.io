@@ -2,61 +2,68 @@ unit Controller.TGeracaoXml;
 
 {
   ============================================================
-  Controller.TGeracaoXml — Orquestrador de geracao de XML
+  Controller.TGeracaoXml — Orquestrador das 4 unidades
   ============================================================
-  Responsabilidade UNICA: orquestrar o fluxo entre repositorio
-  e montador, sem conter logica de negocio propria.
+  Responsabilidade: iterar pelas 4 unidades do colegio,
+  para cada uma buscar os RPS no banco e gerar os XMLs.
 
-  Fluxo do metodo Executar:
-    1. Repassa o callback de log para rastrear cada passo
-    2. Chama FRepositorio.BuscarRps para obter a lista de RPS
-    3. Chama FMontador.Montar para gerar os arquivos XML
-    4. Retorna os resultados ao WorkerThread via out AResultados
+  Hierarquia de pastas gerada:
+    <DiretorioBase>\<Unidade>\<Mes>\<Dia>\Enviadas\
+    <DiretorioBase>\<Unidade>\<Mes>\<Dia>\Canceladas\
+    <DiretorioBase>\<Unidade>\<Mes>\<Dia>\Erro\
 
-  Composicao:
-    FRepositorio : IRepositorioRps — criado via TRepositorioRps.Criar
-    FMontador    : IMontadorXml    — criado via TMontadorXml.Criar
+  Exemplo:
+    C:\Monitor NFs-e - SEFIN\XML\SEDE\03\22\Enviadas\NFSe_001_001.xml
+    C:\Monitor NFs-e - SEFIN\XML\UEQ\03\22\Enviadas\NFSe_001_001.xml
   ============================================================
 }
 
 interface
 
 uses
-  Controller.IGeracaoXml, { IGeracaoXml }
-  Model.IConexaoDB,       { IConexaoDB }
-  Model.IRepositorioRps,  { IRepositorioRps }
-  Model.IMontadorXml,     { IMontadorXml }
-  Shared.Tipos;           { TDadosConfiguracaoEnvio, TResultadoXml, TCallbackProgresso }
+  Controller.IGeracaoXml,
+  Model.IConexaoDB,
+  Model.IRepositorioRps,
+  Model.IMontadorXml,
+  Shared.Tipos;
 
 type
   TGeracaoXml = class(TInterfacedObject, IGeracaoXml)
   private
-    { Repositorio responsavel por buscar os RPS no SQL Server }
+    { Repositorio: busca RPS no SQL Server }
     FRepositorio: IRepositorioRps;
-    { Montador responsavel por gerar e salvar os arquivos XML }
+    { Montador: gera e salva os arquivos XML }
     FMontador   : IMontadorXml;
-  public
-    { Create — inicializa repositorio e montador via suas factories }
-    constructor Create;
+
     {
-      Executar — orquestra busca de RPS e geracao de XMLs.
-      Ver documentacao completa em Controller.IGeracaoXml.
+      ProcessarUnidade — executa o ciclo completo de uma unidade.
+      Preenche CnpjUnidade e InscricaoMunicipal na config,
+      busca os RPS, monta os XMLs e acumula os resultados.
     }
+    procedure ProcessarUnidade(
+      const AUnidade    : TUnidade;
+      const AConexao    : IConexaoDB;
+      const AConfig     : TDadosConfiguracaoEnvio;
+      const ACallbackLog: TCallbackProgresso;
+      var   AResultados : TArray<TResultadoXml>);
+
+  public
+    constructor Create;
     procedure Executar(
       const AConexao    : IConexaoDB;
       const AConfig     : TDadosConfiguracaoEnvio;
       const ACallbackLog: TCallbackProgresso;
       out   AResultados : TArray<TResultadoXml>);
-    { Criar — factory que retorna a interface IGeracaoXml }
     class function Criar: IGeracaoXml;
   end;
 
 implementation
 
 uses
-  System.SysUtils,        { Format }
-  Model.TRepositorioRps,  { TRepositorioRps.Criar }
-  Model.TMontadorXml;     { TMontadorXml.Criar }
+  System.SysUtils,
+  System.IOUtils,
+  Model.TRepositorioRps,
+  Model.TMontadorXml;
 
 class function TGeracaoXml.Criar: IGeracaoXml;
 begin
@@ -66,9 +73,64 @@ end;
 constructor TGeracaoXml.Create;
 begin
   inherited Create;
-  { Composicao via interfaces — sem acoplamento a implementacoes }
   FRepositorio := TRepositorioRps.Criar;
   FMontador    := TMontadorXml.Criar;
+end;
+
+procedure TGeracaoXml.ProcessarUnidade(
+  const AUnidade    : TUnidade;
+  const AConexao    : IConexaoDB;
+  const AConfig     : TDadosConfiguracaoEnvio;
+  const ACallbackLog: TCallbackProgresso;
+  var   AResultados : TArray<TResultadoXml>);
+var
+  LConfig    : TDadosConfiguracaoEnvio; { Config especifica desta unidade }
+  LLista     : TListaDadosRps;          { RPS encontrados no banco }
+  LResultados: TArray<TResultadoXml>;   { XMLs gerados para esta unidade }
+  LIdx       : Integer;                 { Indice para marcar a unidade }
+begin
+  { Copia a config base e preenche os dados desta unidade }
+  LConfig                   := AConfig;
+  LConfig.CnpjUnidade       := CNPJ_UNIDADE[AUnidade];
+  LConfig.InscricaoMunicipal := IM_UNIDADE[AUnidade];
+
+  ACallbackLog(Format('>>> Processando unidade: %s (CNPJ: %s)',
+    [NOME_UNIDADE[AUnidade], CNPJ_UNIDADE[AUnidade]]), False);
+
+  { Busca RPS no banco para esta unidade }
+  ACallbackLog(Format('Buscando RPS — %s — %d/%d...',
+    [NOME_UNIDADE[AUnidade], LConfig.Mes, LConfig.Ano]), False);
+
+  FRepositorio.BuscarRps(
+    AConexao,
+    LConfig.Mes,
+    LConfig.Ano,
+    LConfig.CnpjUnidade,
+    LLista);
+
+  ACallbackLog(Format('%d RPS encontrados para %s.',
+    [Length(LLista), NOME_UNIDADE[AUnidade]]), False);
+
+  case Length(LLista) = 0 of
+    True:
+    begin
+      ACallbackLog(Format('Nenhum RPS para %s — pulando.',
+        [NOME_UNIDADE[AUnidade]]), False);
+      Exit;
+    end;
+  end;
+
+  { Monta os XMLs para esta unidade }
+  FMontador.Montar(LLista, LConfig, ACallbackLog, LResultados);
+
+  { Marca a unidade em cada resultado e acumula }
+  for LIdx := 0 to Length(LResultados) - 1 do
+    LResultados[LIdx].Unidade := AUnidade;
+
+  AResultados := AResultados + LResultados;
+
+  ACallbackLog(Format('<<< Unidade %s concluida. %d XML(s) gerado(s).',
+    [NOME_UNIDADE[AUnidade], Length(LResultados)]), False);
 end;
 
 procedure TGeracaoXml.Executar(
@@ -77,26 +139,22 @@ procedure TGeracaoXml.Executar(
   const ACallbackLog: TCallbackProgresso;
   out   AResultados : TArray<TResultadoXml>);
 var
-  { Lista de RPS retornada pelo repositorio }
-  LLista: TListaDadosRps;
+  LUnidade: TUnidade; { Iterador pelas 4 unidades }
 begin
   AResultados := [];
 
-  { Passo 1: buscar RPS no banco para o mes/ano configurado }
-  ACallbackLog(Format('Buscando RPS no banco — %d/%d...',
-    [AConfig.Mes, AConfig.Ano]), False);
+  ACallbackLog('========================================', False);
+  ACallbackLog(Format('Iniciando ciclo — %d/%d — Modo: %s',
+    [AConfig.Mes, AConfig.Ano,
+     NOME_UNIDADE[unSede]{ apenas para log do modo abaixo }]), False);
 
-  FRepositorio.BuscarRps(
-    AConexao,
-    AConfig.Mes,
-    AConfig.Ano,
-    AConfig.CnpjUnidade,
-    LLista);
+  { Itera pelas 4 unidades: SEDE, UEQ, Varjota, Seis Bocas }
+  for LUnidade := Low(TUnidade) to High(TUnidade) do
+    ProcessarUnidade(LUnidade, AConexao, AConfig, ACallbackLog, AResultados);
 
-  ACallbackLog(Format('%d RPS encontrados.', [Length(LLista)]), False);
-
-  { Passo 2: montar e salvar os XMLs no diretorio configurado }
-  FMontador.Montar(LLista, AConfig, ACallbackLog, AResultados);
+  ACallbackLog(Format('Ciclo completo. Total: %d XML(s) gerado(s).',
+    [Length(AResultados)]), False);
+  ACallbackLog('========================================', False);
 end;
 
 end.

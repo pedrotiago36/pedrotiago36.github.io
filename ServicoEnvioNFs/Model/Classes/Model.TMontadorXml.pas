@@ -9,7 +9,7 @@ uses
   System.DateUtils,
   Xml.XMLIntf,
   Xml.XMLDoc,
-  Shared.Tipos,
+  Shared.Tipos,   { TModoEnvio, TDadosConfiguracaoEnvio, PASTA_ENVIADAS, PASTA_CANCELADAS, PASTA_ERRO }
   Model.IMontadorXml;
 
 type
@@ -63,9 +63,10 @@ type
       const ADados     : TDadosRps);
 
     function ResolverPastaSaida(
-      const ABase: string;
-      const AData: TDateTime;
-      const AModo: TModoEnvio): string;
+      const ABase   : string;
+      const AData   : TDateTime;
+      const AModo   : TModoEnvio;
+      const AUnidade: string): string;
 
     function SalvarXml(
       const AXML    : string;
@@ -445,20 +446,33 @@ end;
 { ── Persistencia ─────────────────────────────────────────────────────── }
 
 function TMontadorXml.ResolverPastaSaida(
-  const ABase: string;
-  const AData: TDateTime;
-  const AModo: TModoEnvio): string;
-const
-  SUBPASTA: array[TModoEnvio] of string = ('Individual', 'Lote');
+  const ABase    : string;
+  const AData    : TDateTime;
+  const AModo    : TModoEnvio;
+  const AUnidade : string): string;
+{
+  Hierarquia criada:
+    <Base>\<Unidade>\<Mes>\<Dia>\Enviadas    <Base>\<Unidade>\<Mes>\<Dia>\Canceladas    <Base>\<Unidade>\<Mes>\<Dia>\Erro
+  Os XMLs ficam em Enviadas\ (movidos apos envio bem-sucedido).
+  As pastas Canceladas\ e Erro\ ficam vazias ate serem usadas
+  na 2a Parte (envio ao SEFIN).
+}
 begin
+  { Pasta base para os XMLs desta unidade/mes/dia }
   Result := TPath.Combine(ABase,
-    Format('%d\%s\%s\%s', [
-      YearOf(AData),
+    Format('%s\%s\%s', [
+      AUnidade,
       FormatFloat('00', MonthOf(AData)),
-      FormatFloat('00', DayOf(AData)),
-      SUBPASTA[AModo]
+      FormatFloat('00', DayOf(AData))
     ]));
-  ForceDirectories(Result);
+
+  { Cria as 3 subpastas obrigatorias }
+  ForceDirectories(TPath.Combine(Result, PASTA_ENVIADAS));
+  ForceDirectories(TPath.Combine(Result, PASTA_CANCELADAS));
+  ForceDirectories(TPath.Combine(Result, PASTA_ERRO));
+
+  { Os XMLs serao salvos em Enviadas\ por padrao }
+  Result := TPath.Combine(Result, PASTA_ENVIADAS);
 end;
 
 function TMontadorXml.SalvarXml(
@@ -519,7 +533,8 @@ begin
 
   ACallbackLog(Format('Iniciando montagem em LOTE — %d RPS encontrados.', [LQtdTotal]), False);
 
-  LPasta := ResolverPastaSaida(AConfig.DiretorioBase, ALista[0].DataEmissao, meLote);
+  LPasta   := ResolverPastaSaida(AConfig.DiretorioBase, ALista[0].DataEmissao,
+    meLote, AConfig.CnpjUnidade);
 
   while LIdxGeral < LQtdTotal do
   begin
@@ -615,7 +630,7 @@ begin
   ACallbackLog(Format('Iniciando montagem INDIVIDUAL — %d RPS.', [LQtdTotal]), False);
 
   LPasta := ResolverPastaSaida(AConfig.DiretorioBase,
-    ALista[0].DataEmissao, meIndividual);
+    ALista[0].DataEmissao, meIndividual, AConfig.CnpjUnidade);
 
   for LIdx := 0 to LQtdTotal - 1 do
   begin
