@@ -10,7 +10,6 @@ uses
   Xml.XMLIntf,
   Xml.XMLDoc,
   Shared.Tipos,
-  Model.IConfiguracaoEnvio,
   Model.IMontadorXml;
 
 type

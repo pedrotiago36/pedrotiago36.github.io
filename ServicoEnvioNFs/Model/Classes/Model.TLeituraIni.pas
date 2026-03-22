@@ -4,7 +4,7 @@ interface
 
 uses
   Model.ILeituraIni,
-  Shared.Tipos, Model.IConfiguracaoEnvio;
+  Shared.Tipos;
 
 type
   TLeituraIni = class(TInterfacedObject, ILeituraIni)
