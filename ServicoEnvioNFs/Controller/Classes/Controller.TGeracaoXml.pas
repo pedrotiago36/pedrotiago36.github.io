@@ -1,23 +1,5 @@
 unit Controller.TGeracaoXml;
 
-{
-  ============================================================
-  Controller.TGeracaoXml — Orquestrador das 4 unidades
-  ============================================================
-  Responsabilidade: iterar pelas 4 unidades do colegio,
-  para cada uma buscar os RPS no banco e gerar os XMLs.
-
-  Hierarquia de pastas gerada:
-    <DiretorioBase>\<Unidade>\<Mes>\<Dia>\Enviadas\
-    <DiretorioBase>\<Unidade>\<Mes>\<Dia>\Canceladas\
-    <DiretorioBase>\<Unidade>\<Mes>\<Dia>\Erro\
-
-  Exemplo:
-    C:\Monitor NFs-e - SEFIN\XML\SEDE\03\22\Enviadas\NFSe_001_001.xml
-    C:\Monitor NFs-e - SEFIN\XML\UEQ\03\22\Enviadas\NFSe_001_001.xml
-  ============================================================
-}
-
 interface
 
 uses
@@ -30,23 +12,14 @@ uses
 type
   TGeracaoXml = class(TInterfacedObject, IGeracaoXml)
   private
-    { Repositorio: busca RPS no SQL Server }
     FRepositorio: IRepositorioRps;
-    { Montador: gera e salva os arquivos XML }
     FMontador   : IMontadorXml;
-
-    {
-      ProcessarUnidade — executa o ciclo completo de uma unidade.
-      Preenche CnpjUnidade e InscricaoMunicipal na config,
-      busca os RPS, monta os XMLs e acumula os resultados.
-    }
     procedure ProcessarUnidade(
       const AUnidade    : TUnidade;
       const AConexao    : IConexaoDB;
       const AConfig     : TDadosConfiguracaoEnvio;
       const ACallbackLog: TCallbackProgresso;
       var   AResultados : TArray<TResultadoXml>);
-
   public
     constructor Create;
     procedure Executar(
@@ -84,20 +57,18 @@ procedure TGeracaoXml.ProcessarUnidade(
   const ACallbackLog: TCallbackProgresso;
   var   AResultados : TArray<TResultadoXml>);
 var
-  LConfig    : TDadosConfiguracaoEnvio; { Config especifica desta unidade }
-  LLista     : TListaDadosRps;          { RPS encontrados no banco }
-  LResultados: TArray<TResultadoXml>;   { XMLs gerados para esta unidade }
-  LIdx       : Integer;                 { Indice para marcar a unidade }
+  LConfig    : TDadosConfiguracaoEnvio;
+  LLista     : TListaDadosRps;
+  LResultados: TArray<TResultadoXml>;
+  LIdx       : Integer;
 begin
-  { Copia a config base e preenche os dados desta unidade }
-  LConfig                   := AConfig;
-  LConfig.CnpjUnidade       := CNPJ_UNIDADE[AUnidade];
+  LConfig                    := AConfig;
+  LConfig.CnpjUnidade        := CNPJ_UNIDADE[AUnidade];
   LConfig.InscricaoMunicipal := IM_UNIDADE[AUnidade];
 
   ACallbackLog(Format('>>> Processando unidade: %s (CNPJ: %s)',
     [NOME_UNIDADE[AUnidade], CNPJ_UNIDADE[AUnidade]]), False);
 
-  { Busca RPS no banco para esta unidade }
   ACallbackLog(Format('Buscando RPS — %s — %d/%d...',
     [NOME_UNIDADE[AUnidade], LConfig.Mes, LConfig.Ano]), False);
 
@@ -106,6 +77,7 @@ begin
     LConfig.Mes,
     LConfig.Ano,
     LConfig.CnpjUnidade,
+    ACallbackLog,
     LLista);
 
   ACallbackLog(Format('%d RPS encontrados para %s.',
@@ -120,10 +92,8 @@ begin
     end;
   end;
 
-  { Monta os XMLs para esta unidade }
   FMontador.Montar(LLista, LConfig, ACallbackLog, LResultados);
 
-  { Marca a unidade em cada resultado e acumula }
   for LIdx := 0 to Length(LResultados) - 1 do
     LResultados[LIdx].Unidade := AUnidade;
 
@@ -139,16 +109,11 @@ procedure TGeracaoXml.Executar(
   const ACallbackLog: TCallbackProgresso;
   out   AResultados : TArray<TResultadoXml>);
 var
-  LUnidade: TUnidade; { Iterador pelas 4 unidades }
+  LUnidade: TUnidade;
 begin
   AResultados := [];
-
   ACallbackLog('========================================', False);
-  ACallbackLog(Format('Iniciando ciclo — %d/%d — Modo: %s',
-    [AConfig.Mes, AConfig.Ano,
-     NOME_UNIDADE[unSede]{ apenas para log do modo abaixo }]), False);
 
-  { Itera pelas 4 unidades: SEDE, UEQ, Varjota, Seis Bocas }
   for LUnidade := Low(TUnidade) to High(TUnidade) do
     ProcessarUnidade(LUnidade, AConexao, AConfig, ACallbackLog, AResultados);
 

@@ -14,6 +14,7 @@ type
       const AMes         : Integer;
       const AAno         : Integer;
       const ACnpjUnidade : string;
+      const ACallbackLog : TCallbackProgresso;
       out   ALista       : TListaDadosRps);
   end;
 

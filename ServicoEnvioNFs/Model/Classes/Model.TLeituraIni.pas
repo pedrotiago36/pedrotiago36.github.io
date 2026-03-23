@@ -71,7 +71,7 @@ begin
 
   LIni := TMemIniFile.Create(LCaminho);
   try
-    Result.Servidor           := LIni.ReadString ('Banco',      'Servidor',           '192.168.1.12');
+    Result.Servidor           := LIni.ReadString ('Banco',      'Servidor',           '192.168.1.19');
     Result.Banco              := LIni.ReadString ('Banco',      'Banco',              'conacd');
     Result.Login              := LIni.ReadString ('Banco',      'Login',              'sa');
     Result.Senha              := LIni.ReadString ('Banco',      'Senha',              'Admbatista#');

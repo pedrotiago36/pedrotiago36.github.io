@@ -21,16 +21,16 @@ type
 
   {
     Unidades emissoras do Colegio Batista Santos Dumont.
-    CNPJs fixos — nunca mudam.
+    CNPJs, IMs e bancos sao fixos — nunca mudam.
   }
   TUnidade = (
-    unSede,       { SEDE       — 07199060000124 }
-    unUEQ,        { UEQ        — 07199060000396 }
-    unVarjota,    { Varjota    — 07199060001015 }
-    unSeisBocas   { Seis Bocas — 07199060001287 }
+    unSede,       { SEDE       — ConAcd  — 07199060000124 — IM 007108 }
+    unUEQ,        { UEQ        — Anexo1  — 07199060000396 — IM 158734 }
+    unVarjota,    { Varjota    — Anexo3  — 07199060001015 — IM 213598 }
+    unSeisBocas   { Seis Bocas — Anexo5  — 07199060001287 — IM 289767 }
   );
 
-  { Dados de um RPS lidos da view vw_NFSe_GeracaoXML }
+  { Dados de um RPS retornados pela procedure GravaXML }
   TDadosRps = record
     NumeroLote               : string;
     Rps                      : string;
@@ -69,7 +69,7 @@ type
   { Configuracoes de envio lidas do NFSe_Servico.ini }
   TDadosConfiguracaoEnvio = record
     Servidor          : string;     { [Banco] IP ou hostname }
-    Banco             : string;     { [Banco] Nome do banco }
+    Banco             : string;     { [Banco] Nome do banco — preenchido por unidade }
     Login             : string;     { [Banco] Usuario }
     Senha             : string;     { [Banco] Senha }
     CnpjUnidade       : string;     { Preenchido por unidade em runtime }
@@ -102,16 +102,23 @@ const
     '07199060001287'   { Seis Bocas }
   );
 
-  {
-    Inscricoes Municipais das unidades.
-    ATENCAO: confirmar com a SEFIN os IMs de UEQ, Varjota e Seis Bocas
-    e atualizar antes de enviar para producao.
-  }
+  { Inscricoes Municipais fixas das 4 unidades }
   IM_UNIDADE: array[TUnidade] of string = (
-    '13371',  { SEDE }
-    '13371',  { UEQ        — CONFIRMAR }
-    '13371',  { Varjota    — CONFIRMAR }
-    '13371'   { Seis Bocas — CONFIRMAR }
+    '007108',  { SEDE }
+    '158734',  { UEQ }
+    '213598',  { Varjota }
+    '289767'   { Seis Bocas }
+  );
+
+  {
+    Nomes dos bancos de cada unidade no SQL Server.
+    Usados na chamada: exec <Banco>.dbo.GravaXML ...
+  }
+  BANCO_UNIDADE: array[TUnidade] of string = (
+    'ConAcd',  { SEDE }
+    'Anexo1',  { UEQ }
+    'Anexo3',  { Varjota }
+    'Anexo5'   { Seis Bocas }
   );
 
   { Subpastas criadas dentro de cada pasta de dia/unidade }
