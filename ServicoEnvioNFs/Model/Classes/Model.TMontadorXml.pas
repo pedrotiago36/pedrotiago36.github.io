@@ -23,12 +23,15 @@ type
     function GerarCodigoVerificacao: string;
     function XMLDocParaString(const ADoc: IXMLDocument): string;
 
-    function MontarCabecalho(
+    { Retorna o documento E o node ListaRps diretamente — evita FindNode com namespace }
+    procedure MontarCabecalho(
       const ANumeroLote        : string;
       const ACnpj              : string;
       const AInscricaoMunicipal: string;
       const ACodigoVerificacao : string;
-      const AQuantidade        : Integer): IXMLDocument;
+      const AQuantidade        : Integer;
+      out   ADoc               : IXMLDocument;
+      out   AListaRpsNode      : IXMLNode);
 
     procedure MontarRps(
       const AListaRpsNode      : IXMLNode;
@@ -104,11 +107,11 @@ begin
   Result := TMontadorXml.Create;
 end;
 
-{ ── Helpers ─────────────────────────────────────────────────────────── }
+{ -- Helpers ----------------------------------------------------------------- }
 
 function TMontadorXml.RetiraAcentos(const ATexto: string): string;
 const
-  COM: string = 'àáâãäéèêëíìîïóòôõöúùûüçÀÁÂÃÄÉÈÊËÍÌÎÏÓÒÔÕÖÚÙÛÜÇ';
+  COM: string = 'áàâãäéèêëíìîïóòôõöúùûüçÁÀÂÃÄÉÈÊËÍÌÎÏÓÒÔÕÖÚÙÛÜÇ';
   SEM: string = 'aaaaaeeeeiiiiooooouuuucAAAAAEEEEIIIIOOOOOUUUUC';
 var
   LI, LP: Integer;
@@ -191,29 +194,30 @@ begin
   end;
 end;
 
-{ ── Cabecalho ────────────────────────────────────────────────────────── }
+{ -- Cabecalho --------------------------------------------------------------- }
 
-function TMontadorXml.MontarCabecalho(
+procedure TMontadorXml.MontarCabecalho(
   const ANumeroLote        : string;
   const ACnpj              : string;
   const AInscricaoMunicipal: string;
   const ACodigoVerificacao : string;
-  const AQuantidade        : Integer): IXMLDocument;
+  const AQuantidade        : Integer;
+  out   ADoc               : IXMLDocument;
+  out   AListaRpsNode      : IXMLNode);
 var
+  LDoc    : TXMLDocument;
   LRaiz   : IXMLNode;
   LLoteRps: IXMLNode;
   LNode   : IXMLNode;
-  LDoc    : TXMLDocument;
 begin
-  { Usa TXMLDocument identico ao sistema antigo — sem dependencia de MSXML externo }
   LDoc := TXMLDocument.Create(nil);
-  LDoc.Active  := True;
+  LDoc.Active   := True;
   LDoc.Version  := '1.0';
   LDoc.Encoding := 'UTF-8';
   LDoc.Options  := LDoc.Options - [doNodeAutoIndent];
-  Result := LDoc;
+  ADoc := LDoc;
 
-  LRaiz := Result.AddChild('ns3:EnviarLoteRpsEnvio');
+  LRaiz := ADoc.AddChild('ns3:EnviarLoteRpsEnvio');
   LRaiz.Attributes['xmlns:ns3'] := 'http://www.ginfes.com.br/servico_enviar_lote_rps_envio_v03.xsd';
   LRaiz.Attributes['xmlns:ns4'] := 'http://www.ginfes.com.br/tipos_v03.xsd';
 
@@ -232,10 +236,11 @@ begin
   LNode      := LLoteRps.AddChild('ns4:QuantidadeRps');
   LNode.Text := IntToStr(AQuantidade);
 
-  LLoteRps.AddChild('ns4:ListaRps');
+  { Guarda referencia direta ao ListaRps — FindNode com namespace falha no TXMLDocument }
+  AListaRpsNode := LLoteRps.AddChild('ns4:ListaRps');
 end;
 
-{ ── Nos do RPS ───────────────────────────────────────────────────────── }
+{ -- Nos do RPS -------------------------------------------------------------- }
 
 procedure TMontadorXml.MontarIdentificacaoRps(
   const AInfRpsNode: IXMLNode;
@@ -446,7 +451,7 @@ begin
   MontarIbsCbs(LInfRps, ADados);
 end;
 
-{ ── Persistencia ─────────────────────────────────────────────────────── }
+{ -- Persistencia ------------------------------------------------------------ }
 
 function TMontadorXml.ResolverPastaSaida(
   const ABase: string;
@@ -487,7 +492,7 @@ begin
   Result := LNomeArq;
 end;
 
-{ ── Montagem em Lote ─────────────────────────────────────────────────── }
+{ -- Montagem em Lote -------------------------------------------------------- }
 
 procedure TMontadorXml.MontarLotes(
   const ALista      : TListaDadosRps;
@@ -539,16 +544,14 @@ begin
     ACallbackLog(Format('[Lote %d] Montando %d RPS...', [LIdxArq, LQtdNesteLote]), False);
 
     try
-      LDoc := MontarCabecalho(
+      MontarCabecalho(
         ALista[LIdxGeral].NumeroLote,
         AConfig.CnpjUnidade,
         AConfig.InscricaoMunicipal,
         LCodVerif,
-        LQtdNesteLote);
-
-      LListaRpsNode := LDoc.DocumentElement
-        .ChildNodes.FindNode('ns3:LoteRps')
-        .ChildNodes.FindNode('ns4:ListaRps');
+        LQtdNesteLote,
+        LDoc,
+        LListaRpsNode);
 
       while (LIdxNoLote < LQtdNesteLote) and (LIdxGeral < LQtdTotal) do
       begin
@@ -587,7 +590,7 @@ begin
   ACallbackLog(Format('Lote concluido. %d arquivo(s) gerado(s).', [LIdxArq]), False);
 end;
 
-{ ── Montagem Individual ──────────────────────────────────────────────── }
+{ -- Montagem Individual ----------------------------------------------------- }
 
 procedure TMontadorXml.MontarIndividual(
   const ALista      : TListaDadosRps;
@@ -625,16 +628,14 @@ begin
   begin
     LCodVerif := GerarCodigoVerificacao;
     try
-      LDoc := MontarCabecalho(
+      MontarCabecalho(
         ALista[LIdx].NumeroLote,
         AConfig.CnpjUnidade,
         AConfig.InscricaoMunicipal,
         LCodVerif,
-        1);
-
-      LListaRpsNode := LDoc.DocumentElement
-        .ChildNodes.FindNode('ns3:LoteRps')
-        .ChildNodes.FindNode('ns4:ListaRps');
+        1,
+        LDoc,
+        LListaRpsNode);
 
       MontarRps(LListaRpsNode, ALista[LIdx],
         AConfig.CnpjUnidade, AConfig.InscricaoMunicipal);
@@ -669,7 +670,7 @@ begin
   ACallbackLog(Format('Individual concluido. %d XML(s) gerado(s).', [LQtdTotal]), False);
 end;
 
-{ ── Ponto de entrada ─────────────────────────────────────────────────── }
+{ -- Ponto de entrada -------------------------------------------------------- }
 
 procedure TMontadorXml.Montar(
   const ALista        : TListaDadosRps;
