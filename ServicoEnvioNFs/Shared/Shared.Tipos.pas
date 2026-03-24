@@ -66,6 +66,9 @@ type
     Unidade        : TUnidade; { Unidade a que pertence este XML }
   end;
 
+  { Ambiente de envio — Homologacao ou Producao }
+  TAmbiente = (amHomologacao, amProducao);
+
   { Configuracoes de envio lidas do NFSe_Servico.ini }
   TDadosConfiguracaoEnvio = record
     Servidor          : string;     { [Banco] IP ou hostname }
@@ -77,6 +80,9 @@ type
     NomeUnidade       : string;     { Preenchido por unidade em runtime }
     DiretorioBase     : string;     { [Diretorios] Pasta raiz dos XMLs }
     ModoEnvio         : TModoEnvio; { [ModoEnvio] Individual ou Lote }
+    Ambiente          : TAmbiente;  { [Ambiente] Homologacao ou Producao }
+    ThreadAtiva       : Boolean;    { [Thread] Ativa=1 — FALSE para o servico }
+    DiaEnvio          : Integer;    { [Config] DiaEnvio — dia do mes para Producao }
     Mes               : Integer;    { Mes de referencia (runtime) }
     Ano               : Integer;    { Ano de referencia (runtime) }
   end;

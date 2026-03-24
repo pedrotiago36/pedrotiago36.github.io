@@ -1,4 +1,4 @@
-unit Model.TLeituraIni;
+﻿unit Model.TLeituraIni;
 
 interface
 
@@ -22,7 +22,8 @@ implementation
 uses
   System.SysUtils,
   System.IniFiles,
-  System.IOUtils;
+  System.IOUtils,
+  System.StrUtils;
 
 class function TLeituraIni.Criar: ILeituraIni;
 begin
@@ -40,22 +41,23 @@ begin
 
   for LI := 0 to 5 do
   begin
-    LTentativa := TPath.Combine(TPath.Combine(LBase, 'exe'), 'Config');
-    case TFile.Exists(TPath.Combine(LTentativa, 'NFSe_Servico.ini')) of
-      True: begin Result := TPath.Combine(LTentativa, 'NFSe_Servico.ini'); Exit; end;
+    { 1o — mesma pasta do exe }
+    LTentativa := TPath.Combine(LBase, 'NFSe_Servico.ini');
+    case TFile.Exists(LTentativa) of
+      True: begin Result := LTentativa; Exit; end;
     end;
 
-    LTentativa := TPath.Combine(LBase, 'Config');
-    case TFile.Exists(TPath.Combine(LTentativa, 'NFSe_Servico.ini')) of
-      True: begin Result := TPath.Combine(LTentativa, 'NFSe_Servico.ini'); Exit; end;
+    { 2o — subpasta Config }
+    LTentativa := TPath.Combine(TPath.Combine(LBase, 'Config'), 'NFSe_Servico.ini');
+    case TFile.Exists(LTentativa) of
+      True: begin Result := LTentativa; Exit; end;
     end;
 
     LBase := TPath.GetFullPath(TPath.Combine(LBase, '..'));
   end;
 
-  Result := TPath.Combine(
-    TPath.Combine(ExtractFilePath(AExePath), 'Config'),
-    'NFSe_Servico.ini');
+  { Fallback — mesma pasta do exe }
+  Result := TPath.Combine(ExtractFilePath(AExePath), 'NFSe_Servico.ini');
 end;
 
 function TLeituraIni.Carregar(
@@ -63,30 +65,59 @@ function TLeituraIni.Carregar(
   const AMes    : Integer;
   const AAno    : Integer): TDadosConfiguracaoEnvio;
 var
-  LIni       : TMemIniFile;
-  LCaminho   : string;
-  LEnviarLote: Integer;
+  LIni           : TMemIniFile;
+  LCaminho       : string;
+  LEnviarLote    : Integer;
+  LThreadAtiva   : Integer;
+  LAmbienteAtivo : string;
 begin
   LCaminho := ResolverCaminhoIni(AExePath);
 
   LIni := TMemIniFile.Create(LCaminho);
   try
+    { [Banco] }
     Result.Servidor           := LIni.ReadString ('Banco',      'Servidor',           '192.168.1.19');
     Result.Banco              := LIni.ReadString ('Banco',      'Banco',              'conacd');
     Result.Login              := LIni.ReadString ('Banco',      'Login',              'sa');
-    Result.Senha              := LIni.ReadString ('Banco',      'Senha',              'Admbatista#');
+    Result.Senha              := LIni.ReadString ('Banco',      'Senha',              '');
+
+    { [Emitente] }
     Result.CnpjUnidade        := LIni.ReadString ('Emitente',   'Cnpj',               '07199060000124');
     Result.InscricaoMunicipal := LIni.ReadString ('Emitente',   'InscricaoMunicipal', '13371');
+
+    { [Diretorios] }
     Result.DiretorioBase      := LIni.ReadString ('Diretorios', 'DiretorioXml',
       ExtractFilePath(AExePath) + 'XML');
-    LEnviarLote               := LIni.ReadInteger('ModoEnvio',  'EnviarEmLote',       0);
+
+    { [ModoEnvio] }
+    LEnviarLote               := LIni.ReadInteger('ModoEnvio',  'EnviarEmLote',  0);
+
+    { [Thread] Ativa=1 libera o servico | Ativa=0 paralisa }
+    LThreadAtiva              := LIni.ReadInteger('Thread',     'Ativa',         0);
+
+    { [Config] DiaEnvio = dia do mes para execucao em Producao }
+    Result.DiaEnvio           := LIni.ReadInteger('Config',     'DiaEnvio',      21);
+
+    { [WebService] AmbienteAtivo = Homologacao ou Producao }
+    LAmbienteAtivo            := LIni.ReadString ('WebService', 'AmbienteAtivo', 'Homologacao');
+
   finally
     LIni.Free;
   end;
 
+  { ModoEnvio }
   case LEnviarLote = 1 of
     True : Result.ModoEnvio := meLote;
     False: Result.ModoEnvio := meIndividual;
+  end;
+
+  { ThreadAtiva }
+  Result.ThreadAtiva := LThreadAtiva = 1;
+
+  { Ambiente — lido de [WebService] AmbienteAtivo }
+  case AnsiSameText(LAmbienteAtivo, 'Producao') of
+    True : Result.Ambiente := amProducao;
+    False: Result.Ambiente := amHomologacao;
   end;
 
   Result.Mes := AMes;

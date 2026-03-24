@@ -1,4 +1,4 @@
-﻿unit View.Configuracao;
+unit View.Configuracao;
 
 interface
 
@@ -131,17 +131,17 @@ var
     Result := '';
     LBase  := ExtractFilePath(ParamStr(0));
 
-    { Tenta subindo até 5 níveis procurando exe\Config ou Config }
+    { Tenta subindo até 5 níveis }
     for I := 0 to 5 do
     begin
-      { Tenta \exe\Config (quando vem do IDE) }
-      LTentativa := TPath.Combine(TPath.Combine(LBase, 'exe'), 'Config');
+      { 1o — mesma pasta do exe }
+      LTentativa := LBase;
       case TFile.Exists(TPath.Combine(LTentativa, 'NFSe_Servico.ini')) of
         True: begin Result := LTentativa; Exit; end;
       end;
 
-      { Tenta \Config direto (quando roda o exe diretamente) }
-      LTentativa := TPath.Combine(LBase, 'Config');
+      { 2o — subpasta exe\Config (IDE) }
+      LTentativa := TPath.Combine(TPath.Combine(LBase, 'exe'), 'Config');
       case TFile.Exists(TPath.Combine(LTentativa, 'NFSe_Servico.ini')) of
         True: begin Result := LTentativa; Exit; end;
       end;
@@ -149,8 +149,8 @@ var
       LBase := TPath.GetFullPath(TPath.Combine(LBase, '..'));
     end;
 
-    { Fallback: Config relativo ao exe }
-    Result := TPath.Combine(ExtractFilePath(ParamStr(0)), 'Config');
+    { Fallback: mesma pasta do exe }
+    Result := ExtractFilePath(ParamStr(0));
   end;
 
 begin

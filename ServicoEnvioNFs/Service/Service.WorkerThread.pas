@@ -1,20 +1,5 @@
 unit Service.WorkerThread;
 
-{
-  WorkerThread — ciclo principal do servico.
-
-  TThread NAO herda de TInterfacedObject, entao nao implementa
-  interface diretamente. A interface IWorkerThread e exposta via
-  factory que retorna o proprio objeto como IWorkerThread usando
-  um adapter simples.
-
-  Ciclo:
-    - Executa imediatamente ao iniciar
-    - Aguarda INTERVALO_MS via TEvent
-    - Ao acordar executa novamente
-    - Para limpo via Parar + WaitFor no TService
-}
-
 interface
 
 uses
@@ -30,18 +15,17 @@ uses
 type
   TWorkerThread = class(TThread)
   private
-    FStop      : TEvent;
-    FExePath   : string;
-    FIntervaloMs: Integer;
+    FStop   : TEvent;
+    FExePath: string;
 
     procedure Executar;
     procedure GravarLog(const AMensagem: string; const AErro: Boolean);
+    function  DeveExecutarAgora(const AConfig: TDadosConfiguracaoEnvio): Boolean;
+    function  IntervaloMs(const AConfig: TDadosConfiguracaoEnvio): Cardinal;
   protected
     procedure Execute; override;
   public
-    constructor Criar(
-      const AExePath    : string;
-      const AIntervaloMs: Integer);
+    constructor Criar(const AExePath: string);
     destructor Destroy; override;
     procedure Parar;
   end;
@@ -56,13 +40,17 @@ uses
   Controller.IGeracaoXml,
   Controller.TGeracaoXml;
 
-constructor TWorkerThread.Criar(
-  const AExePath    : string;
-  const AIntervaloMs: Integer);
+const
+  { Homologacao: executa a cada 1 minuto }
+  INTERVALO_HOMOLOGACAO_MS = 60000;
+
+  { Producao: verifica a cada 1 hora se e o dia certo }
+  INTERVALO_PRODUCAO_MS    = 3600000;
+
+constructor TWorkerThread.Criar(const AExePath: string);
 begin
   inherited Create(True);
   FExePath        := AExePath;
-  FIntervaloMs    := AIntervaloMs;
   FStop           := TEvent.Create(nil, True, False, '');
   FreeOnTerminate := False;
 end;
@@ -107,6 +95,34 @@ begin
   end;
 end;
 
+function TWorkerThread.IntervaloMs(const AConfig: TDadosConfiguracaoEnvio): Cardinal;
+begin
+  { Homologacao — 1 minuto | Producao — 1 hora }
+  case AConfig.Ambiente of
+    amHomologacao: Result := INTERVALO_HOMOLOGACAO_MS;
+    amProducao   : Result := INTERVALO_PRODUCAO_MS;
+  else
+    Result := INTERVALO_PRODUCAO_MS;
+  end;
+end;
+
+function TWorkerThread.DeveExecutarAgora(const AConfig: TDadosConfiguracaoEnvio): Boolean;
+begin
+  case AConfig.Ambiente of
+
+    { Homologacao — executa sempre }
+    amHomologacao:
+      Result := True;
+
+    { Producao — executa somente no dia configurado em [Config] DiaEnvio }
+    amProducao:
+      Result := DayOf(Now) = AConfig.DiaEnvio;
+
+  else
+    Result := False;
+  end;
+end;
+
 procedure TWorkerThread.Executar;
 var
   LLeituraIni: ILeituraIni;
@@ -117,12 +133,33 @@ var
   LIdx       : Integer;
 begin
   try
-    GravarLog('Iniciando ciclo de geracao de XML...', False);
-
+    { Carrega configuracoes a cada ciclo — reflete mudancas no .ini sem reiniciar }
     LLeituraIni := TLeituraIni.Criar;
     LConfig     := LLeituraIni.Carregar(FExePath, MonthOf(Now), YearOf(Now));
 
-    GravarLog(Format('Modo: %s | %d/%d | Banco: %s/%s', [
+    { [Thread] Ativa=0 — paralisa o servico sem derrubar }
+    case LConfig.ThreadAtiva of
+      False:
+      begin
+        GravarLog('[Thread] Ativa=0 no .ini — ciclo suspenso.', False);
+        Exit;
+      end;
+    end;
+
+    { Verifica se deve executar agora conforme ambiente e dia }
+    case DeveExecutarAgora(LConfig) of
+      False:
+      begin
+        GravarLog(Format('[Producao] Aguardando dia %d. Hoje e dia %d.',
+          [LConfig.DiaEnvio, DayOf(Now)]), False);
+        Exit;
+      end;
+    end;
+
+    GravarLog('Iniciando ciclo de geracao de XML...', False);
+
+    GravarLog(Format('Ambiente: %s | Modo: %s | %d/%d | Banco: %s/%s', [
+      BoolToStr(LConfig.Ambiente = amHomologacao, True) + ' (Homologacao/Producao)',
       BoolToStr(LConfig.ModoEnvio = meLote, True),
       LConfig.Mes, LConfig.Ano,
       LConfig.Servidor, LConfig.Banco]), False);
@@ -157,24 +194,48 @@ begin
 
   except
     on E: Exception do
-      GravarLog('EXCECAO: ' + E.Message, True);
+      GravarLog('EXCECAO no ciclo: ' + E.ClassName + ' — ' + E.Message, True);
   end;
 end;
 
 procedure TWorkerThread.Execute;
+var
+  LLeituraIni: ILeituraIni;
+  LConfig    : TDadosConfiguracaoEnvio;
+  LIntervalo : Cardinal;
 begin
-  { Inicializa COM para esta thread — obrigatorio para MSXML/TXMLDocument }
   CoInitialize(nil);
   try
     GravarLog('WorkerThread iniciado.', False);
 
+    { Executa imediatamente na primeira vez }
     Executar;
 
-    while FStop.WaitFor(FIntervaloMs) = wrTimeout do
+    { Loop — intervalo depende do ambiente lido do .ini }
+    while FStop.WaitFor(0) = wrTimeout do
     begin
       case Terminated of
         True: Break;
       end;
+
+      { Rele o ini para pegar intervalo atualizado }
+      try
+        LLeituraIni := TLeituraIni.Criar;
+        LConfig     := LLeituraIni.Carregar(FExePath, MonthOf(Now), YearOf(Now));
+        LIntervalo  := IntervaloMs(LConfig);
+      except
+        LIntervalo := INTERVALO_PRODUCAO_MS;
+      end;
+
+      { Aguarda o intervalo correto }
+      case FStop.WaitFor(LIntervalo) of
+        wrSignaled: Break;
+      end;
+
+      case Terminated of
+        True: Break;
+      end;
+
       Executar;
     end;
 

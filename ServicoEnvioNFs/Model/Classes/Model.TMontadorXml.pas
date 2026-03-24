@@ -21,6 +21,7 @@ type
     function FormatarDataHora(const AData: TDateTime): string;
     function FormatarItemListaServico(const AItem: string): string;
     function GerarCodigoVerificacao: string;
+    function LimparNomeArquivo(const ATexto: string): string;
     function XMLDocParaString(const ADoc: IXMLDocument): string;
 
     { Retorna o documento E o node ListaRps diretamente — evita FindNode com namespace }
@@ -72,10 +73,12 @@ type
       const AUnidade : string): string;
 
     function SalvarXml(
-      const AXML    : string;
-      const APasta  : string;
-      const ANumLote: string;
-      const AIdx    : Integer): string;
+      const AXML      : string;
+      const APasta    : string;
+      const ANumLote  : string;
+      const AIdx      : Integer;
+      const ANomeTomador: string = '';
+      const AModo     : TModoEnvio = meIndividual): string;
 
     procedure MontarLotes(
       const ALista      : TListaDadosRps;
@@ -136,6 +139,28 @@ begin
     case CharInSet(ATexto[LI], ['0'..'9']) of
       True: Result := Result + ATexto[LI];
     end;
+end;
+
+function TMontadorXml.LimparNomeArquivo(const ATexto: string): string;
+const
+  { Caracteres invalidos para nome de arquivo no Windows }
+  INVALIDOS = '/\:*?"<>|';
+var
+  LI    : Integer;
+  LLimpo: string;
+begin
+  LLimpo := RetiraAcentos(ATexto);
+  Result := '';
+  for LI := 1 to Length(LLimpo) do
+  begin
+    case Pos(LLimpo[LI], INVALIDOS) = 0 of
+      True: Result := Result + LLimpo[LI];
+    end;
+  end;
+  Result := Trim(Result);
+  case Result = '' of
+    True: Result := 'SemNome';
+  end;
 end;
 
 function TMontadorXml.FormatarValor(const AValor: Currency): string;
@@ -462,9 +487,11 @@ function TMontadorXml.ResolverPastaSaida(
 const
   SUBPASTA: array[TModoEnvio] of string = ('Individual', 'Lote');
 begin
-  { XML\2026\23\SEDE\Individual }
+  { XML\2026\Marco\24\SEDE\Individual }
   Result := IncludeTrailingPathDelimiter(ABase)
     + FormatDateTime('yyyy', Date)
+    + PathDelim
+    + FormatDateTime('mmmm', Date)
     + PathDelim
     + FormatDateTime('dd', Date)
     + PathDelim
@@ -475,16 +502,32 @@ begin
 end;
 
 function TMontadorXml.SalvarXml(
-  const AXML    : string;
-  const APasta  : string;
-  const ANumLote: string;
-  const AIdx    : Integer): string;
+  const AXML        : string;
+  const APasta      : string;
+  const ANumLote    : string;
+  const AIdx        : Integer;
+  const ANomeTomador: string;
+  const AModo       : TModoEnvio): string;
 var
   LNomeArq: string;
   LWriter : TStreamWriter;
+  LNomeBase: string;
 begin
-  LNomeArq := TPath.Combine(APasta,
-    Format('NFSe_%s_%s.xml', [ANumLote, FormatFloat('000', AIdx)]));
+  case AModo of
+    { Individual — nome do arquivo = nome do tomador }
+    meIndividual:
+    begin
+      case ANomeTomador.IsEmpty of
+        True : LNomeBase := Format('NFSe_%s_%s', [ANumLote, FormatFloat('000', AIdx)]);
+        False: LNomeBase := LimparNomeArquivo(ANomeTomador);
+      end;
+    end;
+    { Lote — nome padrao com numero do lote }
+    meLote:
+      LNomeBase := Format('NFSe_%s_%s', [ANumLote, FormatFloat('000', AIdx)]);
+  end;
+
+  LNomeArq := TPath.Combine(APasta, LNomeBase + '.xml');
 
   LWriter := TStreamWriter.Create(LNomeArq, False, TEncoding.UTF8);
   try
@@ -567,7 +610,8 @@ begin
 
       LXmlStr  := XMLDocParaString(LDoc);
       LCaminho := SalvarXml(LXmlStr, LPasta,
-        ALista[LIdxGeral - 1].NumeroLote, LIdxArq);
+        ALista[LIdxGeral - 1].NumeroLote, LIdxArq,
+        '', meLote);
 
       LResultado.Sucesso        := True;
       LResultado.CaminhoArquivo := LCaminho;
@@ -646,7 +690,8 @@ begin
 
       LXmlStr  := XMLDocParaString(LDoc);
       LCaminho := SalvarXml(LXmlStr, LPasta,
-        ALista[LIdx].NumeroLote, LIdx + 1);
+        ALista[LIdx].NumeroLote, LIdx + 1,
+        ALista[LIdx].Tomador, meIndividual);
 
       LResultado.Sucesso        := True;
       LResultado.CaminhoArquivo := LCaminho;
