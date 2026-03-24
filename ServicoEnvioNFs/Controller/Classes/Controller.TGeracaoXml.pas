@@ -65,6 +65,7 @@ begin
   LConfig                    := AConfig;
   LConfig.CnpjUnidade        := CNPJ_UNIDADE[AUnidade];
   LConfig.InscricaoMunicipal := IM_UNIDADE[AUnidade];
+  LConfig.NomeUnidade        := NOME_UNIDADE[AUnidade];
 
   ACallbackLog(Format('>>> Processando unidade: %s (CNPJ: %s)',
     [NOME_UNIDADE[AUnidade], CNPJ_UNIDADE[AUnidade]]), False);

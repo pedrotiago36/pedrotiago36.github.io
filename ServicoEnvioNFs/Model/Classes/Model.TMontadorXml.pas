@@ -66,9 +66,10 @@ type
       const ADados     : TDadosRps);
 
     function ResolverPastaSaida(
-      const ABase: string;
-      const AData: TDateTime;
-      const AModo: TModoEnvio): string;
+      const ABase    : string;
+      const AData    : TDateTime;
+      const AModo    : TModoEnvio;
+      const AUnidade : string): string;
 
     function SalvarXml(
       const AXML    : string;
@@ -454,19 +455,22 @@ end;
 { -- Persistencia ------------------------------------------------------------ }
 
 function TMontadorXml.ResolverPastaSaida(
-  const ABase: string;
-  const AData: TDateTime;
-  const AModo: TModoEnvio): string;
+  const ABase    : string;
+  const AData    : TDateTime;
+  const AModo    : TModoEnvio;
+  const AUnidade : string): string;
 const
   SUBPASTA: array[TModoEnvio] of string = ('Individual', 'Lote');
 begin
-  Result := TPath.Combine(ABase,
-    Format('%d\%s\%s\%s', [
-      YearOf(AData),
-      FormatFloat('00', MonthOf(AData)),
-      FormatFloat('00', DayOf(AData)),
-      SUBPASTA[AModo]
-    ]));
+  { XML\2026\23\SEDE\Individual }
+  Result := IncludeTrailingPathDelimiter(ABase)
+    + FormatDateTime('yyyy', Date)
+    + PathDelim
+    + FormatDateTime('dd', Date)
+    + PathDelim
+    + AUnidade
+    + PathDelim
+    + SUBPASTA[AModo];
   ForceDirectories(Result);
 end;
 
@@ -528,7 +532,7 @@ begin
 
   ACallbackLog(Format('Iniciando montagem em LOTE — %d RPS encontrados.', [LQtdTotal]), False);
 
-  LPasta := ResolverPastaSaida(AConfig.DiretorioBase, ALista[0].DataEmissao, meLote);
+  LPasta := ResolverPastaSaida(AConfig.DiretorioBase, ALista[0].DataEmissao, meLote, AConfig.NomeUnidade);
 
   while LIdxGeral < LQtdTotal do
   begin
@@ -622,7 +626,7 @@ begin
   ACallbackLog(Format('Iniciando montagem INDIVIDUAL — %d RPS.', [LQtdTotal]), False);
 
   LPasta := ResolverPastaSaida(AConfig.DiretorioBase,
-    ALista[0].DataEmissao, meIndividual);
+    ALista[0].DataEmissao, meIndividual, AConfig.NomeUnidade);
 
   for LIdx := 0 to LQtdTotal - 1 do
   begin

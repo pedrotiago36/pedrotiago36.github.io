@@ -74,6 +74,7 @@ type
     Senha             : string;     { [Banco] Senha }
     CnpjUnidade       : string;     { Preenchido por unidade em runtime }
     InscricaoMunicipal: string;     { Preenchido por unidade em runtime }
+    NomeUnidade       : string;     { Preenchido por unidade em runtime }
     DiretorioBase     : string;     { [Diretorios] Pasta raiz dos XMLs }
     ModoEnvio         : TModoEnvio; { [ModoEnvio] Individual ou Lote }
     Mes               : Integer;    { Mes de referencia (runtime) }
@@ -88,10 +89,10 @@ type
 const
   { Nomes das unidades — usados para criar as pastas }
   NOME_UNIDADE: array[TUnidade] of string = (
-    'SEDE',       { unSede }
-    'UEQ',        { unUEQ }
-    'Varjota',    { unVarjota }
-    'SeisBocas'   { unSeisBocas }
+    'SEDE',        { unSede }
+    'UEQ',         { unUEQ }
+    'Varjota',     { unVarjota }
+    'Seis Bocas'   { unSeisBocas }
   );
 
   { CNPJs fixos das 4 unidades }
