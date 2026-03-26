@@ -1,4 +1,4 @@
-﻿unit Model.TLeituraIni;
+unit Model.TLeituraIni;
 
 interface
 
@@ -76,7 +76,7 @@ begin
   LIni := TMemIniFile.Create(LCaminho);
   try
     { [Banco] }
-    Result.Servidor           := LIni.ReadString ('Banco',      'Servidor',           '192.168.1.19');
+    Result.Servidor           := LIni.ReadString ('Banco',      'Servidor',           '192.168.1.12');
     Result.Banco              := LIni.ReadString ('Banco',      'Banco',              'conacd');
     Result.Login              := LIni.ReadString ('Banco',      'Login',              'sa');
     Result.Senha              := LIni.ReadString ('Banco',      'Senha',              '');
@@ -105,8 +105,8 @@ begin
     LIni.Free;
   end;
 
-  { ModoEnvio }
-  case LEnviarLote = 1 of
+  { ModoEnvio — EnviarEmLote=0 = Lote | EnviarEmLote=1 = Individual }
+  case LEnviarLote = 0 of
     True : Result.ModoEnvio := meLote;
     False: Result.ModoEnvio := meIndividual;
   end;

@@ -104,7 +104,7 @@ begin
 
     { Thread — grava 0/1 para compatibilidade com o servico Windows }
     LIni.WriteInteger('Thread',    'Ativa',       Ord(LDados.ThreadAtiva));
-    LIni.WriteInteger('ModoEnvio', 'EnviarEmLote', Ord(LDados.EnviarEmLote));
+    LIni.WriteInteger('ModoEnvio', 'EnviarEmLote', Ord(not LDados.EnviarEmLote)); { 0=Lote | 1=Individual }
     LIni.WriteString ('Config',    'DiaEnvio',    LDados.DataEnvio);
 
     LIni.UpdateFile;

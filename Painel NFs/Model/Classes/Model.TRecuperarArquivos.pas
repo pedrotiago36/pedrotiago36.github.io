@@ -43,7 +43,7 @@ begin
     LDados.DiretorioRpsCancelados := LIni.ReadString('Diretorios',  'RpsCancelados',   '');
     LDados.DiretorioArquivoIni    := LIni.ReadString('Diretorios',  'ArquivoIni',      '');
     LDados.ThreadAtiva            := LIni.ReadBool   ('Thread',    'Ativa',        False);
-    LDados.EnviarEmLote           := LIni.ReadBool   ('ModoEnvio', 'EnviarEmLote', True);
+    LDados.EnviarEmLote           := LIni.ReadInteger('ModoEnvio', 'EnviarEmLote', 0) = 0; { 0=Lote(True) | 1=Individual(False) }
     LDados.DataEnvio              := LIni.ReadString ('Config',    'DiaEnvio',     '');
     AConfiguracao.Atualizar(LDados);
   finally

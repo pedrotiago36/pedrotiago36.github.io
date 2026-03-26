@@ -1,11 +1,11 @@
-unit Model.TConexaoDB;
+﻿unit Model.TConexaoDB;
 
 {
   TConexaoDB - Conexao dinamica FireDAC para SQL Server
   ======================================================
   Parametros espelhados do FireDAC Explorer (conexao testada e aprovada):
     DriverID  = MSSQL
-    Server    = 192.168.1.12
+    Server    = 192.168.1.19
     Database  = conacd
     User_Name = sa
     Password  = Admbatista#
