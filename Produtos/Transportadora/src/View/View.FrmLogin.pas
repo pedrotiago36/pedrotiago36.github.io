@@ -41,6 +41,7 @@ implementation
 uses
   Model.TLogin,
   Controller.TLoginController,
+  View.FrmPrincipal,
   uniGUIApplication,
   uniGUIVars,
   ServerModule,
@@ -62,15 +63,32 @@ end;
 
 procedure TFrmLogin.HtmlLoginAjaxEvent(Sender: TComponent; EventName: string;
   Params: TUniStrings);
+type
+  TEvtAct = array[Boolean] of TProc;
+var
+  LEvt : TEvtAct;
 begin
-  FUser := Params.Values['user'];
-  FPwd  := Params.Values['pwd'];
-  try
-    FController.ExecuteLogin;
-  except
-    on E: EAssertionFailed do
-      NotifyFailure(E.Message);
-  end;
+  LEvt[False] := procedure
+    begin
+      { DoLogin }
+      FUser := Params.Values['user'];
+      FPwd  := Params.Values['pwd'];
+      try
+        FController.ExecuteLogin;
+      except
+        on E: EAssertionFailed do
+          NotifyFailure(E.Message);
+      end;
+    end;
+
+  LEvt[True] := procedure
+    begin
+      { OpenMain — abre form principal e oculta o login }
+      NewFrmPrincipal.Show;
+      Hide;
+    end;
+
+  LEvt[EventName = 'OpenMain']();
 end;
 
 { ILoginView }
@@ -82,7 +100,7 @@ end;
 
 procedure TFrmLogin.NotifySuccess(const AMessage: string);
 var
-  LSafe: string;
+  LSafe : string;
 begin
   LSafe := StringReplace(AMessage, '\', '\\', [rfReplaceAll]);
   LSafe := StringReplace(LSafe,    '"', '\"', [rfReplaceAll]);
@@ -90,8 +108,12 @@ begin
     'document.getElementById("btnLogin").classList.remove("loading");' +
     'showSuccessMsg("' + LSafe + '");'
   );
-  // TODO: abrir form principal apos animacao de sucesso
-  // TFrmPrincipal.Create(Application).Show; Self.Hide;
+  { Aguarda 800ms para exibir o sucesso e entao abre o form principal }
+  UniSession.AddJS(
+    'setTimeout(function(){' +
+    '  ajaxRequest(window.HtmlLogin,"OpenMain",[]);' +
+    '},800);'
+  );
 end;
 
 procedure TFrmLogin.NotifyFailure(const AMessage: string);
@@ -415,9 +437,11 @@ begin
     S.Append('ajaxRequest(window.HtmlLogin,' + Q + 'DoLogin' + Q + ',');
     S.Append('[' + Q + 'user=' + Q + '+encodeURIComponent(u),' + Q + 'pwd=' + Q + '+encodeURIComponent(p)]);}');
 
-    { enter key }
-    S.Append('document.addEventListener(' + Q + 'keydown' + Q + ',');
-    S.Append('function(e){e.key===' + Q + 'Enter' + Q + '&&doLogin();});');
+    { Enter navega: usuario -> senha -> entrar }
+    S.Append('document.getElementById(' + Q + 'inp_user' + Q + ').addEventListener(' + Q + 'keydown' + Q + ',');
+    S.Append('function(e){if(e.key===' + Q + 'Enter' + Q + '){e.preventDefault();document.getElementById(' + Q + 'inp_pwd' + Q + ').focus();}});');
+    S.Append('document.getElementById(' + Q + 'inp_pwd' + Q + ').addEventListener(' + Q + 'keydown' + Q + ',');
+    S.Append('function(e){if(e.key===' + Q + 'Enter' + Q + '){e.preventDefault();doLogin();}});');
 
     S.Append('</script>');
     S.Append('</body></html>');
