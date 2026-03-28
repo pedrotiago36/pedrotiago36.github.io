@@ -288,14 +288,14 @@ begin
     { secao logo no topo do card }
     S.Append('<div class="logo-sec">');
     S.Append('<div class="logo-wrap">');
-    S.Append('<img src="' + LLogoURL + '" alt="DT&amp;LL Transporte Logo"/>');
+    S.Append('<img src="' + LLogoURL + '" alt="DT&amp;LL Transportadoras Logo"/>');
     S.Append('</div>');
     S.Append('<div class="logo-div"></div>');
-    S.Append('<div class="logo-nm">DT<span>&amp;</span>LL Transporte</div>');
+    S.Append('<div class="logo-nm">Grupo DT<span>&amp;</span>LL</div>');
     S.Append('<div class="logo-sl">Tecnologia em Movimento</div>');
     S.Append('</div>');
     S.Append('<div class="badge"><div class="dot"></div>Sistema online</div>');
-    S.Append('<div class="titulo">Acesse sua conta</div>');
+    S.Append('<div class="titulo">Sistema de Transportadoras</div>');
     S.Append('<div class="subtitulo">Insira suas credenciais para continuar</div>');
 
     { username }
@@ -354,9 +354,9 @@ begin
 
     { footer }
     S.Append('<div class="footer">');
-    S.Append('<span>DT&amp;LL Transporte v1.0</span>');
+    S.Append('<span>Grupo DT&amp;LL - 2026</span>');
     S.Append('<span class="sep">&bull;</span>');
-    S.Append('<span>&copy; 2025 DTecno Sistemas</span>');
+    S.Append('<span>Vers&atilde;o: 1.0</span>');
     S.Append('</div>');
 
     S.Append('</div>'); { .card }

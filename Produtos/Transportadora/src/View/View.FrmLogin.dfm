@@ -3,7 +3,7 @@ object FrmLogin: TFrmLogin
   Top = 0
   ClientHeight = 768
   ClientWidth = 1366
-  Caption = 'DT&&LL Transporte'
+  Caption = 'DT&&LL Transportadoras'
   BorderStyle = bsNone
   OldCreateOrder = False
   BorderIcons = []
