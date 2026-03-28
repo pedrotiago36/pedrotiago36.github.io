@@ -63,32 +63,15 @@ end;
 
 procedure TFrmLogin.HtmlLoginAjaxEvent(Sender: TComponent; EventName: string;
   Params: TUniStrings);
-type
-  TEvtAct = array[Boolean] of TProc;
-var
-  LEvt : TEvtAct;
 begin
-  LEvt[False] := procedure
-    begin
-      { DoLogin }
-      FUser := Params.Values['user'];
-      FPwd  := Params.Values['pwd'];
-      try
-        FController.ExecuteLogin;
-      except
-        on E: EAssertionFailed do
-          NotifyFailure(E.Message);
-      end;
-    end;
-
-  LEvt[True] := procedure
-    begin
-      { OpenMain — abre form principal e oculta o login }
-      NewFrmPrincipal.Show;
-      Hide;
-    end;
-
-  LEvt[EventName = 'OpenMain']();
+  FUser := Params.Values['user'];
+  FPwd  := Params.Values['pwd'];
+  try
+    FController.ExecuteLogin;
+  except
+    on E: EAssertionFailed do
+      NotifyFailure(E.Message);
+  end;
 end;
 
 { ILoginView }
@@ -99,21 +82,17 @@ begin
 end;
 
 procedure TFrmLogin.NotifySuccess(const AMessage: string);
-var
-  LSafe : string;
 begin
-  LSafe := StringReplace(AMessage, '\', '\\', [rfReplaceAll]);
-  LSafe := StringReplace(LSafe,    '"', '\"', [rfReplaceAll]);
   UniSession.AddJS(
-    'document.getElementById("btnLogin").classList.remove("loading");' +
-    'showSuccessMsg("' + LSafe + '");'
+    'document.getElementById("btnLogin").classList.remove("loading");'
   );
-  { Aguarda 800ms para exibir o sucesso e entao abre o form principal }
-  UniSession.AddJS(
-    'setTimeout(function(){' +
-    '  ajaxRequest(window.HtmlLogin,"OpenMain",[]);' +
-    '},800);'
-  );
+  try
+    NewFrmPrincipal.Show;
+    Hide;
+  except
+    on E: Exception do
+      UniSession.AddJS('alert(' + QuotedStr('Erro ao abrir sistema: ' + E.Message) + ');');
+  end;
 end;
 
 procedure TFrmLogin.NotifyFailure(const AMessage: string);
