@@ -8,6 +8,10 @@ uses
   Model.IMenuItem,
   uniGUIForm,
   uniHTMLFrame,
+  uniGUITypes,
+  uniGUIAbstractClasses,
+  uniGUIClasses,
+  uniGUIBaseClasses,
   System.SysUtils,
   System.Classes;
 
@@ -38,6 +42,8 @@ implementation
 uses
   uniGUIVars,
   uniGUIApplication,
+  uniGUIServer,
+  ServerModule,
   System.JSON;
 
 function NewFrmPrincipal: TFrmPrincipal;
