@@ -237,6 +237,8 @@ begin
   J := TStringBuilder.Create;
   try
     J.AppendLine('var OT={}, FAV=[], COL=false;');
+    J.AppendLine('var _aj=typeof ajaxRequest!="undefined"?ajaxRequest:parent.ajaxRequest;');
+    J.AppendLine('var _cp=typeof UniHTMLFrame1!="undefined"?UniHTMLFrame1:parent.UniHTMLFrame1;');
 
     { toggle sidebar }
     J.AppendLine('function togSB(){');
@@ -259,7 +261,7 @@ begin
     { navegar - chama servidor }
     J.AppendLine('function nav(route,cap,bread){');
     J.AppendLine('  if(!route)return;');
-    J.AppendLine('  ajaxRequest(UniHTMLFrame1,"nav",[route,cap,bread]);');
+    J.AppendLine('  _aj(_cp,"nav",[route,cap,bread]);');
     J.AppendLine('}');
 
     { abrir aba - chamado pelo servidor via addJS }
@@ -312,7 +314,7 @@ begin
     J.AppendLine('  var wasAct=tab.classList.contains("act");');
     J.AppendLine('  tab.remove();');
     J.AppendLine('  delete OT[route];');
-    J.AppendLine('  ajaxRequest(UniHTMLFrame1,"closeTab",[route]);');
+    J.AppendLine('  _aj(_cp,"closeTab",[route]);');
     J.AppendLine('  var rem=document.querySelectorAll(".tab");');
     J.AppendLine('  if(wasAct&&rem.length>0){');
     J.AppendLine('    var last=rem[rem.length-1];');
@@ -353,7 +355,7 @@ begin
     { favoritos - toggle }
     J.AppendLine('function togFav(el,route){');
     J.AppendLine('  el.classList.toggle("st");');
-    J.AppendLine('  ajaxRequest(UniHTMLFrame1,"toggleFav",[route]);');
+    J.AppendLine('  _aj(_cp,"toggleFav",[route]);');
     J.AppendLine('}');
 
     { favoritos - atualizar chips (chamado pelo servidor) }
