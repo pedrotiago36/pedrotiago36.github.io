@@ -1,0 +1,53 @@
+# Delphi compiled output
+*.dcu
+*.dcp
+*.dcpil
+*.dpu
+*.o
+*.a
+*.obj
+
+# Executables
+*.exe
+*.so
+*.dylib
+
+# Delphi local/temp files
+*.dproj.local
+*.identcache
+*.tvsconfig
+*.local
+*.stat
+
+# Delphi backup/history
+__history/
+__recovery/
+*.~*
+
+# Delphi debug
+*.map
+*.jdbg
+*.pdb
+
+# Delphi resource files (gerados automaticamente)
+*.res
+*.rsm
+
+# Pastas de saída de compilação
+dcu/
+lib/
+Win32/
+Win64/
+Android/
+iOS/
+OSX/
+
+# Arquivos temporários do Windows
+*.tmp
+*.temp
+~$*
+Thumbs.db
+Desktop.ini
+
+# Preview HTML gerado
+*.Preview.html
