@@ -407,16 +407,14 @@ begin
     S.Append('setErr(' + Q + 'cf_user' + Q + ',false);');
     S.Append('setErr(' + Q + 'cf_pwd'  + Q + ',false);}');
 
-    { main login action }
+    { funcao principal de login }
+    S.Append('var _frame=parent[' + QuotedStr(HtmlLogin.JSName) + '];');
     S.Append('function doLogin(){');
     S.Append('var u=document.getElementById(' + Q + 'inp_user' + Q + ').value;');
     S.Append('var p=document.getElementById(' + Q + 'inp_pwd'  + Q + ').value;');
     S.Append('document.getElementById(' + Q + 'btnLogin' + Q + ').classList.add(' + Q + 'loading' + Q + ');');
     S.Append('showErrMsg(' + Q + Q + ');');
-    { TUniHTMLFrame renderiza dentro de iframe — ajaxRequest e componente estao no contexto pai }
-    S.Append('var _aj=typeof ajaxRequest!=' + Q + 'undefined' + Q + '?ajaxRequest:parent.ajaxRequest;');
-    S.Append('var _cp=typeof HtmlLogin!=' + Q + 'undefined' + Q + '?HtmlLogin:parent.HtmlLogin;');
-    S.Append('_aj(_cp,' + Q + 'DoLogin' + Q + ',');
+    S.Append('ajaxRequest(_frame,' + Q + 'DoLogin' + Q + ',');
     S.Append('[' + Q + 'user=' + Q + '+encodeURIComponent(u),' + Q + 'pwd=' + Q + '+encodeURIComponent(p)]);}');
 
     { Enter navega: usuario -> senha -> entrar }
