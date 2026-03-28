@@ -42,6 +42,14 @@ Android/
 iOS/
 OSX/
 
+# Delphi cache/log/otares
+prj/cache/
+prj/log/
+*.otares
+
+# Claude Code interno
+.claude/
+
 # Arquivos temporários do Windows
 *.tmp
 *.temp
