@@ -13,9 +13,7 @@ uses
   Model.IMenuItem in '..\src\Model\Interface\Model.IMenuItem.pas',
   Model.TMenuTree in '..\src\Model\Classe\Model.TMenuTree.pas',
   Controller.IMainController in '..\src\Controller\Interface\Controller.IMainController.pas',
-  Controller.TMainController in '..\src\Controller\Classe\Controller.TMainController.pas',
-  View.IFrmPrincipal in '..\src\View\View.IFrmPrincipal.pas',
-  View.FrmPrincipal in '..\src\View\View.FrmPrincipal.pas' {FrmPrincipal: TUniForm};
+  Controller.TMainController in '..\src\Controller\Classe\Controller.TMainController.pas';
 
 {$R *.res}
 

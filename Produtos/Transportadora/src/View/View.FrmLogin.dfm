@@ -10,7 +10,7 @@ object FrmLogin: TFrmLogin
   MonitoredKeys.Keys = <>
   TextHeight = 15
   OnCreate = UniFormCreate
-  object HtmlLogin: TUniHTMLFrame
+  object HtmlLogin: TUniURLFrame
     Left = 0
     Top = 0
     Width = 1366
