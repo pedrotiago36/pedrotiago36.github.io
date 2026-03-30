@@ -12,10 +12,11 @@ uses
 type
   TMainController = class(TInterfacedObject, IMainController)
   private
-    FView      : IMainView;
-    FMenuModel : IMenuModel;
-    FFavorites : TList<string>;
-    FRouteMap  : TDictionary<string, TMenuItemRec>;
+    FView           : IMainView;
+    FMenuModel      : IMenuModel;
+    FFavorites      : TList<string>;
+    FRouteMap       : TDictionary<string, TMenuItemRec>;
+    FScreenHandlers : TDictionary<string, TProc>;
     procedure BuildRouteMap;
   public
     constructor Create;
@@ -26,6 +27,7 @@ type
     procedure ToggleFavorite(const ARoute: string);
     function  GetMenuItems: TArray<TMenuItemRec>;
     function  GetFavorites: TArray<string>;
+    procedure RegisterScreenHandler(const ARoute: string; const AHandler: TProc);
   end;
 
 function NewMainController: IMainController;
@@ -42,14 +44,16 @@ end;
 constructor TMainController.Create;
 begin
   inherited;
-  FMenuModel := NewMenuModel;
-  FFavorites := TList<string>.Create;
-  FRouteMap  := TDictionary<string, TMenuItemRec>.Create;
+  FMenuModel      := NewMenuModel;
+  FFavorites      := TList<string>.Create;
+  FRouteMap       := TDictionary<string, TMenuItemRec>.Create;
+  FScreenHandlers := TDictionary<string, TProc>.Create;
   BuildRouteMap;
 end;
 
 destructor TMainController.Destroy;
 begin
+  FScreenHandlers.Free;
   FRouteMap.Free;
   FFavorites.Free;
   inherited;
@@ -71,14 +75,32 @@ begin
 end;
 
 procedure TMainController.NavigateTo(const ARoute: string);
+type
+  THandlerArr = array[Boolean] of TProc;
 var
-  LItem : TMenuItemRec;
+  LItem    : TMenuItemRec;
+  LHandler : TProc;
+  LNoOp    : TProc;
+  LArr     : THandlerArr;
+  LExists  : Boolean;
 begin
   Assert(ARoute <> '', 'Rota não pode ser vazia');
   Assert(FRouteMap.ContainsKey(ARoute), 'Rota não encontrada: ' + ARoute);
   LItem := FRouteMap[ARoute];
   Assert(LItem.Enabled, 'Funcionalidade em breve: ' + LItem.Caption);
   FView.OpenTab(LItem.Route, LItem.Caption, LItem.BreadPath);
+  { Dispara o screen handler sem IF — TryGetValue retorna False se rota sem handler }
+  LNoOp         := procedure begin end;
+  LExists       := FScreenHandlers.TryGetValue(ARoute, LHandler);
+  LArr[False]   := LNoOp;
+  LArr[True]    := LHandler;
+  LArr[LExists]();
+end;
+
+procedure TMainController.RegisterScreenHandler(const ARoute: string;
+  const AHandler: TProc);
+begin
+  FScreenHandlers.AddOrSetValue(ARoute, AHandler);
 end;
 
 procedure TMainController.CloseTab(const ARoute: string);

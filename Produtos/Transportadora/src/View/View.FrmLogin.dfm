@@ -19,4 +19,14 @@ object FrmLogin: TFrmLogin
     HTML.Strings = ()
     OnAjaxEvent = HtmlLoginAjaxEvent
   end
+  object HtmlMain: TUniHTMLFrame
+    Left = 0
+    Top = 0
+    Width = 1366
+    Height = 768
+    Align = alClient
+    Visible = False
+    HTML.Strings = ()
+    OnAjaxEvent = HtmlMainAjaxEvent
+  end
 end

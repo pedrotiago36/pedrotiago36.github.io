@@ -12,29 +12,44 @@ uses
   Controls, Forms,
   uniGUITypes, uniGUIAbstractClasses, uniGUIClasses,
   uniGUIRegClasses, uniGUIForm,
-  uniURLFrame, uniGUIBaseClasses,
+  uniURLFrame, uniHTMLFrame, uniGUIBaseClasses,
   View.ILoginView,
   Controller.ILoginController,
   Controller.IMainController,
+  Controller.IPerfilController,
+  Controller.IUsuarioController,
+  Controller.IPermissoesController,
   Model.ILogin,
-  Model.IMenuItem;
+  Model.IMenuItem,
+  Model.IPerfil,
+  Model.IUsuario,
+  Model.IPermissoes;
 
 type
   TFrmLogin = class(TUniForm, ILoginView, IMainView)
     HtmlLogin: TUniURLFrame;
+    HtmlMain : TUniHTMLFrame;
     procedure UniFormCreate(Sender: TObject);
     procedure HtmlLoginAjaxEvent(Sender: TComponent; EventName: string;
+      Params: TUniStrings);
+    procedure HtmlMainAjaxEvent(Sender: TComponent; EventName: string;
       Params: TUniStrings);
   private
     { estado }
     FInMain     : Boolean;
-    FJSFrame    : string;  { parent['JSName'] — calculado uma vez }
+    FJSFrame    : string;  { parent['JSName'] — atualizado na troca de frame }
     { login }
     FLoginCtrl  : ILoginController;
     FUser       : string;
     FPwd        : string;
     { main }
-    FMainCtrl   : IMainController;
+    FMainCtrl      : IMainController;
+    FPerfilModel   : IPerfilModel;
+    FPerfilCtrl    : IPerfilController;
+    FUsuarioModel    : IUsuarioModel;
+    FUsuarioCtrl     : IUsuarioController;
+    FPermissoesModel : IPermissoesModel;
+    FPermissoesCtrl  : IPermissoesController;
     { construtores de HTML }
     function  BuildLoginHtml: string;
     function  BuildMainHtml: string;
@@ -42,6 +57,27 @@ type
     { handlers por fase }
     procedure HandleLoginEvent(EventName: string; Params: TUniStrings);
     procedure HandleMainEvent(EventName: string; Params: TUniStrings);
+    { perfil — injeção de HTML no #screen }
+    procedure InjectPerfilList(const AItems: TArray<TPerfilRec>);
+    procedure InjectPerfilForm(const ARec: TPerfilRec);
+    function  BuildPerfilListHtml(const AItems: TArray<TPerfilRec>): string;
+    function  BuildPerfilFormHtml(const ARec: TPerfilRec): string;
+    { usuário — injeção de HTML no #screen }
+    procedure InjectUsuarioList(const AItems: TArray<TUsuarioRec>;
+                                const APerfis: TArray<TPerfilRec>);
+    procedure InjectUsuarioForm(const ARec: TUsuarioRec;
+                                const APerfis: TArray<TPerfilRec>);
+    function  BuildUsuarioListHtml(const AItems: TArray<TUsuarioRec>;
+                                   const APerfis: TArray<TPerfilRec>): string;
+    function  BuildUsuarioFormHtml(const ARec: TUsuarioRec;
+                                   const APerfis: TArray<TPerfilRec>): string;
+    { permissões — injeção de HTML no #screen }
+    procedure InjectPermForm(const ARec      : TPermissoesRec;
+                             const AUsuarios : TArray<TUsuarioRec>;
+                             const AItems    : TArray<TMenuItemRec>);
+    function  BuildPermFormHtml(const ARec      : TPermissoesRec;
+                                const AUsuarios : TArray<TUsuarioRec>;
+                                const AItems    : TArray<TMenuItemRec>): string;
     { ILoginView }
     function  CollectCredentials: TLoginCredentials;
     procedure NotifySuccess(const AMessage: string);
@@ -61,13 +97,112 @@ implementation
 
 uses
   StrUtils,
+  System.Generics.Collections,
   Model.TLogin,
+  Model.TPerfil,
+  Model.TUsuario,
+  Model.TPermissoes,
   Controller.TLoginController,
   Controller.TMainController,
+  Controller.TPerfilController,
+  Controller.TUsuarioController,
+  Controller.TPermissoesController,
+  System.JSON,
   uniGUIApplication,
   uniGUIVars,
   ServerModule,
   uniGUIServer;
+
+{ ══════════════════════════════════════════════════════════════
+  Adapter privado — conecta IPerfilView a TFrmLogin
+  ══════════════════════════════════════════════════════════════ }
+
+type
+  TPerfilViewAdapter = class(TInterfacedObject, IPerfilView)
+  strict private
+    FOwner: TFrmLogin;
+  public
+    constructor Create(AOwner: TFrmLogin);
+    procedure ShowList(const AItems: TArray<TPerfilRec>);
+    procedure ShowForm(const ARec: TPerfilRec);
+  end;
+
+constructor TPerfilViewAdapter.Create(AOwner: TFrmLogin);
+begin
+  inherited Create;
+  FOwner := AOwner;
+end;
+
+procedure TPerfilViewAdapter.ShowList(const AItems: TArray<TPerfilRec>);
+begin
+  FOwner.InjectPerfilList(AItems);
+end;
+
+procedure TPerfilViewAdapter.ShowForm(const ARec: TPerfilRec);
+begin
+  FOwner.InjectPerfilForm(ARec);
+end;
+
+{ ══════════════════════════════════════════════════════════════
+  Adapter privado — conecta IUsuarioView a TFrmLogin
+  ══════════════════════════════════════════════════════════════ }
+
+type
+  TUsuarioViewAdapter = class(TInterfacedObject, IUsuarioView)
+  strict private
+    FOwner: TFrmLogin;
+  public
+    constructor Create(AOwner: TFrmLogin);
+    procedure ShowList(const AItems: TArray<TUsuarioRec>;
+                       const APerfis: TArray<TPerfilRec>);
+    procedure ShowForm(const ARec: TUsuarioRec;
+                       const APerfis: TArray<TPerfilRec>);
+  end;
+
+constructor TUsuarioViewAdapter.Create(AOwner: TFrmLogin);
+begin
+  inherited Create;
+  FOwner := AOwner;
+end;
+
+procedure TUsuarioViewAdapter.ShowList(const AItems: TArray<TUsuarioRec>;
+  const APerfis: TArray<TPerfilRec>);
+begin
+  FOwner.InjectUsuarioList(AItems, APerfis);
+end;
+
+procedure TUsuarioViewAdapter.ShowForm(const ARec: TUsuarioRec;
+  const APerfis: TArray<TPerfilRec>);
+begin
+  FOwner.InjectUsuarioForm(ARec, APerfis);
+end;
+
+{ ══════════════════════════════════════════════════════════════
+  Adapter privado — conecta IPermissoesView a TFrmLogin
+  ══════════════════════════════════════════════════════════════ }
+
+type
+  TPermissoesViewAdapter = class(TInterfacedObject, IPermissoesView)
+  strict private
+    FOwner: TFrmLogin;
+  public
+    constructor Create(AOwner: TFrmLogin);
+    procedure ShowPermissoes(const ARec      : TPermissoesRec;
+                             const AUsuarios : TArray<TUsuarioRec>;
+                             const AItems    : TArray<TMenuItemRec>);
+  end;
+
+constructor TPermissoesViewAdapter.Create(AOwner: TFrmLogin);
+begin
+  inherited Create;
+  FOwner := AOwner;
+end;
+
+procedure TPermissoesViewAdapter.ShowPermissoes(const ARec      : TPermissoesRec;
+  const AUsuarios : TArray<TUsuarioRec>; const AItems : TArray<TMenuItemRec>);
+begin
+  FOwner.InjectPermForm(ARec, AUsuarios, AItems);
+end;
 
 { ══════════════════════════════════════════════════════════════
   Inicializacao
@@ -106,14 +241,16 @@ end;
 
 procedure TFrmLogin.HtmlLoginAjaxEvent(Sender: TComponent; EventName: string;
   Params: TUniStrings);
-type
-  TPhaseProc = array[Boolean] of TProc;
-var
-  LPhase : TPhaseProc;
 begin
-  LPhase[False] := procedure begin HandleLoginEvent(EventName, Params) end;
-  LPhase[True]  := procedure begin HandleMainEvent(EventName, Params)  end;
-  LPhase[FInMain]();
+  { HtmlLogin e TUniURLFrame — usado apenas na fase LOGIN }
+  HandleLoginEvent(EventName, Params);
+end;
+
+procedure TFrmLogin.HtmlMainAjaxEvent(Sender: TComponent; EventName: string;
+  Params: TUniStrings);
+begin
+  { HtmlMain e TUniHTMLFrame — usado apenas na fase MAIN }
+  HandleMainEvent(EventName, Params);
 end;
 
 { ── fase LOGIN ── }
@@ -134,12 +271,28 @@ end;
 
 procedure TFrmLogin.HandleMainEvent(EventName: string; Params: TUniStrings);
 type
-  TAct = array[0..3] of TProc;
+  TAct = array[0..13] of TProc;
 var
-  LRoute : string;
-  LAct   : TAct;
+  LRoute    : string;
+  LID       : Integer;
+  LNome     : string;
+  LPerms    : TArray<string>;
+  LLogin    : string;
+  LSenha    : string;
+  LIsAdmin  : Boolean;
+  LPerfilID : Integer;
+  LUsrID    : Integer;
+  LAct      : TAct;
 begin
-  LRoute := Params.Values['route'];
+  LRoute    := Params.Values['route'];
+  LID       := StrToIntDef(Params.Values['id'], 0);
+  LNome     := Params.Values['nome'];
+  LPerms    := SplitString(Params.Values['perms'], '|');
+  LLogin    := Params.Values['login'];
+  LSenha    := Params.Values['senha'];
+  LIsAdmin  := Params.Values['isadmin'] = '1';
+  LPerfilID := StrToIntDef(Params.Values['perfilid'], 0);
+  LUsrID    := StrToIntDef(Params.Values['userid'], 0);
 
   LAct[0] := procedure
     begin
@@ -148,14 +301,37 @@ begin
         UniSession.AddJS('alert(' + QuotedStr(E.Message) + ')');
       end;
     end;
-  LAct[1] := procedure begin FMainCtrl.CloseTab(LRoute); end;
-  LAct[2] := procedure begin FMainCtrl.ToggleFavorite(LRoute); end;
-  LAct[3] := procedure begin end;
+  LAct[1]  := procedure begin FMainCtrl.CloseTab(LRoute) end;
+  LAct[2]  := procedure begin FMainCtrl.ToggleFavorite(LRoute) end;
+  LAct[3]  := procedure begin FPerfilCtrl.StartInsert end;
+  LAct[4]  := procedure begin FPerfilCtrl.StartEdit(LID) end;
+  LAct[5]  := procedure begin FPerfilCtrl.Remove(LID) end;
+  LAct[6]  := procedure begin FPerfilCtrl.Save(LNome, LPerms, LID) end;
+  LAct[7]  := procedure begin FUsuarioCtrl.StartInsert end;
+  LAct[8]  := procedure begin FUsuarioCtrl.StartEdit(LID) end;
+  LAct[9]  := procedure begin FUsuarioCtrl.Remove(LID) end;
+  LAct[10] := procedure begin
+    FUsuarioCtrl.Save(LLogin, LSenha, LIsAdmin, LPerfilID, LID);
+  end;
+  LAct[11] := procedure begin FPermissoesCtrl.SelectUser(LUsrID) end;
+  LAct[12] := procedure begin FPermissoesCtrl.Save(LUsrID, LPerms) end;
+  LAct[13] := procedure begin FPermissoesCtrl.LoadList end;
 
   LAct[
-    Ord(EventName='nav')       * 0 +
-    Ord(EventName='closeTab')  * 1 +
-    Ord(EventName='toggleFav') * 2
+    Ord(EventName='nav')          *  0 +
+    Ord(EventName='closeTab')     *  1 +
+    Ord(EventName='toggleFav')    *  2 +
+    Ord(EventName='prf.insert')   *  3 +
+    Ord(EventName='prf.edit')     *  4 +
+    Ord(EventName='prf.delete')   *  5 +
+    Ord(EventName='prf.save')     *  6 +
+    Ord(EventName='usr.insert')   *  7 +
+    Ord(EventName='usr.edit')     *  8 +
+    Ord(EventName='usr.delete')   *  9 +
+    Ord(EventName='usr.save')     * 10 +
+    Ord(EventName='perm.select')  * 11 +
+    Ord(EventName='perm.save')    * 12 +
+    Ord(EventName='perm.back')    * 13
   ]();
 end;
 
@@ -174,8 +350,40 @@ begin
     FInMain   := True;
     FMainCtrl := NewMainController;
     FMainCtrl.BindView(Self);
-    { NotifyAjax do TUniURLFrame envia o novo HTML via SetWebHTML → document.write }
-    HtmlLogin.HTML.Text := BuildMainHtml;
+
+    { Perfil — instância e wiring }
+    FPerfilModel := NewPerfilModel;
+    FPerfilCtrl  := NewPerfilController(FPerfilModel, FMainCtrl.GetMenuItems);
+    FPerfilCtrl.BindView(TPerfilViewAdapter.Create(Self));
+
+    { Usuário — instância e wiring }
+    FUsuarioModel := NewUsuarioModel;
+    FUsuarioCtrl  := NewUsuarioController(FUsuarioModel, FPerfilModel);
+    FUsuarioCtrl.BindView(TUsuarioViewAdapter.Create(Self));
+
+    { Registra handler de tela para cfg.perfil }
+    FMainCtrl.RegisterScreenHandler('cfg.perfil',
+      procedure begin FPerfilCtrl.LoadList end);
+
+    { Registra handler de tela para cfg.usuario }
+    FMainCtrl.RegisterScreenHandler('cfg.usuario',
+      procedure begin FUsuarioCtrl.LoadList end);
+
+    { Permissões — instância e wiring }
+    FPermissoesModel := NewPermissoesModel;
+    FPermissoesCtrl  := NewPermissoesController(
+      FPermissoesModel, FUsuarioModel, FMainCtrl.GetMenuItems);
+    FPermissoesCtrl.BindView(TPermissoesViewAdapter.Create(Self));
+
+    { Registra handler de tela para cfg.permissoes }
+    FMainCtrl.RegisterScreenHandler('cfg.permissoes',
+      procedure begin FPermissoesCtrl.LoadList end);
+
+    { Troca de frame: oculta TUniURLFrame (login), ativa TUniHTMLFrame (main) }
+    HtmlLogin.Visible := False;
+    FJSFrame := 'parent[' + QuotedStr(HtmlMain.JSName) + ']';
+    HtmlMain.HTML.Text := BuildMainHtml;
+    HtmlMain.Visible := True;
   except
     on E: Exception do
     begin
@@ -197,7 +405,9 @@ end;
 
 procedure TFrmLogin.OpenTab(const ARoute, ACaption, ABreadPath: string);
 begin
-  { O JS do iframe já abre a aba imediatamente em navTo() — no-op aqui }
+  { HtmlMain é TUniHTMLFrame — UniSession.AddJS alcança seu contexto JS diretamente }
+  UniSession.AddJS(Format('openTab(%s,%s,%s);',
+    [QuotedStr(ARoute), QuotedStr(ACaption), QuotedStr(ABreadPath)]));
 end;
 
 procedure TFrmLogin.CloseTab(const ARoute: string);
@@ -559,8 +769,8 @@ begin
     '.tb-srch input:focus{border-color:rgba(245,158,11,.4)!important;' +
     '  background:rgba(245,158,11,.03)!important;' +
     '  box-shadow:0 0 0 3px rgba(245,158,11,.08),inset 0 1px 0 rgba(255,255,255,.04)!important;}' +
-    '.tb-srch input::placeholder{color:#2E3A4A!important;}' +
-    '.srch-ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#2E3A4A;pointer-events:none;}' +
+    '.tb-srch input::placeholder{color:rgba(255,255,255,.35)!important;}' +
+    '.srch-ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.35);pointer-events:none;}' +
     '#sdrop{position:absolute;top:calc(100% + 8px);left:0;right:0;' +
     '  background:rgba(12,8,24,.98);border:1px solid var(--bdr2);border-radius:16px;' +
     '  box-shadow:0 32px 80px rgba(0,0,0,.8),0 0 0 1px rgba(245,158,11,.06);' +
@@ -639,11 +849,11 @@ begin
     { sb-item base }
     '.sb-item{display:flex;align-items:center;gap:11px;padding:9px 12px;' +
     '  border-radius:12px;cursor:pointer;font-size:12.5px;' +
-    '  transition:all .2s cubic-bezier(.4,0,.2,1);color:#374151;' +
+    '  transition:all .2s cubic-bezier(.4,0,.2,1);color:#E2E8F0;' +
     '  user-select:none;border:1px solid transparent;position:relative;}' +
     '.sb-item:hover:not(.disabled){' +
-    '  background:rgba(255,255,255,.04);color:#94A3B8;' +
-    '  border-color:rgba(255,255,255,.06);}' +
+    '  background:rgba(255,255,255,.06);color:#FFFFFF;' +
+    '  border-color:rgba(255,255,255,.08);}' +
     '.sb-item.active{' +
     '  background:linear-gradient(90deg,rgba(245,158,11,.12),rgba(245,158,11,.04))!important;' +
     '  color:var(--am2)!important;' +
@@ -654,15 +864,15 @@ begin
     '  background:linear-gradient(180deg,var(--am2),var(--am));' +
     '  box-shadow:0 0 8px var(--am);}' +
     '.sb-item.disabled{opacity:.18;cursor:not-allowed;pointer-events:none;}' +
-    '.sb-item.sb-grp{color:#2E3A4A;font-weight:700;font-size:11.5px;' +
+    '.sb-item.sb-grp{color:rgba(245,158,11,.7);font-weight:700;font-size:11.5px;' +
     '  letter-spacing:.4px;text-transform:uppercase;}' +
     '.sb-item.sb-grp:hover:not(.disabled){' +
     '  background:rgba(245,158,11,.06);color:var(--am);' +
     '  border-color:rgba(245,158,11,.12);}' +
-    '.sb-arr{margin-left:auto;color:#2E3A4A;display:flex;align-items:center;flex-shrink:0;' +
+    '.sb-arr{margin-left:auto;color:rgba(255,255,255,.3);display:flex;align-items:center;flex-shrink:0;' +
     '  transition:all .2s;}' +
     '.sb-item:hover .sb-arr{color:var(--am);transform:translateX(3px);}' +
-    '.soon{font-size:9px;background:rgba(100,116,139,.08);color:#2E3A4A;' +
+    '.soon{font-size:9px;background:rgba(100,116,139,.08);color:rgba(255,255,255,.35);' +
     '  padding:2px 7px;border-radius:5px;margin-left:auto;letter-spacing:.5px;}' +
     '.item-ico{flex-shrink:0;display:flex;align-items:center;color:inherit;}' +
     '.item-lbl{flex:1;}' +
@@ -746,7 +956,7 @@ begin
     '  color:#F87171!important;' +
     '  box-shadow:0 0 8px rgba(239,68,68,.3);}' +
 
-    '#no-tab{font-size:12px;color:#1E2530;font-style:italic;' +
+    '#no-tab{font-size:12px;color:rgba(255,255,255,.45);font-style:italic;' +
     '  padding:0 8px;align-self:center;letter-spacing:.3px;}' +
 
     { Breadcrumb }
@@ -896,11 +1106,16 @@ begin
     '    if(_navStack.length>0)document.getElementById("drill-hdr").style.display="flex";' +
     '  }' +
     '}' +
+    { Cache de telas: Delphi injeta HTML via cacheScreen(route, html) }
+    'var SC={};' +
+    'function cacheScreen(r,h){SC[r]=h;}' +
     'function renderScr(route,cap){' +
     '  var el=document.getElementById("screen");' +
-    '  if(!route){el.innerHTML="<div class=sc-empty><p>Selecione uma tela no menu lateral</p></div>";return;}' +
-    '  el.innerHTML="<div class=sc-card><h2>"+cap+"</h2><p>Tela em desenvolvimento.</p>' +
-    '    <span class=rtag>"+route+"</span></div>";}' +
+    '  el.innerHTML=!route' +
+    '    ?"<div class=sc-empty><p>Selecione uma tela no menu lateral</p></div>"' +
+    '    :(SC[route]?SC[route]:"<div class=sc-card><h2>"+cap+"</h2>' +
+    '      <p>Tela em desenvolvimento.</p><span class=rtag>"+route+"</span></div>");' +
+    '}' +
     'function favToggle(el,route){' +
     '  el.classList.toggle("on");' +
     '  var i=_favs.indexOf(route);' +
@@ -937,6 +1152,39 @@ begin
     '  drop.style.display="block";}' +
     'document.addEventListener("click",function(e){' +
     '  if(!e.target.closest(".tb-srch"))document.getElementById("sdrop").style.display="none";});' +
+    { Perfil — funções globais (scripts dentro de innerHTML não executam) }
+    'function prfInsert(){parent.ajaxRequest(_f,"prf.insert",[]);}' +
+    'function prfEdit(id){parent.ajaxRequest(_f,"prf.edit",["id="+id]);}' +
+    'function prfDel(id){parent.ajaxRequest(_f,"prf.delete",["id="+id]);}' +
+    'function prfSave(){' +
+    '  var id=document.getElementById("prf-id").value;' +
+    '  var nome=encodeURIComponent(document.getElementById("prf-nome").value.trim());' +
+    '  var perms=[];' +
+    '  document.querySelectorAll(".prf-chk input:checked").forEach(function(c){perms.push(c.value);});' +
+    '  parent.ajaxRequest(_f,"prf.save",["id="+id,"nome="+nome,"perms="+perms.join("|")]);}' +
+    'function prfCancel(){parent.ajaxRequest(_f,"prf.insert",[]);}' +
+    { Usuário — funções globais }
+    'function usrInsert(){parent.ajaxRequest(_f,"usr.insert",[]);}' +
+    'function usrEdit(id){parent.ajaxRequest(_f,"usr.edit",["id="+id]);}' +
+    'function usrDel(id){parent.ajaxRequest(_f,"usr.delete",["id="+id]);}' +
+    'function usrSave(){' +
+    '  var id=document.getElementById("usr-id").value;' +
+    '  var login=encodeURIComponent(document.getElementById("usr-login").value.trim());' +
+    '  var senha=encodeURIComponent(document.getElementById("usr-senha").value.trim());' +
+    '  var isadmin=document.getElementById("usr-admin").checked?"1":"0";' +
+    '  var sel=document.getElementById("usr-perfil");' +
+    '  var perfilid=sel?sel.value:"0";' +
+    '  parent.ajaxRequest(_f,"usr.save",' +
+    '    ["id="+id,"login="+login,"senha="+senha,"isadmin="+isadmin,"perfilid="+perfilid]);}' +
+    'function usrCancel(){parent.ajaxRequest(_f,"usr.insert",[]);}' +
+    { Permissões }
+    'function permSelect(id){parent.ajaxRequest(_f,"perm.select",["userid="+id]);}' +
+    'function permSave(){' +
+    '  var uid=document.getElementById("perm-uid").value;' +
+    '  var perms=[];' +
+    '  document.querySelectorAll(".perm-chk input:checked").forEach(function(c){perms.push(c.value);});' +
+    '  parent.ajaxRequest(_f,"perm.save",["userid="+uid,"perms="+perms.join("|")]);}' +
+    'function permBack(){parent.ajaxRequest(_f,"perm.back",[]);}' +
     'window.addEventListener("load",function(){renderScr("","");});';
 
   H := TStringBuilder.Create;
@@ -999,6 +1247,833 @@ begin
     Result := H.ToString;
   finally
     H.Free;
+  end;
+end;
+
+{ ══════════════════════════════════════════════════════════════
+  Injeção de HTML de perfil no #screen via cacheScreen JS
+  ══════════════════════════════════════════════════════════════ }
+
+procedure TFrmLogin.InjectPerfilList(const AItems: TArray<TPerfilRec>);
+var
+  LHtml : string;
+  LJson : TJSONString;
+begin
+  LHtml := BuildPerfilListHtml(AItems);
+  LJson := TJSONString.Create(LHtml);
+  try
+    UniSession.AddJS(
+      'cacheScreen("cfg.perfil",' + LJson.ToString + ');' +
+      'renderScr("cfg.perfil","Cadastro de Perfil");');
+  finally
+    LJson.Free;
+  end;
+end;
+
+procedure TFrmLogin.InjectPerfilForm(const ARec: TPerfilRec);
+type
+  TTitleArr = array[Boolean] of string;
+const
+  TITLES: TTitleArr = ('Novo Perfil', 'Editar Perfil');
+var
+  LHtml : string;
+  LJson : TJSONString;
+begin
+  LHtml := BuildPerfilFormHtml(ARec);
+  LJson := TJSONString.Create(LHtml);
+  try
+    UniSession.AddJS(
+      'cacheScreen("cfg.perfil",' + LJson.ToString + ');' +
+      'renderScr("cfg.perfil",' + QuotedStr(TITLES[ARec.ID > 0]) + ');');
+  finally
+    LJson.Free;
+  end;
+end;
+
+{ ══════════════════════════════════════════════════════════════
+  BuildPerfilListHtml — tela de lista de perfis
+  ══════════════════════════════════════════════════════════════ }
+
+function TFrmLogin.BuildPerfilListHtml(const AItems: TArray<TPerfilRec>): string;
+type
+  TBodyArr = array[Boolean] of string;
+var
+  B     : TStringBuilder;
+  P     : TPerfilRec;
+  CSS   : string;
+  Rows  : string;
+  LBody : TBodyArr;
+begin
+  CSS :=
+    '<style>' +
+    '.prf-screen{font-family:"Segoe UI",system-ui,sans-serif;color:#E2E8F0;animation:fuSlide .3s cubic-bezier(.22,1,.36,1);}' +
+    '.prf-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;}' +
+    '.prf-title{font-size:22px;font-weight:800;background:linear-gradient(90deg,#FCD34D,#F59E0B);' +
+    '  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}' +
+    '.prf-sub{font-size:12px;color:#4E5A6B;margin-top:4px;}' +
+    '.btn-prf-new{display:flex;align-items:center;gap:8px;' +
+    '  background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(232,82,10,.12));' +
+    '  border:1px solid rgba(245,158,11,.4);border-radius:14px;' +
+    '  padding:10px 20px;color:#FCD34D;font-size:13px;font-weight:700;' +
+    '  cursor:pointer;transition:all .25s;letter-spacing:.3px;}' +
+    '.btn-prf-new:hover{background:linear-gradient(135deg,rgba(245,158,11,.3),rgba(232,82,10,.18));' +
+    '  box-shadow:0 0 20px rgba(245,158,11,.25);transform:translateY(-1px);}' +
+    '.prf-table-wrap{background:linear-gradient(135deg,rgba(19,15,34,.9),rgba(28,23,48,.9));' +
+    '  border:1px solid rgba(245,158,11,.1);border-radius:20px;overflow:hidden;' +
+    '  box-shadow:0 8px 40px rgba(0,0,0,.4);}' +
+    '.prf-table{width:100%;border-collapse:collapse;}' +
+    '.prf-table thead th{padding:14px 20px;text-align:left;font-size:11px;font-weight:700;' +
+    '  color:#4E5A6B;letter-spacing:1px;text-transform:uppercase;' +
+    '  border-bottom:1px solid rgba(245,158,11,.1);background:rgba(245,158,11,.04);}' +
+    '.prf-row td{padding:16px 20px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.03);}' +
+    '.prf-row:last-child td{border-bottom:none;}' +
+    '.prf-row:hover td{background:rgba(255,255,255,.02);}' +
+    '.prf-nome{font-weight:600;color:#CBD5E1;}' +
+    '.prf-badge{display:inline-flex;align-items:center;gap:6px;' +
+    '  background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);' +
+    '  border-radius:8px;padding:3px 10px;font-size:11px;color:#F59E0B;}' +
+    '.prf-dot{width:6px;height:6px;border-radius:50%;background:#F59E0B;' +
+    '  box-shadow:0 0 6px rgba(245,158,11,.6);}' +
+    '.btn-edit{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);' +
+    '  border-radius:10px;padding:6px 14px;color:#60A5FA;font-size:12px;font-weight:600;' +
+    '  cursor:pointer;transition:all .2s;margin-right:8px;}' +
+    '.btn-edit:hover{background:rgba(59,130,246,.15);box-shadow:0 0 12px rgba(59,130,246,.2);}' +
+    '.btn-del{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);' +
+    '  border-radius:10px;padding:6px 14px;color:#F87171;font-size:12px;font-weight:600;' +
+    '  cursor:pointer;transition:all .2s;}' +
+    '.btn-del:hover{background:rgba(239,68,68,.15);box-shadow:0 0 12px rgba(239,68,68,.2);}' +
+    '.prf-empty{padding:60px 20px;text-align:center;color:#2E3A4A;font-size:14px;}' +
+    '.prf-empty-ico{font-size:40px;margin-bottom:16px;opacity:.4;}' +
+    '</style>';
+
+  { Gera linhas da tabela }
+  B := TStringBuilder.Create;
+  try
+    for P in AItems do
+      B.AppendFormat(
+        '<tr class="prf-row">' +
+        '<td class="prf-nome">%s</td>' +
+        '<td><span class="prf-badge"><span class="prf-dot"></span>%d permiss&otilde;es</span></td>' +
+        '<td>' +
+        '<button class="btn-edit" onclick="prfEdit(%d)">&#9998; Editar</button>' +
+        '<button class="btn-del"  onclick="prfDel(%d)">&#10005; Excluir</button>' +
+        '</td></tr>',
+        [P.Nome, Length(P.Permissoes), P.ID, P.ID]);
+    Rows := B.ToString;
+  finally
+    B.Free;
+  end;
+
+  { Conteúdo: tabela com dados ou estado vazio — sem IF }
+  LBody[False] :=
+    '<div class="prf-empty"><div class="prf-empty-ico">&#128101;</div>' +
+    '<p>Nenhum perfil cadastrado.</p>' +
+    '<p style="font-size:12px;margin-top:8px;color:#2E3A4A;">Clique em ' +
+    '<b style="color:#F59E0B">+ Novo Perfil</b> para come&ccedil;ar.</p></div>';
+  LBody[True] :=
+    '<table class="prf-table">' +
+    '<thead><tr><th>Nome</th><th>Permiss&otilde;es</th><th>A&ccedil;&otilde;es</th></tr></thead>' +
+    '<tbody>' + Rows + '</tbody></table>';
+
+  Result :=
+    CSS +
+    '<div class="prf-screen">' +
+    '<div class="prf-hdr">' +
+    '<div><div class="prf-title">Cadastro de Perfil</div>' +
+    '<div class="prf-sub">Gerencie os perfis de acesso do sistema</div></div>' +
+    '<button class="btn-prf-new" onclick="prfInsert()">&#43; Novo Perfil</button>' +
+    '</div>' +
+    '<div class="prf-table-wrap">' + LBody[Length(AItems) > 0] + '</div>' +
+    '</div>';
+end;
+
+{ ══════════════════════════════════════════════════════════════
+  BuildPerfilFormHtml — tela de cadastro/edição de perfil
+  ══════════════════════════════════════════════════════════════ }
+
+function TFrmLogin.BuildPerfilFormHtml(const ARec: TPerfilRec): string;
+const
+  GRP_IDS    : array[0..4] of string =
+    ('grp-cad', 'grp-oper', 'grp-fin', 'grp-rel', 'grp-cfg');
+  GRP_LABELS : array[0..4] of string =
+    ('Cadastro', 'Operacional', 'Financeiro',
+     'Relat' + #243 + 'rios', 'Configura' + #231 + #245 + 'es');
+  GRP_COLORS : array[0..4] of string =
+    ('#F59E0B', '#3B82F6', '#10B981', '#8B5CF6', '#F43F5E');
+type
+  TDispArr  = array[Boolean] of string;
+var
+  B         : TStringBuilder;
+  Cards     : TStringBuilder;
+  G         : Integer;
+  Item      : TMenuItemRec;
+  LItems    : TArray<TMenuItemRec>;
+  LTitle    : TDispArr;
+  LChecked  : string;
+  LDispArr  : TDispArr;
+  LItemArr  : TDispArr;
+  LHasPerm  : Boolean;
+  LPermSet  : TDictionary<string, Boolean>;
+  LPerm     : string;
+  CSS       : string;
+begin
+  LItems := FMainCtrl.GetMenuItems;
+
+  { Dicionário de permissões para lookup O(1) — sem IF }
+  LPermSet := TDictionary<string, Boolean>.Create;
+  try
+    for LPerm in ARec.Permissoes do
+      LPermSet.AddOrSetValue(LPerm, True);
+
+    LTitle[False] := 'Novo Perfil';
+    LTitle[True]  := 'Editar Perfil';
+
+    CSS :=
+      '<style>' +
+      '.prf-screen{font-family:"Segoe UI",system-ui,sans-serif;color:#E2E8F0;animation:fuSlide .3s cubic-bezier(.22,1,.36,1);}' +
+      '.prf-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;}' +
+      '.prf-title{font-size:22px;font-weight:800;background:linear-gradient(90deg,#FCD34D,#F59E0B);' +
+      '  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}' +
+      '.prf-form-acts{display:flex;gap:10px;}' +
+      '.btn-cancel{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);' +
+      '  border-radius:14px;padding:10px 20px;color:#64748B;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}' +
+      '.btn-cancel:hover{background:rgba(255,255,255,.08);color:#94A3B8;}' +
+      '.btn-save{background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(232,82,10,.12));' +
+      '  border:1px solid rgba(245,158,11,.4);border-radius:14px;' +
+      '  padding:10px 24px;color:#FCD34D;font-size:13px;font-weight:700;cursor:pointer;transition:all .25s;}' +
+      '.btn-save:hover{background:linear-gradient(135deg,rgba(245,158,11,.3),rgba(232,82,10,.18));' +
+      '  box-shadow:0 0 20px rgba(245,158,11,.25);}' +
+      '.prf-field{margin-bottom:28px;}' +
+      '.prf-label{font-size:11px;font-weight:700;color:#4E5A6B;letter-spacing:1px;' +
+      '  text-transform:uppercase;margin-bottom:8px;display:block;}' +
+      '.prf-input{width:100%;max-width:480px;background:rgba(255,255,255,.04);' +
+      '  border:1px solid rgba(255,255,255,.08);border-radius:14px;' +
+      '  padding:12px 18px;color:#E2E8F0;font-size:14px;font-family:inherit;outline:none;' +
+      '  transition:all .25s;box-shadow:inset 0 1px 0 rgba(255,255,255,.04);}' +
+      '.prf-input:focus{border-color:rgba(245,158,11,.4);' +
+      '  box-shadow:0 0 0 3px rgba(245,158,11,.08),inset 0 1px 0 rgba(255,255,255,.04);}' +
+      '.prf-input::placeholder{color:#2E3A4A;}' +
+      '.prf-perm-title{font-size:13px;font-weight:700;color:#4E5A6B;' +
+      '  letter-spacing:.5px;text-transform:uppercase;margin-bottom:16px;}' +
+      '.prf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}' +
+      '.prf-card{background:linear-gradient(135deg,rgba(19,15,34,.9),rgba(28,23,48,.9));' +
+      '  border-radius:18px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.3);}' +
+      '.prf-card-hdr{display:flex;align-items:center;gap:10px;padding:14px 18px;' +
+      '  border-bottom:1px solid rgba(255,255,255,.05);}' +
+      '.prf-card-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}' +
+      '.prf-card-lbl{font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;}' +
+      '.prf-chk-list{padding:12px 14px;display:flex;flex-direction:column;gap:4px;}' +
+      '.prf-chk{display:flex;align-items:center;gap:10px;padding:7px 10px;' +
+      '  border-radius:10px;cursor:pointer;transition:background .15s;}' +
+      '.prf-chk:hover{background:rgba(255,255,255,.04);}' +
+      '.prf-chk input[type=checkbox]{display:none;}' +
+      '.prf-chk-box{width:18px;height:18px;border-radius:5px;flex-shrink:0;' +
+      '  border:2px solid rgba(255,255,255,.1);transition:all .2s;' +
+      '  display:flex;align-items:center;justify-content:center;font-size:11px;color:#000;}' +
+      '.prf-chk input:checked~.prf-chk-box{border-color:transparent;}' +
+      '.prf-chk-lbl{font-size:12.5px;color:#64748B;transition:color .15s;}' +
+      '.prf-chk:hover .prf-chk-lbl{color:#94A3B8;}' +
+      '.prf-chk input:checked~.prf-chk-lbl{color:#E2E8F0;}' +
+      { CSS var --cc definida por card, usada nos checkboxes marcados }
+      '.prf-chk input:checked~.prf-chk-box{background:var(--cc);' +
+      '  box-shadow:0 0 10px var(--cc);border-color:transparent;}' +
+      '</style>';
+
+    { Gera cards por grupo }
+    Cards := TStringBuilder.Create;
+    try
+      for G := 0 to 4 do
+      begin
+        { Verifica se grupo tem itens folha com Route }
+        LHasPerm := False;
+        for Item in LItems do
+          LHasPerm := LHasPerm or
+            ((Item.ParentID = GRP_IDS[G]) and (Item.Route <> ''));
+
+        LDispArr[False] := 'display:none';
+        LDispArr[True]  := 'display:block';
+
+        Cards.AppendFormat(
+          '<div class="prf-card" style="%s;border:1px solid %s30;--cc:%s">',
+          [LDispArr[LHasPerm], GRP_COLORS[G], GRP_COLORS[G]]);
+        Cards.AppendFormat(
+          '<div class="prf-card-hdr">' +
+          '<span class="prf-card-dot" style="background:%s;box-shadow:0 0 8px %s60"></span>' +
+          '<span class="prf-card-lbl" style="color:%s">%s</span>' +
+          '</div><div class="prf-chk-list">',
+          [GRP_COLORS[G], GRP_COLORS[G], GRP_COLORS[G], GRP_LABELS[G]]);
+
+        for Item in LItems do
+        begin
+          LHasPerm := (Item.ParentID = GRP_IDS[G]) and (Item.Route <> '');
+          LDispArr[False] := '';
+          LDispArr[True]  := 'checked';
+          LChecked := LDispArr[LPermSet.ContainsKey(Item.Route)];
+
+          LItemArr[False] := '';
+          LItemArr[True]  :=
+            Format('<label class="prf-chk">' +
+              '<input type="checkbox" value="%s" %s>' +
+              '<span class="prf-chk-box">&#10003;</span>' +
+              '<span class="prf-chk-lbl">%s</span>' +
+              '</label>',
+              [Item.Route, LChecked, Item.Caption]);
+
+          Cards.Append(LItemArr[LHasPerm]);
+        end;
+
+        Cards.Append('</div></div>');
+      end;
+
+      B := TStringBuilder.Create;
+      try
+        B.Append(CSS);
+        B.Append('<div class="prf-screen">');
+        B.Append('<div class="prf-hdr">');
+        B.AppendFormat('<div class="prf-title">%s</div>', [LTitle[ARec.ID > 0]]);
+        B.Append('<div class="prf-form-acts">');
+        B.Append('<button class="btn-cancel" onclick="prfCancel()">Cancelar</button>');
+        B.Append('<button class="btn-save" onclick="prfSave()">&#10003; Salvar</button>');
+        B.Append('</div></div>');
+        B.AppendFormat('<input type="hidden" id="prf-id" value="%d">', [ARec.ID]);
+        B.Append('<div class="prf-field">');
+        B.Append('<label class="prf-label" for="prf-nome">Nome do Perfil</label>');
+        B.AppendFormat(
+          '<input id="prf-nome" class="prf-input" type="text" ' +
+          'placeholder="Ex: Operador de fretes" value="%s">',
+          [ARec.Nome]);
+        B.Append('</div>');
+        B.Append('<div class="prf-perm-title">Permiss&otilde;es de Acesso</div>');
+        B.Append('<div class="prf-grid">');
+        B.Append(Cards.ToString);
+        B.Append('</div>');
+        B.Append('</div>');
+        Result := B.ToString;
+      finally
+        B.Free;
+      end;
+    finally
+      Cards.Free;
+    end;
+  finally
+    LPermSet.Free;
+  end;
+end;
+
+{ ══════════════════════════════════════════════════════════════
+  Injeção de HTML de usuário no #screen via cacheScreen JS
+  ══════════════════════════════════════════════════════════════ }
+
+procedure TFrmLogin.InjectUsuarioList(const AItems: TArray<TUsuarioRec>;
+  const APerfis: TArray<TPerfilRec>);
+var
+  LHtml : string;
+  LJson : TJSONString;
+begin
+  LHtml := BuildUsuarioListHtml(AItems, APerfis);
+  LJson := TJSONString.Create(LHtml);
+  try
+    UniSession.AddJS(
+      'cacheScreen("cfg.usuario",' + LJson.ToString + ');' +
+      'renderScr("cfg.usuario","Cadastro de Usu\u00E1rio");');
+  finally
+    LJson.Free;
+  end;
+end;
+
+procedure TFrmLogin.InjectUsuarioForm(const ARec: TUsuarioRec;
+  const APerfis: TArray<TPerfilRec>);
+const
+  TITLES: array[Boolean] of string = ('Novo Usu'#225'rio', 'Editar Usu'#225'rio');
+var
+  LHtml : string;
+  LJson : TJSONString;
+begin
+  LHtml := BuildUsuarioFormHtml(ARec, APerfis);
+  LJson := TJSONString.Create(LHtml);
+  try
+    UniSession.AddJS(
+      'cacheScreen("cfg.usuario",' + LJson.ToString + ');' +
+      'renderScr("cfg.usuario",' + QuotedStr(TITLES[ARec.ID > 0]) + ');');
+  finally
+    LJson.Free;
+  end;
+end;
+
+{ ══════════════════════════════════════════════════════════════
+  BuildUsuarioListHtml
+  ══════════════════════════════════════════════════════════════ }
+
+function TFrmLogin.BuildUsuarioListHtml(const AItems: TArray<TUsuarioRec>;
+  const APerfis: TArray<TPerfilRec>): string;
+type
+  TBodyArr = array[Boolean] of string;
+var
+  CSS     : string;
+  LRows   : TStringBuilder;
+  LBody   : TBodyArr;
+  LPerfis : TDictionary<Integer, string>;
+  Item    : TUsuarioRec;
+  Perfil  : TPerfilRec;
+  LAdmBdg : string;
+  LPrfNm  : string;
+begin
+  { Monta dicionário id→nome de perfil para lookup O(1) }
+  LPerfis := TDictionary<Integer, string>.Create;
+  try
+    for Perfil in APerfis do
+      LPerfis.AddOrSetValue(Perfil.ID, Perfil.Nome);
+
+    CSS :=
+      '<style>' +
+      '.usr-screen{font-family:"Segoe UI",system-ui,sans-serif;color:#E2E8F0;}' +
+      '.usr-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;}' +
+      '.usr-title{font-size:22px;font-weight:800;background:linear-gradient(90deg,#FCD34D,#F59E0B);' +
+      '  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}' +
+      '.usr-sub{font-size:12px;color:rgba(245,158,11,.6);margin-top:4px;}' +
+      '.btn-usr-new{display:flex;align-items:center;gap:8px;' +
+      '  background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(232,82,10,.12));' +
+      '  border:1px solid rgba(245,158,11,.25);border-radius:12px;' +
+      '  color:#F59E0B;font-size:12px;font-weight:700;padding:10px 18px;' +
+      '  cursor:pointer;letter-spacing:.3px;transition:all .25s;}' +
+      '.btn-usr-new:hover{box-shadow:0 0 20px rgba(245,158,11,.25);transform:translateY(-1px);}' +
+      '.usr-table-wrap{background:linear-gradient(135deg,rgba(19,15,34,.9),rgba(28,23,48,.9));' +
+      '  border:1px solid rgba(245,158,11,.1);border-radius:20px;overflow:hidden;' +
+      '  box-shadow:0 8px 40px rgba(0,0,0,.4);}' +
+      '.usr-table{width:100%;border-collapse:collapse;}' +
+      '.usr-table thead th{padding:14px 20px;text-align:left;font-size:11px;font-weight:700;' +
+      '  color:#F59E0B;letter-spacing:1px;text-transform:uppercase;' +
+      '  border-bottom:1px solid rgba(245,158,11,.1);background:rgba(245,158,11,.04);}' +
+      '.usr-row td{padding:16px 20px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.03);}' +
+      '.usr-row:last-child td{border-bottom:none;}' +
+      '.usr-row:hover td{background:rgba(255,255,255,.02);}' +
+      '.usr-login{font-weight:600;color:#FCD34D;}' +
+      '.badge-admin{display:inline-flex;align-items:center;gap:5px;' +
+      '  background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);' +
+      '  border-radius:8px;padding:3px 10px;font-size:11px;color:#F59E0B;font-weight:700;}' +
+      '.badge-user{display:inline-flex;align-items:center;gap:5px;' +
+      '  background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.15);' +
+      '  border-radius:8px;padding:3px 10px;font-size:11px;color:rgba(245,158,11,.6);}' +
+      '.prf-tag{display:inline-block;background:rgba(245,158,11,.07);' +
+      '  border:1px solid rgba(245,158,11,.2);border-radius:8px;' +
+      '  padding:3px 10px;font-size:11px;color:#F59E0B;}' +
+      '.btn-edit{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);' +
+      '  border-radius:8px;padding:6px 14px;font-size:12px;color:#F59E0B;' +
+      '  cursor:pointer;margin-right:8px;transition:all .2s;}' +
+      '.btn-edit:hover{background:rgba(245,158,11,.15);box-shadow:0 0 12px rgba(245,158,11,.2);}' +
+      '.btn-del{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);' +
+      '  border-radius:8px;padding:6px 14px;font-size:12px;color:#EF4444;' +
+      '  cursor:pointer;transition:all .2s;}' +
+      '.btn-del:hover{background:rgba(239,68,68,.15);box-shadow:0 0 12px rgba(239,68,68,.2);}' +
+      '.usr-empty{padding:60px 20px;text-align:center;color:rgba(245,158,11,.4);font-size:14px;}' +
+      '</style>';
+
+    LRows := TStringBuilder.Create;
+    try
+      for Item in AItems do
+      begin
+        LAdmBdg := '<span class="badge-admin">&#9733; Admin</span>';
+        LPrfNm  := '';
+        LPerfis.TryGetValue(Item.PerfilID, LPrfNm);
+
+        LRows.AppendFormat(
+          '<tr class="usr-row">' +
+          '<td class="usr-login">%s</td>' +
+          '<td>%s</td>' +
+          '<td>%s</td>' +
+          '<td>' +
+          '<button class="btn-edit" onclick="usrEdit(%d)">&#9998; Editar</button>' +
+          '<button class="btn-del"  onclick="usrDel(%d)">&#10005; Excluir</button>' +
+          '</td></tr>',
+          [Item.Login,
+           IfThen(Item.IsAdmin, LAdmBdg, '<span class="badge-user">Usuário</span>'),
+           IfThen(LPrfNm <> '', '<span class="prf-tag">' + LPrfNm + '</span>', '—'),
+           Item.ID, Item.ID]);
+      end;
+
+      LBody[False] :=
+        '<div class="usr-empty"><p>Nenhum usu&aacute;rio cadastrado.</p></div>';
+      LBody[True] :=
+        '<table class="usr-table">' +
+        '<thead><tr>' +
+        '<th>Login</th><th>Tipo</th><th>Perfil</th><th>A&ccedil;&otilde;es</th>' +
+        '</tr></thead><tbody>' + LRows.ToString + '</tbody></table>';
+
+      Result :=
+        CSS +
+        '<div class="usr-screen">' +
+        '<div class="usr-hdr">' +
+        '<div><div class="usr-title">Cadastro de Usu&aacute;rio</div>' +
+        '<div class="usr-sub">Gerencie os usu&aacute;rios do sistema</div></div>' +
+        '<button class="btn-usr-new" onclick="usrInsert()">&#43; Novo Usu&aacute;rio</button>' +
+        '</div>' +
+        '<div class="usr-table-wrap">' + LBody[Length(AItems) > 0] + '</div>' +
+        '</div>';
+    finally
+      LRows.Free;
+    end;
+  finally
+    LPerfis.Free;
+  end;
+end;
+
+{ ══════════════════════════════════════════════════════════════
+  BuildUsuarioFormHtml
+  ══════════════════════════════════════════════════════════════ }
+
+function TFrmLogin.BuildUsuarioFormHtml(const ARec: TUsuarioRec;
+  const APerfis: TArray<TPerfilRec>): string;
+type
+  TDispArr = array[Boolean] of string;
+var
+  B         : TStringBuilder;
+  CSS       : string;
+  LTitle    : TDispArr;
+  LAdmChk   : TDispArr;
+  LOptStr   : TStringBuilder;
+  Perfil    : TPerfilRec;
+  LSel      : TDispArr;
+begin
+  LTitle[False] := 'Novo Usu&aacute;rio';
+  LTitle[True]  := 'Editar Usu&aacute;rio';
+
+  LAdmChk[False] := '';
+  LAdmChk[True]  := 'checked';
+
+  CSS :=
+    '<style>' +
+    '.usr-form{font-family:"Segoe UI",system-ui,sans-serif;color:#E2E8F0;max-width:640px;}' +
+    '.usr-form-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;}' +
+    '.usr-form-title{font-size:22px;font-weight:800;' +
+    '  background:linear-gradient(90deg,#FCD34D,#F59E0B);' +
+    '  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}' +
+    '.usr-form-acts{display:flex;gap:12px;}' +
+    '.btn-cancel{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);' +
+    '  border-radius:10px;padding:9px 20px;font-size:12px;color:#64748B;' +
+    '  cursor:pointer;font-weight:600;transition:all .2s;}' +
+    '.btn-cancel:hover{border-color:rgba(255,255,255,.2);color:#94A3B8;}' +
+    '.btn-save{background:linear-gradient(135deg,rgba(245,158,11,.25),rgba(232,82,10,.15));' +
+    '  border:1px solid rgba(245,158,11,.35);border-radius:10px;' +
+    '  padding:9px 20px;font-size:12px;color:#F59E0B;' +
+    '  cursor:pointer;font-weight:700;transition:all .2s;}' +
+    '.btn-save:hover{box-shadow:0 0 20px rgba(245,158,11,.3);}' +
+    { Card de admin }
+    '.usr-admin-card{display:flex;align-items:center;justify-content:space-between;' +
+    '  background:linear-gradient(135deg,rgba(245,158,11,.06),rgba(232,82,10,.04));' +
+    '  border:1px solid rgba(245,158,11,.2);border-radius:16px;padding:20px 24px;' +
+    '  margin-bottom:24px;cursor:pointer;transition:all .25s;}' +
+    '.usr-admin-card:hover{border-color:rgba(245,158,11,.4);' +
+    '  box-shadow:0 0 24px rgba(245,158,11,.1);}' +
+    '.usr-admin-info{}' +
+    '.usr-admin-lbl{font-size:14px;font-weight:700;color:#FCD34D;margin-bottom:4px;}' +
+    '.usr-admin-desc{font-size:12px;color:rgba(245,158,11,.6);}' +
+    { Toggle switch }
+    '.usr-toggle{position:relative;width:48px;height:26px;flex-shrink:0;}' +
+    '.usr-toggle input{display:none;}' +
+    '.usr-toggle-track{position:absolute;inset:0;border-radius:13px;' +
+    '  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);' +
+    '  transition:all .25s;cursor:pointer;}' +
+    '.usr-toggle input:checked~.usr-toggle-track{' +
+    '  background:rgba(245,158,11,.35);border-color:rgba(245,158,11,.5);' +
+    '  box-shadow:0 0 12px rgba(245,158,11,.3);}' +
+    '.usr-toggle-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;' +
+    '  border-radius:50%;background:rgba(245,158,11,.35);transition:all .25s;pointer-events:none;}' +
+    '.usr-toggle input:checked~.usr-toggle-thumb{' +
+    '  left:27px;background:#F59E0B;box-shadow:0 0 8px rgba(245,158,11,.6);}' +
+    { Campos }
+    '.usr-field{margin-bottom:20px;}' +
+    '.usr-label{font-size:11px;font-weight:700;color:#F59E0B;' +
+    '  letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;display:block;}' +
+    '.usr-input{width:100%;background:rgba(255,255,255,.04);' +
+    '  border:1px solid rgba(245,158,11,.15);border-radius:12px;' +
+    '  padding:12px 16px;font-size:14px;color:#FCD34D;' +
+    '  font-family:"Segoe UI",system-ui,sans-serif;outline:none;' +
+    '  transition:border-color .2s,box-shadow .2s;}' +
+    '.usr-input::placeholder{color:rgba(245,158,11,.3);}' +
+    '.usr-input:focus{border-color:rgba(245,158,11,.5);' +
+    '  box-shadow:0 0 0 3px rgba(245,158,11,.1);}' +
+    { Select de perfil }
+    '.usr-select{width:100%;background:rgba(255,255,255,.04);' +
+    '  border:1px solid rgba(245,158,11,.15);border-radius:12px;' +
+    '  padding:12px 16px;font-size:14px;color:#FCD34D;' +
+    '  font-family:"Segoe UI",system-ui,sans-serif;outline:none;' +
+    '  cursor:pointer;transition:border-color .2s;}' +
+    '.usr-select:focus{border-color:rgba(245,158,11,.5);}' +
+    '.usr-select option{background:#130F22;color:#FCD34D;}' +
+    '.usr-section{font-size:11px;font-weight:700;color:#F59E0B;' +
+    '  letter-spacing:1.5px;text-transform:uppercase;margin:28px 0 16px;' +
+    '  padding-bottom:8px;border-bottom:1px solid rgba(245,158,11,.1);}' +
+    '</style>';
+
+  { Monta opções do select de perfil }
+  LOptStr := TStringBuilder.Create;
+  try
+    LOptStr.Append('<option value="0">-- Sem perfil --</option>');
+    for Perfil in APerfis do
+    begin
+      LSel[False] := '';
+      LSel[True]  := ' selected';
+      LOptStr.AppendFormat('<option value="%d"%s>%s</option>',
+        [Perfil.ID, LSel[ARec.PerfilID = Perfil.ID], Perfil.Nome]);
+    end;
+
+    B := TStringBuilder.Create;
+    try
+      B.Append(CSS);
+      B.Append('<div class="usr-form">');
+      B.Append('<div class="usr-form-hdr">');
+      B.AppendFormat('<div class="usr-form-title">%s</div>', [LTitle[ARec.ID > 0]]);
+      B.Append('<div class="usr-form-acts">');
+      B.Append('<button class="btn-cancel" onclick="usrCancel()">Cancelar</button>');
+      B.Append('<button class="btn-save"   onclick="usrSave()">&#10003; Salvar</button>');
+      B.Append('</div></div>');
+      B.AppendFormat('<input type="hidden" id="usr-id" value="%d">', [ARec.ID]);
+
+      { Card de administrador }
+      B.Append('<label class="usr-admin-card" for="usr-admin">');
+      B.Append('<div class="usr-admin-info">');
+      B.Append('<div class="usr-admin-lbl">&#9733; Administrador do Sistema</div>');
+      B.Append('<div class="usr-admin-desc">Acesso irrestrito a todos os m&oacute;dulos do sistema</div>');
+      B.Append('</div>');
+      B.Append('<div class="usr-toggle">');
+      B.AppendFormat('<input type="checkbox" id="usr-admin" %s>', [LAdmChk[ARec.IsAdmin]]);
+      B.Append('<div class="usr-toggle-track"></div>');
+      B.Append('<div class="usr-toggle-thumb"></div>');
+      B.Append('</div></label>');
+
+      { Campos de login e senha }
+      B.Append('<div class="usr-section">Credenciais de Acesso</div>');
+      B.Append('<div class="usr-field">');
+      B.Append('<label class="usr-label" for="usr-login">Login de Usu&aacute;rio</label>');
+      B.AppendFormat(
+        '<input id="usr-login" class="usr-input" type="text" ' +
+        'placeholder="Ex: joao.silva" autocomplete="off" value="%s">',
+        [ARec.Login]);
+      B.Append('</div>');
+      B.Append('<div class="usr-field">');
+      B.Append('<label class="usr-label" for="usr-senha">Senha</label>');
+      B.AppendFormat(
+        '<input id="usr-senha" class="usr-input" type="password" ' +
+        'placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" ' +
+        'autocomplete="new-password" value="%s">',
+        [ARec.Senha]);
+      B.Append('</div>');
+
+      { Seleção de perfil }
+      B.Append('<div class="usr-field">');
+      B.Append('<label class="usr-label" for="usr-perfil">Vincule o Perfil se for o caso</label>');
+      B.AppendFormat('<select id="usr-perfil" class="usr-select">%s</select>',
+        [LOptStr.ToString]);
+      B.Append('</div>');
+
+      B.Append('</div>');
+      Result := B.ToString;
+    finally
+      B.Free;
+    end;
+  finally
+    LOptStr.Free;
+  end;
+end;
+
+{ ══════════════════════════════════════════════════════════════
+  Injeção de HTML de permissões no #screen
+  ══════════════════════════════════════════════════════════════ }
+
+procedure TFrmLogin.InjectPermForm(const ARec      : TPermissoesRec;
+  const AUsuarios : TArray<TUsuarioRec>; const AItems : TArray<TMenuItemRec>);
+var
+  LHtml : string;
+  LJson : TJSONString;
+begin
+  LHtml := BuildPermFormHtml(ARec, AUsuarios, AItems);
+  LJson := TJSONString.Create(LHtml);
+  try
+    UniSession.AddJS(
+      'cacheScreen("cfg.permissoes",' + LJson.ToString + ');' +
+      'renderScr("cfg.permissoes","Permiss\u00F5es de Usu\u00E1rios");');
+  finally
+    LJson.Free;
+  end;
+end;
+
+{ ══════════════════════════════════════════════════════════════
+  BuildPermFormHtml — tela única: seletor de usuário + cards
+  ══════════════════════════════════════════════════════════════ }
+
+function TFrmLogin.BuildPermFormHtml(const ARec      : TPermissoesRec;
+  const AUsuarios : TArray<TUsuarioRec>;
+  const AItems    : TArray<TMenuItemRec>): string;
+const
+  GRP_IDS    : array[0..4] of string =
+    ('grp-cad', 'grp-oper', 'grp-fin', 'grp-rel', 'grp-cfg');
+  GRP_LABELS : array[0..4] of string =
+    ('Cadastro', 'Operacional', 'Financeiro',
+     'Relat' + #243 + 'rios', 'Configura' + #231 + #245 + 'es');
+  GRP_COLORS : array[0..4] of string =
+    ('#F59E0B', '#3B82F6', '#10B981', '#8B5CF6', '#F43F5E');
+type
+  TDispArr = array[Boolean] of string;
+  THasArr  = array[Boolean] of string;
+var
+  B        : TStringBuilder;
+  Cards    : TStringBuilder;
+  SelOpts  : TStringBuilder;
+  CSS      : string;
+  G        : Integer;
+  Item     : TMenuItemRec;
+  Usu      : TUsuarioRec;
+  LPermSet : TDictionary<string, Boolean>;
+  LDispArr : TDispArr;
+  LChecked : string;
+  LHasPerm : Boolean;
+  LItemArr : THasArr;
+  LSel     : TDispArr;
+  LHasUsr  : TDispArr;
+  LCardsBlock : string;
+begin
+  LPermSet := TDictionary<string, Boolean>.Create;
+  try
+    for var P in ARec.Permissoes do
+      LPermSet.AddOrSetValue(P, True);
+
+    CSS :=
+      '<style>' +
+      '.prm-screen{font-family:"Segoe UI",system-ui,sans-serif;color:#E2E8F0;}' +
+      '.prm-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}' +
+      '.prm-title{font-size:22px;font-weight:800;background:linear-gradient(90deg,#FCD34D,#F59E0B);' +
+      '  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}' +
+      '.prm-sub{font-size:12px;color:rgba(245,158,11,.6);margin-top:4px;}' +
+      { Seletor de usuário }
+      '.prm-sel-wrap{background:linear-gradient(135deg,rgba(19,15,34,.9),rgba(28,23,48,.9));' +
+      '  border:1px solid rgba(245,158,11,.15);border-radius:16px;' +
+      '  padding:20px 24px;margin-bottom:28px;display:flex;align-items:center;gap:16px;}' +
+      '.prm-sel-lbl{font-size:11px;font-weight:700;color:#F59E0B;' +
+      '  letter-spacing:1px;text-transform:uppercase;white-space:nowrap;}' +
+      '.prm-sel{flex:1;background:rgba(255,255,255,.04);' +
+      '  border:1px solid rgba(245,158,11,.2);border-radius:10px;' +
+      '  padding:10px 14px;font-size:14px;color:#FCD34D;' +
+      '  font-family:"Segoe UI",system-ui,sans-serif;outline:none;cursor:pointer;}' +
+      '.prm-sel:focus{border-color:rgba(245,158,11,.5);}' +
+      '.prm-sel option{background:#130F22;color:#FCD34D;}' +
+      '.btn-save-perm{background:linear-gradient(135deg,rgba(245,158,11,.25),rgba(232,82,10,.15));' +
+      '  border:1px solid rgba(245,158,11,.35);border-radius:10px;' +
+      '  padding:10px 22px;font-size:12px;color:#F59E0B;' +
+      '  cursor:pointer;font-weight:700;transition:all .2s;white-space:nowrap;}' +
+      '.btn-save-perm:hover{box-shadow:0 0 20px rgba(245,158,11,.3);}' +
+      '.btn-save-perm:disabled{opacity:.3;cursor:not-allowed;}' +
+      { Hint quando nenhum usuário selecionado }
+      '.prm-hint{padding:48px;text-align:center;color:rgba(245,158,11,.35);font-size:14px;}' +
+      { Cards }
+      '.prm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}' +
+      '.prm-card{background:linear-gradient(135deg,rgba(19,15,34,.95),rgba(28,23,48,.95));' +
+      '  border-radius:16px;padding:20px;border:1px solid rgba(255,255,255,.06);' +
+      '  box-shadow:0 4px 24px rgba(0,0,0,.3);}' +
+      '.prm-card-hdr{display:flex;align-items:center;gap:10px;margin-bottom:16px;' +
+      '  padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.05);}' +
+      '.prm-card-dot{width:8px;height:8px;border-radius:50%;background:var(--cc);' +
+      '  box-shadow:0 0 8px var(--cc);}' +
+      '.prm-card-lbl{font-size:11px;font-weight:800;letter-spacing:1.2px;' +
+      '  text-transform:uppercase;color:var(--cc);}' +
+      '.prm-chk-list{display:flex;flex-direction:column;gap:10px;}' +
+      '.prm-chk{display:flex;align-items:center;gap:10px;cursor:pointer;' +
+      '  padding:6px 8px;border-radius:8px;transition:background .15s;}' +
+      '.prm-chk:hover{background:rgba(255,255,255,.04);}' +
+      '.prm-chk input{display:none;}' +
+      '.prm-chk-box{width:18px;height:18px;border-radius:5px;flex-shrink:0;' +
+      '  border:2px solid rgba(255,255,255,.12);display:flex;align-items:center;' +
+      '  justify-content:center;font-size:11px;color:transparent;transition:all .2s;}' +
+      '.prm-chk input:checked~.prm-chk-box{' +
+      '  background:var(--cc);border-color:var(--cc);color:#fff;box-shadow:0 0 10px var(--cc);}' +
+      '.prm-chk-lbl{font-size:13px;color:#CBD5E1;transition:color .15s;}' +
+      '.prm-chk input:checked~.prm-chk-lbl{color:#E2E8F0;font-weight:600;}' +
+      '</style>';
+
+    { Opções do select }
+    SelOpts := TStringBuilder.Create;
+    try
+      SelOpts.Append('<option value="0">-- Selecione um usu&aacute;rio --</option>');
+      for Usu in AUsuarios do
+      begin
+        LSel[False] := '';
+        LSel[True]  := ' selected';
+        SelOpts.AppendFormat('<option value="%d"%s>%s</option>',
+          [Usu.ID, LSel[ARec.UsuarioID = Usu.ID], Usu.Login]);
+      end;
+
+      { Cards de permissão }
+      Cards := TStringBuilder.Create;
+      try
+        for G := 0 to 4 do
+        begin
+          Cards.AppendFormat(
+            '<div class="prm-card" style="--cc:%s">' +
+            '<div class="prm-card-hdr">' +
+            '<div class="prm-card-dot"></div>' +
+            '<span class="prm-card-lbl">%s</span>' +
+            '</div><div class="prm-chk-list">',
+            [GRP_COLORS[G], GRP_LABELS[G]]);
+
+          for Item in AItems do
+          begin
+            LHasPerm := (Item.ParentID = GRP_IDS[G]) and (Item.Route <> '');
+            LDispArr[False] := '';
+            LDispArr[True]  := 'checked';
+            LChecked := LDispArr[LPermSet.ContainsKey(Item.Route)];
+
+            LItemArr[False] := '';
+            LItemArr[True]  :=
+              Format('<label class="prm-chk">' +
+                '<input type="checkbox" value="%s" %s>' +
+                '<span class="prm-chk-box">&#10003;</span>' +
+                '<span class="prm-chk-lbl">%s</span>' +
+                '</label>',
+                [Item.Route, LChecked, Item.Caption]);
+
+            Cards.Append(LItemArr[LHasPerm]);
+          end;
+          Cards.Append('</div></div>');
+        end;
+
+        { Bloco de cards: só aparece quando há usuário selecionado }
+        LHasUsr[False] :=
+          '<div class="prm-hint">&#8593; Selecione um usu&aacute;rio acima para definir as permiss&otilde;es</div>';
+        LHasUsr[True] :=
+          '<div class="prm-grid">' + Cards.ToString + '</div>';
+        LCardsBlock := LHasUsr[ARec.UsuarioID > 0];
+
+        B := TStringBuilder.Create;
+        try
+          B.Append(CSS);
+          B.AppendFormat('<input type="hidden" id="perm-uid" value="%d">', [ARec.UsuarioID]);
+          B.Append('<div class="prm-screen">');
+          B.Append('<div class="prm-hdr">');
+          B.Append('<div><div class="prm-title">Permiss&otilde;es de Usu&aacute;rios</div>');
+          B.Append('<div class="prm-sub">Selecione o usu&aacute;rio e marque as telas permitidas</div></div>');
+          B.Append('</div>');
+          { Seletor }
+          B.Append('<div class="prm-sel-wrap">');
+          B.Append('<span class="prm-sel-lbl">Usu&aacute;rio</span>');
+          B.AppendFormat('<select class="prm-sel" onchange="permSelect(this.value)">%s</select>',
+            [SelOpts.ToString]);
+          B.AppendFormat('<button class="btn-save-perm" onclick="permSave()" %s>&#10003; Salvar</button>',
+            [IfThen(ARec.UsuarioID = 0, 'disabled', '')]);
+          B.Append('</div>');
+          { Cards ou hint }
+          B.Append(LCardsBlock);
+          B.Append('</div>');
+          Result := B.ToString;
+        finally
+          B.Free;
+        end;
+      finally
+        Cards.Free;
+      end;
+    finally
+      SelOpts.Free;
+    end;
+  finally
+    LPermSet.Free;
   end;
 end;
 

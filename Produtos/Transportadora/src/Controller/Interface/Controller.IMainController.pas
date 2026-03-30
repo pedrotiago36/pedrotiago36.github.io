@@ -3,19 +3,21 @@ unit Controller.IMainController;
 interface
 
 uses
-  Model.IMenuItem;
+  Model.IMenuItem,
+  System.SysUtils;
 
 type
   IMainView = interface;
 
   IMainController = interface
-    ['{B2C3D4E5-F6A7-8901-BCDE-F12345678901}']
+    ['{B2C3D4E5-F6A7-8901-BCDE-F12345678902}']
     procedure BindView(AView: IMainView);
     procedure NavigateTo(const ARoute: string);
     procedure CloseTab(const ARoute: string);
     procedure ToggleFavorite(const ARoute: string);
     function  GetMenuItems: TArray<TMenuItemRec>;
     function  GetFavorites: TArray<string>;
+    procedure RegisterScreenHandler(const ARoute: string; const AHandler: TProc);
   end;
 
   IMainView = interface
