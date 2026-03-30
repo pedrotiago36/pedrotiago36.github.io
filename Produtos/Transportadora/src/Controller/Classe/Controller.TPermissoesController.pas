@@ -60,12 +60,17 @@ end;
 
 procedure TPermissoesController.LoadList;
 var
-  LEmpty: TPermissoesRec;
+  LUsers  : TArray<TUsuarioRec>;
+  LFirstID: Integer;
 begin
-  { Abre a tela sem usuário selecionado (UsuarioID = 0) }
-  LEmpty.UsuarioID  := 0;
-  LEmpty.Permissoes := [];
-  FView.ShowPermissoes(LEmpty, FUsuModel.ListAll, FMenuItems);
+  LUsers   := FUsuModel.ListAll;
+  LFirstID := 0;
+  if Length(LUsers) > 0 then LFirstID := LUsers[0].ID;
+  { Pré-seleciona o primeiro usuário se houver algum cadastrado }
+  FView.ShowPermissoes(
+    FModel.FindByUsuario(LFirstID),
+    LUsers,
+    FMenuItems);
 end;
 
 procedure TPermissoesController.SelectUser(const AUsuarioID: Integer);

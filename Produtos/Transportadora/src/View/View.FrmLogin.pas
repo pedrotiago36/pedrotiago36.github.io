@@ -396,7 +396,7 @@ end;
 procedure TFrmLogin.NotifyFailure(const AMessage: string);
 begin
   { Ext.Msg.alert roda no contexto da pagina principal (ExtJS) — sempre disponivel }
-  UniSession.AddJS('Ext.Msg.alert("Aten' + #231 + #227 + 'o",' + QuotedStr(AMessage) + ');');
+  UniSession.AddJS('Ext.Msg.alert("Aten\u00E7\u00E3o",' + QuotedStr(AMessage) + ');');
 end;
 
 { ══════════════════════════════════════════════════════════════
@@ -1182,7 +1182,7 @@ begin
     'function permSave(){' +
     '  var uid=document.getElementById("perm-uid").value;' +
     '  var perms=[];' +
-    '  document.querySelectorAll(".perm-chk input:checked").forEach(function(c){perms.push(c.value);});' +
+    '  document.querySelectorAll(".prm-chk input:checked").forEach(function(c){perms.push(c.value);});' +
     '  parent.ajaxRequest(_f,"perm.save",["userid="+uid,"perms="+perms.join("|")]);}' +
     'function permBack(){parent.ajaxRequest(_f,"perm.back",[]);}' +
     'window.addEventListener("load",function(){renderScr("","");});';
@@ -1325,9 +1325,11 @@ begin
     '.prf-table thead th{padding:14px 20px;text-align:left;font-size:11px;font-weight:700;' +
     '  color:#4E5A6B;letter-spacing:1px;text-transform:uppercase;' +
     '  border-bottom:1px solid rgba(245,158,11,.1);background:rgba(245,158,11,.04);}' +
+    '.prf-table thead th:last-child{text-align:right;}' +
     '.prf-row td{padding:16px 20px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.03);}' +
     '.prf-row:last-child td{border-bottom:none;}' +
     '.prf-row:hover td{background:rgba(255,255,255,.02);}' +
+    '.prf-row td:last-child{text-align:right;}' +
     '.prf-nome{font-weight:600;color:#CBD5E1;}' +
     '.prf-badge{display:inline-flex;align-items:center;gap:6px;' +
     '  background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);' +
@@ -1397,7 +1399,7 @@ const
     ('grp-cad', 'grp-oper', 'grp-fin', 'grp-rel', 'grp-cfg');
   GRP_LABELS : array[0..4] of string =
     ('Cadastro', 'Operacional', 'Financeiro',
-     'Relat' + #243 + 'rios', 'Configura' + #231 + #245 + 'es');
+     'Relat&oacute;rios', 'Configura&ccedil;&otilde;es');
   GRP_COLORS : array[0..4] of string =
     ('#F59E0B', '#3B82F6', '#10B981', '#8B5CF6', '#F43F5E');
 type
@@ -1584,7 +1586,7 @@ end;
 procedure TFrmLogin.InjectUsuarioForm(const ARec: TUsuarioRec;
   const APerfis: TArray<TPerfilRec>);
 const
-  TITLES: array[Boolean] of string = ('Novo Usu'#225'rio', 'Editar Usu'#225'rio');
+  TITLES: array[Boolean] of string = ('Novo Usu\u00E1rio', 'Editar Usu\u00E1rio');
 var
   LHtml : string;
   LJson : TJSONString;
@@ -1644,7 +1646,9 @@ begin
       '.usr-table thead th{padding:14px 20px;text-align:left;font-size:11px;font-weight:700;' +
       '  color:#F59E0B;letter-spacing:1px;text-transform:uppercase;' +
       '  border-bottom:1px solid rgba(245,158,11,.1);background:rgba(245,158,11,.04);}' +
+      '.usr-table thead th:last-child{text-align:right;}' +
       '.usr-row td{padding:16px 20px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.03);}' +
+      '.usr-row td:last-child{text-align:right;}' +
       '.usr-row:last-child td{border-bottom:none;}' +
       '.usr-row:hover td{background:rgba(255,255,255,.02);}' +
       '.usr-login{font-weight:600;color:#FCD34D;}' +
@@ -1686,8 +1690,8 @@ begin
           '<button class="btn-del"  onclick="usrDel(%d)">&#10005; Excluir</button>' +
           '</td></tr>',
           [Item.Login,
-           IfThen(Item.IsAdmin, LAdmBdg, '<span class="badge-user">Usuário</span>'),
-           IfThen(LPrfNm <> '', '<span class="prf-tag">' + LPrfNm + '</span>', '—'),
+           IfThen(Item.IsAdmin, LAdmBdg, '<span class="badge-user">Usu&aacute;rio</span>'),
+           IfThen(LPrfNm <> '', '<span class="prf-tag">' + LPrfNm + '</span>', '&mdash;'),
            Item.ID, Item.ID]);
       end;
 
@@ -1723,16 +1727,36 @@ end;
 
 function TFrmLogin.BuildUsuarioFormHtml(const ARec: TUsuarioRec;
   const APerfis: TArray<TPerfilRec>): string;
+const
+  GRP_IDS    : array[0..4] of string =
+    ('grp-cad', 'grp-oper', 'grp-fin', 'grp-rel', 'grp-cfg');
+  GRP_LABELS : array[0..4] of string =
+    ('Cadastro', 'Operacional', 'Financeiro',
+     'Relat&oacute;rios', 'Configura&ccedil;&otilde;es');
+  GRP_COLORS : array[0..4] of string =
+    ('#F59E0B', '#3B82F6', '#10B981', '#8B5CF6', '#F43F5E');
 type
-  TDispArr = array[Boolean] of string;
+  TDispArr  = array[Boolean] of string;
 var
-  B         : TStringBuilder;
-  CSS       : string;
-  LTitle    : TDispArr;
-  LAdmChk   : TDispArr;
-  LOptStr   : TStringBuilder;
-  Perfil    : TPerfilRec;
-  LSel      : TDispArr;
+  B            : TStringBuilder;
+  Cards        : TStringBuilder;
+  CSS          : string;
+  LTitle       : TDispArr;
+  LAdmChk      : TDispArr;
+  LOptStr      : TStringBuilder;
+  Perfil       : TPerfilRec;
+  LSel         : TDispArr;
+  G            : Integer;
+  MenuItem     : TMenuItemRec;
+  LItems       : TArray<TMenuItemRec>;
+  LHasPerm     : Boolean;
+  LPermSet     : TDictionary<string, Boolean>;
+  LPerfilPerms : TDictionary<Integer, TArray<string>>;
+  LFoundPerms  : TArray<string>;
+  LPerm        : string;
+  LChecked     : string;
+  LItemArr     : TDispArr;
+  LDispArr     : TDispArr;
 begin
   LTitle[False] := 'Novo Usu&aacute;rio';
   LTitle[True]  := 'Editar Usu&aacute;rio';
@@ -1742,10 +1766,9 @@ begin
 
   CSS :=
     '<style>' +
-    '.usr-form{font-family:"Segoe UI",system-ui,sans-serif;color:#E2E8F0;max-width:640px;}' +
-    '.usr-form-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;}' +
-    '.usr-form-title{font-size:22px;font-weight:800;' +
-    '  background:linear-gradient(90deg,#FCD34D,#F59E0B);' +
+    '.usr-form{font-family:"Segoe UI",system-ui,sans-serif;color:#E2E8F0;max-width:980px;margin:0 auto;}' +
+    '.usr-form-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;}' +
+    '.usr-form-title{font-size:22px;font-weight:800;background:linear-gradient(90deg,#FCD34D,#F59E0B);' +
     '  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}' +
     '.usr-form-acts{display:flex;gap:12px;}' +
     '.btn-cancel{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);' +
@@ -1754,59 +1777,76 @@ begin
     '.btn-cancel:hover{border-color:rgba(255,255,255,.2);color:#94A3B8;}' +
     '.btn-save{background:linear-gradient(135deg,rgba(245,158,11,.25),rgba(232,82,10,.15));' +
     '  border:1px solid rgba(245,158,11,.35);border-radius:10px;' +
-    '  padding:9px 20px;font-size:12px;color:#F59E0B;' +
-    '  cursor:pointer;font-weight:700;transition:all .2s;}' +
+    '  padding:9px 20px;font-size:12px;color:#F59E0B;cursor:pointer;font-weight:700;transition:all .2s;}' +
     '.btn-save:hover{box-shadow:0 0 20px rgba(245,158,11,.3);}' +
-    { Card de admin }
+    { Layout 2 colunas para campos + card admin }
+    '.usr-cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px;align-items:start;}' +
+    '.usr-col{display:flex;flex-direction:column;gap:16px;}' +
+    '.usr-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}' +
+    { Card de admin — sem margin-bottom pois está dentro de coluna }
     '.usr-admin-card{display:flex;align-items:center;justify-content:space-between;' +
     '  background:linear-gradient(135deg,rgba(245,158,11,.06),rgba(232,82,10,.04));' +
     '  border:1px solid rgba(245,158,11,.2);border-radius:16px;padding:20px 24px;' +
-    '  margin-bottom:24px;cursor:pointer;transition:all .25s;}' +
-    '.usr-admin-card:hover{border-color:rgba(245,158,11,.4);' +
-    '  box-shadow:0 0 24px rgba(245,158,11,.1);}' +
-    '.usr-admin-info{}' +
+    '  cursor:pointer;transition:all .25s;}' +
+    '.usr-admin-card:hover{border-color:rgba(245,158,11,.4);box-shadow:0 0 24px rgba(245,158,11,.1);}' +
     '.usr-admin-lbl{font-size:14px;font-weight:700;color:#FCD34D;margin-bottom:4px;}' +
     '.usr-admin-desc{font-size:12px;color:rgba(245,158,11,.6);}' +
     { Toggle switch }
     '.usr-toggle{position:relative;width:48px;height:26px;flex-shrink:0;}' +
     '.usr-toggle input{display:none;}' +
     '.usr-toggle-track{position:absolute;inset:0;border-radius:13px;' +
-    '  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);' +
-    '  transition:all .25s;cursor:pointer;}' +
-    '.usr-toggle input:checked~.usr-toggle-track{' +
-    '  background:rgba(245,158,11,.35);border-color:rgba(245,158,11,.5);' +
-    '  box-shadow:0 0 12px rgba(245,158,11,.3);}' +
+    '  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);transition:all .25s;cursor:pointer;}' +
+    '.usr-toggle input:checked~.usr-toggle-track{background:rgba(245,158,11,.35);' +
+    '  border-color:rgba(245,158,11,.5);box-shadow:0 0 12px rgba(245,158,11,.3);}' +
     '.usr-toggle-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;' +
     '  border-radius:50%;background:rgba(245,158,11,.35);transition:all .25s;pointer-events:none;}' +
-    '.usr-toggle input:checked~.usr-toggle-thumb{' +
-    '  left:27px;background:#F59E0B;box-shadow:0 0 8px rgba(245,158,11,.6);}' +
+    '.usr-toggle input:checked~.usr-toggle-thumb{left:27px;background:#F59E0B;box-shadow:0 0 8px rgba(245,158,11,.6);}' +
     { Campos }
-    '.usr-field{margin-bottom:20px;}' +
-    '.usr-label{font-size:11px;font-weight:700;color:#F59E0B;' +
-    '  letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;display:block;}' +
-    '.usr-input{width:100%;background:rgba(255,255,255,.04);' +
-    '  border:1px solid rgba(245,158,11,.15);border-radius:12px;' +
-    '  padding:12px 16px;font-size:14px;color:#FCD34D;' +
-    '  font-family:"Segoe UI",system-ui,sans-serif;outline:none;' +
-    '  transition:border-color .2s,box-shadow .2s;}' +
+    '.usr-field{display:flex;flex-direction:column;gap:8px;}' +
+    '.usr-label{font-size:11px;font-weight:700;color:#F59E0B;letter-spacing:1px;text-transform:uppercase;}' +
+    '.usr-input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(245,158,11,.15);' +
+    '  border-radius:12px;padding:12px 16px;font-size:14px;color:#FCD34D;' +
+    '  font-family:"Segoe UI",system-ui,sans-serif;outline:none;transition:border-color .2s,box-shadow .2s;}' +
     '.usr-input::placeholder{color:rgba(245,158,11,.3);}' +
-    '.usr-input:focus{border-color:rgba(245,158,11,.5);' +
-    '  box-shadow:0 0 0 3px rgba(245,158,11,.1);}' +
-    { Select de perfil }
-    '.usr-select{width:100%;background:rgba(255,255,255,.04);' +
-    '  border:1px solid rgba(245,158,11,.15);border-radius:12px;' +
-    '  padding:12px 16px;font-size:14px;color:#FCD34D;' +
-    '  font-family:"Segoe UI",system-ui,sans-serif;outline:none;' +
-    '  cursor:pointer;transition:border-color .2s;}' +
+    '.usr-input:focus{border-color:rgba(245,158,11,.5);box-shadow:0 0 0 3px rgba(245,158,11,.1);}' +
+    '.usr-select{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(245,158,11,.15);' +
+    '  border-radius:12px;padding:12px 16px;font-size:14px;color:#FCD34D;' +
+    '  font-family:"Segoe UI",system-ui,sans-serif;outline:none;cursor:pointer;transition:border-color .2s;}' +
     '.usr-select:focus{border-color:rgba(245,158,11,.5);}' +
     '.usr-select option{background:#130F22;color:#FCD34D;}' +
-    '.usr-section{font-size:11px;font-weight:700;color:#F59E0B;' +
-    '  letter-spacing:1.5px;text-transform:uppercase;margin:28px 0 16px;' +
-    '  padding-bottom:8px;border-bottom:1px solid rgba(245,158,11,.1);}' +
+    '.usr-col-section{font-size:10px;font-weight:800;color:rgba(245,158,11,.5);' +
+    '  letter-spacing:2px;text-transform:uppercase;padding-bottom:6px;' +
+    '  border-bottom:1px solid rgba(245,158,11,.08);}' +
+    { Seção de permissões centralizada }
+    '.usr-perm-wrap{margin-top:4px;}' +
+    '.usr-perm-hdr{font-size:11px;font-weight:700;color:#F59E0B;letter-spacing:1.5px;' +
+    '  text-transform:uppercase;margin-bottom:8px;padding-bottom:8px;' +
+    '  border-bottom:1px solid rgba(245,158,11,.1);}' +
+    '.usr-perm-note{font-size:12px;color:rgba(245,158,11,.45);margin-bottom:20px;font-style:italic;}' +
+    { Grid de cards centralizado }
+    '.prf-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;}' +
+    '.prf-card{width:240px;background:linear-gradient(135deg,rgba(19,15,34,.9),rgba(28,23,48,.9));' +
+    '  border-radius:18px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.3);}' +
+    '.prf-card-hdr{display:flex;align-items:center;gap:10px;padding:14px 18px;' +
+    '  border-bottom:1px solid rgba(255,255,255,.05);}' +
+    '.prf-card-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}' +
+    '.prf-card-lbl{font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;}' +
+    '.prf-chk-list{padding:12px 14px;display:flex;flex-direction:column;gap:4px;}' +
+    '.prf-chk{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:10px;cursor:default;}' +
+    '.prf-chk input[type=checkbox]{display:none;}' +
+    '.prf-chk-box{width:18px;height:18px;border-radius:5px;flex-shrink:0;' +
+    '  border:2px solid rgba(255,255,255,.1);transition:all .2s;' +
+    '  display:flex;align-items:center;justify-content:center;font-size:11px;color:#000;}' +
+    '.prf-chk input:checked~.prf-chk-box{border-color:transparent;background:var(--cc);box-shadow:0 0 10px var(--cc);}' +
+    '.prf-chk-lbl{font-size:12.5px;color:#64748B;}' +
+    '.prf-chk input:checked~.prf-chk-lbl{color:#E2E8F0;}' +
     '</style>';
 
-  { Monta opções do select de perfil }
-  LOptStr := TStringBuilder.Create;
+  { Monta opções do select de perfil e coleta permissões do perfil vinculado }
+  LOptStr      := TStringBuilder.Create;
+  LPermSet     := TDictionary<string, Boolean>.Create;
+  LPerfilPerms := TDictionary<Integer, TArray<string>>.Create;
+  Cards        := TStringBuilder.Create;
   try
     LOptStr.Append('<option value="0">-- Sem perfil --</option>');
     for Perfil in APerfis do
@@ -1815,12 +1855,65 @@ begin
       LSel[True]  := ' selected';
       LOptStr.AppendFormat('<option value="%d"%s>%s</option>',
         [Perfil.ID, LSel[ARec.PerfilID = Perfil.ID], Perfil.Nome]);
+      LPerfilPerms.AddOrSetValue(Perfil.ID, Perfil.Permissoes);
+    end;
+
+    { Permissões do perfil vinculado ao usuário }
+    LItems := FMainCtrl.GetMenuItems;
+    LFoundPerms := [];
+    LPerfilPerms.TryGetValue(ARec.PerfilID, LFoundPerms);
+    for LPerm in LFoundPerms do
+      LPermSet.AddOrSetValue(LPerm, True);
+
+    { Gera cards de permissão por grupo }
+    for G := 0 to 4 do
+    begin
+      LHasPerm := False;
+      for MenuItem in LItems do
+        LHasPerm := LHasPerm or
+          ((MenuItem.ParentID = GRP_IDS[G]) and (MenuItem.Route <> ''));
+
+      LDispArr[False] := 'display:none';
+      LDispArr[True]  := 'display:block';
+
+      Cards.AppendFormat(
+        '<div class="prf-card" style="%s;border:1px solid %s30;--cc:%s">',
+        [LDispArr[LHasPerm], GRP_COLORS[G], GRP_COLORS[G]]);
+      Cards.AppendFormat(
+        '<div class="prf-card-hdr">' +
+        '<span class="prf-card-dot" style="background:%s;box-shadow:0 0 8px %s60"></span>' +
+        '<span class="prf-card-lbl" style="color:%s">%s</span>' +
+        '</div><div class="prf-chk-list">',
+        [GRP_COLORS[G], GRP_COLORS[G], GRP_COLORS[G], GRP_LABELS[G]]);
+
+      for MenuItem in LItems do
+      begin
+        LHasPerm := (MenuItem.ParentID = GRP_IDS[G]) and (MenuItem.Route <> '');
+        LDispArr[False] := '';
+        LDispArr[True]  := 'checked';
+        LChecked := LDispArr[LPermSet.ContainsKey(MenuItem.Route)];
+
+        LItemArr[False] := '';
+        LItemArr[True]  :=
+          Format('<label class="prf-chk">' +
+            '<input type="checkbox" value="%s" %s disabled>' +
+            '<span class="prf-chk-box">&#10003;</span>' +
+            '<span class="prf-chk-lbl">%s</span>' +
+            '</label>',
+            [MenuItem.Route, LChecked, MenuItem.Caption]);
+
+        Cards.Append(LItemArr[LHasPerm]);
+      end;
+
+      Cards.Append('</div></div>');
     end;
 
     B := TStringBuilder.Create;
     try
       B.Append(CSS);
       B.Append('<div class="usr-form">');
+
+      { Cabeçalho }
       B.Append('<div class="usr-form-hdr">');
       B.AppendFormat('<div class="usr-form-title">%s</div>', [LTitle[ARec.ID > 0]]);
       B.Append('<div class="usr-form-acts">');
@@ -1829,20 +1922,12 @@ begin
       B.Append('</div></div>');
       B.AppendFormat('<input type="hidden" id="usr-id" value="%d">', [ARec.ID]);
 
-      { Card de administrador }
-      B.Append('<label class="usr-admin-card" for="usr-admin">');
-      B.Append('<div class="usr-admin-info">');
-      B.Append('<div class="usr-admin-lbl">&#9733; Administrador do Sistema</div>');
-      B.Append('<div class="usr-admin-desc">Acesso irrestrito a todos os m&oacute;dulos do sistema</div>');
-      B.Append('</div>');
-      B.Append('<div class="usr-toggle">');
-      B.AppendFormat('<input type="checkbox" id="usr-admin" %s>', [LAdmChk[ARec.IsAdmin]]);
-      B.Append('<div class="usr-toggle-track"></div>');
-      B.Append('<div class="usr-toggle-thumb"></div>');
-      B.Append('</div></label>');
+      { Layout 2 colunas }
+      B.Append('<div class="usr-cols">');
 
-      { Campos de login e senha }
-      B.Append('<div class="usr-section">Credenciais de Acesso</div>');
+      { Coluna esquerda: Login + Senha + Perfil }
+      B.Append('<div class="usr-col">');
+      B.Append('<div class="usr-col-section">Credenciais de Acesso</div>');
       B.Append('<div class="usr-field">');
       B.Append('<label class="usr-label" for="usr-login">Login de Usu&aacute;rio</label>');
       B.AppendFormat(
@@ -1850,6 +1935,7 @@ begin
         'placeholder="Ex: joao.silva" autocomplete="off" value="%s">',
         [ARec.Login]);
       B.Append('</div>');
+      B.Append('<div class="usr-row">');
       B.Append('<div class="usr-field">');
       B.Append('<label class="usr-label" for="usr-senha">Senha</label>');
       B.AppendFormat(
@@ -1858,13 +1944,38 @@ begin
         'autocomplete="new-password" value="%s">',
         [ARec.Senha]);
       B.Append('</div>');
-
-      { Seleção de perfil }
       B.Append('<div class="usr-field">');
-      B.Append('<label class="usr-label" for="usr-perfil">Vincule o Perfil se for o caso</label>');
+      B.Append('<label class="usr-label" for="usr-perfil">Perfil vinculado</label>');
       B.AppendFormat('<select id="usr-perfil" class="usr-select">%s</select>',
         [LOptStr.ToString]);
       B.Append('</div>');
+      B.Append('</div>');
+      B.Append('</div>');
+
+      { Coluna direita: Card de Administrador }
+      B.Append('<div class="usr-col">');
+      B.Append('<div class="usr-col-section">N&iacute;vel de Acesso</div>');
+      B.Append('<label class="usr-admin-card" for="usr-admin">');
+      B.Append('<div class="usr-admin-info">');
+      B.Append('<div class="usr-admin-lbl">&#9733; Administrador do Sistema</div>');
+      B.Append('<div class="usr-admin-desc">Acesso irrestrito a todos os m&oacute;dulos</div>');
+      B.Append('</div>');
+      B.Append('<div class="usr-toggle">');
+      B.AppendFormat('<input type="checkbox" id="usr-admin" %s>', [LAdmChk[ARec.IsAdmin]]);
+      B.Append('<div class="usr-toggle-track"></div>');
+      B.Append('<div class="usr-toggle-thumb"></div>');
+      B.Append('</div></label>');
+      B.Append('</div>');
+
+      B.Append('</div>'); { /usr-cols }
+
+      { Cards de permissão centralizados }
+      B.Append('<div class="usr-perm-wrap">');
+      B.Append('<div class="usr-perm-hdr">Permiss&otilde;es de Acesso (via Perfil)</div>');
+      B.Append('<div class="usr-perm-note">&#128274; Somente leitura &mdash; herdadas do perfil vinculado. Gerencie em Cadastro de Perfil</div>');
+      B.Append('<div class="prf-grid">');
+      B.Append(Cards.ToString);
+      B.Append('</div></div>');
 
       B.Append('</div>');
       Result := B.ToString;
@@ -1872,6 +1983,9 @@ begin
       B.Free;
     end;
   finally
+    Cards.Free;
+    LPerfilPerms.Free;
+    LPermSet.Free;
     LOptStr.Free;
   end;
 end;
@@ -1909,7 +2023,7 @@ const
     ('grp-cad', 'grp-oper', 'grp-fin', 'grp-rel', 'grp-cfg');
   GRP_LABELS : array[0..4] of string =
     ('Cadastro', 'Operacional', 'Financeiro',
-     'Relat' + #243 + 'rios', 'Configura' + #231 + #245 + 'es');
+     'Relat&oacute;rios', 'Configura&ccedil;&otilde;es');
   GRP_COLORS : array[0..4] of string =
     ('#F59E0B', '#3B82F6', '#10B981', '#8B5CF6', '#F43F5E');
 type

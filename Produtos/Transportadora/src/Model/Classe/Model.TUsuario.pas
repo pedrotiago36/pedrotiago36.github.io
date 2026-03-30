@@ -34,10 +34,27 @@ end;
 { TUsuarioModel }
 
 constructor TUsuarioModel.Create;
+
+  procedure Seed(const ALogin, ASenha: string; AAdmin: Boolean);
+  var
+    LRec: TUsuarioRec;
+  begin
+    LRec.ID      := FNextID;
+    LRec.Login   := ALogin;
+    LRec.Senha   := ASenha;
+    LRec.IsAdmin := AAdmin;
+    LRec.PerfilID:= 0;
+    FStore.AddOrSetValue(LRec.ID, LRec);
+    Inc(FNextID);
+  end;
+
 begin
   inherited;
   FStore  := TDictionary<Integer, TUsuarioRec>.Create;
   FNextID := 1;
+  Seed('admin',     'admin123', True);
+  Seed('motorista', 'motor123', False);
+  Seed('operador',  'op@2024',  False);
 end;
 
 destructor TUsuarioModel.Destroy;
