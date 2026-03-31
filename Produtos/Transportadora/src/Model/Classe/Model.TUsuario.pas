@@ -1,16 +1,29 @@
 unit Model.TUsuario;
 
+// =============================================================
+//  CRUD de usuarios via API REST
+//  GET  /usuarios          -> ListAll
+//  GET  /usuarios/:id      -> FindByID
+//  POST /crud (INSERT)     -> Insert   (senha hasheada SHA-256)
+//  POST /crud (UPDATE)     -> Update   (senha hasheada se preenchida)
+//  POST /crud (DELETE)     -> Delete   (logico — ativo=0)
+// =============================================================
+
 interface
 
 uses
   Model.IUsuario,
-  System.Generics.Collections;
+  Service.ApiClient,
+  System.JSON,
+  System.SysUtils;
 
 type
-  TUsuarioModel = class(TInterfacedObject, IUsuarioModel)
-  strict private
-    FStore  : TDictionary<Integer, TUsuarioRec>;
-    FNextID : Integer;
+  TUsuarioAPI = class(TInterfacedObject, IUsuarioModel)
+  private
+    FAPI: TApiClient;
+    function ParseRec(const AJson: TJSONObject): TUsuarioRec;
+    function BuildCrudBody(const ATabela, AAcao: string;
+                           const ADados: TJSONObject): string;
   public
     constructor Create;
     destructor  Destroy; override;
@@ -26,100 +39,143 @@ function NewUsuarioModel: IUsuarioModel;
 
 implementation
 
+uses
+  System.Hash;
+
 function NewUsuarioModel: IUsuarioModel;
 begin
-  Result := TUsuarioModel.Create;
+  Result := TUsuarioAPI.Create;
 end;
 
-{ TUsuarioModel }
-
-constructor TUsuarioModel.Create;
-
-  procedure Seed(const ALogin, ASenha: string; AAdmin: Boolean);
-  var
-    LRec: TUsuarioRec;
-  begin
-    LRec.ID      := FNextID;
-    LRec.Login   := ALogin;
-    LRec.Senha   := ASenha;
-    LRec.IsAdmin := AAdmin;
-    LRec.PerfilID:= 0;
-    FStore.AddOrSetValue(LRec.ID, LRec);
-    Inc(FNextID);
-  end;
-
+constructor TUsuarioAPI.Create;
 begin
   inherited;
-  FStore  := TDictionary<Integer, TUsuarioRec>.Create;
-  FNextID := 1;
-  Seed('admin',     'admin123', True);
-  Seed('motorista', 'motor123', False);
-  Seed('operador',  'op@2024',  False);
+  FAPI := TApiClient.Create;
 end;
 
-destructor TUsuarioModel.Destroy;
+destructor TUsuarioAPI.Destroy;
 begin
-  FStore.Free;
+  FAPI.Free;
   inherited;
 end;
 
-function TUsuarioModel.NextID: Integer;
+function TUsuarioAPI.ParseRec(const AJson: TJSONObject): TUsuarioRec;
 begin
-  Result  := FNextID;
-  Inc(FNextID);
+  Result.ID       := StrToIntDef(AJson.GetValue('id').Value,       -1);
+  Result.Login    := AJson.GetValue('login').Value;
+  Result.Senha    := '';  // hash nao e retornado pela API
+  Result.IsAdmin  := AJson.GetValue('is_admin').Value = '1';
+  Result.PerfilID := StrToIntDef(AJson.GetValue('perfil_id').Value, 0);
 end;
 
-function TUsuarioModel.ListAll: TArray<TUsuarioRec>;
+function TUsuarioAPI.BuildCrudBody(const ATabela, AAcao: string;
+                                   const ADados: TJSONObject): string;
 var
-  LRec : TUsuarioRec;
-  LIdx : Integer;
+  LRoot: TJSONObject;
 begin
-  SetLength(Result, FStore.Count);
-  LIdx := 0;
-  for LRec in FStore.Values do
-  begin
-    Result[LIdx] := LRec;
-    Inc(LIdx);
+  LRoot := TJSONObject.Create;
+  try
+    LRoot.AddPair('tabela', ATabela);
+    LRoot.AddPair('acao',   AAcao);
+    LRoot.AddPair('dados',  ADados);  // LRoot toma ownership de ADados
+    Result := LRoot.ToString;
+  finally
+    LRoot.Free;
   end;
 end;
 
-function TUsuarioModel.FindByID(const AID: Integer): TUsuarioRec;
-type
-  TResArr = array[Boolean] of TUsuarioRec;
+function TUsuarioAPI.ListAll: TArray<TUsuarioRec>;
 var
-  LFound  : TUsuarioRec;
-  LEmpty  : TUsuarioRec;
-  LExists : Boolean;
-  LArr    : TResArr;
+  LResponse : string;
+  LArr      : TJSONArray;
+  LI        : Integer;
 begin
-  LEmpty.ID       := -1;
-  LEmpty.Login    := '';
-  LEmpty.Senha    := '';
-  LEmpty.IsAdmin  := False;
-  LEmpty.PerfilID := 0;
-  LExists         := FStore.TryGetValue(AID, LFound);
-  LArr[False]     := LEmpty;
-  LArr[True]      := LFound;
-  Result          := LArr[LExists];
+  SetLength(Result, 0);
+  try
+    LResponse := FAPI.Get('/usuarios');
+    LArr := TJSONObject.ParseJSONValue(LResponse) as TJSONArray;
+    if not Assigned(LArr) then Exit;
+    try
+      SetLength(Result, LArr.Count);
+      for LI := 0 to LArr.Count - 1 do
+        Result[LI] := ParseRec(LArr.Items[LI] as TJSONObject);
+    finally
+      LArr.Free;
+    end;
+  except
+    SetLength(Result, 0);
+  end;
 end;
 
-procedure TUsuarioModel.Insert(const ARec: TUsuarioRec);
+function TUsuarioAPI.FindByID(const AID: Integer): TUsuarioRec;
 var
-  LRec: TUsuarioRec;
+  LResponse : string;
+  LJson     : TJSONObject;
 begin
-  LRec         := ARec;
-  LRec.ID      := NextID;
-  FStore.AddOrSetValue(LRec.ID, LRec);
+  Result.ID      := -1;
+  Result.Login   := '';
+  Result.Senha   := '';
+  Result.IsAdmin := False;
+  Result.PerfilID:= 0;
+  try
+    LResponse := FAPI.Get('/usuarios/' + IntToStr(AID));
+    LJson := TJSONObject.ParseJSONValue(LResponse) as TJSONObject;
+    if Assigned(LJson) then
+    try
+      if StrToIntDef(LJson.GetValue('id').Value, -1) > 0 then
+        Result := ParseRec(LJson);
+    finally
+      LJson.Free;
+    end;
+  except
+  end;
 end;
 
-procedure TUsuarioModel.Update(const ARec: TUsuarioRec);
+procedure TUsuarioAPI.Insert(const ARec: TUsuarioRec);
+var
+  LDados: TJSONObject;
 begin
-  FStore.AddOrSetValue(ARec.ID, ARec);
+  LDados := TJSONObject.Create;
+  LDados.AddPair('login',     ARec.Login);
+  LDados.AddPair('senha',     THashSHA2.GetHashString(ARec.Senha));
+  LDados.AddPair('is_admin',  TJSONNumber.Create(Ord(ARec.IsAdmin)));
+  LDados.AddPair('perfil_id', TJSONNumber.Create(ARec.PerfilID));
+  // BuildCrudBody toma ownership de LDados
+  FAPI.Post('/crud', BuildCrudBody('tb_usuarios', 'INSERT', LDados));
 end;
 
-procedure TUsuarioModel.Delete(const AID: Integer);
+procedure TUsuarioAPI.Update(const ARec: TUsuarioRec);
+var
+  LDados : TJSONObject;
+  LSenha : string;
 begin
-  FStore.Remove(AID);
+  // Se o usuario nao informou nova senha, envia vazio — SP mantem a existente
+  if Trim(ARec.Senha) <> '' then
+    LSenha := THashSHA2.GetHashString(ARec.Senha)
+  else
+    LSenha := '';
+
+  LDados := TJSONObject.Create;
+  LDados.AddPair('id',        TJSONNumber.Create(ARec.ID));
+  LDados.AddPair('login',     ARec.Login);
+  LDados.AddPair('senha',     LSenha);
+  LDados.AddPair('is_admin',  TJSONNumber.Create(Ord(ARec.IsAdmin)));
+  LDados.AddPair('perfil_id', TJSONNumber.Create(ARec.PerfilID));
+  FAPI.Post('/crud', BuildCrudBody('tb_usuarios', 'UPDATE', LDados));
+end;
+
+procedure TUsuarioAPI.Delete(const AID: Integer);
+var
+  LDados: TJSONObject;
+begin
+  LDados := TJSONObject.Create;
+  LDados.AddPair('id', TJSONNumber.Create(AID));
+  FAPI.Post('/crud', BuildCrudBody('tb_usuarios', 'DELETE', LDados));
+end;
+
+function TUsuarioAPI.NextID: Integer;
+begin
+  Result := 0;  // ID gerado pelo auto-increment do banco
 end;
 
 end.

@@ -48,28 +48,49 @@ begin
   Result.Connected := True;
 end;
 
-// Le string de TJSONObject sem lancar excecao — retorna ADefault se campo ausente
+// Helpers para ler valores JSON sem lancar excecao
 function JStr(const AObj: TJSONObject; const AKey, ADefault: string): string;
 var
   LVal: TJSONValue;
 begin
   LVal := AObj.GetValue(AKey);
-  if Assigned(LVal) then
-    Result := LVal.Value
-  else
-    Result := ADefault;
+  if Assigned(LVal) then Result := LVal.Value
+  else Result := ADefault;
 end;
 
-// Le inteiro de TJSONObject — retorna ADefault se campo ausente
 function JInt(const AObj: TJSONObject; const AKey: string; ADefault: Integer): Integer;
 var
   LVal: TJSONValue;
 begin
   LVal := AObj.GetValue(AKey);
-  if Assigned(LVal) then
-    Result := StrToIntDef(LVal.Value, ADefault)
-  else
-    Result := ADefault;
+  if Assigned(LVal) then Result := StrToIntDef(LVal.Value, ADefault)
+  else Result := ADefault;
+end;
+
+// Carrega rotas de permissao de uma tabela para um dado ID
+// Retorna TJSONArray com as rotas (caller e responsavel por liberar)
+function CarregarRotas(const Conn: TFDConnection;
+                       const ATabela, ACampoID: string;
+                       const AID: Integer): TJSONArray;
+var
+  Qry: TFDQuery;
+begin
+  Result := TJSONArray.Create;
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := Conn;
+    Qry.SQL.Text   := 'SELECT rota FROM ' + ATabela +
+                      ' WHERE ' + ACampoID + ' = :id ORDER BY rota';
+    Qry.ParamByName('id').AsInteger := AID;
+    Qry.Open;
+    while not Qry.Eof do
+    begin
+      Result.Add(Qry.FieldByName('rota').AsString);
+      Qry.Next;
+    end;
+  finally
+    Qry.Free;
+  end;
 end;
 
 begin
@@ -84,52 +105,67 @@ begin
     end
   );
 
-  // GET /ListaProdutos?empresa_id=X
-  THorse.Get('/ListaProdutos',
+  // POST /login
+  // Body: {"login":"admin","senha":"sha256_hash"}
+  // Response: {"sucesso":true|false,"mensagem":"..."}
+  THorse.Post('/login',
     procedure(Req: THorseRequest; Res: THorseResponse)
     var
-      Conn               : TFDConnection;
-      QryConsultaProduto : TFDQuery;
-      Clientes           : TJSONArray;
-      EmpresaID, I       : Integer;
-      ProdutoObj         : TJSONObject;
+      LRoot   : TJSONObject;
+      LLogin  : string;
+      LSenha  : string;
+      Conn    : TFDConnection;
+      Qry     : TFDQuery;
+      LResp   : TJSONObject;
+      LSucesso: Boolean;
     begin
       try
-        Conn := NewMySQLConnection;
-        QryConsultaProduto := TFDQuery.Create(nil);
-        QryConsultaProduto.FetchOptions.RowsetSize := 10000000;
+        LRoot := TJSONObject.ParseJSONValue(Req.Body) as TJSONObject;
+        if not Assigned(LRoot) then
+        begin
+          Res.Status(400).Send('JSON invalido');
+          Exit;
+        end;
         try
-          EmpresaID := StrToIntDef(Req.Query['empresa_id'], 0);
-          QryConsultaProduto.Connection := Conn;
-          QryConsultaProduto.SQL.Clear;
-          QryConsultaProduto.SQL.Add(
-            'SELECT ID, CODIGO_BARRAS, REFERENCIA, VALOR_UNITARIO, VALOR_COMPRA, NOME ' +
-            'FROM produtos ' +
-            'WHERE CODIGO_BARRAS IS NOT NULL AND CODIGO_BARRAS <> ' + QuotedStr('') +
-            '  AND REFERENCIA   IS NOT NULL AND REFERENCIA   <> ' + QuotedStr('') +
-            '  AND EMPRESA_ID = :EMPRESA_ID');
-          QryConsultaProduto.ParamByName('EMPRESA_ID').AsInteger := EmpresaID;
-          QryConsultaProduto.Open;
-
-          Clientes := TJSONArray.Create;
-          Writeln(FormatDateTime('dd/mm/yyyy hh:nn:ss', Now) + ' GET /ListaProdutos');
-
-          for I := 0 to QryConsultaProduto.RecordCount - 1 do
-          begin
-            ProdutoObj := TJSONObject.Create;
-            ProdutoObj.AddPair('ID',            QryConsultaProduto.FieldByName('ID').AsString);
-            ProdutoObj.AddPair('CODIGO_BARRAS', QryConsultaProduto.FieldByName('CODIGO_BARRAS').AsString);
-            ProdutoObj.AddPair('NOME',          QryConsultaProduto.FieldByName('NOME').AsString);
-            ProdutoObj.AddPair('REFERENCIA',    QryConsultaProduto.FieldByName('REFERENCIA').AsString);
-            ProdutoObj.AddPair('VALOR_UNITARIO',QryConsultaProduto.FieldByName('VALOR_UNITARIO').AsString);
-            ProdutoObj.AddPair('VALOR_COMPRA',  QryConsultaProduto.FieldByName('VALOR_COMPRA').AsString);
-            Clientes.Add(ProdutoObj);
-            QryConsultaProduto.Next;
-          end;
-
-          Res.Send<TJSONArray>(Clientes);
+          LLogin := JStr(LRoot, 'login', '');
+          LSenha := JStr(LRoot, 'senha', '');
         finally
-          QryConsultaProduto.Free;
+          LRoot.Free;
+        end;
+
+        Conn := NewMySQLConnection;
+        try
+          Qry := TFDQuery.Create(nil);
+          try
+            Qry.Connection := Conn;
+            Qry.SQL.Text   :=
+              'SELECT id, login, is_admin FROM tb_usuarios ' +
+              'WHERE login = :login AND senha = :senha AND ativo = 1 LIMIT 1';
+            Qry.ParamByName('login').AsString := LLogin;
+            Qry.ParamByName('senha').AsString := LSenha;
+            Qry.Open;
+
+            LSucesso := Qry.RecordCount > 0;
+            LResp    := TJSONObject.Create;
+            try
+              LResp.AddPair('sucesso', TJSONBool.Create(LSucesso));
+              if LSucesso then
+                LResp.AddPair('mensagem', 'Bem-vindo, ' + Qry.FieldByName('login').AsString + '!')
+              else
+                LResp.AddPair('mensagem', 'Usu' + #195 + #161 + 'rio ou senha incorretos.');
+
+              Writeln(FormatDateTime('dd/mm/yyyy hh:nn:ss', Now) +
+                ' POST /login login=' + LLogin + ' sucesso=' + BoolToStr(LSucesso, True));
+
+              Res.Status(200).Send<TJSONObject>(LResp);
+            except
+              LResp.Free;
+              raise;
+            end;
+          finally
+            Qry.Free;
+          end;
+        finally
           Conn.Free;
         end;
       except
@@ -139,15 +175,293 @@ begin
     end
   );
 
-  // POST /crud
-  // Body: "tabela", "acao" (INSERT|UPDATE|DELETE), "dados" (objeto JSON)
-  //
-  // tb_usuarios:
-  //   dados: id, login, senha, is_admin, perfil_id
-  // tb_perfis:
-  //   dados: id, nome, descricao
-  // tb_permissoes_usuarios:
-  //   dados: usuario_id, rotas (array de strings)
+  // GET /usuarios — lista todos os usuarios ativos
+  // Response: [{"id":1,"login":"admin","is_admin":1,"perfil_id":0},...]
+  THorse.Get('/usuarios',
+    procedure(Req: THorseRequest; Res: THorseResponse)
+    var
+      Conn : TFDConnection;
+      Qry  : TFDQuery;
+      LArr : TJSONArray;
+      LObj : TJSONObject;
+    begin
+      try
+        Conn := NewMySQLConnection;
+        try
+          Qry := TFDQuery.Create(nil);
+          try
+            Qry.Connection := Conn;
+            Qry.SQL.Text   :=
+              'SELECT id, login, is_admin, COALESCE(perfil_id,0) AS perfil_id ' +
+              'FROM tb_usuarios WHERE ativo = 1 ORDER BY login';
+            Qry.Open;
+
+            LArr := TJSONArray.Create;
+            try
+              while not Qry.Eof do
+              begin
+                LObj := TJSONObject.Create;
+                LObj.AddPair('id',        TJSONNumber.Create(Qry.FieldByName('id').AsInteger));
+                LObj.AddPair('login',     Qry.FieldByName('login').AsString);
+                LObj.AddPair('is_admin',  TJSONNumber.Create(Qry.FieldByName('is_admin').AsInteger));
+                LObj.AddPair('perfil_id', TJSONNumber.Create(Qry.FieldByName('perfil_id').AsInteger));
+                LArr.Add(LObj);
+                Qry.Next;
+              end;
+              Writeln(FormatDateTime('dd/mm/yyyy hh:nn:ss', Now) + ' GET /usuarios');
+              Res.Status(200).Send<TJSONArray>(LArr);
+            except
+              LArr.Free;
+              raise;
+            end;
+          finally
+            Qry.Free;
+          end;
+        finally
+          Conn.Free;
+        end;
+      except
+        on E: Exception do
+          Res.Status(500).Send('Erro: ' + E.Message);
+      end;
+    end
+  );
+
+  // GET /usuarios/:id — busca usuario por ID
+  // Response: {"id":1,"login":"admin","is_admin":1,"perfil_id":0}
+  THorse.Get('/usuarios/:id',
+    procedure(Req: THorseRequest; Res: THorseResponse)
+    var
+      LID  : Integer;
+      Conn : TFDConnection;
+      Qry  : TFDQuery;
+      LObj : TJSONObject;
+    begin
+      try
+        LID  := StrToIntDef(Req.Params['id'], 0);
+        Conn := NewMySQLConnection;
+        try
+          Qry := TFDQuery.Create(nil);
+          try
+            Qry.Connection := Conn;
+            Qry.SQL.Text   :=
+              'SELECT id, login, is_admin, COALESCE(perfil_id,0) AS perfil_id ' +
+              'FROM tb_usuarios WHERE id = :id AND ativo = 1 LIMIT 1';
+            Qry.ParamByName('id').AsInteger := LID;
+            Qry.Open;
+
+            LObj := TJSONObject.Create;
+            try
+              if not Qry.Eof then
+              begin
+                LObj.AddPair('id',        TJSONNumber.Create(Qry.FieldByName('id').AsInteger));
+                LObj.AddPair('login',     Qry.FieldByName('login').AsString);
+                LObj.AddPair('is_admin',  TJSONNumber.Create(Qry.FieldByName('is_admin').AsInteger));
+                LObj.AddPair('perfil_id', TJSONNumber.Create(Qry.FieldByName('perfil_id').AsInteger));
+              end
+              else
+                LObj.AddPair('id', TJSONNumber.Create(-1));
+
+              Res.Status(200).Send<TJSONObject>(LObj);
+            except
+              LObj.Free;
+              raise;
+            end;
+          finally
+            Qry.Free;
+          end;
+        finally
+          Conn.Free;
+        end;
+      except
+        on E: Exception do
+          Res.Status(500).Send('Erro: ' + E.Message);
+      end;
+    end
+  );
+
+  // GET /perfis — lista todos os perfis ativos com suas permissoes
+  // Response: [{"id":1,"nome":"Operador","permissoes":["cad.clientes",...]},...]
+  THorse.Get('/perfis',
+    procedure(Req: THorseRequest; Res: THorseResponse)
+    var
+      Conn     : TFDConnection;
+      Qry      : TFDQuery;
+      LArr     : TJSONArray;
+      LObj     : TJSONObject;
+      LPerms   : TJSONArray;
+      LPerfilID: Integer;
+    begin
+      try
+        Conn := NewMySQLConnection;
+        try
+          Qry := TFDQuery.Create(nil);
+          try
+            Qry.Connection := Conn;
+            Qry.SQL.Text   :=
+              'SELECT id, nome FROM tb_perfis WHERE ativo = 1 ORDER BY nome';
+            Qry.Open;
+
+            LArr := TJSONArray.Create;
+            try
+              while not Qry.Eof do
+              begin
+                LPerfilID := Qry.FieldByName('id').AsInteger;
+                LPerms    := CarregarRotas(Conn, 'tb_permissoes_perfis', 'perfil_id', LPerfilID);
+
+                LObj := TJSONObject.Create;
+                LObj.AddPair('id',         TJSONNumber.Create(LPerfilID));
+                LObj.AddPair('nome',       Qry.FieldByName('nome').AsString);
+                LObj.AddPair('permissoes', LPerms);  // LObj toma ownership de LPerms
+                LArr.Add(LObj);
+                Qry.Next;
+              end;
+              Writeln(FormatDateTime('dd/mm/yyyy hh:nn:ss', Now) + ' GET /perfis');
+              Res.Status(200).Send<TJSONArray>(LArr);
+            except
+              LArr.Free;
+              raise;
+            end;
+          finally
+            Qry.Free;
+          end;
+        finally
+          Conn.Free;
+        end;
+      except
+        on E: Exception do
+          Res.Status(500).Send('Erro: ' + E.Message);
+      end;
+    end
+  );
+
+  // GET /perfis/:id — busca perfil por ID com suas permissoes
+  // Response: {"id":1,"nome":"Operador","permissoes":["cad.clientes",...]}
+  THorse.Get('/perfis/:id',
+    procedure(Req: THorseRequest; Res: THorseResponse)
+    var
+      LID   : Integer;
+      Conn  : TFDConnection;
+      Qry   : TFDQuery;
+      LObj  : TJSONObject;
+      LPerms: TJSONArray;
+    begin
+      try
+        LID  := StrToIntDef(Req.Params['id'], 0);
+        Conn := NewMySQLConnection;
+        try
+          Qry := TFDQuery.Create(nil);
+          try
+            Qry.Connection := Conn;
+            Qry.SQL.Text   :=
+              'SELECT id, nome FROM tb_perfis WHERE id = :id AND ativo = 1 LIMIT 1';
+            Qry.ParamByName('id').AsInteger := LID;
+            Qry.Open;
+
+            LObj := TJSONObject.Create;
+            try
+              if not Qry.Eof then
+              begin
+                LPerms := CarregarRotas(Conn, 'tb_permissoes_perfis', 'perfil_id', LID);
+                LObj.AddPair('id',         TJSONNumber.Create(Qry.FieldByName('id').AsInteger));
+                LObj.AddPair('nome',       Qry.FieldByName('nome').AsString);
+                LObj.AddPair('permissoes', LPerms);
+              end
+              else
+                LObj.AddPair('id', TJSONNumber.Create(-1));
+
+              Res.Status(200).Send<TJSONObject>(LObj);
+            except
+              LObj.Free;
+              raise;
+            end;
+          finally
+            Qry.Free;
+          end;
+        finally
+          Conn.Free;
+        end;
+      except
+        on E: Exception do
+          Res.Status(500).Send('Erro: ' + E.Message);
+      end;
+    end
+  );
+
+  // GET /permissoes/usuario/:id — rotas liberadas para um usuario
+  // Response: {"usuario_id":3,"rotas":["cad.clientes","fin.receber",...]}
+  THorse.Get('/permissoes/usuario/:id',
+    procedure(Req: THorseRequest; Res: THorseResponse)
+    var
+      LID   : Integer;
+      Conn  : TFDConnection;
+      LObj  : TJSONObject;
+      LRotas: TJSONArray;
+    begin
+      try
+        LID  := StrToIntDef(Req.Params['id'], 0);
+        Conn := NewMySQLConnection;
+        try
+          LRotas := CarregarRotas(Conn, 'tb_permissoes_usuarios', 'usuario_id', LID);
+          LObj   := TJSONObject.Create;
+          try
+            LObj.AddPair('usuario_id', TJSONNumber.Create(LID));
+            LObj.AddPair('rotas',      LRotas);  // LObj toma ownership de LRotas
+            Writeln(FormatDateTime('dd/mm/yyyy hh:nn:ss', Now) +
+              ' GET /permissoes/usuario/' + IntToStr(LID));
+            Res.Status(200).Send<TJSONObject>(LObj);
+          except
+            LObj.Free;
+            raise;
+          end;
+        finally
+          Conn.Free;
+        end;
+      except
+        on E: Exception do
+          Res.Status(500).Send('Erro: ' + E.Message);
+      end;
+    end
+  );
+
+  // GET /permissoes/perfil/:id — rotas liberadas para um perfil
+  // Response: {"perfil_id":1,"rotas":["cad.clientes","fin.receber",...]}
+  THorse.Get('/permissoes/perfil/:id',
+    procedure(Req: THorseRequest; Res: THorseResponse)
+    var
+      LID   : Integer;
+      Conn  : TFDConnection;
+      LObj  : TJSONObject;
+      LRotas: TJSONArray;
+    begin
+      try
+        LID  := StrToIntDef(Req.Params['id'], 0);
+        Conn := NewMySQLConnection;
+        try
+          LRotas := CarregarRotas(Conn, 'tb_permissoes_perfis', 'perfil_id', LID);
+          LObj   := TJSONObject.Create;
+          try
+            LObj.AddPair('perfil_id', TJSONNumber.Create(LID));
+            LObj.AddPair('rotas',     LRotas);
+            Writeln(FormatDateTime('dd/mm/yyyy hh:nn:ss', Now) +
+              ' GET /permissoes/perfil/' + IntToStr(LID));
+            Res.Status(200).Send<TJSONObject>(LObj);
+          except
+            LObj.Free;
+            raise;
+          end;
+        finally
+          Conn.Free;
+        end;
+      except
+        on E: Exception do
+          Res.Status(500).Send('Erro: ' + E.Message);
+      end;
+    end
+  );
+
+  // POST /crud — chama sp_CRUD_Generico
+  // Body: {"tabela":"tb_usuarios","acao":"INSERT|UPDATE|DELETE","dados":{...}}
   THorse.Post('/crud',
     procedure(Req: THorseRequest; Res: THorseResponse)
     var
@@ -194,7 +508,6 @@ begin
             Exit;
           end;
 
-          // Mapeia campos do JSON para parametros posicionais da SP
           LpID     := 0;
           LpParam1 := '';
           LpParam2 := '';
@@ -215,9 +528,14 @@ begin
             LpParam1 := JStr(LDados, 'nome',      '');
             LpParam2 := JStr(LDados, 'descricao', '');
           end
-          else if LTabela = 'tb_permissoes_usuarios' then
+          else if (LTabela = 'tb_permissoes_usuarios') or
+                  (LTabela = 'tb_permissoes_perfis') then
           begin
+            // usuario_id ou perfil_id — ambos chegam em 'usuario_id' ou 'perfil_id'
             LpParam4  := IntToStr(JInt(LDados, 'usuario_id', 0));
+            if LpParam4 = '0' then
+              LpParam4 := IntToStr(JInt(LDados, 'perfil_id', 0));
+
             LRotas    := '';
             LRotasArr := LDados.GetValue('rotas') as TJSONArray;
             if Assigned(LRotasArr) then
@@ -229,7 +547,6 @@ begin
             LpParam2 := LRotas;
           end;
 
-          // Chama SP
           Conn := NewMySQLConnection;
           try
             Qry := TFDQuery.Create(nil);
@@ -285,6 +602,61 @@ begin
     end
   );
 
+  // GET /ListaProdutos?empresa_id=X (endpoint legado)
+  THorse.Get('/ListaProdutos',
+    procedure(Req: THorseRequest; Res: THorseResponse)
+    var
+      Conn               : TFDConnection;
+      QryConsultaProduto : TFDQuery;
+      Clientes           : TJSONArray;
+      EmpresaID, I       : Integer;
+      ProdutoObj         : TJSONObject;
+    begin
+      try
+        Conn := NewMySQLConnection;
+        QryConsultaProduto := TFDQuery.Create(nil);
+        QryConsultaProduto.FetchOptions.RowsetSize := 10000000;
+        try
+          EmpresaID := StrToIntDef(Req.Query['empresa_id'], 0);
+          QryConsultaProduto.Connection := Conn;
+          QryConsultaProduto.SQL.Clear;
+          QryConsultaProduto.SQL.Add(
+            'SELECT ID, CODIGO_BARRAS, REFERENCIA, VALOR_UNITARIO, VALOR_COMPRA, NOME ' +
+            'FROM produtos ' +
+            'WHERE CODIGO_BARRAS IS NOT NULL AND CODIGO_BARRAS <> ' + QuotedStr('') +
+            '  AND REFERENCIA   IS NOT NULL AND REFERENCIA   <> ' + QuotedStr('') +
+            '  AND EMPRESA_ID = :EMPRESA_ID');
+          QryConsultaProduto.ParamByName('EMPRESA_ID').AsInteger := EmpresaID;
+          QryConsultaProduto.Open;
+
+          Clientes := TJSONArray.Create;
+          Writeln(FormatDateTime('dd/mm/yyyy hh:nn:ss', Now) + ' GET /ListaProdutos');
+
+          for I := 0 to QryConsultaProduto.RecordCount - 1 do
+          begin
+            ProdutoObj := TJSONObject.Create;
+            ProdutoObj.AddPair('ID',            QryConsultaProduto.FieldByName('ID').AsString);
+            ProdutoObj.AddPair('CODIGO_BARRAS', QryConsultaProduto.FieldByName('CODIGO_BARRAS').AsString);
+            ProdutoObj.AddPair('NOME',          QryConsultaProduto.FieldByName('NOME').AsString);
+            ProdutoObj.AddPair('REFERENCIA',    QryConsultaProduto.FieldByName('REFERENCIA').AsString);
+            ProdutoObj.AddPair('VALOR_UNITARIO',QryConsultaProduto.FieldByName('VALOR_UNITARIO').AsString);
+            ProdutoObj.AddPair('VALOR_COMPRA',  QryConsultaProduto.FieldByName('VALOR_COMPRA').AsString);
+            Clientes.Add(ProdutoObj);
+            QryConsultaProduto.Next;
+          end;
+
+          Res.Send<TJSONArray>(Clientes);
+        finally
+          QryConsultaProduto.Free;
+          Conn.Free;
+        end;
+      except
+        on E: Exception do
+          Res.Status(500).Send('Erro: ' + E.Message);
+      end;
+    end
+  );
+
   // POST /atualizarestoque (endpoint legado)
   THorse.Post('/atualizarestoque',
     procedure(Req: THorseRequest; Res: THorseResponse)
@@ -300,7 +672,6 @@ begin
           Res.Status(400).Send('JSON vazio');
           Exit;
         end;
-
         Conn := NewMySQLConnection;
         try
           qryAtualizaEstoque := TFDQuery.Create(nil);
@@ -317,12 +688,9 @@ begin
         finally
           Conn.Free;
         end;
-
       except
         on E: Exception do
-        begin
           Res.Status(500).Send('Erro: ' + E.Message);
-        end;
       end;
     end
   );

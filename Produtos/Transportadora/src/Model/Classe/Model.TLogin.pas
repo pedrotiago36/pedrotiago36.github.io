@@ -1,21 +1,22 @@
 unit Model.TLogin;
 
+// =============================================================
+//  Autentica o usuario contra a API REST (POST /login)
+//  A senha e enviada como SHA-256 antes de trafegar na rede
+// =============================================================
+
 interface
 
 uses
   Model.ILogin,
-  System.SysUtils,
-  System.Generics.Collections;
+  Service.ApiClient,
+  System.JSON,
+  System.Hash,
+  System.SysUtils;
 
 type
   TLogin = class(TInterfacedObject, ILogin)
-  strict private
-    FUsers : TDictionary<string, string>;
-    procedure ValidateCredentials(const ACredentials: TLoginCredentials);
-    function  WelcomeMessage(const AUsername: string): string;
   public
-    constructor Create;
-    destructor  Destroy; override;
     procedure Authenticate(
       const ACredentials : TLoginCredentials;
       const AOnSuccess   : TProc<string>;
@@ -32,57 +33,58 @@ begin
   Result := TLogin.Create;
 end;
 
-{ TLogin }
-
-constructor TLogin.Create;
-begin
-  inherited;
-  FUsers := TDictionary<string, string>.Create;
-  FUsers.Add('admin',     'admin123');
-  FUsers.Add('motorista', 'motor123');
-  FUsers.Add('operador',  'op@2024');
-end;
-
-destructor TLogin.Destroy;
-begin
-  FUsers.Free;
-  inherited;
-end;
-
-procedure TLogin.ValidateCredentials(const ACredentials: TLoginCredentials);
-begin
-  Assert(Trim(ACredentials.Username) <> '', 'O campo Usu' + #225 + 'rio ' + #233 + ' obrigat' + #243 + 'rio.');
-  Assert(Trim(ACredentials.Password) <> '', 'O campo Senha ' + #233 + ' obrigat' + #243 + 'ria.');
-end;
-
-function TLogin.WelcomeMessage(const AUsername: string): string;
-begin
-  Result := 'Acesso autorizado. Bem-vindo, ' + AUsername + '!';
-end;
-
 procedure TLogin.Authenticate(
   const ACredentials : TLoginCredentials;
   const AOnSuccess   : TProc<string>;
   const AOnFailure   : TProc<string>
 );
 var
-  LCallbacks     : array[Boolean] of TProc<string>;
-  LMessages      : array[Boolean] of string;
-  LStoredPwd     : string;
-  LAuthenticated : Boolean;
+  LAPI      : TApiClient;
+  LBody     : TJSONObject;
+  LResponse : string;
+  LJson     : TJSONObject;
+  LSucesso  : Boolean;
+  LMensagem : string;
 begin
-  ValidateCredentials(ACredentials);
+  Assert(Trim(ACredentials.Username) <> '',
+    'O campo Usu' + #225 + 'rio ' + #233 + ' obrigat' + #243 + 'rio.');
+  Assert(Trim(ACredentials.Password) <> '',
+    'O campo Senha ' + #233 + ' obrigat' + #243 + 'ria.');
 
-  LCallbacks[False] := AOnFailure;
-  LCallbacks[True]  := AOnSuccess;
+  LAPI  := TApiClient.Create;
+  LBody := TJSONObject.Create;
+  try
+    LBody.AddPair('login', ACredentials.Username);
+    LBody.AddPair('senha', THashSHA2.GetHashString(ACredentials.Password));
 
-  LMessages[False] := 'Usu' + #225 + 'rio ou senha incorretos. Verifique e tente novamente.';
-  LMessages[True]  := WelcomeMessage(ACredentials.Username);
+    LResponse := LAPI.Post('/login', LBody.ToString);
 
-  LAuthenticated := FUsers.TryGetValue(ACredentials.Username, LStoredPwd)
-                    and (LStoredPwd = ACredentials.Password);
+    LJson := TJSONObject.ParseJSONValue(LResponse) as TJSONObject;
+    if not Assigned(LJson) then
+    begin
+      AOnFailure('Erro de comunica' + #231 + #227 + 'o com o servidor.');
+      Exit;
+    end;
 
-  LCallbacks[LAuthenticated](LMessages[LAuthenticated]);
+    try
+      LSucesso  := LJson.GetValue('sucesso').Value = 'true';
+      LMensagem := LJson.GetValue('mensagem').Value;
+    finally
+      LJson.Free;
+    end;
+
+    if LSucesso then
+      AOnSuccess(LMensagem)
+    else
+      AOnFailure(LMensagem);
+
+  except
+    on E: Exception do
+      AOnFailure('Erro ao conectar com o servidor: ' + E.Message);
+  end;
+
+  LBody.Free;
+  LAPI.Free;
 end;
 
 end.

@@ -1,15 +1,23 @@
 unit Model.TPermissoes;
 
+// =============================================================
+//  Permissoes de usuario via API REST
+//  GET  /permissoes/usuario/:id  -> FindByUsuario
+//  POST /crud (INSERT)           -> Save (substitui todas do usuario)
+// =============================================================
+
 interface
 
 uses
   Model.IPermissoes,
-  System.Generics.Collections;
+  Service.ApiClient,
+  System.JSON,
+  System.SysUtils;
 
 type
-  TPermissoesModel = class(TInterfacedObject, IPermissoesModel)
-  strict private
-    FStore: TDictionary<Integer, TPermissoesRec>;
+  TPermissoesAPI = class(TInterfacedObject, IPermissoesModel)
+  private
+    FAPI: TApiClient;
   public
     constructor Create;
     destructor  Destroy; override;
@@ -23,43 +31,77 @@ implementation
 
 function NewPermissoesModel: IPermissoesModel;
 begin
-  Result := TPermissoesModel.Create;
+  Result := TPermissoesAPI.Create;
 end;
 
-{ TPermissoesModel }
-
-constructor TPermissoesModel.Create;
+constructor TPermissoesAPI.Create;
 begin
   inherited;
-  FStore := TDictionary<Integer, TPermissoesRec>.Create;
+  FAPI := TApiClient.Create;
 end;
 
-destructor TPermissoesModel.Destroy;
+destructor TPermissoesAPI.Destroy;
 begin
-  FStore.Free;
+  FAPI.Free;
   inherited;
 end;
 
-function TPermissoesModel.FindByUsuario(const AUsuarioID: Integer): TPermissoesRec;
-type
-  TResArr = array[Boolean] of TPermissoesRec;
+function TPermissoesAPI.FindByUsuario(const AUsuarioID: Integer): TPermissoesRec;
 var
-  LFound  : TPermissoesRec;
-  LEmpty  : TPermissoesRec;
-  LExists : Boolean;
-  LArr    : TResArr;
+  LResponse : string;
+  LJson     : TJSONObject;
+  LRotas    : TJSONArray;
+  LI        : Integer;
 begin
-  LEmpty.UsuarioID  := AUsuarioID;
-  LEmpty.Permissoes := [];
-  LExists           := FStore.TryGetValue(AUsuarioID, LFound);
-  LArr[False]       := LEmpty;
-  LArr[True]        := LFound;
-  Result            := LArr[LExists];
+  Result.UsuarioID := AUsuarioID;
+  SetLength(Result.Permissoes, 0);
+  try
+    LResponse := FAPI.Get('/permissoes/usuario/' + IntToStr(AUsuarioID));
+    LJson := TJSONObject.ParseJSONValue(LResponse) as TJSONObject;
+    if not Assigned(LJson) then Exit;
+    try
+      LRotas := LJson.GetValue('rotas') as TJSONArray;
+      if Assigned(LRotas) then
+      begin
+        SetLength(Result.Permissoes, LRotas.Count);
+        for LI := 0 to LRotas.Count - 1 do
+          Result.Permissoes[LI] := LRotas.Items[LI].Value;
+      end;
+    finally
+      LJson.Free;
+    end;
+  except
+    SetLength(Result.Permissoes, 0);
+  end;
 end;
 
-procedure TPermissoesModel.Save(const ARec: TPermissoesRec);
+procedure TPermissoesAPI.Save(const ARec: TPermissoesRec);
+var
+  LRoot  : TJSONObject;
+  LDados : TJSONObject;
+  LRotas : TJSONArray;
+  LI     : Integer;
+  LBody  : string;
 begin
-  FStore.AddOrSetValue(ARec.UsuarioID, ARec);
+  LRoot  := TJSONObject.Create;
+  LDados := TJSONObject.Create;
+  LRotas := TJSONArray.Create;
+  try
+    for LI := 0 to Length(ARec.Permissoes) - 1 do
+      LRotas.Add(ARec.Permissoes[LI]);
+
+    LDados.AddPair('usuario_id', TJSONNumber.Create(ARec.UsuarioID));
+    LDados.AddPair('rotas',      LRotas);   // LDados toma ownership de LRotas
+
+    LRoot.AddPair('tabela', 'tb_permissoes_usuarios');
+    LRoot.AddPair('acao',   'INSERT');
+    LRoot.AddPair('dados',  LDados);        // LRoot toma ownership de LDados
+
+    LBody := LRoot.ToString;
+  finally
+    LRoot.Free;
+  end;
+  FAPI.Post('/crud', LBody);
 end;
 
 end.
