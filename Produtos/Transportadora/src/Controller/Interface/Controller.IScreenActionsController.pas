@@ -20,6 +20,7 @@ type
     procedure LoadList;
     procedure SelectUser(const AUsuarioID: Integer);
     procedure ToggleAction(const AUsuarioID: Integer; const ARoute, AActionKey: string);
+    procedure SaveActions(const AUsuarioID: Integer);
   end;
 
 implementation

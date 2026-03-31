@@ -341,7 +341,7 @@ end;
 
 procedure TFrmLogin.HandleMainEvent(EventName: string; Params: TUniStrings);
 type
-  TAct = array[0..16] of TProc;
+  TAct = array[0..17] of TProc;
 var
   LRoute    : string;
   LID       : Integer;
@@ -393,6 +393,10 @@ begin
   LAct[14] := procedure begin FScreenActionsCtrl.SelectUser(LUsrID) end;
   LAct[15] := procedure begin FScreenActionsCtrl.ToggleAction(LUsrID, LActionRoute, LActionKey) end;
   LAct[16] := procedure begin FScreenActionsCtrl.LoadList end;
+  LAct[17] := procedure begin
+    FScreenActionsCtrl.SaveActions(LUsrID);
+    UniSession.AddJS('acSaveDone();');
+  end;
 
   LAct[
     Ord(EventName='nav')          *  0 +
@@ -411,7 +415,8 @@ begin
     Ord(EventName='perm.back')    * 13 +
     Ord(EventName='ac.select')    * 14 +
     Ord(EventName='ac.toggle')    * 15 +
-    Ord(EventName='ac.back')      * 16
+    Ord(EventName='ac.back')      * 16 +
+    Ord(EventName='ac.save')      * 17
   ]();
 end;
 
@@ -1367,6 +1372,16 @@ begin
     '  el.classList.toggle("allowed",!isAllowed);' +
     '  el.classList.toggle("denied",isAllowed);' +
     '  parent.ajaxRequest(_f,"ac.toggle",["userid="+uid,"actroute="+encodeURIComponent(route),"actkey="+encodeURIComponent(key)]);}' +
+    'function acSave(){' +
+    '  var uid=document.getElementById("ac-uid");' +
+    '  if(!uid||!uid.value||uid.value==="0")return;' +
+    '  var btn=document.getElementById("btn-ac-save");' +
+    '  if(btn){btn.disabled=true;btn.textContent="Salvando...";}' +
+    '  parent.ajaxRequest(_f,"ac.save",["userid="+uid.value]);}' +
+    'function acSaveDone(){' +
+    '  var btn=document.getElementById("btn-ac-save");' +
+    '  if(btn){btn.disabled=false;btn.textContent="\u2713 Salvar";}' +
+    '  alert("Permiss\u00F5es de a\u00E7\u00F5es salvas com sucesso!");}' +
     'window.addEventListener("load",function(){renderScr("","");});';
 
   H := TStringBuilder.Create;
@@ -2476,6 +2491,12 @@ begin
     '  font-family:"Segoe UI",system-ui,sans-serif;outline:none;cursor:pointer;}' +
     '.ac-sel:focus{border-color:rgba(245,158,11,.5);}' +
     '.ac-sel option{background:#130F22;color:#FCD34D;}' +
+    '.btn-ac-save{background:linear-gradient(135deg,rgba(245,158,11,.25),rgba(232,82,10,.15));' +
+    '  border:1px solid rgba(245,158,11,.4);border-radius:10px;' +
+    '  padding:10px 22px;font-size:12px;color:#FCD34D;' +
+    '  cursor:pointer;font-weight:700;transition:all .2s;white-space:nowrap;}' +
+    '.btn-ac-save:hover{box-shadow:0 0 20px rgba(245,158,11,.3);}' +
+    '.btn-ac-save:disabled{opacity:.3;cursor:not-allowed;}' +
     '.ac-hint{padding:48px;text-align:center;color:rgba(245,158,11,.35);font-size:14px;}' +
     '.ac-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}' +
     '.ac-card{background:linear-gradient(135deg,rgba(19,15,34,.95),rgba(28,23,48,.95));' +
@@ -2506,10 +2527,14 @@ begin
       B.Append('<div class="ac-sub">Selecione o usu&aacute;rio e marque as a&ccedil;&otilde;es permitidas por tela</div></div>');
       B.Append('</div>');
       { Seletor }
+      B.AppendFormat('<input type="hidden" id="ac-uid" value="%d">', [ASelectedUserID]);
       B.Append('<div class="ac-sel-wrap">');
       B.Append('<span class="ac-sel-lbl">Usu&aacute;rio</span>');
       B.AppendFormat('<select class="ac-sel" onchange="acSelect(this.value)">%s</select>',
         [SelOpts.ToString]);
+      B.AppendFormat(
+        '<button id="btn-ac-save" class="btn-ac-save" onclick="acSave()" %s>&#10003; Salvar</button>',
+        [IfThen(ASelectedUserID = 0, 'disabled', '')]);
       B.Append('</div>');
 
       { Cards de telas — só mostram se usuário selecionado }

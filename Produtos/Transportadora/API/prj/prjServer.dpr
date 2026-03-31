@@ -602,6 +602,142 @@ begin
     end
   );
 
+  // GET /acoes/usuario/:id — carrega acoes do usuario
+  // Response: [{"tela":"cfg.perfil","acao":"insert","permitido":1}, ...]
+  THorse.Get('/acoes/usuario/:id',
+    procedure(Req: THorseRequest; Res: THorseResponse)
+    var
+      LID  : Integer;
+      Conn : TFDConnection;
+      Qry  : TFDQuery;
+      LArr : TJSONArray;
+      LObj : TJSONObject;
+    begin
+      try
+        LID  := StrToIntDef(Req.Params['id'], 0);
+        Conn := NewMySQLConnection;
+        try
+          Qry := TFDQuery.Create(nil);
+          try
+            Qry.Connection := Conn;
+            Qry.SQL.Text   :=
+              'SELECT tela, acao, permitido FROM tb_acoes_usuarios ' +
+              'WHERE usuario_id = :uid ORDER BY tela, acao';
+            Qry.ParamByName('uid').AsInteger := LID;
+            Qry.Open;
+            LArr := TJSONArray.Create;
+            try
+              while not Qry.Eof do
+              begin
+                LObj := TJSONObject.Create;
+                LObj.AddPair('tela',      Qry.FieldByName('tela').AsString);
+                LObj.AddPair('acao',      Qry.FieldByName('acao').AsString);
+                LObj.AddPair('permitido', TJSONNumber.Create(
+                  Ord(Qry.FieldByName('permitido').AsBoolean)));
+                LArr.Add(LObj);
+                Qry.Next;
+              end;
+              Writeln(FormatDateTime('dd/mm/yyyy hh:nn:ss', Now) +
+                ' GET /acoes/usuario/' + IntToStr(LID));
+              Res.Status(200).Send<TJSONArray>(LArr);
+            except
+              LArr.Free;
+              raise;
+            end;
+          finally
+            Qry.Free;
+          end;
+        finally
+          Conn.Free;
+        end;
+      except
+        on E: Exception do
+          Res.Status(500).Send('Erro: ' + E.Message);
+      end;
+    end
+  );
+
+  // POST /acoes/usuario — salva (substitui) todas as acoes do usuario
+  // Body: {"usuario_id":3,"acoes":[{"tela":"cfg.perfil","acao":"insert","permitido":0},...]}
+  // Response: {"sucesso":true,"total":N}
+  THorse.Post('/acoes/usuario',
+    procedure(Req: THorseRequest; Res: THorseResponse)
+    var
+      LRoot      : TJSONObject;
+      LUsuarioID : Integer;
+      LAcoesArr  : TJSONArray;
+      LItem      : TJSONValue;
+      LItemObj   : TJSONObject;
+      Conn       : TFDConnection;
+      Qry        : TFDQuery;
+      LTotal     : Integer;
+      LResp      : TJSONObject;
+    begin
+      try
+        LRoot := TJSONObject.ParseJSONValue(Req.Body) as TJSONObject;
+        if not Assigned(LRoot) then begin Res.Status(400).Send('JSON invalido'); Exit; end;
+        try
+          LUsuarioID := JInt(LRoot, 'usuario_id', 0);
+          LAcoesArr  := LRoot.GetValue('acoes') as TJSONArray;
+          if (LUsuarioID = 0) or not Assigned(LAcoesArr) then
+          begin
+            Res.Status(400).Send('Campos obrigatorios: usuario_id, acoes');
+            Exit;
+          end;
+          Conn := NewMySQLConnection;
+          try
+            Qry := TFDQuery.Create(nil);
+            try
+              Qry.Connection := Conn;
+              { Remove todos os registros anteriores do usuario }
+              Qry.SQL.Text := 'DELETE FROM tb_acoes_usuarios WHERE usuario_id = :uid';
+              Qry.ParamByName('uid').AsInteger := LUsuarioID;
+              Qry.ExecSQL;
+              { Insere somente as acoes negadas (permitido=0) — as demais sao permitidas por padrao }
+              LTotal := 0;
+              for LItem in LAcoesArr do
+              begin
+                LItemObj := LItem as TJSONObject;
+                if JInt(LItemObj, 'permitido', 1) = 0 then
+                begin
+                  Qry.SQL.Text :=
+                    'INSERT INTO tb_acoes_usuarios (usuario_id, tela, acao, permitido) ' +
+                    'VALUES (:uid, :tela, :acao, 0)';
+                  Qry.ParamByName('uid').AsInteger  := LUsuarioID;
+                  Qry.ParamByName('tela').AsString  := JStr(LItemObj, 'tela', '');
+                  Qry.ParamByName('acao').AsString  := JStr(LItemObj, 'acao', '');
+                  Qry.ExecSQL;
+                  Inc(LTotal);
+                end;
+              end;
+              LResp := TJSONObject.Create;
+              try
+                LResp.AddPair('sucesso', TJSONBool.Create(True));
+                LResp.AddPair('total',   TJSONNumber.Create(LTotal));
+                Writeln(FormatDateTime('dd/mm/yyyy hh:nn:ss', Now) +
+                  ' POST /acoes/usuario usuario_id=' + IntToStr(LUsuarioID) +
+                  ' negadas=' + IntToStr(LTotal));
+                Res.Status(200).Send<TJSONObject>(LResp);
+              except
+                LResp.Free;
+                raise;
+              end;
+            finally
+              Qry.Free;
+            end;
+          finally
+            Conn.Free;
+          end;
+        finally
+          LRoot.Free;
+        end;
+      except
+        on E: Exception do
+          Res.Status(500).Send('Erro: ' + E.Message);
+      end;
+    end
+  );
+
   // GET /ListaProdutos?empresa_id=X (endpoint legado)
   THorse.Get('/ListaProdutos',
     procedure(Req: THorseRequest; Res: THorseResponse)

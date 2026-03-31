@@ -20,6 +20,7 @@ type
     procedure LoadList;
     procedure SelectUser(const AUsuarioID: Integer);
     procedure ToggleAction(const AUsuarioID: Integer; const ARoute, AActionKey: string);
+    procedure SaveActions(const AUsuarioID: Integer);
   end;
 
 function NewScreenActionsController(const AModel: IScreenActionsModel;
@@ -74,7 +75,7 @@ end;
 procedure TScreenActionsController.SelectUser(const AUsuarioID: Integer);
 begin
   FSelectedUserID := AUsuarioID;
-  { Re-render da view com novo usuário selecionado }
+  FModel.LoadUserActions(AUsuarioID);
   LoadList;
 end;
 
@@ -83,6 +84,11 @@ procedure TScreenActionsController.ToggleAction(const AUsuarioID: Integer;
 begin
   { Persiste o toggle no model — o JS já atualizou o visual, não re-renderiza }
   FModel.ToggleAction(AUsuarioID, ARoute, AActionKey);
+end;
+
+procedure TScreenActionsController.SaveActions(const AUsuarioID: Integer);
+begin
+  FModel.SaveUserActions(AUsuarioID);
 end;
 
 end.

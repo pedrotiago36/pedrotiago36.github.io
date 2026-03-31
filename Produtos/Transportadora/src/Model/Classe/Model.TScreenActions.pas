@@ -28,7 +28,9 @@ function NewScreenActionsModel: IScreenActionsModel;
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils,
+  System.JSON,
+  Service.ApiClient;
 
 function NewScreenActionsModel: IScreenActionsModel;
 begin
@@ -142,6 +144,101 @@ begin
     LUserActions.AddOrSetValue(LKey, not LAllowed)
   else
     LUserActions.Add(LKey, True);
+end;
+
+procedure TScreenActionsModel.LoadUserActions(const AUsuarioID: Integer);
+var
+  LClient     : TApiClient;
+  LJson       : string;
+  LArr        : TJSONArray;
+  LItem       : TJSONValue;
+  LObj        : TJSONObject;
+  LTela       : string;
+  LAcao       : string;
+  LPermitido  : Boolean;
+  LKey        : string;
+  LUserActions: TDictionary<string, Boolean>;
+begin
+  { Remove estado anterior deste usuário }
+  if FData.TryGetValue(AUsuarioID, LUserActions) then
+  begin
+    LUserActions.Free;
+    FData.Remove(AUsuarioID);
+  end;
+
+  LClient := TApiClient.Create;
+  try
+    LJson := LClient.Get('/acoes/usuario/' + IntToStr(AUsuarioID));
+  finally
+    LClient.Free;
+  end;
+
+  LArr := TJSONObject.ParseJSONValue(LJson) as TJSONArray;
+  if not Assigned(LArr) then Exit;
+  try
+    if LArr.Count = 0 then Exit;
+
+    LUserActions := TDictionary<string, Boolean>.Create;
+    FData.Add(AUsuarioID, LUserActions);
+
+    for LItem in LArr do
+    begin
+      LObj       := LItem as TJSONObject;
+      LTela      := LObj.GetValue('tela').Value;
+      LAcao      := LObj.GetValue('acao').Value;
+      LPermitido := LObj.GetValue('permitido').Value = '1';
+      LKey       := MakeKey(LTela, LAcao);
+      LUserActions.AddOrSetValue(LKey, LPermitido);
+    end;
+  finally
+    LArr.Free;
+  end;
+end;
+
+procedure TScreenActionsModel.SaveUserActions(const AUsuarioID: Integer);
+var
+  LClient      : TApiClient;
+  LUserActions : TDictionary<string, Boolean>;
+  LRoot        : TJSONObject;
+  LAcoesArr    : TJSONArray;
+  LItem        : TJSONObject;
+  LKey         : string;
+  LAllowed     : Boolean;
+  LParts       : TArray<string>;
+begin
+  LRoot     := TJSONObject.Create;
+  LAcoesArr := TJSONArray.Create;
+  try
+    LRoot.AddPair('usuario_id', TJSONNumber.Create(AUsuarioID));
+
+    if FData.TryGetValue(AUsuarioID, LUserActions) then
+    begin
+      for LKey in LUserActions.Keys do
+      begin
+        LUserActions.TryGetValue(LKey, LAllowed);
+        LParts := LKey.Split(['|']);
+        if Length(LParts) = 2 then
+        begin
+          LItem := TJSONObject.Create;
+          LItem.AddPair('tela',      LParts[0]);
+          LItem.AddPair('acao',      LParts[1]);
+          LItem.AddPair('permitido', TJSONNumber.Create(Ord(LAllowed)));
+          LAcoesArr.Add(LItem);
+        end;
+      end;
+    end;
+
+    LRoot.AddPair('acoes', LAcoesArr);
+
+    LClient := TApiClient.Create;
+    try
+      LClient.Post('/acoes/usuario', LRoot.ToString);
+    finally
+      LClient.Free;
+    end;
+  finally
+    LRoot.Free;  { LAcoesArr é destruído junto com LRoot }
+  end;
 end;
 
 function TScreenActionsModel.GetAllScreens: TArray<string>;
