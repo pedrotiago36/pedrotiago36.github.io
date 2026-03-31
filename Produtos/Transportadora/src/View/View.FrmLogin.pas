@@ -1067,6 +1067,14 @@ begin
 
     '#no-tab{font-size:12px;color:rgba(255,255,255,.45);font-style:italic;' +
     '  padding:0 8px;align-self:center;letter-spacing:.3px;}' +
+    '#tabs-sep{width:1px;height:22px;background:rgba(255,255,255,.08);flex-shrink:0;margin-left:auto;}' +
+    '#btn-close-all{display:flex;align-items:center;gap:5px;flex-shrink:0;' +
+    '  background:none;border:1px solid rgba(239,68,68,.25);border-radius:16px;' +
+    '  padding:0 12px;height:28px;color:rgba(239,68,68,.5);font-size:11px;font-weight:600;' +
+    '  cursor:pointer;transition:all .2s;letter-spacing:.4px;white-space:nowrap;}' +
+    '#btn-close-all:hover{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.6);' +
+    '  color:#F87171;box-shadow:0 0 12px rgba(239,68,68,.2);}' +
+    '#btn-close-all:disabled{opacity:.2;cursor:not-allowed;pointer-events:none;}' +
 
     { Breadcrumb }
     '#breadcrumb{padding:8px 22px;display:flex;align-items:center;gap:6px;font-size:12px;' +
@@ -1133,11 +1141,19 @@ begin
     '  if(_navStack.length===0)document.getElementById("drill-hdr").style.display="none";' +
     '}' +
     'function navTo(r,c,b){if(!r)return;openTab(r,c,b,JSON.parse(JSON.stringify(_navStack)));parent.ajaxRequest(_f,"nav",["route="+r]);}' +
+    'function _updCloseAll(){' +
+    '  var n=document.querySelectorAll(".tab-btn").length;' +
+    '  var btn=document.getElementById("btn-close-all");' +
+    '  var sep=document.getElementById("tabs-sep");' +
+    '  if(btn)btn.disabled=(n===0);' +
+    '  if(sep)sep.style.visibility=n>0?"visible":"hidden";}' +
     'function openTab(route,cap,bread,stack){' +
     '  if(OT[route]){setActive(route);return;}' +
+    '  if(Object.keys(OT).length>=6){' +
+    '    alert("M\u00E1ximo de 6 abas abertas. Feche uma aba antes de abrir outra.");return;}' +
     '  OT[route]={cap:cap,bread:bread,stack:stack||[]};' +
     '  var bar=document.getElementById("tabs-bar");' +
-    '  var nt=document.getElementById("no-tab");if(nt)nt.remove();' +
+    '  var nt=document.getElementById("no-tab");if(nt)nt.style.display="none";' +
     '  var t=document.createElement("div");t.className="tab-btn";t.dataset.route=route;' +
     '  var dot=document.createElement("span");dot.className="tab-ico";' +
     '  var l=document.createElement("span");l.textContent=cap;' +
@@ -1145,8 +1161,10 @@ begin
     '  (function(ro){t.addEventListener("click",function(){setActive(ro);});' +
     '   x.addEventListener("click",function(e){e.stopPropagation();closeTab(ro);});' +
     '  })(route);' +
-    '  t.appendChild(dot);t.appendChild(l);t.appendChild(x);bar.appendChild(t);setActive(route);' +
-    '}' +
+    '  t.appendChild(dot);t.appendChild(l);t.appendChild(x);' +
+    '  var sep=document.getElementById("tabs-sep");' +
+    '  if(sep)bar.insertBefore(t,sep);else bar.appendChild(t);' +
+    '  setActive(route);_updCloseAll();}' + +
     'function setActive(route){' +
     '  document.querySelectorAll(".tab-btn").forEach(function(t){t.classList.toggle("active",t.dataset.route===route);});' +
     '  document.querySelectorAll(".nav-item").forEach(function(m){m.classList.toggle("active",m.dataset.route===route);});' +
@@ -1158,11 +1176,21 @@ begin
     '  parent.ajaxRequest(_f,"closeTab",["route="+route]);' +
     '  var rem=document.querySelectorAll(".tab-btn");' +
     '  if(wa&&rem.length)setActive(rem[rem.length-1].dataset.route);' +
-    '  else if(!rem.length){var s=document.createElement("span");s.id="no-tab";' +
-    '    s.textContent="Nenhuma tela aberta";document.getElementById("tabs-bar").appendChild(s);' +
+    '  else if(!rem.length){' +
+    '    var nt=document.getElementById("no-tab");if(nt)nt.style.display="";' +
     '    renderBC("");renderScr("","");}' +
     '  document.querySelectorAll(".nav-item").forEach(function(m){m.classList.remove("active");});' +
-    '}' +
+    '  _updCloseAll();}' +
+    'function closeAllTabs(){' +
+    '  Object.keys(OT).forEach(function(r){' +
+    '    var t=document.querySelector(".tab-btn[data-route="+JSON.stringify(r)+"]");' +
+    '    if(t)t.remove();' +
+    '    parent.ajaxRequest(_f,"closeTab",["route="+r]);' +
+    '  });' +
+    '  OT={};' +
+    '  var nt=document.getElementById("no-tab");if(nt)nt.style.display="";' +
+    '  document.querySelectorAll(".nav-item").forEach(function(m){m.classList.remove("active");});' +
+    '  renderBC("");renderScr("","");_updCloseAll();}' +
     { _bcp = partes do breadcrumb atual; bcClick(i) evita escape de aspas no onclick }
     'var _bcp=[];' +
     'function renderBC(bread){' +
@@ -1334,7 +1362,10 @@ begin
     '    allInp.checked=(n===boxes.length);});}' +
     { Ações em Telas }
     'function acSelect(id){parent.ajaxRequest(_f,"ac.select",["userid="+id]);}' +
-    'function acToggle(uid,route,key){' +
+    'function acToggle(el,uid,route,key){' +
+    '  var isAllowed=el.classList.contains("allowed");' +
+    '  el.classList.toggle("allowed",!isAllowed);' +
+    '  el.classList.toggle("denied",isAllowed);' +
     '  parent.ajaxRequest(_f,"ac.toggle",["userid="+uid,"actroute="+encodeURIComponent(route),"actkey="+encodeURIComponent(key)]);}' +
     'window.addEventListener("load",function(){renderScr("","");});';
 
@@ -1387,7 +1418,13 @@ begin
     H.Append('</div></div>');
 
     H.Append('<div id="content">');
-    H.Append('<div id="tabs-bar"><span id="no-tab">Nenhuma tela aberta</span></div>');
+    H.Append('<div id="tabs-bar">' +
+      '<span id="no-tab">Nenhuma tela aberta</span>' +
+      '<span id="tabs-sep"></span>' +
+      '<button id="btn-close-all" disabled onclick="closeAllTabs()">' +
+      '&#10005; Fechar todas' +
+      '</button>' +
+      '</div>');
     H.Append('<div id="breadcrumb"></div>');
     H.Append('<div id="screen"></div>');
     H.Append('</div></div>');
@@ -2495,7 +2532,7 @@ begin
             end;
             LAllowed := True; { Por agora, assume permite tudo }
             B.AppendFormat(
-              '<div class="ac-action %s" onclick="acToggle(%d,%s,%s)">' +
+              '<div class="ac-action %s" onclick="acToggle(this,%d,%s,%s)">' +
               '<div class="ac-dot"></div><span>%s</span></div>',
               [IfThen(LAllowed, 'allowed', 'denied'),
                ASelectedUserID, QuotedStr(Screen), QuotedStr(LKey),
