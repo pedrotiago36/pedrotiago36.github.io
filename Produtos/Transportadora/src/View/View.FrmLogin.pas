@@ -1477,11 +1477,7 @@ begin
     '  var sel=document.getElementById("perm-perfil");' +
     '  var pid=sel?sel.value:"0";' +
     '  parent.ajaxRequest(_f,"perm.saveperfil",["userid="+uid,"perfilid="+pid]);}' +
-    'function permPerfilChange(pid){' +
-    '  var sel=document.getElementById("perm-perfil");' +
-    '  if(!sel)return;' +
-    '  var opt=sel.options[sel.selectedIndex];' +
-    '  var raw=opt?opt.getAttribute("data-rotas"):"";' +
+    'function permPerfilChange(pid,raw){' +
     '  var rotas=raw?raw.split("|"):[];' +
     '  var rotaSet={};' +
     '  for(var i=0;i<rotas.length;i++){if(rotas[i])rotaSet[rotas[i]]=true;}' +
@@ -2626,7 +2622,7 @@ begin
               B.Append('<div class="prm-sel-wrap" style="margin-top:-12px">');
               B.Append('<span class="prm-sel-lbl">Perfil</span>');
               B.AppendFormat(
-                '<select class="prm-sel" id="perm-perfil" onchange="permPerfilChange(this.value)">%s</select>',
+                '<select class="prm-sel" id="perm-perfil" onchange="permPerfilChange(this.value,this.options[this.selectedIndex].getAttribute(''data-rotas''))">%s</select>',
                 [PrfOpts.ToString]);
               B.Append('<button class="btn-save-perm" onclick="permSavePerfil()" style="background:linear-gradient(135deg,rgba(99,102,241,.25),rgba(99,102,241,.1));border-color:rgba(99,102,241,.4);color:#818CF8">' +
                 '&#10003; Aplicar Perfil</button>');
