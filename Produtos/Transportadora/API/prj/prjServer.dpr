@@ -203,7 +203,7 @@ begin
                 LObj := TJSONObject.Create;
                 LObj.AddPair('id',        TJSONNumber.Create(Qry.FieldByName('id').AsInteger));
                 LObj.AddPair('login',     Qry.FieldByName('login').AsString);
-                LObj.AddPair('is_admin',  TJSONNumber.Create(Qry.FieldByName('is_admin').AsInteger));
+                LObj.AddPair('is_admin',  TJSONNumber.Create(Qry.FieldByName('is_admin').AsSmallInt));
                 LObj.AddPair('perfil_id', TJSONNumber.Create(Qry.FieldByName('perfil_id').AsInteger));
                 LArr.Add(LObj);
                 Qry.Next;
@@ -256,7 +256,7 @@ begin
               begin
                 LObj.AddPair('id',        TJSONNumber.Create(Qry.FieldByName('id').AsInteger));
                 LObj.AddPair('login',     Qry.FieldByName('login').AsString);
-                LObj.AddPair('is_admin',  TJSONNumber.Create(Qry.FieldByName('is_admin').AsInteger));
+                LObj.AddPair('is_admin',  TJSONNumber.Create(Qry.FieldByName('is_admin').AsSmallInt));
                 LObj.AddPair('perfil_id', TJSONNumber.Create(Qry.FieldByName('perfil_id').AsInteger));
               end
               else
