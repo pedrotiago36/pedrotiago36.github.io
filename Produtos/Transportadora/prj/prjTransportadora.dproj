@@ -165,6 +165,7 @@
         </DCCReference>
         <DCCReference Include="..\src\View\View.ILoginView.pas"/>
         <DCCReference Include="..\src\Model\Interface\Model.ILogin.pas"/>
+        <DCCReference Include="..\src\Service\Service.ApiClient.pas"/>
         <DCCReference Include="..\src\Model\Classe\Model.TLogin.pas"/>
         <DCCReference Include="..\src\Controller\Interface\Controller.ILoginController.pas"/>
         <DCCReference Include="..\src\Controller\Classe\Controller.TLoginController.pas"/>
