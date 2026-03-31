@@ -28,11 +28,18 @@ type
 
 implementation
 
+function NewHTTP: THTTPClient;
+begin
+  Result := THTTPClient.Create;
+  // Bypass proxy para conexoes localhost (evita erro 12029 no WinInet)
+  Result.ProxySettings := TProxySettings.Create('', 0, '', '', '127.0.0.1,localhost');
+end;
+
 function TApiClient.Get(const AEndpoint: string): string;
 var
   LHTTP: THTTPClient;
 begin
-  LHTTP := THTTPClient.Create;
+  LHTTP := NewHTTP;
   try
     Result := LHTTP.Get(API_BASE_URL + AEndpoint).ContentAsString(TEncoding.UTF8);
   finally
@@ -46,7 +53,7 @@ var
   LStream  : TStringStream;
   LHeaders : TNetHeaders;
 begin
-  LHTTP   := THTTPClient.Create;
+  LHTTP   := NewHTTP;
   LStream := TStringStream.Create(ABody, TEncoding.UTF8);
   try
     SetLength(LHeaders, 1);
