@@ -2545,7 +2545,8 @@ begin
         begin
           Screen := AScreens[I];
           B.Append('<div class="ac-card">');
-          B.AppendFormat('<div class="ac-card-hdr">%s</div>', [Screen]);
+          B.AppendFormat('<div class="ac-card-hdr">%s</div>',
+            [FScreenActionsModel.GetScreenCaption(Screen)]);
           B.Append('<div class="ac-actions">');
           { Ações: para este protótipo, mostra insert, edit, delete }
           for J := 0 to 2 do

@@ -24,6 +24,7 @@ type
     function  IsActionAllowed(const AUsuarioID: Integer; const ARoute, AActionKey: string): Boolean;
     procedure ToggleAction(const AUsuarioID: Integer; const ARoute, AActionKey: string);
     function  GetAllScreens: TArray<string>;
+    function  GetScreenCaption(const ARoute: string): string;
     procedure LoadUserActions(const AUsuarioID: Integer);
     procedure SaveUserActions(const AUsuarioID: Integer);
   end;

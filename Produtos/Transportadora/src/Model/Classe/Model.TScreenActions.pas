@@ -10,8 +10,9 @@ type
   TScreenActionsModel = class(TInterfacedObject, IScreenActionsModel)
   private
     { FData[UsuarioID][Route+ActionKey] = Allowed }
-    FData: TDictionary<Integer, TDictionary<string, Boolean>>;
-    FScreens: TDictionary<string, TArray<string>>; { tela → [actionKey1, actionKey2, ...] }
+    FData     : TDictionary<Integer, TDictionary<string, Boolean>>;
+    FScreens  : TDictionary<string, TArray<string>>;  { rota → [actionKey,...] }
+    FCaptions : TDictionary<string, string>;           { rota → nome legível }
     procedure Seed;
     function MakeKey(const ARoute, AActionKey: string): string;
   public
@@ -21,6 +22,7 @@ type
     function  IsActionAllowed(const AUsuarioID: Integer; const ARoute, AActionKey: string): Boolean;
     procedure ToggleAction(const AUsuarioID: Integer; const ARoute, AActionKey: string);
     function  GetAllScreens: TArray<string>;
+    function  GetScreenCaption(const ARoute: string): string;
     procedure LoadUserActions(const AUsuarioID: Integer);
     procedure SaveUserActions(const AUsuarioID: Integer);
   end;
@@ -42,8 +44,9 @@ end;
 constructor TScreenActionsModel.Create;
 begin
   inherited Create;
-  FData := TDictionary<Integer, TDictionary<string, Boolean>>.Create;
-  FScreens := TDictionary<string, TArray<string>>.Create;
+  FData     := TDictionary<Integer, TDictionary<string, Boolean>>.Create;
+  FScreens  := TDictionary<string, TArray<string>>.Create;
+  FCaptions := TDictionary<string, string>.Create;
   Seed;
 end;
 
@@ -55,12 +58,13 @@ begin
     D.Free;
   FData.Free;
   FScreens.Free;
+  FCaptions.Free;
   inherited;
 end;
 
 procedure TScreenActionsModel.Seed;
   { Open array — compatível com qualquer versão do Delphi (XE e anteriores) }
-  procedure AddScreen(const ARoute: string; const AActions: array of string);
+  procedure AddScreen(const ARoute, ACaption: string; const AActions: array of string);
   var
     LArr : TArray<string>;
     I    : Integer;
@@ -69,15 +73,16 @@ procedure TScreenActionsModel.Seed;
     for I := 0 to High(AActions) do
       LArr[I] := AActions[I];
     FScreens.Add(ARoute, LArr);
+    FCaptions.Add(ARoute, ACaption);
   end;
 begin
-  AddScreen('cfg.perfil',     ['insert', 'edit', 'delete', 'save', 'cancel']);
-  AddScreen('cfg.usuario',    ['insert', 'edit', 'delete', 'save', 'cancel']);
-  AddScreen('cfg.permissoes', ['save', 'cancel']);
-  AddScreen('cfg.acoes',      ['save', 'cancel']);
-  AddScreen('cad.clientes',   ['insert', 'edit', 'delete', 'save', 'cancel']);
-  AddScreen('cad.motoristas', ['insert', 'edit', 'delete', 'save', 'cancel']);
-  AddScreen('cad.veiculos',   ['insert', 'edit', 'delete', 'save', 'cancel']);
+  AddScreen('cfg.perfil',     'Perfis de Acesso',         ['insert', 'edit', 'delete', 'save', 'cancel']);
+  AddScreen('cfg.usuario',    'Cadastro de Usuarios',      ['insert', 'edit', 'delete', 'save', 'cancel']);
+  AddScreen('cfg.permissoes', 'Permissoes de Usuarios',    ['save', 'cancel']);
+  AddScreen('cfg.acoes',      'Permissoes de Acoes',       ['save', 'cancel']);
+  AddScreen('cad.clientes',   'Cadastro de Clientes',      ['insert', 'edit', 'delete', 'save', 'cancel']);
+  AddScreen('cad.motoristas', 'Cadastro de Motoristas',    ['insert', 'edit', 'delete', 'save', 'cancel']);
+  AddScreen('cad.veiculos',   'Cadastro de Veiculos',      ['insert', 'edit', 'delete', 'save', 'cancel']);
 end;
 
 function TScreenActionsModel.MakeKey(const ARoute, AActionKey: string): string;
@@ -241,6 +246,12 @@ begin
   finally
     LRoot.Free;  { LAcoesArr é destruído junto com LRoot }
   end;
+end;
+
+function TScreenActionsModel.GetScreenCaption(const ARoute: string): string;
+begin
+  if not FCaptions.TryGetValue(ARoute, Result) then
+    Result := ARoute;
 end;
 
 function TScreenActionsModel.GetAllScreens: TArray<string>;
