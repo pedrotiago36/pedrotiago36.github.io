@@ -1,4 +1,4 @@
-unit View.FrmLogin;
+﻿unit View.FrmLogin;
 
 { Form unico da aplicacao.
   - Fase LOGIN : renderiza a tela de autenticacao no frame
@@ -25,7 +25,7 @@ uses
   Model.IPerfil,
   Model.IUsuario,
   Model.IPermissoes,
-  Model.IScreenActions;
+  Model.IScreenActions, uniPanel;
 
 type
   TFrmLogin = class(TUniForm, ILoginView, IMainView)
@@ -1478,10 +1478,13 @@ begin
     '  var pid=sel?sel.value:"0";' +
     '  parent.ajaxRequest(_f,"perm.saveperfil",["userid="+uid,"perfilid="+pid]);}' +
     'function permPerfilChange(pid){' +
-    '  if(!pid||pid==="0"){return;}' +
-    '  var rotas=(_prfRotas&&_prfRotas[pid])?_prfRotas[pid]:[];' +
+    '  var sel=document.getElementById("perm-perfil");' +
+    '  if(!sel)return;' +
+    '  var opt=sel.options[sel.selectedIndex];' +
+    '  var raw=opt?opt.getAttribute("data-rotas"):"";' +
+    '  var rotas=raw?raw.split("|"):[];' +
     '  var rotaSet={};' +
-    '  rotas.forEach(function(r){rotaSet[r]=true;});' +
+    '  for(var i=0;i<rotas.length;i++){if(rotas[i])rotaSet[rotas[i]]=true;}' +
     '  document.querySelectorAll(".prm-chk input[type=checkbox]").forEach(function(c){' +
     '    c.checked=!!rotaSet[c.value];});' +
     '  permInitAllChk();}' +
@@ -2536,31 +2539,26 @@ begin
           [Usu.ID, LSel[ARec.UsuarioID = Usu.ID], Usu.Login]);
       end;
 
-      { Opções select perfil + JSON com rotas de cada perfil embutido como data-rotas }
+      { Opções select perfil — rotas embutidas como data-rotas em cada option
+        (scripts injetados via innerHTML não executam; data-attributes sim) }
       PrfOpts := TStringBuilder.Create;
-      PrfJson := TStringBuilder.Create;
+      PrfJson := TStringBuilder.Create; { reutilizado como buffer por opção }
       try
-        PrfOpts.Append('<option value="0">-- Nenhum (usar permiss&otilde;es individuais) --</option>');
-        { JSON: {id:[rotas],...} para o JS usar ao selecionar perfil }
-        PrfJson.Append('{');
+        PrfOpts.Append('<option value="0" data-rotas="">-- Nenhum (usar permiss&otilde;es individuais) --</option>');
         for LPI := 0 to High(APerfis) do
         begin
           Prf := APerfis[LPI];
           LPrfSel := IfThen(ARec.PerfilID = Prf.ID, ' selected', '');
-          PrfOpts.AppendFormat('<option value="%d"%s>%s</option>',
-            [Prf.ID, LPrfSel, Prf.Nome]);
-          if LPI > 0 then PrfJson.Append(',');
-          PrfJson.AppendFormat('"%d":[', [Prf.ID]);
+          { Monta lista de rotas separada por | para usar como data-rotas }
+          PrfJson.Clear;
           for LRoute in Prf.Permissoes do
           begin
-            PrfJson.AppendFormat('"%s",', [LRoute]);
+            if PrfJson.Length > 0 then PrfJson.Append('|');
+            PrfJson.Append(LRoute);
           end;
-          { Remove última vírgula se houver rotas }
-          if Length(Prf.Permissoes) > 0 then
-            PrfJson.Remove(PrfJson.Length - 1, 1);
-          PrfJson.Append(']');
+          PrfOpts.AppendFormat('<option value="%d"%s data-rotas="%s">%s</option>',
+            [Prf.ID, LPrfSel, PrfJson.ToString, Prf.Nome]);
         end;
-        PrfJson.Append('}');
 
         { Cards de permissão — usa rotas individuais para marcar }
         Cards := TStringBuilder.Create;
@@ -2610,8 +2608,6 @@ begin
           B := TStringBuilder.Create;
           try
             B.Append(CSS);
-            { JSON de rotas dos perfis — usado pelo JS ao selecionar perfil }
-            B.AppendFormat('<script>var _prfRotas=%s;</script>', [PrfJson.ToString]);
             B.AppendFormat('<input type="hidden" id="perm-uid" value="%d">', [ARec.UsuarioID]);
             B.Append('<div class="prm-screen">');
             B.Append('<div class="prm-hdr">');
