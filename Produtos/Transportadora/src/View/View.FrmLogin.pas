@@ -1555,8 +1555,7 @@ begin
     H.Append('<div id="sdrop"></div></div>');
     { Right: usuario logado + logout }
     H.Append('<div class="tb-right">');
-    H.AppendFormat('<div class="tb-user" title="Clique para sair" onclick="%s">',
-      ['ajaxRequest(''' + HtmlMain.JSName + ''',''logout'',{})']);
+    H.Append('<div class="tb-user" title="Clique para sair" onclick="parent.ajaxRequest(_f,''logout'',[]);">');
     H.AppendFormat('<div class="tb-av">%s</div>',
       [UpperCase(Copy(FUser, 1, 2))]);
     H.Append('<div>');
