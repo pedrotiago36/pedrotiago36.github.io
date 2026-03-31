@@ -121,49 +121,88 @@ begin
 
 { ── POST /crud — chama sp_CRUD_Generico ────────────────────────────
   Body JSON esperado:
-    { "tabela": "tb_usuarios", "acao": "INSERT", "dados": { ... } }
+    { "tabela": "tb_usuarios", "acao": "INSERT|UPDATE|DELETE", "dados": { ... } }
 
-  Exemplo INSERT usuário:
-    { "tabela": "tb_usuarios", "acao": "INSERT",
-      "dados": { "login": "maria", "senha": "hash256", "is_admin": 0, "perfil_id": 1 } }
+  A API parseia o JSON aqui e mapeia para parâmetros posicionais da SP
+  (MySQL 5.1 não tem JSON_EXTRACT — não pode parsear JSON na SP).
 
-  Exemplo SALVAR permissões:
-    { "tabela": "tb_permissoes_usuarios", "acao": "INSERT",
-      "dados": { "usuario_id": 3, "rotas": ["cfg.usuario","fin.receber"] } }
+  Mapeamento por tabela:
+    tb_usuarios          → p_id, p_param1=login, p_param2=senha, p_param3=is_admin, p_param4=perfil_id
+    tb_perfis            → p_id, p_param1=nome,  p_param2=descricao
+    tb_permissoes_usu... → p_param2=rotas(pipe), p_param4=usuario_id
+
+  Exemplos:
+    INSERT usuário:
+      {"tabela":"tb_usuarios","acao":"INSERT","dados":{"login":"maria","senha":"hash","is_admin":0,"perfil_id":1}}
+    UPDATE perfil:
+      {"tabela":"tb_perfis","acao":"UPDATE","dados":{"id":2,"nome":"Gerente","descricao":"Acesso gerencial"}}
+    SALVAR permissões:
+      {"tabela":"tb_permissoes_usuarios","acao":"INSERT","dados":{"usuario_id":3,"rotas":["cfg.usuario","fin.receber"]}}
 ──────────────────────────────────────────────────────────────────── }
 THorse.Post('/crud',
   procedure(Req: THorseRequest; Res: THorseResponse)
   var
-    LBody    : string;
-    LJsonObj : TJSONObject;
-    LTabela  : string;
-    LAcao    : string;
-    LDados   : TJSONValue;
-    LDadosStr: string;
-    Conn     : TFDConnection;
-    Qry      : TFDQuery;
-    LResult  : TJSONObject;
+    LBody      : string;
+    LRoot      : TJSONObject;
+    LDados     : TJSONObject;
+    LTabela    : string;
+    LAcao      : string;
+    LpID       : Integer;
+    LpParam1   : string;
+    LpParam2   : string;
+    LpParam3   : string;
+    LpParam4   : string;
+    LRotasArr  : TJSONArray;
+    LRotas     : string;
+    LI         : Integer;
+    Conn       : TFDConnection;
+    Qry        : TFDQuery;
+    LResult    : TJSONObject;
+
+    { Lê string de um TJSONObject sem lançar exceção — retorna ADefault se ausente }
+    function JStr(const AObj: TJSONObject; const AKey, ADefault: string): string;
+    var
+      LVal: TJSONValue;
+    begin
+      LVal := AObj.GetValue(AKey);
+      if Assigned(LVal) then
+        Result := LVal.Value
+      else
+        Result := ADefault;
+    end;
+
+    { Lê inteiro de um TJSONObject — retorna ADefault se ausente }
+    function JInt(const AObj: TJSONObject; const AKey: string; ADefault: Integer): Integer;
+    var
+      LVal: TJSONValue;
+    begin
+      LVal := AObj.GetValue(AKey);
+      if Assigned(LVal) then
+        Result := StrToIntDef(LVal.Value, ADefault)
+      else
+        Result := ADefault;
+    end;
+
   begin
     try
       LBody := Req.Body;
-
       if LBody.IsEmpty then
       begin
         Res.Status(400).Send('JSON vazio');
         Exit;
       end;
 
-      LJsonObj := TJSONObject.ParseJSONValue(LBody) as TJSONObject;
-      if not Assigned(LJsonObj) then
+      LRoot := TJSONObject.ParseJSONValue(LBody) as TJSONObject;
+      if not Assigned(LRoot) then
       begin
         Res.Status(400).Send('JSON inválido');
         Exit;
       end;
 
       try
-        LTabela := LJsonObj.GetValue<string>('tabela');
-        LAcao   := LJsonObj.GetValue<string>('acao');
-        LDados  := LJsonObj.GetValue('dados');
+        LTabela := JStr(LRoot, 'tabela', '');
+        LAcao   := JStr(LRoot, 'acao',   '');
+        LDados  := LRoot.GetValue('dados') as TJSONObject;
 
         if LTabela.IsEmpty or LAcao.IsEmpty or not Assigned(LDados) then
         begin
@@ -171,17 +210,58 @@ THorse.Post('/crud',
           Exit;
         end;
 
-        LDadosStr := LDados.ToString;
+        { ── Mapeia campos do JSON para os parâmetros posicionais ───── }
+        LpID     := 0;
+        LpParam1 := '';
+        LpParam2 := '';
+        LpParam3 := '';
+        LpParam4 := '0';
 
+        if LTabela = 'tb_usuarios' then
+        begin
+          LpID     := JInt(LDados, 'id',        0);
+          LpParam1 := JStr(LDados, 'login',     '');
+          LpParam2 := JStr(LDados, 'senha',     '');
+          LpParam3 := IntToStr(JInt(LDados, 'is_admin',  0));
+          LpParam4 := IntToStr(JInt(LDados, 'perfil_id', 0));
+        end
+        else if LTabela = 'tb_perfis' then
+        begin
+          LpID     := JInt(LDados, 'id',        0);
+          LpParam1 := JStr(LDados, 'nome',      '');
+          LpParam2 := JStr(LDados, 'descricao', '');
+        end
+        else if LTabela = 'tb_permissoes_usuarios' then
+        begin
+          LpParam4 := IntToStr(JInt(LDados, 'usuario_id', 0));
+          { Converte array de rotas para string pipe-separated }
+          LRotas    := '';
+          LRotasArr := LDados.GetValue('rotas') as TJSONArray;
+          if Assigned(LRotasArr) then
+            for LI := 0 to LRotasArr.Count - 1 do
+            begin
+              if LRotas <> '' then LRotas := LRotas + '|';
+              LRotas := LRotas + LRotasArr.Items[LI].Value;
+            end;
+          LpParam2 := LRotas;
+        end;
+
+        { ── Chama a SP com parâmetros posicionais ────────────────── }
         Conn := NewMySQLConnection;
         try
           Qry := TFDQuery.Create(nil);
           try
             Qry.Connection := Conn;
-            Qry.SQL.Text   := 'CALL sp_CRUD_Generico(:pTabela, :pAcao, :pJson)';
-            Qry.ParamByName('pTabela').AsString := LTabela;
-            Qry.ParamByName('pAcao').AsString   := LAcao;
-            Qry.ParamByName('pJson').AsString   := LDadosStr;
+            Qry.SQL.Text   :=
+              'CALL sp_CRUD_Generico(:pTabela,:pAcao,:pID,' +
+              ':pParam1,:pParam2,:pParam3,:pParam4)';
+            Qry.ParamByName('pTabela').AsString  := LTabela;
+            Qry.ParamByName('pAcao').AsString    := LAcao;
+            Qry.ParamByName('pID').AsInteger     := LpID;
+            Qry.ParamByName('pParam1').AsString  := LpParam1;
+            Qry.ParamByName('pParam2').AsString  := LpParam2;
+            Qry.ParamByName('pParam3').AsString  := LpParam3;
+            Qry.ParamByName('pParam4').AsString  := LpParam4;
             Qry.Open;
 
             LResult := TJSONObject.Create;
@@ -206,8 +286,9 @@ THorse.Post('/crud',
         finally
           Conn.Free;
         end;
+
       finally
-        LJsonObj.Free;
+        LRoot.Free;
       end;
 
     except
