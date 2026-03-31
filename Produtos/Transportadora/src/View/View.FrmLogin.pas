@@ -365,22 +365,10 @@ begin
   { Ignora eventos que chegam apos o logout (ex: nav disparado por bubble de click) }
   if (not FInMain) and (EventName <> 'logout') then Exit;
 
-  { Logout — reseta estado e volta para a tela de login }
+  { Logout — recarrega a pagina inteira para reinicializar tudo do zero }
   if EventName = 'logout' then
   begin
-    FInMain := False;
-    FLoggedUserID := 0;
-    FIsAdmin := False;
-    FUser := '';
-    FPwd  := '';
-    if Assigned(FAllowedRoutes) then
-      FreeAndNil(FAllowedRoutes);
-    HtmlMain.Visible := False;
-    HtmlMain.HTML.Text := '';
-    FLoginCtrl := NewLoginController(NewLogin);
-    FLoginCtrl.BindView(Self);
-    HtmlLogin.HTML.Text := BuildLoginHtml;
-    HtmlLogin.Visible := True;
+    UniSession.AddJS('parent.location.reload();');
     Exit;
   end;
 
