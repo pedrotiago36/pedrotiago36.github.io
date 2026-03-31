@@ -29,32 +29,23 @@ uses
   FireDAC.Phys.ODBCBase,
   FireDAC.Phys.MSSQL;
 
+{ ── Conexão principal — dtll_Transportadora ────────────────────── }
 function NewMySQLConnection: TFDConnection;
+begin
+  Result := TFDConnection.Create(nil);
+  Result.LoginPrompt := False;
+  with Result.Params do
   begin
-    Result := TFDConnection.Create(nil);
-    Result.LoginPrompt := False;
-
-    // Limpa e define os parâmetros
-    with Result.Params do
-    begin
-      Clear;
-      // Driver
-      Add('DriverID=MySQL');
-
-      // Conexão
-      Add('Server=192.168.1.5');
-      Add('Port=3306');
-      Add('Database=polysy74_polyweb_on');
-      Add('User_Name=root');
-      Add('Password=adminbatista');
-
-      // Recomendações
-      Add('CharacterSet=utf8');
-      // Add('Pooled=False'); // mantenha False se realmente quiser destruir a conexão a cada request
-    end;
-
-    // Abre
-    Result.Connected := True;
+    Clear;
+    Add('DriverID=MySQL');
+    Add('Server=192.168.1.5');
+    Add('Port=3306');
+    Add('Database=dtll_Transportadora');
+    Add('User_Name=root');
+    Add('Password=adminbatista');
+    Add('CharacterSet=utf8');
+  end;
+  Result.Connected := True;
 end;
 
 
@@ -127,6 +118,108 @@ begin
       end;
     end
   );
+
+{ ── POST /crud — chama sp_CRUD_Generico ────────────────────────────
+  Body JSON esperado:
+    { "tabela": "tb_usuarios", "acao": "INSERT", "dados": { ... } }
+
+  Exemplo INSERT usuário:
+    { "tabela": "tb_usuarios", "acao": "INSERT",
+      "dados": { "login": "maria", "senha": "hash256", "is_admin": 0, "perfil_id": 1 } }
+
+  Exemplo SALVAR permissões:
+    { "tabela": "tb_permissoes_usuarios", "acao": "INSERT",
+      "dados": { "usuario_id": 3, "rotas": ["cfg.usuario","fin.receber"] } }
+──────────────────────────────────────────────────────────────────── }
+THorse.Post('/crud',
+  procedure(Req: THorseRequest; Res: THorseResponse)
+  var
+    LBody    : string;
+    LJsonObj : TJSONObject;
+    LTabela  : string;
+    LAcao    : string;
+    LDados   : TJSONValue;
+    LDadosStr: string;
+    Conn     : TFDConnection;
+    Qry      : TFDQuery;
+    LResult  : TJSONObject;
+  begin
+    try
+      LBody := Req.Body;
+
+      if LBody.IsEmpty then
+      begin
+        Res.Status(400).Send('JSON vazio');
+        Exit;
+      end;
+
+      LJsonObj := TJSONObject.ParseJSONValue(LBody) as TJSONObject;
+      if not Assigned(LJsonObj) then
+      begin
+        Res.Status(400).Send('JSON inválido');
+        Exit;
+      end;
+
+      try
+        LTabela := LJsonObj.GetValue<string>('tabela');
+        LAcao   := LJsonObj.GetValue<string>('acao');
+        LDados  := LJsonObj.GetValue('dados');
+
+        if LTabela.IsEmpty or LAcao.IsEmpty or not Assigned(LDados) then
+        begin
+          Res.Status(400).Send('Campos obrigatórios: tabela, acao, dados');
+          Exit;
+        end;
+
+        LDadosStr := LDados.ToString;
+
+        Conn := NewMySQLConnection;
+        try
+          Qry := TFDQuery.Create(nil);
+          try
+            Qry.Connection := Conn;
+            Qry.SQL.Text   := 'CALL sp_CRUD_Generico(:pTabela, :pAcao, :pJson)';
+            Qry.ParamByName('pTabela').AsString := LTabela;
+            Qry.ParamByName('pAcao').AsString   := LAcao;
+            Qry.ParamByName('pJson').AsString   := LDadosStr;
+            Qry.Open;
+
+            LResult := TJSONObject.Create;
+            try
+              LResult.AddPair('sucesso', TJSONBool.Create(True));
+              LResult.AddPair('linhas_afetadas',
+                TJSONNumber.Create(Qry.FieldByName('linhas_afetadas').AsInteger));
+              LResult.AddPair('ultimo_id',
+                TJSONNumber.Create(Qry.FieldByName('ultimo_id').AsInteger));
+
+              Writeln(FormatDateTime('dd/mm/yyyy hh:nn:ss', Now) +
+                ' POST /crud | tabela=' + LTabela + ' acao=' + LAcao);
+
+              Res.Status(200).Send<TJSONObject>(LResult);
+            except
+              LResult.Free;
+              raise;
+            end;
+          finally
+            Qry.Free;
+          end;
+        finally
+          Conn.Free;
+        end;
+      finally
+        LJsonObj.Free;
+      end;
+
+    except
+      on E: Exception do
+      begin
+        Writeln(FormatDateTime('dd/mm/yyyy hh:nn:ss', Now) +
+          ' ERRO /crud: ' + E.Message);
+        Res.Status(500).Send('Erro: ' + E.Message);
+      end;
+    end;
+  end
+);
 
 THorse.Post('/atualizarestoque',
   procedure(Req: THorseRequest; Res: THorseResponse)
