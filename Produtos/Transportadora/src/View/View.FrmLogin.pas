@@ -1395,13 +1395,19 @@ end;
 
 function TFrmLogin.BuildPerfilFormHtml(const ARec: TPerfilRec): string;
 const
-  GRP_IDS    : array[0..4] of string =
-    ('grp-cad', 'grp-oper', 'grp-fin', 'grp-rel', 'grp-cfg');
-  GRP_LABELS : array[0..4] of string =
-    ('Cadastro', 'Operacional', 'Financeiro',
-     'Relat&oacute;rios', 'Configura&ccedil;&otilde;es');
-  GRP_COLORS : array[0..4] of string =
-    ('#F59E0B', '#3B82F6', '#10B981', '#8B5CF6', '#F43F5E');
+  GRP_IDS    : array[0..11] of string =
+    ('grp-cad', 'grp-oper', 'grp-doc', 'grp-frota', 'grp-fin',
+     'grp-com', 'grp-rh', 'grp-rastr', 'grp-rel', 'grp-int',
+     'grp-cfg', 'grp-util');
+  GRP_LABELS : array[0..11] of string =
+    ('Cadastros', 'Operacional', 'Doc. Fiscais', 'Frota', 'Financeiro',
+     'Fretes/Comercial', 'Motoristas/RH', 'Rastreamento',
+     'Relat&oacute;rios', 'Integra&ccedil;&otilde;es',
+     'Configura&ccedil;&otilde;es', 'Utilit&aacute;rios');
+  GRP_COLORS : array[0..11] of string =
+    ('#F59E0B', '#3B82F6', '#F97316', '#06B6D4', '#10B981',
+     '#EAB308', '#6366F1', '#14B8A6', '#8B5CF6', '#EC4899',
+     '#F43F5E', '#64748B');
 type
   TDispArr  = array[Boolean] of string;
 var
@@ -1484,7 +1490,7 @@ begin
     { Gera cards por grupo }
     Cards := TStringBuilder.Create;
     try
-      for G := 0 to 4 do
+      for G := 0 to 11 do
       begin
         { Verifica se grupo tem itens folha com Route }
         LHasPerm := False;
@@ -1728,13 +1734,19 @@ end;
 function TFrmLogin.BuildUsuarioFormHtml(const ARec: TUsuarioRec;
   const APerfis: TArray<TPerfilRec>): string;
 const
-  GRP_IDS    : array[0..4] of string =
-    ('grp-cad', 'grp-oper', 'grp-fin', 'grp-rel', 'grp-cfg');
-  GRP_LABELS : array[0..4] of string =
-    ('Cadastro', 'Operacional', 'Financeiro',
-     'Relat&oacute;rios', 'Configura&ccedil;&otilde;es');
-  GRP_COLORS : array[0..4] of string =
-    ('#F59E0B', '#3B82F6', '#10B981', '#8B5CF6', '#F43F5E');
+  GRP_IDS    : array[0..11] of string =
+    ('grp-cad', 'grp-oper', 'grp-doc', 'grp-frota', 'grp-fin',
+     'grp-com', 'grp-rh', 'grp-rastr', 'grp-rel', 'grp-int',
+     'grp-cfg', 'grp-util');
+  GRP_LABELS : array[0..11] of string =
+    ('Cadastros', 'Operacional', 'Doc. Fiscais', 'Frota', 'Financeiro',
+     'Fretes/Comercial', 'Motoristas/RH', 'Rastreamento',
+     'Relat&oacute;rios', 'Integra&ccedil;&otilde;es',
+     'Configura&ccedil;&otilde;es', 'Utilit&aacute;rios');
+  GRP_COLORS : array[0..11] of string =
+    ('#F59E0B', '#3B82F6', '#F97316', '#06B6D4', '#10B981',
+     '#EAB308', '#6366F1', '#14B8A6', '#8B5CF6', '#EC4899',
+     '#F43F5E', '#64748B');
 type
   TDispArr  = array[Boolean] of string;
 var
@@ -1866,7 +1878,7 @@ begin
       LPermSet.AddOrSetValue(LPerm, True);
 
     { Gera cards de permissão por grupo }
-    for G := 0 to 4 do
+    for G := 0 to 11 do
     begin
       LHasPerm := False;
       for MenuItem in LItems do
@@ -2019,13 +2031,19 @@ function TFrmLogin.BuildPermFormHtml(const ARec      : TPermissoesRec;
   const AUsuarios : TArray<TUsuarioRec>;
   const AItems    : TArray<TMenuItemRec>): string;
 const
-  GRP_IDS    : array[0..4] of string =
-    ('grp-cad', 'grp-oper', 'grp-fin', 'grp-rel', 'grp-cfg');
-  GRP_LABELS : array[0..4] of string =
-    ('Cadastro', 'Operacional', 'Financeiro',
-     'Relat&oacute;rios', 'Configura&ccedil;&otilde;es');
-  GRP_COLORS : array[0..4] of string =
-    ('#F59E0B', '#3B82F6', '#10B981', '#8B5CF6', '#F43F5E');
+  GRP_IDS    : array[0..11] of string =
+    ('grp-cad', 'grp-oper', 'grp-doc', 'grp-frota', 'grp-fin',
+     'grp-com', 'grp-rh', 'grp-rastr', 'grp-rel', 'grp-int',
+     'grp-cfg', 'grp-util');
+  GRP_LABELS : array[0..11] of string =
+    ('Cadastros', 'Operacional', 'Doc. Fiscais', 'Frota', 'Financeiro',
+     'Fretes/Comercial', 'Motoristas/RH', 'Rastreamento',
+     'Relat&oacute;rios', 'Integra&ccedil;&otilde;es',
+     'Configura&ccedil;&otilde;es', 'Utilit&aacute;rios');
+  GRP_COLORS : array[0..11] of string =
+    ('#F59E0B', '#3B82F6', '#F97316', '#06B6D4', '#10B981',
+     '#EAB308', '#6366F1', '#14B8A6', '#8B5CF6', '#EC4899',
+     '#F43F5E', '#64748B');
 type
   TDispArr = array[Boolean] of string;
   THasArr  = array[Boolean] of string;
@@ -2118,7 +2136,7 @@ begin
       { Cards de permissão }
       Cards := TStringBuilder.Create;
       try
-        for G := 0 to 4 do
+        for G := 0 to 11 do
         begin
           Cards.AppendFormat(
             '<div class="prm-card" style="--cc:%s">' +
