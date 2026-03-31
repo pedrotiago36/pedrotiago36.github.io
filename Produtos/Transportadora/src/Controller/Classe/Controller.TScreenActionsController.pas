@@ -81,9 +81,8 @@ end;
 procedure TScreenActionsController.ToggleAction(const AUsuarioID: Integer;
   const ARoute, AActionKey: string);
 begin
+  { Persiste o toggle no model — o JS já atualizou o visual, não re-renderiza }
   FModel.ToggleAction(AUsuarioID, ARoute, AActionKey);
-  { Re-render após toggle }
-  LoadList;
 end;
 
 end.

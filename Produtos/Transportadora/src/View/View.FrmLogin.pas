@@ -2530,7 +2530,7 @@ begin
               1: begin LKey := 'edit';   LLabel := 'Editar';  end;
             else   begin LKey := 'delete'; LLabel := 'Deletar'; end;
             end;
-            LAllowed := True; { Por agora, assume permite tudo }
+            LAllowed := FScreenActionsModel.IsActionAllowed(ASelectedUserID, Screen, LKey);
             B.AppendFormat(
               '<div class="ac-action %s" onclick="acToggle(this,%d,%s,%s)">' +
               '<div class="ac-dot"></div><span>%s</span></div>',
