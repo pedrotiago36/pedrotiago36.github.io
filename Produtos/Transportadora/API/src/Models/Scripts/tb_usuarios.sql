@@ -1,4 +1,4 @@
--- =============================================================
+﻿-- =============================================================
 --  SCRIPT: tb_usuarios.sql
 --  Banco  : dtll_Transportadora
 --  MySQL  : 5.7+
@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS tb_usuarios (
     is_admin       TINYINT(1)   NOT NULL DEFAULT 0,
     perfil_id      INT(11)          NULL              COMMENT 'FK -> tb_perfis.id',
     ativo          TINYINT(1)   NOT NULL DEFAULT 1,
-    dt_cadastro    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    dt_atualizacao DATETIME         NULL ON UPDATE CURRENT_TIMESTAMP,
+    dt_cadastro    DATETIME     NOT NULL,
+    dt_atualizacao DATETIME         NULL,
 
     PRIMARY KEY (id),
     UNIQUE KEY  uk_usuario_login  (login),
@@ -31,11 +31,12 @@ CREATE TABLE IF NOT EXISTS tb_usuarios (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Usuários do sistema';
 
 -- Usuário admin inicial (senha: admin123 — trocar em produção)
-INSERT IGNORE INTO tb_usuarios (login, senha, is_admin)
+INSERT IGNORE INTO tb_usuarios (login, senha, is_admin, dt_cadastro)
 VALUES (
     'admin',
-    SHA2('admin123', 256),
-    1
+    '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',
+    1,
+    NOW()
 );
 
 COMMIT;

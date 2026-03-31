@@ -1,4 +1,4 @@
--- =============================================================
+﻿-- =============================================================
 --  SCRIPT: tb_perfis.sql
 --  Banco  : dtll_Transportadora
 --  MySQL  : 5.7+
@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS tb_perfis (
     nome           VARCHAR(100) NOT NULL,
     descricao      VARCHAR(255)     NULL,
     ativo          TINYINT(1)   NOT NULL DEFAULT 1,
-    dt_cadastro    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    dt_atualizacao DATETIME         NULL ON UPDATE CURRENT_TIMESTAMP,
+    dt_cadastro    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    dt_atualizacao TIMESTAMP        NULL,
 
     PRIMARY KEY (id),
     UNIQUE KEY uk_perfil_nome (nome),
