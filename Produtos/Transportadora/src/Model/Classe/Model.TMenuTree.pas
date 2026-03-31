@@ -232,6 +232,7 @@ begin
   Result := Result + [Item('cfg-usr',  GRP_CFG, 'Cadastro de Usu'#225'rios',         ICO_USER,  'cfg.usuario',   CFG+' > Cadastro de Usu'#225'rios',         True)];
   Result := Result + [Item('cfg-prf',  GRP_CFG, 'Cadastro de Perfil',                ICO_USERS, 'cfg.perfil',    CFG+' > Cadastro de Perfil',                True)];
   Result := Result + [Item('cfg-prm',  GRP_CFG, 'Permiss'#245'es de Usu'#225'rios',  ICO_KEY,   'cfg.permissoes',CFG+' > Permiss'#245'es de Usu'#225'rios',  True)];
+  Result := Result + [Item('cfg-ac',   GRP_CFG, 'Permiss'#245'es de A'#231#245'es',   ICO_KEY,   'cfg.acoes',     CFG+' > Permiss'#245'es de A'#231#245'es',   True)];
 
   { ══════════════════════════════════════════════════════ }
   { 12. UTILITÁRIOS                                       }

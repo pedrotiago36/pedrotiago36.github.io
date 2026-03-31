@@ -19,11 +19,13 @@ uses
   Controller.IPerfilController,
   Controller.IUsuarioController,
   Controller.IPermissoesController,
+  Controller.IScreenActionsController,
   Model.ILogin,
   Model.IMenuItem,
   Model.IPerfil,
   Model.IUsuario,
-  Model.IPermissoes;
+  Model.IPermissoes,
+  Model.IScreenActions;
 
 type
   TFrmLogin = class(TUniForm, ILoginView, IMainView)
@@ -50,6 +52,8 @@ type
     FUsuarioCtrl     : IUsuarioController;
     FPermissoesModel : IPermissoesModel;
     FPermissoesCtrl  : IPermissoesController;
+    FScreenActionsModel : IScreenActionsModel;
+    FScreenActionsCtrl  : IScreenActionsController;
     { construtores de HTML }
     function  BuildLoginHtml: string;
     function  BuildMainHtml: string;
@@ -78,6 +82,13 @@ type
     function  BuildPermFormHtml(const ARec      : TPermissoesRec;
                                 const AUsuarios : TArray<TUsuarioRec>;
                                 const AItems    : TArray<TMenuItemRec>): string;
+    { ações em telas — injeção de HTML no #screen }
+    procedure InjectScreenActions(const AScreens: TArray<string>;
+                                  const AUsuarios: TArray<string>;
+                                  const ASelectedUserID: Integer);
+    function  BuildScreenActionsHtml(const AScreens: TArray<string>;
+                                     const AUsuarios: TArray<string>;
+                                     const ASelectedUserID: Integer): string;
     { ILoginView }
     function  CollectCredentials: TLoginCredentials;
     procedure NotifySuccess(const AMessage: string);
@@ -102,16 +113,20 @@ uses
   Model.TPerfil,
   Model.TUsuario,
   Model.TPermissoes,
+  Model.TScreenActions,
   Controller.TLoginController,
   Controller.TMainController,
   Controller.TPerfilController,
   Controller.TUsuarioController,
   Controller.TPermissoesController,
+  Controller.TScreenActionsController,
   System.JSON,
   uniGUIApplication,
   uniGUIVars,
   ServerModule,
-  uniGUIServer;
+  uniGUIServer,
+  Service.ApiHealthCheck,
+  Service.ApiClient;
 
 { ══════════════════════════════════════════════════════════════
   Adapter privado — conecta IPerfilView a TFrmLogin
@@ -205,6 +220,33 @@ begin
 end;
 
 { ══════════════════════════════════════════════════════════════
+  Adapter privado — conecta IScreenActionsView a TFrmLogin
+  ══════════════════════════════════════════════════════════════ }
+
+type
+  TScreenActionsViewAdapter = class(TInterfacedObject, IScreenActionsView)
+  strict private
+    FOwner: TFrmLogin;
+  public
+    constructor Create(AOwner: TFrmLogin);
+    procedure ShowScreenActions(const AScreens: TArray<string>;
+                                const AUsuarios: TArray<string>;
+                                const ASelectedUserID: Integer);
+  end;
+
+constructor TScreenActionsViewAdapter.Create(AOwner: TFrmLogin);
+begin
+  inherited Create;
+  FOwner := AOwner;
+end;
+
+procedure TScreenActionsViewAdapter.ShowScreenActions(const AScreens: TArray<string>;
+  const AUsuarios: TArray<string>; const ASelectedUserID: Integer);
+begin
+  FOwner.InjectScreenActions(AScreens, AUsuarios, ASelectedUserID);
+end;
+
+{ ══════════════════════════════════════════════════════════════
   Inicializacao
   ══════════════════════════════════════════════════════════════ }
 
@@ -256,7 +298,29 @@ end;
 { ── fase LOGIN ── }
 
 procedure TFrmLogin.HandleLoginEvent(EventName: string; Params: TUniStrings);
+var
+  LThread : TApiHealthThread;
+  LOnline : Boolean;
 begin
+  { ── verificação de saúde da API (disparada periodicamente pelo JS) ── }
+  if EventName = 'checkApi' then
+  begin
+    LThread := TApiHealthThread.Create(API_BASE_URL);
+    try
+      LThread.Start;
+      LThread.WaitFor;   { timeout HTTP = 2 s — não bloqueia por mais que isso }
+      LOnline := LThread.IsOnline;
+    finally
+      LThread.Free;
+    end;
+    if LOnline then
+      UniSession.AddJS('setApiStatus(true);')
+    else
+      UniSession.AddJS('setApiStatus(false);');
+    Exit;
+  end;
+
+  { ── autenticação normal ── }
   FUser := Params.Values['user'];
   FPwd  := Params.Values['pwd'];
   try
@@ -271,7 +335,7 @@ end;
 
 procedure TFrmLogin.HandleMainEvent(EventName: string; Params: TUniStrings);
 type
-  TAct = array[0..13] of TProc;
+  TAct = array[0..16] of TProc;
 var
   LRoute    : string;
   LID       : Integer;
@@ -282,6 +346,8 @@ var
   LIsAdmin  : Boolean;
   LPerfilID : Integer;
   LUsrID    : Integer;
+  LActionRoute : string;
+  LActionKey : string;
   LAct      : TAct;
 begin
   LRoute    := Params.Values['route'];
@@ -293,6 +359,8 @@ begin
   LIsAdmin  := Params.Values['isadmin'] = '1';
   LPerfilID := StrToIntDef(Params.Values['perfilid'], 0);
   LUsrID    := StrToIntDef(Params.Values['userid'], 0);
+  LActionRoute := Params.Values['actroute'];
+  LActionKey := Params.Values['actkey'];
 
   LAct[0] := procedure
     begin
@@ -316,6 +384,9 @@ begin
   LAct[11] := procedure begin FPermissoesCtrl.SelectUser(LUsrID) end;
   LAct[12] := procedure begin FPermissoesCtrl.Save(LUsrID, LPerms) end;
   LAct[13] := procedure begin FPermissoesCtrl.LoadList end;
+  LAct[14] := procedure begin FScreenActionsCtrl.SelectUser(LUsrID) end;
+  LAct[15] := procedure begin FScreenActionsCtrl.ToggleAction(LUsrID, LActionRoute, LActionKey) end;
+  LAct[16] := procedure begin FScreenActionsCtrl.LoadList end;
 
   LAct[
     Ord(EventName='nav')          *  0 +
@@ -331,7 +402,10 @@ begin
     Ord(EventName='usr.save')     * 10 +
     Ord(EventName='perm.select')  * 11 +
     Ord(EventName='perm.save')    * 12 +
-    Ord(EventName='perm.back')    * 13
+    Ord(EventName='perm.back')    * 13 +
+    Ord(EventName='ac.select')    * 14 +
+    Ord(EventName='ac.toggle')    * 15 +
+    Ord(EventName='ac.back')      * 16
   ]();
 end;
 
@@ -378,6 +452,15 @@ begin
     { Registra handler de tela para cfg.permissoes }
     FMainCtrl.RegisterScreenHandler('cfg.permissoes',
       procedure begin FPermissoesCtrl.LoadList end);
+
+    { Ações em Telas — instância e wiring }
+    FScreenActionsModel := NewScreenActionsModel;
+    FScreenActionsCtrl  := NewScreenActionsController(FScreenActionsModel, FUsuarioModel);
+    FScreenActionsCtrl.BindView(TScreenActionsViewAdapter.Create(Self));
+
+    { Registra handler de tela para cfg.acoes }
+    FMainCtrl.RegisterScreenHandler('cfg.acoes',
+      procedure begin FScreenActionsCtrl.LoadList end);
 
     { Troca de frame: oculta TUniURLFrame (login), ativa TUniHTMLFrame (main) }
     HtmlLogin.Visible := False;
@@ -469,9 +552,13 @@ begin
     S.Append('.logo-nm{font-size:26px;font-weight:900;letter-spacing:-.4px;color:#FFE888;text-align:center;text-shadow:0 0 24px rgba(255,185,40,0.55)}');
     S.Append('.logo-nm span{color:#E8520A}');
     S.Append('.logo-sl{font-size:10px;font-weight:600;color:rgba(255,200,90,0.50);text-align:center;letter-spacing:3.5px;text-transform:uppercase;margin-top:2px}');
-    S.Append('.badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:600;color:rgba(65,230,115,0.92);letter-spacing:.8px;text-transform:uppercase;margin-bottom:14px}');
-    S.Append('.dot{width:6px;height:6px;border-radius:50%;background:#41E673;box-shadow:0 0 8px rgba(65,230,115,.88);animation:pulse 2s ease-in-out infinite}');
-    S.Append('@keyframes pulse{0%,100%{box-shadow:0 0 6px rgba(65,230,115,.65)}50%{box-shadow:0 0 14px rgba(65,230,115,1)}}');
+    S.Append('.badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;margin-bottom:14px;transition:color .3s}');
+    S.Append('.dot{width:6px;height:6px;border-radius:50%;box-shadow:0 0 8px;animation:pulse 2s ease-in-out infinite;transition:background .3s,box-shadow .3s}');
+    S.Append('.dot.online{background:#41E673;box-shadow:0 0 8px rgba(65,230,115,.88);color:rgba(65,230,115,0.92)}');
+    S.Append('.dot.offline{background:#EF4444;box-shadow:0 0 8px rgba(239,68,68,.88);color:rgba(239,68,68,0.92);animation:none}');
+    S.Append('.badge.online{color:rgba(65,230,115,0.92)}');
+    S.Append('.badge.offline{color:rgba(239,68,68,0.92)}');
+    S.Append('@keyframes pulse{0%,100%{box-shadow:0 0 6px currentColor}50%{box-shadow:0 0 14px currentColor}}');
     S.Append('.titulo{font-size:21px;font-weight:700;color:rgba(255,245,220,0.97);letter-spacing:-.4px;line-height:1.15}');
     S.Append('.subtitulo{font-size:12px;color:rgba(255,200,130,0.38);margin-top:4px;margin-bottom:26px}');
     S.Append('.campo{margin-bottom:18px}');
@@ -528,7 +615,7 @@ begin
     S.Append('<div class="logo-sl">Tecnologia em Movimento</div>');
     S.Append('</div>');
 
-    S.Append('<div class="badge"><div class="dot"></div>Sistema online</div>');
+    S.Append('<div class="badge" id="api-status"><div class="dot online" id="api-dot"></div><span id="api-txt">API Online</span></div>');
     S.Append('<div class="titulo">Sistema de Transportadoras</div>');
     S.Append('<div class="subtitulo">Insira suas credenciais para continuar</div>');
 
@@ -594,6 +681,20 @@ begin
     S.Append('function(e){if(e.key===' + Q + 'Enter' + Q + '){e.preventDefault();document.getElementById(' + Q + 'inp_pwd' + Q + ').focus();}});');
     S.Append('document.getElementById(' + Q + 'inp_pwd' + Q + ').addEventListener(' + Q + 'keydown' + Q + ',');
     S.Append('function(e){if(e.key===' + Q + 'Enter' + Q + '){e.preventDefault();doLogin();}});');
+    { setApiStatus(true|false) — chamada pelo Delphi via UniSession.AddJS após WaitFor }
+    S.Append('function setApiStatus(on){');
+    S.Append('var dot=document.getElementById(' + Q + 'api-dot' + Q + ');');
+    S.Append('var badge=document.getElementById(' + Q + 'api-status' + Q + ');');
+    S.Append('var txt=document.getElementById(' + Q + 'api-txt' + Q + ');');
+    S.Append('if(!dot||!badge||!txt)return;');
+    S.Append('dot.className=on?' + Q + 'dot online' + Q + ':' + Q + 'dot offline' + Q + ';');
+    S.Append('badge.className=on?' + Q + 'badge online' + Q + ':' + Q + 'badge offline' + Q + ';');
+    S.Append('txt.textContent=on?' + Q + 'API Online' + Q + ':' + Q + 'API Offline' + Q + ';}');
+    { checkApiStatus — solicita verificação ao servidor Delphi (TApiHealthThread) via ajaxRequest }
+    S.Append('function checkApiStatus(){');
+    S.Append('parent.ajaxRequest(_f,' + Q + 'checkApi' + Q + ',[]);}');
+    S.Append('checkApiStatus();');
+    S.Append('setInterval(checkApiStatus,5000);');
     S.Append('</script></body></html>');
 
     Result := S.ToString;
@@ -1185,6 +1286,10 @@ begin
     '  document.querySelectorAll(".prm-chk input:checked").forEach(function(c){perms.push(c.value);});' +
     '  parent.ajaxRequest(_f,"perm.save",["userid="+uid,"perms="+perms.join("|")]);}' +
     'function permBack(){parent.ajaxRequest(_f,"perm.back",[]);}' +
+    { Ações em Telas }
+    'function acSelect(id){parent.ajaxRequest(_f,"ac.select",["userid="+id]);}' +
+    'function acToggle(uid,route,key){' +
+    '  parent.ajaxRequest(_f,"ac.toggle",["userid="+uid,"actroute="+encodeURIComponent(route),"actkey="+encodeURIComponent(key)]);}' +
     'window.addEventListener("load",function(){renderScr("","");});';
 
   H := TStringBuilder.Create;
@@ -2206,6 +2311,138 @@ begin
     end;
   finally
     LPermSet.Free;
+  end;
+end;
+
+{ ══════════════════════════════════════════════════════════════
+  BuildScreenActionsHtml — tela de permissões de ações
+  ══════════════════════════════════════════════════════════════ }
+
+procedure TFrmLogin.InjectScreenActions(const AScreens: TArray<string>;
+  const AUsuarios: TArray<string>; const ASelectedUserID: Integer);
+var
+  LHtml : string;
+  LJson : TJSONString;
+begin
+  LHtml := BuildScreenActionsHtml(AScreens, AUsuarios, ASelectedUserID);
+  LJson := TJSONString.Create(LHtml);
+  try
+    UniSession.AddJS(
+      'cacheScreen("cfg.acoes",' + LJson.ToString + ');' +
+      'renderScr("cfg.acoes","Permiss\u00F5es de A\u00E7\u00F5es");');
+  finally
+    LJson.Free;
+  end;
+end;
+
+function TFrmLogin.BuildScreenActionsHtml(const AScreens: TArray<string>;
+  const AUsuarios: TArray<string>; const ASelectedUserID: Integer): string;
+var
+  B        : TStringBuilder;
+  CSS      : string;
+  I, J     : Integer;
+  Screen   : string;
+  SelOpts  : TStringBuilder;
+  Usuario  : string;
+  LKey     : string;
+  LLabel   : string;
+  LAllowed : Boolean;
+begin
+  CSS :=
+    '<style>' +
+    '.ac-screen{font-family:"Segoe UI",system-ui,sans-serif;color:#E2E8F0;}' +
+    '.ac-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}' +
+    '.ac-title{font-size:22px;font-weight:800;background:linear-gradient(90deg,#FCD34D,#F59E0B);' +
+    '  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}' +
+    '.ac-sub{font-size:12px;color:rgba(245,158,11,.6);margin-top:4px;}' +
+    '.ac-sel-wrap{background:linear-gradient(135deg,rgba(19,15,34,.9),rgba(28,23,48,.9));' +
+    '  border:1px solid rgba(245,158,11,.15);border-radius:16px;padding:20px 24px;' +
+    '  margin-bottom:28px;display:flex;align-items:center;gap:16px;}' +
+    '.ac-sel-lbl{font-size:11px;font-weight:700;color:#F59E0B;letter-spacing:1px;' +
+    '  text-transform:uppercase;white-space:nowrap;}' +
+    '.ac-sel{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(245,158,11,.2);' +
+    '  border-radius:10px;padding:10px 14px;font-size:14px;color:#FCD34D;' +
+    '  font-family:"Segoe UI",system-ui,sans-serif;outline:none;cursor:pointer;}' +
+    '.ac-sel:focus{border-color:rgba(245,158,11,.5);}' +
+    '.ac-sel option{background:#130F22;color:#FCD34D;}' +
+    '.ac-hint{padding:48px;text-align:center;color:rgba(245,158,11,.35);font-size:14px;}' +
+    '.ac-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}' +
+    '.ac-card{background:linear-gradient(135deg,rgba(19,15,34,.95),rgba(28,23,48,.95));' +
+    '  border-radius:16px;padding:20px;border:1px solid rgba(255,255,255,.06);' +
+    '  box-shadow:0 4px 24px rgba(0,0,0,.3);}' +
+    '.ac-card-hdr{font-size:13px;font-weight:700;color:#FCD34D;margin-bottom:14px;' +
+    '  padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.05);}' +
+    '.ac-actions{display:flex;flex-direction:column;gap:8px;}' +
+    '.ac-action{display:flex;align-items:center;gap:10px;font-size:12px;color:#CBD5E1;cursor:pointer;}' +
+    '.ac-action.allowed .ac-dot{background:#41E673;box-shadow:0 0 6px rgba(65,230,115,.8);}' +
+    '.ac-action.denied .ac-dot{background:#EF4444;box-shadow:0 0 6px rgba(239,68,68,.8);}' +
+    '.ac-dot{width:6px;height:6px;border-radius:50%;transition:all .2s;}' +
+    '</style>';
+
+  SelOpts := TStringBuilder.Create;
+  try
+    SelOpts.Append('<option value="0">-- Selecione um usuário --</option>');
+    for I := 0 to High(AUsuarios) do
+      SelOpts.AppendFormat('<option value="%d"%s>%s</option>',
+        [I+1, IfThen(I+1 = ASelectedUserID, ' selected', ''), AUsuarios[I]]);
+
+    B := TStringBuilder.Create;
+    try
+      B.Append(CSS);
+      B.Append('<div class="ac-screen">');
+      B.Append('<div class="ac-hdr">');
+      B.Append('<div><div class="ac-title">Permiss&otilde;es de A&ccedil;&otilde;es</div>');
+      B.Append('<div class="ac-sub">Selecione o usu&aacute;rio e marque as a&ccedil;&otilde;es permitidas por tela</div></div>');
+      B.Append('</div>');
+      { Seletor }
+      B.Append('<div class="ac-sel-wrap">');
+      B.Append('<span class="ac-sel-lbl">Usu&aacute;rio</span>');
+      B.AppendFormat('<select class="ac-sel" onchange="acSelect(this.value)">%s</select>',
+        [SelOpts.ToString]);
+      B.Append('</div>');
+
+      { Cards de telas — só mostram se usuário selecionado }
+      if ASelectedUserID > 0 then
+      begin
+        B.Append('<div class="ac-grid">');
+        for I := 0 to High(AScreens) do
+        begin
+          Screen := AScreens[I];
+          B.Append('<div class="ac-card">');
+          B.AppendFormat('<div class="ac-card-hdr">%s</div>', [Screen]);
+          B.Append('<div class="ac-actions">');
+          { Ações: para este protótipo, mostra insert, edit, delete }
+          for J := 0 to 2 do
+          begin
+            case J of
+              0: begin LKey := 'insert'; LLabel := 'Inserir'; end;
+              1: begin LKey := 'edit';   LLabel := 'Editar';  end;
+            else   begin LKey := 'delete'; LLabel := 'Deletar'; end;
+            end;
+            LAllowed := True; { Por agora, assume permite tudo }
+            B.AppendFormat(
+              '<div class="ac-action %s" onclick="acToggle(%d,%s,%s)">' +
+              '<div class="ac-dot"></div><span>%s</span></div>',
+              [IfThen(LAllowed, 'allowed', 'denied'),
+               ASelectedUserID, QuotedStr(Screen), QuotedStr(LKey),
+               LLabel]);
+          end;
+          B.Append('</div></div>');
+        end;
+        B.Append('</div>');
+      end
+      else
+      begin
+        B.Append('<div class="ac-hint">&#8593; Selecione um usu&aacute;rio acima para definir as permiss&otilde;es de a&ccedil;&otilde;es</div>');
+      end;
+
+      B.Append('</div>');
+      Result := B.ToString;
+    finally
+      B.Free;
+    end;
+  finally
+    SelOpts.Free;
   end;
 end;
 

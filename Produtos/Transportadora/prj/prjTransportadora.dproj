@@ -184,7 +184,12 @@
         <DCCReference Include="..\src\Model\Classe\Model.TPermissoes.pas"/>
         <DCCReference Include="..\src\Controller\Interface\Controller.IPermissoesController.pas"/>
         <DCCReference Include="..\src\Controller\Classe\Controller.TPermissoesController.pas"/>
+        <DCCReference Include="..\src\Model\Interface\Model.IScreenActions.pas"/>
+        <DCCReference Include="..\src\Model\Classe\Model.TScreenActions.pas"/>
+        <DCCReference Include="..\src\Controller\Interface\Controller.IScreenActionsController.pas"/>
+        <DCCReference Include="..\src\Controller\Classe\Controller.TScreenActionsController.pas"/>
         <DCCReference Include="..\src\Service\Service.ApiClient.pas"/>
+        <DCCReference Include="..\src\Service\Service.ApiHealthCheck.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

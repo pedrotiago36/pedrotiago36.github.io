@@ -26,7 +26,12 @@ uses
   Model.TPermissoes in '..\src\Model\Classe\Model.TPermissoes.pas',
   Controller.IPermissoesController in '..\src\Controller\Interface\Controller.IPermissoesController.pas',
   Controller.TPermissoesController in '..\src\Controller\Classe\Controller.TPermissoesController.pas',
-  Service.ApiClient in '..\src\Service\Service.ApiClient.pas';
+  Model.IScreenActions in '..\src\Model\Interface\Model.IScreenActions.pas',
+  Model.TScreenActions in '..\src\Model\Classe\Model.TScreenActions.pas',
+  Controller.IScreenActionsController in '..\src\Controller\Interface\Controller.IScreenActionsController.pas',
+  Controller.TScreenActionsController in '..\src\Controller\Classe\Controller.TScreenActionsController.pas',
+  Service.ApiClient in '..\src\Service\Service.ApiClient.pas',
+  Service.ApiHealthCheck in '..\src\Service\Service.ApiHealthCheck.pas';
 
 {$R *.res}
 
