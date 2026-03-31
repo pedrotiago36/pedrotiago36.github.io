@@ -1,0 +1,338 @@
+================================================================================
+   ARQUIVO COMPLETO: CADASTRO DE CLIENTES - ERP DE TRANSPORTADORA
+================================================================================
+   Data de geração: 31/03/2026
+   Formato: Texto puro (.txt)
+================================================================================
+
+
+================================================================================
+1. IDENTIFICAÇÃO E TIPO DE PESSOA
+================================================================================
+
+Campo                      Descrição                                            Obrigatoriedade
+-------------------------- ---------------------------------------------------- ------------------
+Tipo de Pessoa             Pessoa Física (PF) ou Pessoa Jurídica (PJ)           Obrigatório
+CNPJ                       Cadastro Nacional de Pessoa Jurídica                 Obrigatório para PJ
+CPF                        Cadastro de Pessoa Física                            Obrigatório para PF
+Inscrição Estadual (IE)    Inscrição no cadastro de contribuintes do ICMS       Obrigatório para PJ
+Inscrição Municipal (IM)   Inscrição no cadastro municipal                      Opcional
+CUOIT / RUC / RUT          Números de registro para empresas fora do país       Opcional
+Código ANTT / RNTRC        Registro Nacional de Transportadores Rodoviários     Essencial para transportadoras
+Inscrição DNIT / DETER     Registros em órgãos de trânsito e infraestrutura     Opcional
+
+
+================================================================================
+2. NOME E DADOS COMERCIAIS
+================================================================================
+
+Campo                      Descrição                                            Obrigatoriedade
+-------------------------- ---------------------------------------------------- ------------------
+Razão Social               Nome legal da empresa                                Obrigatório para PJ
+Nome Fantasia              Nome comercial                                       Opcional
+Nome Completo              Nome completo do cliente (para PF)                   Obrigatório para PF
+Apelido                    Nome alternativo ou abreviação                       Opcional
+Grupo Econômico            Identificação do grupo de empresas ao qual pertence  Opcional
+Segmento / Ramo            Setor de atuação do cliente                          Opcional
+Código do Cliente          Identificador único no sistema                       Obrigatório
+
+
+================================================================================
+3. ENDEREÇO PRINCIPAL
+================================================================================
+
+Campo                      Descrição                                            Obrigatoriedade
+-------------------------- ---------------------------------------------------- ------------------
+CEP                        Código de Endereçamento Postal                       Obrigatório
+Logradouro                 Rua, avenida, etc.                                   Obrigatório
+Número                     Número do imóvel                                     Obrigatório
+Complemento                Apartamento, bloco, sala                             Opcional
+Bairro                     Bairro do endereço                                   Obrigatório
+Cidade                     Município                                            Obrigatório
+UF                         Unidade Federativa                                   Obrigatório
+País                       País do endereço                                     Obrigatório
+Região                     Região geográfica cadastrada no sistema              Opcional
+Região de Coleta           Região específica para coleta de cargas              Opcional
+Região de Entrega          Região específica para entregas                      Opcional
+Código Fiscal IBGE         Código do município conforme tabela do IBGE          Opcional
+Fuso Horário               Diferença de horário em relação ao UTC               Opcional
+
+
+================================================================================
+4. ENDEREÇOS ESPECÍFICOS (MÚLTIPLOS)
+================================================================================
+
+Campo                      Descrição                                            Observação
+-------------------------- ---------------------------------------------------- ------------------
+Endereço de Coleta         Local onde a carga será coletada                     Pode ser diferente do principal
+Endereço de Entrega        Local onde a carga será entregada                    Pode ser diferente do principal
+Endereço de Cobrança       Local onde as faturas serão enviadas                 Pode ser diferente do principal
+Endereço de Origem         Local de origem das mercadorias                      Para operações específicas
+Endereço de Faturamento    Local para envio de notas fiscais                    Pode ser diferente do principal
+
+
+================================================================================
+5. CONTATOS (MÚLTIPLOS POR PAPEL)
+================================================================================
+
+Campo                      Descrição                                            Observação
+-------------------------- ---------------------------------------------------- ------------------
+Nome do Contato            Nome da pessoa de referência                         Pode haver múltiplos
+Telefone                   Com DDD                                              Formatado conforme máscara
+Celular                    Com DDD                                              Para SMS e WhatsApp
+E-mail                     Endereço eletrônico                                  Para envio de documentos
+Papel no Sistema           Função do contato na organização                     Shipping, Receiving, Billing
+Departamento               Setor onde o contato trabalha                        Expedição, Financeiro, etc.
+Cargo / Posição            Função exercida                                      Gerente, Coordenador, etc.
+Contato Principal          Indicador se é o contato principal do cliente        Flag
+Contato de Cobrança        Indicador se é responsável pelo financeiro           Flag
+Contato de Cotação         Indicador se recebe cotações de frete                Flag
+Contato de Expedição       Indicador se é responsável pela operação             Flag
+Contato para Notificação   Indicador se recebe alertas automáticos              Flag
+
+
+================================================================================
+6. DADOS FISCAIS E TRIBUTÁRIOS
+================================================================================
+
+Campo                      Descrição                                            Observação
+-------------------------- ---------------------------------------------------- ------------------
+Contribuinte ICMS          Indica se o cliente contribui para o ICMS            Sim/Não
+Isento de ICMS             Flag para clientes imunes ou isentos                 Flag
+Indicador de Tributação PIS Regime de apuração do PIS                           Conforme legislação
+Indicador de Tributação COFINS Regime de apuração da COFINS                     Conforme legislação
+Indicador de Tributação IPI Regime de apuração do IPI                           Conforme legislação
+Retém IRRF                 Indica se há retenção de imposto de renda            Sim/Não
+Retém ISS                  Indica se há retenção de ISSQN                       Sim/Não
+Retém CSLL                 Indica se há retenção de CSLL                        Sim/Não
+CNAE Fiscal                Classificação Nacional de Atividades Econômicas      Opcional
+Regime Tributário          Simples Nacional, Lucro Presumido, Lucro Real        Conforme enquadramento
+Substituto Tributário por UF Configuração por estado para ICMS ST               Configuração avançada
+
+
+================================================================================
+7. DADOS FINANCEIROS
+================================================================================
+
+Campo                      Descrição                                            Observação
+-------------------------- ---------------------------------------------------- ------------------
+Condição de Pagamento      Prazo e forma de pagamento (ex: 30 dias, à vista)    Essencial
+Método de Pagamento        Dinheiro, cartão, boleto, transferência              Essencial
+Limite de Crédito          Valor máximo autorizado para débito                  Essencial
+Limite de Crédito Disponível Saldo restante do limite                           Cálculo automático
+Bloquear Cliente           Impede novas ordens de serviço por inadimplência     Flag
+Conta de Recebíveis        Conta contábil para faturamento                      Contábil
+Condição de Vencimento     Dia de vencimento das faturas                        Configurável
+Tabela de Preço            Vinculação a uma tabela de frete específica          Essencial
+Procedimento de Preço      Regra de cálculo de frete                            Avançado
+Risco de Crédito           Classificação de risco financeiro                    Opcional
+Dias para Vencimento       Número de dias padrão para pagamento                 Opcional
+
+
+================================================================================
+8. DADOS OPERACIONAIS E LOGÍSTICOS
+================================================================================
+
+Campo                      Descrição                                            Observação
+-------------------------- ---------------------------------------------------- ------------------
+Transportadora Associada   Transportadora preferencial para entregas            Opcional
+Transit Route (TRANS)      Rota de trânsito (sequência de países)               Avançado
+Shipping Point (VSTEL)     Ponto de expedição                                   Avançado
+Route Planning Indicator   Indicador de planejamento de rotas                   Avançado
+Forwarding Agent (SPDNR)   Agente de carga / despachante                        Opcional
+Instrução de Entrega       Observações para o motorista                         Texto livre
+Instrução de Coleta        Observações para coleta de carga                     Texto livre
+Local de Difícil Acesso    Sinaliza se o endereço tem restrições de acesso      Flag
+Dias de Atendimento        Dias da semana para carga/descarga                   Configuração
+Horário de Atendimento     Horário permitido para operações                     Configuração
+Tempo Médio de Carga       Tempo estimado para carregamento                     Minutos/horas
+Tempo Médio de Descarga    Tempo estimado para descarregamento                  Minutos/horas
+Necessita Agendamento      Indica se exige agendamento prévio                   Flag
+Necessita Dock Leveler     Indica se requer nivelador de doca                   Flag
+Acesso para Carretas       Indica se permite veículos de grande porte           Flag
+
+
+================================================================================
+9. REGRAS DE FATURAMENTO
+================================================================================
+
+Campo                      Descrição                                            Observação
+-------------------------- ---------------------------------------------------- ------------------
+Exigir Ordem de Compra (PO) Define se o cliente precisa enviar OP              Flag
+Formato de Faturamento     Padrão de emissão de notas                           Conforme configuração
+Agrupar Notas              Se notas de múltiplas entregas são agrupadas         Sim/Não
+Dia de Fechamento          Dia do mês para corte de faturamento                 Opcional
+Envio de NF-e por E-mail   Se a nota é enviada automaticamente                  Flag
+Endereço de E-mail NF-e    E-mail específico para notas fiscais                 Opcional
+
+
+================================================================================
+10. DOCUMENTOS E ANEXOS
+================================================================================
+
+Campo                      Descrição                                            Observação
+-------------------------- ---------------------------------------------------- ------------------
+Contrato Social            Documento da empresa                                 Anexo
+Pesquisa Serasa / SPC      Análise de crédito                                   Anexo
+Aprovação da Tabela de Frete Comprovante de negociação                          Anexo
+Inscrição Estadual (comprovante) Documento de IE                                Anexo
+CNPJ (comprovante)         Cartão CNPJ                                          Anexo
+Alvará de Funcionamento    Licença municipal                                    Anexo
+Certificado Digital        Para emissão de NF-e                                 Anexo
+Observações / Comentários   Campo de texto livre para informações gerais        Texto livre
+
+
+================================================================================
+11. CLASSIFICAÇÃO E CATEGORIZAÇÃO
+================================================================================
+
+Campo                      Descrição                                            Observação
+-------------------------- ---------------------------------------------------- ------------------
+Classe do Cliente          Agrupamento por critérios comerciais                 Múltipla seleção possível
+Tipo de Cliente            Classificação: Cliente, Fornecedor, Transportadora   Essencial
+Categoria Fiscal           Classificação para obrigações acessórias             Conforme legislação
+Canal de Venda             Cadeia de distribuição                               Opcional
+Grupo de Clientes          Agrupamento para relatórios                          Opcional
+
+
+================================================================================
+12. STATUS E CONTROLE
+================================================================================
+
+Campo                      Descrição                                            Observação
+-------------------------- ---------------------------------------------------- ------------------
+Status de Acesso           Ativo, Bloquado, Pendente                            Essencial
+Data de Cadastro           Data de inclusão no sistema                          Automático
+Data da Última Alteração   Data da última modificação                           Automático
+Usuário Responsável        Quem criou/alterou o cadastro                        Automático
+Filial que Atende          Unidade da transportadora responsável                Essencial
+Data de Inativação         Quando o cliente foi inativado                       Opcional
+Motivo de Inativação       Justificativa para inativação                        Opcional
+
+
+================================================================================
+13. DADOS DE GEOLOCALIZAÇÃO
+================================================================================
+
+Campo                      Descrição                                            Observação
+-------------------------- ---------------------------------------------------- ------------------
+Latitude                   Coordenada geográfica                                Para roteirização
+Longitude                  Coordenada geográfica                                Para roteirização
+Localidade                 Referência do CEP no sistema                         Automático
+
+
+================================================================================
+14. CONFIGURAÇÕES DE SEGURO
+================================================================================
+
+Campo                      Descrição                                            Observação
+-------------------------- ---------------------------------------------------- ------------------
+Apólice de Seguro Padrão   Apólice vinculada ao cliente                         Para cargas
+Cobertura de Seguro        Percentual ou valor de cobertura                     Opcional
+Averbação Automática       Se averbação é feita automaticamente                 Flag
+
+
+================================================================================
+15. DADOS DE INTEGRAÇÃO
+================================================================================
+
+Campo                      Descrição                                            Observação
+-------------------------- ---------------------------------------------------- ------------------
+Código no Sistema Legado   Identificador no sistema anterior                   Para migração
+URL do Portal              Link para portal do cliente                          Opcional
+Integração SEFAZ           Validação automática com cadastro da SEFAZ           Automático
+MC Number (Motor Carrier)  Número da transportadora nos EUA                     Para operações internacionais
+DOT Number                 Número do Departamento de Transportes dos EUA        Para operações internacionais
+
+
+================================================================================
+16. CAMPOS PARA OPERAÇÕES INTERNACIONAIS
+================================================================================
+
+Campo                      Descrição                                            Observação
+-------------------------- ---------------------------------------------------- ------------------
+País de Origem             País do cliente                                      Essencial para importação/exportação
+Incoterms                  Termos de comércio internacional                     Opcional
+Moeda de Negociação        Moeda para cotações e faturamento                    Opcional
+Alfândega de Destino       Local de desembaraço aduaneiro                       Opcional
+NCM Padrão                 Classificação de mercadorias                         Opcional
+
+
+================================================================================
+17. CAMPOS PARA COTAÇÃO E CONTRATOS
+================================================================================
+
+Campo                      Descrição                                            Observação
+-------------------------- ---------------------------------------------------- ------------------
+Contrato Vigente           Contrato de prestação de serviços                    Opcional
+Regiões Atendidas          Áreas geográficas cobertas                           Configuração
+Cláusulas de Combustível   Regras de reajuste por combustível                   Avançado
+Cláusulas de Pedágio       Regras de reajuste por pedágio                       Avançado
+Cotação Automática         Se participa de cotações automáticas                 Flag
+
+
+================================================================================
+18. CAMPOS TÉCNICOS DO ERP/TMS
+================================================================================
+
+Campo                      Descrição                                            Observação
+-------------------------- ---------------------------------------------------- ------------------
+MANDT (Client)             Identificador do cliente no sistema SAP              Técnico
+KUNNR (Customer Number)    Número do cliente no SAP                             Técnico
+VSTEL (Shipping Point)     Ponto de expedição                                   Técnico
+TRANS (Transit Route)      Rota de trânsito                                     Técnico
+SPDNR (Forwarding Agent)   Código do agente de carga                            Técnico
+
+
+================================================================================
+RESUMO DE CAMPOS POR CATEGORIA
+================================================================================
+
+Categoria                                             Quantidade de Campos
+---------------------------------------------------- ---------------------
+1. Identificação e Tipo de Pessoa                                 8
+2. Nome e Dados Comerciais                                         7
+3. Endereço Principal                                             12
+4. Endereços Específicos                                           5
+5. Contatos (por papel)                                           10
+6. Dados Fiscais e Tributários                                    11
+7. Dados Financeiros                                              10
+8. Dados Operacionais e Logísticos                                16
+9. Regras de Faturamento                                           6
+10. Documentos e Anexos                                            8
+11. Classificação e Categorização                                  5
+12. Status e Controle                                              7
+13. Dados de Geolocalização                                        3
+14. Configurações de Seguro                                        3
+15. Dados de Integração                                            5
+16. Operações Internacionais                                       5
+17. Cotação e Contratos                                            5
+18. Campos Técnicos                                                5
+
+TOTAL APROXIMADO: 131 campos
+
+
+================================================================================
+RECOMENDAÇÕES FINAIS
+================================================================================
+
+1. Mínimo viável para um ERP de transportadora:
+   - Seções 1, 2, 3, 5, 6, 7, 8 e 12 são essenciais.
+
+2. Diferenciais competitivos:
+   - Múltiplos endereços operacionais (coleta, entrega, cobrança)
+   - Múltiplos contatos com papéis definidos
+   - Integração SEFAZ
+   - Campos de geolocalização
+
+3. Validações automáticas:
+   - CNPJ/CPF
+   - Inscrição Estadual por UF
+   - CEP via ViaCEP
+
+4. Escalabilidade:
+   - Permitir configuração de quais campos são obrigatórios por perfil de usuário
+
+================================================================================
+FIM DO ARQUIVO
+================================================================================

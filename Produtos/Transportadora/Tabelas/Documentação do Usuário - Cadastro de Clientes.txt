@@ -1,0 +1,273 @@
+================================================================================
+           DOCUMENTAÇÃO DO USUÁRIO - CADASTRO DE CLIENTES
+                 SISTEMA DE TRANSPORTADORA
+================================================================================
+
+Versão: 1.0
+Data: 31/03/2026
+Objetivo: Explicar para que serve cada campo e como preenchê-lo corretamente.
+
+================================================================================
+1. IDENTIFICAÇÃO E TIPO DE PESSOA
+================================================================================
+
+Campo: Tipo de Pessoa
+O que é: Define se o cliente é empresa (PJ) ou pessoa física (PF).
+Como preencher: Selecione "Pessoa Jurídica" para empresas. Selecione "Pessoa Física" para indivíduos.
+
+Campo: CNPJ
+O que é: Documento oficial da empresa.
+Como preencher: Digite os 14 números. O sistema valida e busca dados automaticamente.
+
+Campo: CPF
+O que é: Documento da pessoa física.
+Como preencher: Digite os 11 números. O sistema valida se é um CPF válido.
+
+Campo: Inscrição Estadual (IE)
+O que é: Registro da empresa no estado para ICMS.
+Como preencher: Digite o número conforme cartão CNPJ. Se a empresa for isenta, preencha com "ISENTO".
+
+Campo: Código ANTT / RNTRC
+O que é: Registro obrigatório para transportadoras.
+Como preencher: Digite o código de 12 dígitos (formato XXXX-XX-XXXX-X). Usar apenas se o cliente for transportadora.
+
+================================================================================
+2. NOME E DADOS COMERCIAIS
+================================================================================
+
+Campo: Razão Social
+O que é: Nome legal da empresa.
+Como preencher: Digite exatamente como aparece no cartão CNPJ. Não usar para pessoa física.
+
+Campo: Nome Fantasia
+O que é: Nome comercial da empresa.
+Como preencher: Digite o nome pelo qual o cliente é conhecido no mercado.
+
+Campo: Nome Completo
+O que é: Nome do cliente quando for pessoa física.
+Como preencher: Digite o nome completo sem abreviações.
+
+Campo: Código do Cliente
+O que é: Identificador único no sistema.
+Como preencher: O sistema pode gerar automaticamente. Use o código para buscas rápidas.
+
+Campo: Segmento / Ramo de Atividade
+O que é: Setor de atuação do cliente.
+Como preencher: Selecione entre as opções (comércio, indústria, serviços, etc.).
+
+================================================================================
+3. ENDEREÇO PRINCIPAL
+================================================================================
+
+Campo: CEP
+O que é: Código de Endereçamento Postal.
+Como preencher: Digite os 8 dígitos. O sistema preenche rua, bairro, cidade e UF automaticamente.
+
+Campo: Logradouro
+O que é: Nome da rua ou avenida.
+Como preencher: Preenchido automaticamente pelo CEP. Ajuste se necessário.
+
+Campo: Número
+O que é: Número do imóvel.
+Como preencher: Digite o número. Se não houver, use "S/N".
+
+Campo: Complemento
+O que é: Informações adicionais.
+Como preencher: Digite apartamento, bloco, sala, ponto de referência. Exemplo: "Ap 101", "Bloco B".
+
+Campo: Bairro
+O que é: Bairro do endereço.
+Como preencher: Preenchido automaticamente pelo CEP. Confirme se está correto.
+
+Campo: Cidade
+O que é: Município do endereço.
+Como preencher: Preenchido automaticamente pelo CEP.
+
+Campo: UF
+O que é: Estado.
+Como preencher: Preenchido automaticamente pelo CEP.
+
+================================================================================
+4. ENDEREÇOS ESPECÍFICOS
+================================================================================
+
+Campo: Endereço de Coleta
+O que é: Local onde a mercadoria será buscada.
+Como preencher: Informe apenas se for diferente do endereço principal.
+
+Campo: Endereço de Entrega
+O que é: Local onde a mercadoria será entregue.
+Como preencher: Informe apenas se for diferente do endereço principal.
+
+Campo: Endereço de Cobrança
+O que é: Local onde as faturas serão enviadas.
+Como preencher: Informe apenas se for diferente do endereço principal.
+
+================================================================================
+5. CONTATOS
+================================================================================
+
+Campo: Nome do Contato
+O que é: Nome da pessoa de referência no cliente.
+Como preencher: Digite o nome completo. Cadastre múltiplos contatos para áreas diferentes.
+
+Campo: Telefone
+O que é: Telefone comercial.
+Como preencher: Inclua DDD. Exemplo: 11 1234-5678.
+
+Campo: Celular
+O que é: Telefone para urgências e WhatsApp.
+Como preencher: Inclua DDD. Exemplo: 11 99999-9999.
+
+Campo: E-mail
+O que é: Endereço eletrônico para comunicações.
+Como preencher: Digite o e-mail completo. Usar e-mail genérico da empresa quando possível.
+
+Campo: Papel no Sistema (TMS Role)
+O que é: Função do contato no processo logístico.
+Como preencher: Selecione entre:
+   - Expedidor (Shipper): quem envia mercadorias
+   - Recebedor (Consignee): quem recebe as cargas
+   - Financeiro (Billing): responsável por pagamentos
+   - Cotação (Quoting): responsável por orçamentos
+
+================================================================================
+6. DADOS FISCAIS E TRIBUTÁRIOS
+================================================================================
+
+Campo: Contribuinte ICMS
+O que é: Indica se o cliente paga ICMS.
+Como preencher: Marque "Sim" se o cliente tem Inscrição Estadual. Marque "Não" para consumidor final.
+
+Campo: Regime Tributário
+O que é: Regime de impostos da empresa.
+Como preencher: Selecione: Simples Nacional, Lucro Presumido, Lucro Real ou MEI.
+
+Campo: Retém IRRF
+O que é: Indica se o cliente retém Imposto de Renda nos pagamentos.
+Como preencher: Marque "Sim" para clientes públicos (governo, autarquias). Consulte o setor fiscal.
+
+Campo: Retém ISS
+O que é: Indica se o cliente retém ISSQN.
+Como preencher: Marque "Sim" se houver retenção de ISS no serviço de transporte.
+
+================================================================================
+7. DADOS FINANCEIROS
+================================================================================
+
+Campo: Condição de Pagamento
+O que é: Prazo e forma de pagamento das faturas.
+Como preencher: Selecione a opção negociada (ex: "À Vista", "30 dias", "Boleto").
+
+Campo: Limite de Crédito
+O que é: Valor máximo que o cliente pode ficar devendo.
+Como preencher: Informe o valor aprovado na análise de crédito.
+
+Campo: Bloquear Cliente
+O que é: Impede novas operações para este cliente.
+Como preencher: Marque quando cliente estiver inadimplente. Desmarque quando regularizado.
+
+Campo: Tabela de Preço
+O que é: Define a tabela de fretes aplicável.
+Como preencher: Selecione a tabela vigente no contrato comercial.
+
+================================================================================
+8. DADOS OPERACIONAIS E LOGÍSTICOS
+================================================================================
+
+Campo: Instrução de Entrega
+O que é: Observações para o motorista sobre a entrega.
+Como preencher: Exemplos:
+   - "Entregar na portaria 2"
+   - "Tocar interfone 101"
+   - "Não aceita carga após 14h"
+   - "Contato: João - 11 99999-9999"
+
+Campo: Instrução de Coleta
+O que é: Observações para o motorista sobre a coleta.
+Como preencher: Exemplos:
+   - "Coleta no depósito 2"
+   - "Aguardar autorização para coleta"
+
+Campo: Dias de Atendimento
+O que é: Dias da semana em que o cliente recebe cargas.
+Como preencher: Selecione os dias (ex: segunda a sexta).
+
+Campo: Horário de Atendimento
+O que é: Horário permitido para carga e descarga.
+Como preencher: Exemplo: "08:00 às 12:00 e 13:00 às 17:00".
+
+Campo: Local de Difícil Acesso
+O que é: Indica restrições de acesso ao local.
+Como preencher: Marque para clientes em ruas estreitas, comunidades, áreas de risco.
+
+Campo: Acesso para Carretas
+O que é: Indica se veículos grandes podem entrar.
+Como preencher: Desmarque se o local não comporta carretas.
+
+================================================================================
+9. REGRAS DE FATURAMENTO
+================================================================================
+
+Campo: Exigir Ordem de Compra (PO)
+O que é: Define se o cliente exige número de Ordem de Compra.
+Como preencher: Marque "Sim" se o cliente sempre fornece um número de PO.
+
+Campo: Envio de NF-e por E-mail
+O que é: Define se a nota fiscal é enviada automaticamente por e-mail.
+Como preencher: Marque "Sim" se o cliente deseja receber as notas por e-mail.
+
+================================================================================
+10. DOCUMENTOS E ANEXOS
+================================================================================
+
+Campo: Contrato Social / CNPJ / IE (anexos)
+O que é: Documentos do cliente anexados ao cadastro.
+Como preencher: Utilize o upload para anexar arquivos (PDF, imagem). Mantenha atualizado.
+
+Campo: Observações / Comentários
+O que é: Campo livre para informações adicionais.
+Como preencher: Use para histórico de relacionamento, negociações especiais, observações de cobrança.
+Atenção: Este campo é interno e não aparece em documentos fiscais.
+
+================================================================================
+11. CLASSIFICAÇÃO E STATUS
+================================================================================
+
+Campo: Tipo de Cliente
+O que é: Classifica o papel do cadastro.
+Como preencher: Selecione: Cliente, Fornecedor, Transportadora, Remetente, Destinatário.
+
+Campo: Status de Acesso
+O que é: Define se o cliente está ativo para operações.
+Como preencher:
+   - Ativo: cliente liberado
+   - Bloqueado: não pode criar novas ordens
+   - Pendente: cadastro incompleto ou aguardando aprovação
+
+Campo: Filial que Atende
+O que é: Unidade da transportadora responsável pelo cliente.
+Como preencher: Selecione a filial definida comercialmente.
+
+================================================================================
+12. RESUMO DE RECOMENDAÇÕES
+================================================================================
+
+BOAS PRÁTICAS:
+- Sempre valide o CNPJ/CPF antes de salvar
+- Use a busca automática de CEP para evitar erros
+- Cadastre múltiplos contatos com papéis definidos
+- Preencha instruções de entrega detalhadamente
+- Mantenha os documentos atualizados
+- Revise periodicamente o limite de crédito
+
+ERROS COMUNS A EVITAR:
+- CNPJ ou CPF errado -> nota fiscal rejeitada
+- CEP incorreto -> entrega atrasada ou extraviada
+- Falta de complemento -> motorista não encontra o local
+- Condição de pagamento errada -> conflito comercial
+- Status incorreto -> operações liberadas para clientes inadimplentes
+
+================================================================================
+FIM DA DOCUMENTAÇÃO
+================================================================================
