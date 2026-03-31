@@ -1286,6 +1286,44 @@ begin
     '  document.querySelectorAll(".prm-chk input:checked").forEach(function(c){perms.push(c.value);});' +
     '  parent.ajaxRequest(_f,"perm.save",["userid="+uid,"perms="+perms.join("|")]);}' +
     'function permBack(){parent.ajaxRequest(_f,"perm.back",[]);}' +
+    { Marcar todos — perfil }
+    'function prfCheckAll(lbl){' +
+    '  var inp=lbl.querySelector("input");' +
+    '  var card=lbl.closest(".prf-card");' +
+    '  card.querySelectorAll(".prf-chk input").forEach(function(b){b.checked=inp.checked;});}' +
+    'function prfUpdateAllChk(inp){' +
+    '  var card=inp.closest(".prf-card");' +
+    '  var boxes=card.querySelectorAll(".prf-chk input");' +
+    '  var allInp=card.querySelector(".prf-chk-all input");' +
+    '  if(!allInp)return;' +
+    '  var n=0;boxes.forEach(function(b){if(b.checked)n++;});' +
+    '  allInp.checked=(boxes.length>0&&n===boxes.length);}' +
+    'function prfInitAllChk(){' +
+    '  document.querySelectorAll(".prf-card").forEach(function(card){' +
+    '    var boxes=card.querySelectorAll(".prf-chk input");' +
+    '    var allInp=card.querySelector(".prf-chk-all input");' +
+    '    if(!allInp||!boxes.length)return;' +
+    '    var n=0;boxes.forEach(function(b){if(b.checked)n++;});' +
+    '    allInp.checked=(n===boxes.length);});}' +
+    { Marcar todos — permissões }
+    'function permCheckAll(lbl){' +
+    '  var inp=lbl.querySelector("input");' +
+    '  var card=lbl.closest(".prm-card");' +
+    '  card.querySelectorAll(".prm-chk input").forEach(function(b){b.checked=inp.checked;});}' +
+    'function permUpdateAllChk(inp){' +
+    '  var card=inp.closest(".prm-card");' +
+    '  var boxes=card.querySelectorAll(".prm-chk input");' +
+    '  var allInp=card.querySelector(".prm-chk-all input");' +
+    '  if(!allInp)return;' +
+    '  var n=0;boxes.forEach(function(b){if(b.checked)n++;});' +
+    '  allInp.checked=(boxes.length>0&&n===boxes.length);}' +
+    'function permInitAllChk(){' +
+    '  document.querySelectorAll(".prm-card").forEach(function(card){' +
+    '    var boxes=card.querySelectorAll(".prm-chk input");' +
+    '    var allInp=card.querySelector(".prm-chk-all input");' +
+    '    if(!allInp||!boxes.length)return;' +
+    '    var n=0;boxes.forEach(function(b){if(b.checked)n++;});' +
+    '    allInp.checked=(n===boxes.length);});}' +
     { Ações em Telas }
     'function acSelect(id){parent.ajaxRequest(_f,"ac.select",["userid="+id]);}' +
     'function acToggle(uid,route,key){' +
@@ -1389,7 +1427,8 @@ begin
   try
     UniSession.AddJS(
       'cacheScreen("cfg.perfil",' + LJson.ToString + ');' +
-      'renderScr("cfg.perfil",' + QuotedStr(TITLES[ARec.ID > 0]) + ');');
+      'renderScr("cfg.perfil",' + QuotedStr(TITLES[ARec.ID > 0]) + ');' +
+      'prfInitAllChk();');
   finally
     LJson.Free;
   end;
@@ -1574,7 +1613,15 @@ begin
       '.prf-card-hdr{display:flex;align-items:center;gap:10px;padding:14px 18px;' +
       '  border-bottom:1px solid rgba(255,255,255,.05);}' +
       '.prf-card-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}' +
-      '.prf-card-lbl{font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;}' +
+      '.prf-card-lbl{font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;flex:1;}' +
+      '.prf-chk-all{display:flex;align-items:center;gap:6px;cursor:pointer;' +
+      '  font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:.5px;' +
+      '  text-transform:uppercase;padding:4px 8px;border-radius:8px;transition:all .15s;' +
+      '  border:1px solid rgba(255,255,255,.08);}' +
+      '.prf-chk-all:hover{color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.2);}' +
+      '.prf-chk-all input{display:none;}' +
+      '.prf-chk-all .prf-chk-box{width:14px;height:14px;font-size:9px;}' +
+      '.prf-chk-all input:checked~.prf-chk-box{background:var(--cc);box-shadow:0 0 8px var(--cc);border-color:transparent;}' +
       '.prf-chk-list{padding:12px 14px;display:flex;flex-direction:column;gap:4px;}' +
       '.prf-chk{display:flex;align-items:center;gap:10px;padding:7px 10px;' +
       '  border-radius:10px;cursor:pointer;transition:background .15s;}' +
@@ -1613,6 +1660,11 @@ begin
           '<div class="prf-card-hdr">' +
           '<span class="prf-card-dot" style="background:%s;box-shadow:0 0 8px %s60"></span>' +
           '<span class="prf-card-lbl" style="color:%s">%s</span>' +
+          '<label class="prf-chk-all" onclick="prfCheckAll(this)">' +
+          '<input type="checkbox">' +
+          '<span class="prf-chk-box">&#10003;</span>' +
+          '<span>Todos</span>' +
+          '</label>' +
           '</div><div class="prf-chk-list">',
           [GRP_COLORS[G], GRP_COLORS[G], GRP_COLORS[G], GRP_LABELS[G]]);
 
@@ -1626,7 +1678,7 @@ begin
           LItemArr[False] := '';
           LItemArr[True]  :=
             Format('<label class="prf-chk">' +
-              '<input type="checkbox" value="%s" %s>' +
+              '<input type="checkbox" value="%s" %s onchange="prfUpdateAllChk(this)">' +
               '<span class="prf-chk-box">&#10003;</span>' +
               '<span class="prf-chk-lbl">%s</span>' +
               '</label>',
@@ -2122,7 +2174,8 @@ begin
   try
     UniSession.AddJS(
       'cacheScreen("cfg.permissoes",' + LJson.ToString + ');' +
-      'renderScr("cfg.permissoes","Permiss\u00F5es de Usu\u00E1rios");');
+      'renderScr("cfg.permissoes","Permiss\u00F5es de Usu\u00E1rios");' +
+      'permInitAllChk();');
   finally
     LJson.Free;
   end;
@@ -2209,9 +2262,17 @@ begin
       '.prm-card-hdr{display:flex;align-items:center;gap:10px;margin-bottom:16px;' +
       '  padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.05);}' +
       '.prm-card-dot{width:8px;height:8px;border-radius:50%;background:var(--cc);' +
-      '  box-shadow:0 0 8px var(--cc);}' +
+      '  box-shadow:0 0 8px var(--cc);flex-shrink:0;}' +
       '.prm-card-lbl{font-size:11px;font-weight:800;letter-spacing:1.2px;' +
-      '  text-transform:uppercase;color:var(--cc);}' +
+      '  text-transform:uppercase;color:var(--cc);flex:1;}' +
+      '.prm-chk-all{display:flex;align-items:center;gap:5px;cursor:pointer;' +
+      '  font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:.5px;' +
+      '  text-transform:uppercase;padding:3px 7px;border-radius:7px;transition:all .15s;' +
+      '  border:1px solid rgba(255,255,255,.08);}' +
+      '.prm-chk-all:hover{color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.2);}' +
+      '.prm-chk-all input{display:none;}' +
+      '.prm-chk-all .prm-chk-box{width:14px;height:14px;font-size:9px;}' +
+      '.prm-chk-all input:checked~.prm-chk-box{background:var(--cc);border-color:var(--cc);color:#fff;box-shadow:0 0 8px var(--cc);}' +
       '.prm-chk-list{display:flex;flex-direction:column;gap:10px;}' +
       '.prm-chk{display:flex;align-items:center;gap:10px;cursor:pointer;' +
       '  padding:6px 8px;border-radius:8px;transition:background .15s;}' +
@@ -2248,6 +2309,11 @@ begin
             '<div class="prm-card-hdr">' +
             '<div class="prm-card-dot"></div>' +
             '<span class="prm-card-lbl">%s</span>' +
+            '<label class="prm-chk-all" onclick="permCheckAll(this)">' +
+            '<input type="checkbox">' +
+            '<span class="prm-chk-box">&#10003;</span>' +
+            '<span>Todos</span>' +
+            '</label>' +
             '</div><div class="prm-chk-list">',
             [GRP_COLORS[G], GRP_LABELS[G]]);
 
@@ -2261,7 +2327,7 @@ begin
             LItemArr[False] := '';
             LItemArr[True]  :=
               Format('<label class="prm-chk">' +
-                '<input type="checkbox" value="%s" %s>' +
+                '<input type="checkbox" value="%s" %s onchange="permUpdateAllChk(this)">' +
                 '<span class="prm-chk-box">&#10003;</span>' +
                 '<span class="prm-chk-lbl">%s</span>' +
                 '</label>',
