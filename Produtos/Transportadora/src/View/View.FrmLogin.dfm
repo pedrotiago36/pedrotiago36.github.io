@@ -8,15 +8,18 @@ object FrmLogin: TFrmLogin
   OldCreateOrder = False
   BorderIcons = []
   MonitoredKeys.Keys = <>
-  TextHeight = 15
   OnCreate = UniFormCreate
+  TextHeight = 15
   object HtmlLogin: TUniURLFrame
     Left = 0
     Top = 0
     Width = 1366
     Height = 768
+    Hint = ''
     Align = alClient
-    HTML.Strings = ()
+    TabOrder = 0
+    ParentColor = False
+    Color = clBtnFace
     OnAjaxEvent = HtmlLoginAjaxEvent
   end
   object HtmlMain: TUniHTMLFrame
@@ -24,9 +27,9 @@ object FrmLogin: TFrmLogin
     Top = 0
     Width = 1366
     Height = 768
-    Align = alClient
+    Hint = ''
     Visible = False
-    HTML.Strings = ()
+    Align = alClient
     OnAjaxEvent = HtmlMainAjaxEvent
   end
 end
