@@ -362,6 +362,9 @@ var
   LActionKey : string;
   LAct      : TAct;
 begin
+  { Ignora eventos que chegam apos o logout (ex: nav disparado por bubble de click) }
+  if (not FInMain) and (EventName <> 'logout') then Exit;
+
   { Logout — reseta estado e volta para a tela de login }
   if EventName = 'logout' then
   begin
