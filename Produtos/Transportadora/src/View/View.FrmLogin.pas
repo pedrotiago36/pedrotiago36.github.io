@@ -563,7 +563,9 @@ begin
     S.Append('.dot.online{background:#41E673;box-shadow:0 0 8px rgba(65,230,115,.88);color:rgba(65,230,115,0.92)}');
     S.Append('.dot.offline{background:#EF4444;box-shadow:0 0 8px rgba(239,68,68,.88);color:rgba(239,68,68,0.92);animation:none}');
     S.Append('.badge.online{color:rgba(65,230,115,0.92)}');
+    S.Append('.badge.online span{color:rgba(65,230,115,0.92)}');
     S.Append('.badge.offline{color:rgba(239,68,68,0.92)}');
+    S.Append('.badge.offline span{color:rgba(239,68,68,0.92)}');
     S.Append('@keyframes pulse{0%,100%{box-shadow:0 0 6px currentColor}50%{box-shadow:0 0 14px currentColor}}');
     S.Append('.titulo{font-size:21px;font-weight:700;color:rgba(255,245,220,0.97);letter-spacing:-.4px;line-height:1.15}');
     S.Append('.subtitulo{font-size:12px;color:rgba(255,200,130,0.38);margin-top:4px;margin-bottom:26px}');
