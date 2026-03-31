@@ -313,10 +313,16 @@ begin
     finally
       LThread.Free;
     end;
+    { UniSession.AddJS roda no contexto pai (ExtJS). setApiStatus está dentro do
+      iframe (TUniURLFrame) — precisa acessar via contentWindow do elemento iframe. }
     if LOnline then
-      UniSession.AddJS('setApiStatus(true);')
+      UniSession.AddJS('(function(){var c=' + HtmlLogin.JSName +
+        ';if(c&&c.iframe&&c.iframe.contentWindow&&c.iframe.contentWindow.setApiStatus)' +
+        'c.iframe.contentWindow.setApiStatus(true);})();')
     else
-      UniSession.AddJS('setApiStatus(false);');
+      UniSession.AddJS('(function(){var c=' + HtmlLogin.JSName +
+        ';if(c&&c.iframe&&c.iframe.contentWindow&&c.iframe.contentWindow.setApiStatus)' +
+        'c.iframe.contentWindow.setApiStatus(false);})();');
     Exit;
   end;
 
