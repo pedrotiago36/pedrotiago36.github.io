@@ -44,7 +44,7 @@ procedure TLoginController.ExecuteLogin;
 begin
   FModel.Authenticate(
     FView.CollectCredentials,
-    procedure(AMessage: string) begin FView.NotifySuccess(AMessage); end,
+    procedure(AResult: TLoginResult) begin FView.NotifySuccess(AResult); end,
     procedure(AMessage: string) begin FView.NotifyFailure(AMessage); end
   );
 end;

@@ -44,6 +44,10 @@ type
     FLoginCtrl  : ILoginController;
     FUser       : string;
     FPwd        : string;
+    { usuario logado }
+    FLoggedUserID : Integer;
+    FIsAdmin      : Boolean;
+    FAllowedRoutes: TStringList;
     { main }
     FMainCtrl      : IMainController;
     FPerfilModel   : IPerfilModel;
@@ -91,8 +95,10 @@ type
                                      const ASelectedUserID: Integer): string;
     { ILoginView }
     function  CollectCredentials: TLoginCredentials;
-    procedure NotifySuccess(const AMessage: string);
+    procedure NotifySuccess(const AResult: TLoginResult);
     procedure NotifyFailure(const AMessage: string);
+    { filtragem de permissoes }
+    function  FilterMenuItems(const AItems: TArray<TMenuItemRec>): TArray<TMenuItemRec>;
     { IMainView }
     procedure OpenTab(const ARoute, ACaption, ABreadPath: string);
     procedure CloseTab(const ARoute: string);
@@ -356,6 +362,25 @@ var
   LActionKey : string;
   LAct      : TAct;
 begin
+  { Logout — reseta estado e volta para a tela de login }
+  if EventName = 'logout' then
+  begin
+    FInMain := False;
+    FLoggedUserID := 0;
+    FIsAdmin := False;
+    FUser := '';
+    FPwd  := '';
+    if Assigned(FAllowedRoutes) then
+      FreeAndNil(FAllowedRoutes);
+    HtmlMain.Visible := False;
+    HtmlMain.HTML.Text := '';
+    FLoginCtrl := NewLoginController(NewLogin);
+    FLoginCtrl.BindView(Self);
+    HtmlLogin.HTML.Text := BuildLoginHtml;
+    HtmlLogin.Visible := True;
+    Exit;
+  end;
+
   LRoute    := Params.Values['route'];
   LID       := StrToIntDef(Params.Values['id'], 0);
   LNome     := Params.Values['nome'];
@@ -429,8 +454,52 @@ begin
   Result := TLoginCredentials.New(FUser, FPwd);
 end;
 
-procedure TFrmLogin.NotifySuccess(const AMessage: string);
+procedure TFrmLogin.NotifySuccess(const AResult: TLoginResult);
+var
+  LClient   : TApiClient;
+  LJson     : string;
+  LObj      : TJSONObject;
+  LRotas    : TJSONArray;
+  I         : Integer;
 begin
+  { Armazena dados do usuario logado }
+  FLoggedUserID := AResult.UsuarioID;
+  FIsAdmin      := AResult.IsAdmin;
+
+  { Inicializa lista de rotas permitidas }
+  if Assigned(FAllowedRoutes) then
+    FAllowedRoutes.Free;
+  FAllowedRoutes := TStringList.Create;
+  FAllowedRoutes.Sorted     := True;
+  FAllowedRoutes.Duplicates := dupIgnore;
+
+  { Busca permissoes do usuario (somente se nao for admin) }
+  if (not FIsAdmin) and (FLoggedUserID > 0) then
+  begin
+    try
+      LClient := TApiClient.Create;
+      try
+        LJson := LClient.Get('/permissoes/usuario/' + IntToStr(FLoggedUserID));
+      finally
+        LClient.Free;
+      end;
+      LObj := TJSONObject.ParseJSONValue(LJson) as TJSONObject;
+      if Assigned(LObj) then
+      begin
+        try
+          LRotas := LObj.GetValue('rotas') as TJSONArray;
+          if Assigned(LRotas) then
+            for I := 0 to LRotas.Count - 1 do
+              FAllowedRoutes.Add(LRotas.Items[I].Value);
+        finally
+          LObj.Free;
+        end;
+      end;
+    except
+      { Se falhar, deixa lista vazia — usuario vera menus bloqueados }
+    end;
+  end;
+
   try
     FInMain   := True;
     FMainCtrl := NewMainController;
@@ -720,6 +789,84 @@ end;
   HTML do APP PRINCIPAL (sidebar + abas + conteudo)
   ══════════════════════════════════════════════════════════════ }
 
+{ Filtra itens do menu de acordo com as permissoes do usuario logado.
+  Admin vê tudo. Usuarios normais veem apenas rotas em FAllowedRoutes.
+  Grupos sem filhos visíveis também são removidos. }
+function TFrmLogin.FilterMenuItems(const AItems: TArray<TMenuItemRec>): TArray<TMenuItemRec>;
+var
+  I          : Integer;
+  J          : Integer;
+  Item       : TMenuItemRec;
+  VisibleIDs : TStringList;
+  ResultList : TList<TMenuItemRec>;
+  PassTwo    : Boolean;
+  HasChild   : Boolean;
+begin
+  { Admin vê tudo }
+  if FIsAdmin then
+  begin
+    Result := AItems;
+    Exit;
+  end;
+
+  VisibleIDs := TStringList.Create;
+  ResultList := TList<TMenuItemRec>.Create;
+  try
+    { 1ª passagem: marca folhas (Route nao vazio) que o usuario tem permissao }
+    for I := 0 to High(AItems) do
+    begin
+      Item := AItems[I];
+      if (Item.Route <> '') and Assigned(FAllowedRoutes) then
+      begin
+        if FAllowedRoutes.IndexOf(Item.Route) >= 0 then
+          VisibleIDs.Add(Item.ID);
+      end;
+    end;
+
+    { 2ª passagem: marca grupos que tem ao menos um filho visivel (loop ate estabilizar) }
+    PassTwo := True;
+    while PassTwo do
+    begin
+      PassTwo := False;
+      for I := 0 to High(AItems) do
+      begin
+        Item := AItems[I];
+        { So processa grupos ainda nao marcados }
+        if (Item.Route = '') and (VisibleIDs.IndexOf(Item.ID) < 0) then
+        begin
+          HasChild := False;
+          for J := 0 to High(AItems) do
+            if (AItems[J].ParentID = Item.ID) and (VisibleIDs.IndexOf(AItems[J].ID) >= 0) then
+            begin
+              HasChild := True;
+              Break;
+            end;
+          if HasChild then
+          begin
+            VisibleIDs.Add(Item.ID);
+            PassTwo := True;
+          end;
+        end;
+      end;
+    end;
+
+    { Monta resultado preservando a ordem original }
+    for I := 0 to High(AItems) do
+    begin
+      Item := AItems[I];
+      if VisibleIDs.IndexOf(Item.ID) >= 0 then
+        ResultList.Add(Item);
+    end;
+
+    SetLength(Result, ResultList.Count);
+    for I := 0 to ResultList.Count - 1 do
+      Result[I] := ResultList[I];
+  finally
+    VisibleIDs.Free;
+    ResultList.Free;
+  end;
+end;
+
 function TFrmLogin.RenderSidebar(const AItems: TArray<TMenuItemRec>): string;
 const
   SVG_CHEVRON_R = 'M9 18l6-6-6-6';
@@ -817,7 +964,7 @@ var
 begin
   LLogoURL := UniServerModule.FilesFolderURL + 'logo_transportadora.png?v=' +
               FormatDateTime('yyyymmddhhnnss', Now);
-  LItems := FMainCtrl.GetMenuItems;
+  LItems := FilterMenuItems(FMainCtrl.GetMenuItems);
 
   CSS :=
     '*{margin:0;padding:0;box-sizing:border-box!important;}' +
@@ -1406,12 +1553,23 @@ begin
     H.Append('<span class="srch-ico">' + SvgIcon(SVG_SEARCH, 15) + '</span>');
     H.Append('<input id="srch-inp" type="text" placeholder="Buscar telas..." oninput="doSearch(this.value)">');
     H.Append('<div id="sdrop"></div></div>');
-    { Right: notificação + usuário }
+    { Right: usuario logado + logout }
     H.Append('<div class="tb-right">');
-    H.Append('<div class="tb-user">');
-    H.Append('<div class="tb-av">AD</div>');
-    H.Append('<div><div class="tb-uname">Administrador</div>');
-    H.Append('<div class="tb-role">Admin</div></div>');
+    H.AppendFormat('<div class="tb-user" title="Clique para sair" onclick="%s">',
+      ['ajaxRequest(''' + HtmlMain.JSName + ''',''logout'',{})']);
+    H.AppendFormat('<div class="tb-av">%s</div>',
+      [UpperCase(Copy(FUser, 1, 2))]);
+    H.Append('<div>');
+    H.AppendFormat('<div class="tb-uname">%s</div>', [FUser]);
+    H.AppendFormat('<div class="tb-role">%s</div>',
+      [IfThen(FIsAdmin, '&#9733; Admin', 'Usu&aacute;rio')]);
+    H.Append('</div>');
+    H.Append('<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8"' +
+      ' stroke-width="2" stroke-linecap="round" stroke-linejoin="round"' +
+      ' style="margin-left:4px;flex-shrink:0">' +
+      '<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>' +
+      '<polyline points="16 17 21 12 16 7"/>' +
+      '<line x1="21" y1="12" x2="9" y2="12"/></svg>');
     H.Append('</div></div></div>');
 
     H.Append('<div id="app">');

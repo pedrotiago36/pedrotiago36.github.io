@@ -19,7 +19,7 @@ type
   public
     procedure Authenticate(
       const ACredentials : TLoginCredentials;
-      const AOnSuccess   : TProc<string>;
+      const AOnSuccess   : TProc<TLoginResult>;
       const AOnFailure   : TProc<string>
     );
   end;
@@ -35,7 +35,7 @@ end;
 
 procedure TLogin.Authenticate(
   const ACredentials : TLoginCredentials;
-  const AOnSuccess   : TProc<string>;
+  const AOnSuccess   : TProc<TLoginResult>;
   const AOnFailure   : TProc<string>
 );
 var
@@ -44,7 +44,8 @@ var
   LResponse : string;
   LJson     : TJSONObject;
   LSucesso  : Boolean;
-  LMensagem : string;
+  LResult   : TLoginResult;
+  LVal      : TJSONValue;
 begin
   Assert(Trim(ACredentials.Username) <> '',
     'O campo Usu' + #225 + 'rio ' + #233 + ' obrigat' + #243 + 'rio.');
@@ -67,16 +68,27 @@ begin
     end;
 
     try
-      LSucesso  := LJson.GetValue('sucesso').Value = 'true';
-      LMensagem := LJson.GetValue('mensagem').Value;
+      LSucesso := LJson.GetValue('sucesso').Value = 'true';
+      LResult.Mensagem  := LJson.GetValue('mensagem').Value;
+      LResult.UsuarioID := 0;
+      LResult.IsAdmin   := False;
+      if LSucesso then
+      begin
+        LVal := LJson.GetValue('usuario_id');
+        if Assigned(LVal) then
+          LResult.UsuarioID := StrToIntDef(LVal.Value, 0);
+        LVal := LJson.GetValue('is_admin');
+        if Assigned(LVal) then
+          LResult.IsAdmin := LVal.Value = '1';
+      end;
     finally
       LJson.Free;
     end;
 
     if LSucesso then
-      AOnSuccess(LMensagem)
+      AOnSuccess(LResult)
     else
-      AOnFailure(LMensagem);
+      AOnFailure(LResult.Mensagem);
 
   except
     on E: Exception do

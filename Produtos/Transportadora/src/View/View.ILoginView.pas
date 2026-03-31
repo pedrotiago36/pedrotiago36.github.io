@@ -9,7 +9,7 @@ type
   ILoginView = interface
     ['{5E2A8F1D-3C9B-4E7A-8D2F-6B1E9C4A7F3D}']
     function  CollectCredentials: TLoginCredentials;
-    procedure NotifySuccess(const AMessage: string);
+    procedure NotifySuccess(const AResult: TLoginResult);
     procedure NotifyFailure(const AMessage: string);
   end;
 

@@ -93,6 +93,39 @@ begin
   end;
 end;
 
+// Carrega rotas efetivas de um usuario: uniao de permissoes individuais
+// (tb_permissoes_usuarios) + rotas do perfil associado (tb_permissoes_perfis).
+// Retorna TJSONArray com rotas distintas ordenadas (caller libera).
+function CarregarRotasUsuario(const Conn: TFDConnection;
+                              const AUsuarioID: Integer): TJSONArray;
+var
+  Qry: TFDQuery;
+begin
+  Result := TJSONArray.Create;
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := Conn;
+    Qry.SQL.Text   :=
+      'SELECT DISTINCT rota FROM (' +
+      '  SELECT rota FROM tb_permissoes_usuarios WHERE usuario_id = :uid1' +
+      '  UNION' +
+      '  SELECT pp.rota FROM tb_permissoes_perfis pp' +
+      '  INNER JOIN tb_usuarios u ON u.perfil_id = pp.perfil_id' +
+      '  WHERE u.id = :uid2 AND u.ativo = 1' +
+      ') t ORDER BY rota';
+    Qry.ParamByName('uid1').AsInteger := AUsuarioID;
+    Qry.ParamByName('uid2').AsInteger := AUsuarioID;
+    Qry.Open;
+    while not Qry.Eof do
+    begin
+      Result.Add(Qry.FieldByName('rota').AsString);
+      Qry.Next;
+    end;
+  finally
+    Qry.Free;
+  end;
+end;
+
 begin
   THorse.Use(Jhonson());
 
@@ -150,7 +183,11 @@ begin
             try
               LResp.AddPair('sucesso', TJSONBool.Create(LSucesso));
               if LSucesso then
-                LResp.AddPair('mensagem', 'Bem-vindo, ' + Qry.FieldByName('login').AsString + '!')
+              begin
+                LResp.AddPair('mensagem',    'Bem-vindo, ' + Qry.FieldByName('login').AsString + '!');
+                LResp.AddPair('usuario_id',  TJSONNumber.Create(Qry.FieldByName('id').AsInteger));
+                LResp.AddPair('is_admin',    TJSONNumber.Create(Ord(Qry.FieldByName('is_admin').AsBoolean)));
+              end
               else
                 LResp.AddPair('mensagem', 'Usu' + #195 + #161 + 'rio ou senha incorretos.');
 
@@ -388,7 +425,8 @@ begin
     end
   );
 
-  // GET /permissoes/usuario/:id — rotas liberadas para um usuario
+  // GET /permissoes/usuario/:id — rotas efetivas do usuario
+  // (UNION permissoes individuais + rotas do perfil associado)
   // Response: {"usuario_id":3,"rotas":["cad.clientes","fin.receber",...]}
   THorse.Get('/permissoes/usuario/:id',
     procedure(Req: THorseRequest; Res: THorseResponse)
@@ -402,7 +440,7 @@ begin
         LID  := StrToIntDef(Req.Params['id'], 0);
         Conn := NewMySQLConnection;
         try
-          LRotas := CarregarRotas(Conn, 'tb_permissoes_usuarios', 'usuario_id', LID);
+          LRotas := CarregarRotasUsuario(Conn, LID);
           LObj   := TJSONObject.Create;
           try
             LObj.AddPair('usuario_id', TJSONNumber.Create(LID));

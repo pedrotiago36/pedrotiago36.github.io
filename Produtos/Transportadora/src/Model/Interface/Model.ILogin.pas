@@ -13,11 +13,17 @@ type
     class function New(const AUsername, APassword: string): TLoginCredentials; static;
   end;
 
+  TLoginResult = record
+    Mensagem  : string;
+    UsuarioID : Integer;
+    IsAdmin   : Boolean;
+  end;
+
   ILogin = interface
     ['{3A1F9E2C-7B4D-4F8A-9C3E-1D5B8F2E6A4C}']
     procedure Authenticate(
       const ACredentials : TLoginCredentials;
-      const AOnSuccess   : TProc<string>;
+      const AOnSuccess   : TProc<TLoginResult>;
       const AOnFailure   : TProc<string>
     );
   end;
