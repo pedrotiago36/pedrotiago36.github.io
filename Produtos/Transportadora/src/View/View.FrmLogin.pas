@@ -1164,7 +1164,7 @@ begin
     '  t.appendChild(dot);t.appendChild(l);t.appendChild(x);' +
     '  var sep=document.getElementById("tabs-sep");' +
     '  if(sep)bar.insertBefore(t,sep);else bar.appendChild(t);' +
-    '  setActive(route);_updCloseAll();}' + +
+    '  setActive(route);_updCloseAll();}' +
     'function setActive(route){' +
     '  document.querySelectorAll(".tab-btn").forEach(function(t){t.classList.toggle("active",t.dataset.route===route);});' +
     '  document.querySelectorAll(".nav-item").forEach(function(m){m.classList.toggle("active",m.dataset.route===route);});' +
