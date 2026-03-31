@@ -615,7 +615,9 @@ begin
       LI        : Integer;
       Conn      : TFDConnection;
       Qry       : TFDQuery;
+      QryID     : TFDQuery;
       LResult   : TJSONObject;
+      LUltimoID : Integer;
     begin
       try
         LBody := Req.Body;
@@ -697,15 +699,29 @@ begin
               Qry.ParamByName('pParam2').AsString := LpParam2;
               Qry.ParamByName('pParam3').AsString := LpParam3;
               Qry.ParamByName('pParam4').AsString := LpParam4;
-              Qry.Open;
+              { ExecSQL evita EFDException -308 quando o SP contem DML antes do SELECT.
+                LAST_INSERT_ID() e consultado em seguida na mesma conexao. }
+              Qry.ExecSQL;
+
+              LUltimoID := 0;
+              QryID := TFDQuery.Create(nil);
+              try
+                QryID.Connection := Conn;
+                QryID.SQL.Text   := 'SELECT LAST_INSERT_ID() AS ultimo_id';
+                QryID.Open;
+                if not QryID.Eof then
+                  LUltimoID := QryID.FieldByName('ultimo_id').AsInteger;
+              finally
+                QryID.Free;
+              end;
 
               LResult := TJSONObject.Create;
               try
                 LResult.AddPair('sucesso', TJSONBool.Create(True));
                 LResult.AddPair('linhas_afetadas',
-                  TJSONNumber.Create(Qry.FieldByName('linhas_afetadas').AsInteger));
+                  TJSONNumber.Create(Qry.RowsAffected));
                 LResult.AddPair('ultimo_id',
-                  TJSONNumber.Create(Qry.FieldByName('ultimo_id').AsInteger));
+                  TJSONNumber.Create(LUltimoID));
 
                 Writeln(FormatDateTime('dd/mm/yyyy hh:nn:ss', Now) +
                   ' POST /crud tabela=' + LTabela + ' acao=' + LAcao);

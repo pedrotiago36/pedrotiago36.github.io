@@ -1465,6 +1465,12 @@ begin
     '  parent.ajaxRequest(_f,"usr.save",' +
     '    ["id="+id,"login="+login,"senha="+senha,"isadmin="+isadmin,"perfilid="+perfilid]);}' +
     'function usrCancel(){parent.ajaxRequest(_f,"usr.insert",[]);}' +
+    'function usrPerfilChange(raw){' +
+    '  var rotas=raw?raw.split("|"):[];' +
+    '  var rotaSet={};' +
+    '  for(var i=0;i<rotas.length;i++){if(rotas[i])rotaSet[rotas[i]]=true;}' +
+    '  document.querySelectorAll(".prf-chk input[type=checkbox]").forEach(function(c){' +
+    '    c.checked=!!rotaSet[c.value];});}' +
     { Permissões }
     'function permSelect(id){parent.ajaxRequest(_f,"perm.select",["userid="+id]);}' +
     'function permSave(){' +
@@ -2154,6 +2160,8 @@ var
   LChecked     : string;
   LItemArr     : TDispArr;
   LDispArr     : TDispArr;
+  LRoutesBuf   : TStringBuilder;
+  LPrfRoute    : string;
 begin
   LTitle[False] := 'Novo Usu&aacute;rio';
   LTitle[True]  := 'Editar Usu&aacute;rio';
@@ -2245,14 +2253,26 @@ begin
   LPerfilPerms := TDictionary<Integer, TArray<string>>.Create;
   Cards        := TStringBuilder.Create;
   try
-    LOptStr.Append('<option value="0">-- Sem perfil --</option>');
-    for Perfil in APerfis do
-    begin
-      LSel[False] := '';
-      LSel[True]  := ' selected';
-      LOptStr.AppendFormat('<option value="%d"%s>%s</option>',
-        [Perfil.ID, LSel[ARec.PerfilID = Perfil.ID], Perfil.Nome]);
-      LPerfilPerms.AddOrSetValue(Perfil.ID, Perfil.Permissoes);
+    LOptStr.Append('<option value="0" data-rotas="">-- Sem perfil --</option>');
+    LRoutesBuf := TStringBuilder.Create;
+    try
+      for Perfil in APerfis do
+      begin
+        LSel[False] := '';
+        LSel[True]  := ' selected';
+        { Monta data-rotas pipe-separated para uso no onchange via JS }
+        LRoutesBuf.Clear;
+        for LPrfRoute in Perfil.Permissoes do
+        begin
+          if LRoutesBuf.Length > 0 then LRoutesBuf.Append('|');
+          LRoutesBuf.Append(LPrfRoute);
+        end;
+        LOptStr.AppendFormat('<option value="%d"%s data-rotas="%s">%s</option>',
+          [Perfil.ID, LSel[ARec.PerfilID = Perfil.ID], LRoutesBuf.ToString, Perfil.Nome]);
+        LPerfilPerms.AddOrSetValue(Perfil.ID, Perfil.Permissoes);
+      end;
+    finally
+      LRoutesBuf.Free;
     end;
 
     { Permissões do perfil vinculado ao usuário }
@@ -2343,7 +2363,9 @@ begin
       B.Append('</div>');
       B.Append('<div class="usr-field">');
       B.Append('<label class="usr-label" for="usr-perfil">Perfil vinculado</label>');
-      B.AppendFormat('<select id="usr-perfil" class="usr-select">%s</select>',
+      B.AppendFormat(
+        '<select id="usr-perfil" class="usr-select"' +
+        ' onchange="usrPerfilChange(this.options[this.selectedIndex].getAttribute(''data-rotas''))">%s</select>',
         [LOptStr.ToString]);
       B.Append('</div>');
       B.Append('</div>');
