@@ -5,6 +5,7 @@ interface
 uses
   Model.IPermissoes,
   Model.IUsuario,
+  Model.IPerfil,
   Model.IMenuItem;
 
 type
@@ -12,18 +13,19 @@ type
 
   IPermissoesController = interface
     ['{E5F6A7B8-C9D0-1234-EF01-567890123457}']
-    procedure BindView   (const AView: IPermissoesView);
+    procedure BindView       (const AView: IPermissoesView);
     procedure LoadList;
-    procedure SelectUser (const AUsuarioID: Integer);
-    procedure Save       (const AUsuarioID: Integer;
-                          const APerms: TArray<string>);
+    procedure SelectUser     (const AUsuarioID: Integer);
+    procedure Save           (const AUsuarioID: Integer;
+                              const APerms: TArray<string>);
+    procedure SaveWithPerfil (const AUsuarioID, APerfilID: Integer);
   end;
 
   IPermissoesView = interface
     ['{F6A7B8C9-D0E1-2345-F012-678901234568}']
-    { Tela única: seletor de usuário + cards de permissão }
     procedure ShowPermissoes(const ARec      : TPermissoesRec;
                              const AUsuarios : TArray<TUsuarioRec>;
+                             const APerfis   : TArray<TPerfilRec>;
                              const AItems    : TArray<TMenuItemRec>);
   end;
 

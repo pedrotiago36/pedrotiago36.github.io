@@ -462,6 +462,103 @@ begin
     end
   );
 
+  // GET /permissoes/individual/:id — somente permissoes individuais do usuario (sem perfil)
+  // Response: {"usuario_id":3,"rotas":["cad.clientes",...]}
+  THorse.Get('/permissoes/individual/:id',
+    procedure(Req: THorseRequest; Res: THorseResponse)
+    var
+      LID   : Integer;
+      Conn  : TFDConnection;
+      LObj  : TJSONObject;
+      LRotas: TJSONArray;
+    begin
+      try
+        LID  := StrToIntDef(Req.Params['id'], 0);
+        Conn := NewMySQLConnection;
+        try
+          LRotas := CarregarRotas(Conn, 'tb_permissoes_usuarios', 'usuario_id', LID);
+          LObj   := TJSONObject.Create;
+          try
+            LObj.AddPair('usuario_id', TJSONNumber.Create(LID));
+            LObj.AddPair('rotas',      LRotas);
+            Res.Status(200).Send<TJSONObject>(LObj);
+          except
+            LObj.Free;
+            raise;
+          end;
+        finally
+          Conn.Free;
+        end;
+      except
+        on E: Exception do
+          Res.Status(500).Send('Erro: ' + E.Message);
+      end;
+    end
+  );
+
+  // POST /permissoes/usuario/perfil — vincula usuario a um perfil e apaga permissoes individuais
+  // Body: {"usuario_id":3,"perfil_id":1}
+  THorse.Post('/permissoes/usuario/perfil',
+    procedure(Req: THorseRequest; Res: THorseResponse)
+    var
+      LRoot      : TJSONObject;
+      LUsuarioID : Integer;
+      LPerfilID  : Integer;
+      Conn       : TFDConnection;
+      Qry        : TFDQuery;
+    begin
+      try
+        LRoot := TJSONObject.ParseJSONValue(Req.Body) as TJSONObject;
+        if not Assigned(LRoot) then
+        begin
+          Res.Status(400).Send('JSON invalido');
+          Exit;
+        end;
+        try
+          LUsuarioID := JInt(LRoot, 'usuario_id', 0);
+          LPerfilID  := JInt(LRoot, 'perfil_id',  0);
+        finally
+          LRoot.Free;
+        end;
+
+        if LUsuarioID = 0 then
+        begin
+          Res.Status(400).Send('usuario_id obrigatorio');
+          Exit;
+        end;
+
+        Conn := NewMySQLConnection;
+        try
+          Qry := TFDQuery.Create(nil);
+          try
+            Qry.Connection := Conn;
+            { Atualiza perfil_id do usuario }
+            Qry.SQL.Text := 'UPDATE tb_usuarios SET perfil_id = :pid WHERE id = :uid';
+            Qry.ParamByName('pid').AsInteger := LPerfilID;
+            Qry.ParamByName('uid').AsInteger := LUsuarioID;
+            Qry.ExecSQL;
+            { Apaga permissoes individuais }
+            Qry.SQL.Text := 'DELETE FROM tb_permissoes_usuarios WHERE usuario_id = :uid';
+            Qry.ParamByName('uid').AsInteger := LUsuarioID;
+            Qry.ExecSQL;
+            Writeln(FormatDateTime('dd/mm/yyyy hh:nn:ss', Now) +
+              ' POST /permissoes/usuario/perfil uid=' + IntToStr(LUsuarioID) +
+              ' perfil=' + IntToStr(LPerfilID));
+            Res.Status(200).Send<TJSONObject>(
+              TJSONObject.Create.AddPair('sucesso', TJSONBool.Create(True)));
+          finally
+            Qry.Free;
+          end;
+        finally
+          Conn.Free;
+        end;
+      except
+        on E: Exception do
+          Res.Status(500).Send('Erro: ' + E.Message);
+      end;
+    end
+  );
+
   // GET /permissoes/perfil/:id — rotas liberadas para um perfil
   // Response: {"perfil_id":1,"rotas":["cad.clientes","fin.receber",...]}
   THorse.Get('/permissoes/perfil/:id',

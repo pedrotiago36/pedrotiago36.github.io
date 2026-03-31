@@ -21,8 +21,9 @@ type
   public
     constructor Create;
     destructor  Destroy; override;
-    function  FindByUsuario (const AUsuarioID: Integer): TPermissoesRec;
-    procedure Save          (const ARec: TPermissoesRec);
+    function  FindByUsuario  (const AUsuarioID: Integer): TPermissoesRec;
+    procedure Save           (const ARec: TPermissoesRec);
+    procedure SaveWithPerfil (const AUsuarioID, APerfilID: Integer);
   end;
 
 function NewPermissoesModel: IPermissoesModel;
@@ -51,12 +52,30 @@ var
   LResponse : string;
   LJson     : TJSONObject;
   LRotas    : TJSONArray;
+  LVal      : TJSONValue;
   LI        : Integer;
 begin
   Result.UsuarioID := AUsuarioID;
+  Result.PerfilID  := 0;
   SetLength(Result.Permissoes, 0);
+  if AUsuarioID = 0 then Exit;
   try
-    LResponse := FAPI.Get('/permissoes/usuario/' + IntToStr(AUsuarioID));
+    { Busca perfil_id atual do usuario }
+    LResponse := FAPI.Get('/usuarios/' + IntToStr(AUsuarioID));
+    LJson := TJSONObject.ParseJSONValue(LResponse) as TJSONObject;
+    if Assigned(LJson) then
+    begin
+      try
+        LVal := LJson.GetValue('perfil_id');
+        if Assigned(LVal) then
+          Result.PerfilID := StrToIntDef(LVal.Value, 0);
+      finally
+        LJson.Free;
+      end;
+    end;
+
+    { Busca rotas individuais do usuario }
+    LResponse := FAPI.Get('/permissoes/individual/' + IntToStr(AUsuarioID));
     LJson := TJSONObject.ParseJSONValue(LResponse) as TJSONObject;
     if not Assigned(LJson) then Exit;
     try
@@ -102,6 +121,20 @@ begin
     LRoot.Free;
   end;
   FAPI.Post('/crud', LBody);
+end;
+
+procedure TPermissoesAPI.SaveWithPerfil(const AUsuarioID, APerfilID: Integer);
+var
+  LBody : TJSONObject;
+begin
+  LBody := TJSONObject.Create;
+  try
+    LBody.AddPair('usuario_id', TJSONNumber.Create(AUsuarioID));
+    LBody.AddPair('perfil_id',  TJSONNumber.Create(APerfilID));
+    FAPI.Post('/permissoes/usuario/perfil', LBody.ToString);
+  finally
+    LBody.Free;
+  end;
 end;
 
 end.

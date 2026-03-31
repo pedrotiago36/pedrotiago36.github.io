@@ -82,9 +82,11 @@ type
     { permissões — injeção de HTML no #screen }
     procedure InjectPermForm(const ARec      : TPermissoesRec;
                              const AUsuarios : TArray<TUsuarioRec>;
+                             const APerfis   : TArray<TPerfilRec>;
                              const AItems    : TArray<TMenuItemRec>);
     function  BuildPermFormHtml(const ARec      : TPermissoesRec;
                                 const AUsuarios : TArray<TUsuarioRec>;
+                                const APerfis   : TArray<TPerfilRec>;
                                 const AItems    : TArray<TMenuItemRec>): string;
     { ações em telas — injeção de HTML no #screen }
     procedure InjectScreenActions(const AScreens: TArray<string>;
@@ -210,6 +212,7 @@ type
     constructor Create(AOwner: TFrmLogin);
     procedure ShowPermissoes(const ARec      : TPermissoesRec;
                              const AUsuarios : TArray<TUsuarioRec>;
+                             const APerfis   : TArray<TPerfilRec>;
                              const AItems    : TArray<TMenuItemRec>);
   end;
 
@@ -220,9 +223,10 @@ begin
 end;
 
 procedure TPermissoesViewAdapter.ShowPermissoes(const ARec      : TPermissoesRec;
-  const AUsuarios : TArray<TUsuarioRec>; const AItems : TArray<TMenuItemRec>);
+  const AUsuarios : TArray<TUsuarioRec>; const APerfis: TArray<TPerfilRec>;
+  const AItems : TArray<TMenuItemRec>);
 begin
-  FOwner.InjectPermForm(ARec, AUsuarios, AItems);
+  FOwner.InjectPermForm(ARec, AUsuarios, APerfis, AItems);
 end;
 
 { ══════════════════════════════════════════════════════════════
@@ -347,7 +351,7 @@ end;
 
 procedure TFrmLogin.HandleMainEvent(EventName: string; Params: TUniStrings);
 type
-  TAct = array[0..17] of TProc;
+  TAct = array[0..18] of TProc;
 var
   LRoute    : string;
   LID       : Integer;
@@ -413,26 +417,30 @@ begin
     FScreenActionsCtrl.SaveActions(LUsrID);
     UniSession.AddJS('acSaveDone();');
   end;
+  LAct[18] := procedure begin
+    FPermissoesCtrl.SaveWithPerfil(LUsrID, LPerfilID);
+  end;
 
   LAct[
-    Ord(EventName='nav')          *  0 +
-    Ord(EventName='closeTab')     *  1 +
-    Ord(EventName='toggleFav')    *  2 +
-    Ord(EventName='prf.insert')   *  3 +
-    Ord(EventName='prf.edit')     *  4 +
-    Ord(EventName='prf.delete')   *  5 +
-    Ord(EventName='prf.save')     *  6 +
-    Ord(EventName='usr.insert')   *  7 +
-    Ord(EventName='usr.edit')     *  8 +
-    Ord(EventName='usr.delete')   *  9 +
-    Ord(EventName='usr.save')     * 10 +
-    Ord(EventName='perm.select')  * 11 +
-    Ord(EventName='perm.save')    * 12 +
-    Ord(EventName='perm.back')    * 13 +
-    Ord(EventName='ac.select')    * 14 +
-    Ord(EventName='ac.toggle')    * 15 +
-    Ord(EventName='ac.back')      * 16 +
-    Ord(EventName='ac.save')      * 17
+    Ord(EventName='nav')              *  0 +
+    Ord(EventName='closeTab')         *  1 +
+    Ord(EventName='toggleFav')        *  2 +
+    Ord(EventName='prf.insert')       *  3 +
+    Ord(EventName='prf.edit')         *  4 +
+    Ord(EventName='prf.delete')       *  5 +
+    Ord(EventName='prf.save')         *  6 +
+    Ord(EventName='usr.insert')       *  7 +
+    Ord(EventName='usr.edit')         *  8 +
+    Ord(EventName='usr.delete')       *  9 +
+    Ord(EventName='usr.save')         * 10 +
+    Ord(EventName='perm.select')      * 11 +
+    Ord(EventName='perm.save')        * 12 +
+    Ord(EventName='perm.back')        * 13 +
+    Ord(EventName='ac.select')        * 14 +
+    Ord(EventName='ac.toggle')        * 15 +
+    Ord(EventName='ac.back')          * 16 +
+    Ord(EventName='ac.save')          * 17 +
+    Ord(EventName='perm.saveperfil')  * 18
   ]();
 end;
 
@@ -517,7 +525,7 @@ begin
     { Permissões — instância e wiring }
     FPermissoesModel := NewPermissoesModel;
     FPermissoesCtrl  := NewPermissoesController(
-      FPermissoesModel, FUsuarioModel, FMainCtrl.GetMenuItems);
+      FPermissoesModel, FUsuarioModel, FPerfilModel, FMainCtrl.GetMenuItems);
     FPermissoesCtrl.BindView(TPermissoesViewAdapter.Create(Self));
 
     { Registra handler de tela para cfg.permissoes }
@@ -1464,6 +1472,19 @@ begin
     '  var perms=[];' +
     '  document.querySelectorAll(".prm-chk input:checked").forEach(function(c){perms.push(c.value);});' +
     '  parent.ajaxRequest(_f,"perm.save",["userid="+uid,"perms="+perms.join("|")]);}' +
+    'function permSavePerfil(){' +
+    '  var uid=document.getElementById("perm-uid").value;' +
+    '  var sel=document.getElementById("perm-perfil");' +
+    '  var pid=sel?sel.value:"0";' +
+    '  parent.ajaxRequest(_f,"perm.saveperfil",["userid="+uid,"perfilid="+pid]);}' +
+    'function permPerfilChange(pid){' +
+    '  if(!pid||pid==="0"){return;}' +
+    '  var rotas=(_prfRotas&&_prfRotas[pid])?_prfRotas[pid]:[];' +
+    '  var rotaSet={};' +
+    '  rotas.forEach(function(r){rotaSet[r]=true;});' +
+    '  document.querySelectorAll(".prm-chk input[type=checkbox]").forEach(function(c){' +
+    '    c.checked=!!rotaSet[c.value];});' +
+    '  permInitAllChk();}' +
     'function permBack(){parent.ajaxRequest(_f,"perm.back",[]);}' +
     { Marcar todos — perfil }
     'function prfCheckAll(lbl){' +
@@ -2372,12 +2393,13 @@ end;
   ══════════════════════════════════════════════════════════════ }
 
 procedure TFrmLogin.InjectPermForm(const ARec      : TPermissoesRec;
-  const AUsuarios : TArray<TUsuarioRec>; const AItems : TArray<TMenuItemRec>);
+  const AUsuarios : TArray<TUsuarioRec>; const APerfis: TArray<TPerfilRec>;
+  const AItems : TArray<TMenuItemRec>);
 var
   LHtml : string;
   LJson : TJSONString;
 begin
-  LHtml := BuildPermFormHtml(ARec, AUsuarios, AItems);
+  LHtml := BuildPermFormHtml(ARec, AUsuarios, APerfis, AItems);
   LJson := TJSONString.Create(LHtml);
   try
     UniSession.AddJS(
@@ -2395,6 +2417,7 @@ end;
 
 function TFrmLogin.BuildPermFormHtml(const ARec      : TPermissoesRec;
   const AUsuarios : TArray<TUsuarioRec>;
+  const APerfis   : TArray<TPerfilRec>;
   const AItems    : TArray<TMenuItemRec>): string;
 const
   GRP_IDS    : array[0..11] of string =
@@ -2414,26 +2437,32 @@ type
   TDispArr = array[Boolean] of string;
   THasArr  = array[Boolean] of string;
 var
-  B        : TStringBuilder;
-  Cards    : TStringBuilder;
-  SelOpts  : TStringBuilder;
-  CSS      : string;
-  G        : Integer;
-  Item     : TMenuItemRec;
-  Usu      : TUsuarioRec;
-  LPermSet : TDictionary<string, Boolean>;
-  LDispArr : TDispArr;
-  LChecked : string;
-  LHasPerm : Boolean;
-  LItemArr : THasArr;
-  LSel     : TDispArr;
-  LHasUsr  : TDispArr;
+  B           : TStringBuilder;
+  Cards       : TStringBuilder;
+  SelOpts     : TStringBuilder;
+  PrfOpts     : TStringBuilder;
+  PrfJson     : TStringBuilder;
+  CSS         : string;
+  G           : Integer;
+  Item        : TMenuItemRec;
+  Usu         : TUsuarioRec;
+  Prf         : TPerfilRec;
+  LPermSet    : TDictionary<string, Boolean>;
+  LDispArr    : TDispArr;
+  LChecked    : string;
+  LHasPerm    : Boolean;
+  LItemArr    : THasArr;
+  LSel        : TDispArr;
+  LHasUsr     : TDispArr;
   LCardsBlock : string;
+  LPrfSel     : string;
+  LPI         : Integer;
+  LRoute      : string;
 begin
   LPermSet := TDictionary<string, Boolean>.Create;
   try
-    for var P in ARec.Permissoes do
-      LPermSet.AddOrSetValue(P, True);
+    for LPI := 0 to High(ARec.Permissoes) do
+      LPermSet.AddOrSetValue(ARec.Permissoes[LPI], True);
 
     CSS :=
       '<style>' +
@@ -2495,7 +2524,7 @@ begin
       '.prm-chk input:checked~.prm-chk-lbl{color:#E2E8F0;font-weight:600;}' +
       '</style>';
 
-    { Opções do select }
+    { Opções select usuário }
     SelOpts := TStringBuilder.Create;
     try
       SelOpts.Append('<option value="0">-- Selecione um usu&aacute;rio --</option>');
@@ -2507,78 +2536,120 @@ begin
           [Usu.ID, LSel[ARec.UsuarioID = Usu.ID], Usu.Login]);
       end;
 
-      { Cards de permissão }
-      Cards := TStringBuilder.Create;
+      { Opções select perfil + JSON com rotas de cada perfil embutido como data-rotas }
+      PrfOpts := TStringBuilder.Create;
+      PrfJson := TStringBuilder.Create;
       try
-        for G := 0 to 11 do
+        PrfOpts.Append('<option value="0">-- Nenhum (usar permiss&otilde;es individuais) --</option>');
+        { JSON: {id:[rotas],...} para o JS usar ao selecionar perfil }
+        PrfJson.Append('{');
+        for LPI := 0 to High(APerfis) do
         begin
-          Cards.AppendFormat(
-            '<div class="prm-card" style="--cc:%s">' +
-            '<div class="prm-card-hdr">' +
-            '<div class="prm-card-dot"></div>' +
-            '<span class="prm-card-lbl">%s</span>' +
-            '<label class="prm-chk-all" onclick="permCheckAll(this)">' +
-            '<input type="checkbox">' +
-            '<span class="prm-chk-box">&#10003;</span>' +
-            '<span>Todos</span>' +
-            '</label>' +
-            '</div><div class="prm-chk-list">',
-            [GRP_COLORS[G], GRP_LABELS[G]]);
-
-          for Item in AItems do
+          Prf := APerfis[LPI];
+          LPrfSel := IfThen(ARec.PerfilID = Prf.ID, ' selected', '');
+          PrfOpts.AppendFormat('<option value="%d"%s>%s</option>',
+            [Prf.ID, LPrfSel, Prf.Nome]);
+          if LPI > 0 then PrfJson.Append(',');
+          PrfJson.AppendFormat('"%d":[', [Prf.ID]);
+          for LRoute in Prf.Permissoes do
           begin
-            LHasPerm := (Item.ParentID = GRP_IDS[G]) and (Item.Route <> '');
-            LDispArr[False] := '';
-            LDispArr[True]  := 'checked';
-            LChecked := LDispArr[LPermSet.ContainsKey(Item.Route)];
-
-            LItemArr[False] := '';
-            LItemArr[True]  :=
-              Format('<label class="prm-chk">' +
-                '<input type="checkbox" value="%s" %s onchange="permUpdateAllChk(this)">' +
-                '<span class="prm-chk-box">&#10003;</span>' +
-                '<span class="prm-chk-lbl">%s</span>' +
-                '</label>',
-                [Item.Route, LChecked, Item.Caption]);
-
-            Cards.Append(LItemArr[LHasPerm]);
+            PrfJson.AppendFormat('"%s",', [LRoute]);
           end;
-          Cards.Append('</div></div>');
+          { Remove última vírgula se houver rotas }
+          if Length(Prf.Permissoes) > 0 then
+            PrfJson.Remove(PrfJson.Length - 1, 1);
+          PrfJson.Append(']');
         end;
+        PrfJson.Append('}');
 
-        { Bloco de cards: só aparece quando há usuário selecionado }
-        LHasUsr[False] :=
-          '<div class="prm-hint">&#8593; Selecione um usu&aacute;rio acima para definir as permiss&otilde;es</div>';
-        LHasUsr[True] :=
-          '<div class="prm-grid">' + Cards.ToString + '</div>';
-        LCardsBlock := LHasUsr[ARec.UsuarioID > 0];
-
-        B := TStringBuilder.Create;
+        { Cards de permissão — usa rotas individuais para marcar }
+        Cards := TStringBuilder.Create;
         try
-          B.Append(CSS);
-          B.AppendFormat('<input type="hidden" id="perm-uid" value="%d">', [ARec.UsuarioID]);
-          B.Append('<div class="prm-screen">');
-          B.Append('<div class="prm-hdr">');
-          B.Append('<div><div class="prm-title">Permiss&otilde;es de Usu&aacute;rios</div>');
-          B.Append('<div class="prm-sub">Selecione o usu&aacute;rio e marque as telas permitidas</div></div>');
-          B.Append('</div>');
-          { Seletor }
-          B.Append('<div class="prm-sel-wrap">');
-          B.Append('<span class="prm-sel-lbl">Usu&aacute;rio</span>');
-          B.AppendFormat('<select class="prm-sel" onchange="permSelect(this.value)">%s</select>',
-            [SelOpts.ToString]);
-          B.AppendFormat('<button class="btn-save-perm" onclick="permSave()" %s>&#10003; Salvar</button>',
-            [IfThen(ARec.UsuarioID = 0, 'disabled', '')]);
-          B.Append('</div>');
-          { Cards ou hint }
-          B.Append(LCardsBlock);
-          B.Append('</div>');
-          Result := B.ToString;
+          for G := 0 to 11 do
+          begin
+            Cards.AppendFormat(
+              '<div class="prm-card" style="--cc:%s">' +
+              '<div class="prm-card-hdr">' +
+              '<div class="prm-card-dot"></div>' +
+              '<span class="prm-card-lbl">%s</span>' +
+              '<label class="prm-chk-all" onclick="permCheckAll(this)">' +
+              '<input type="checkbox">' +
+              '<span class="prm-chk-box">&#10003;</span>' +
+              '<span>Todos</span>' +
+              '</label>' +
+              '</div><div class="prm-chk-list">',
+              [GRP_COLORS[G], GRP_LABELS[G]]);
+
+            for Item in AItems do
+            begin
+              LHasPerm := (Item.ParentID = GRP_IDS[G]) and (Item.Route <> '');
+              LDispArr[False] := '';
+              LDispArr[True]  := 'checked';
+              LChecked := LDispArr[LPermSet.ContainsKey(Item.Route)];
+
+              LItemArr[False] := '';
+              LItemArr[True]  :=
+                Format('<label class="prm-chk">' +
+                  '<input type="checkbox" value="%s" %s onchange="permUpdateAllChk(this)">' +
+                  '<span class="prm-chk-box">&#10003;</span>' +
+                  '<span class="prm-chk-lbl">%s</span>' +
+                  '</label>',
+                  [Item.Route, LChecked, Item.Caption]);
+
+              Cards.Append(LItemArr[LHasPerm]);
+            end;
+            Cards.Append('</div></div>');
+          end;
+
+          LHasUsr[False] :=
+            '<div class="prm-hint">&#8593; Selecione um usu&aacute;rio acima para definir as permiss&otilde;es</div>';
+          LHasUsr[True] :=
+            '<div class="prm-grid">' + Cards.ToString + '</div>';
+          LCardsBlock := LHasUsr[ARec.UsuarioID > 0];
+
+          B := TStringBuilder.Create;
+          try
+            B.Append(CSS);
+            { JSON de rotas dos perfis — usado pelo JS ao selecionar perfil }
+            B.AppendFormat('<script>var _prfRotas=%s;</script>', [PrfJson.ToString]);
+            B.AppendFormat('<input type="hidden" id="perm-uid" value="%d">', [ARec.UsuarioID]);
+            B.Append('<div class="prm-screen">');
+            B.Append('<div class="prm-hdr">');
+            B.Append('<div><div class="prm-title">Permiss&otilde;es de Usu&aacute;rios</div>');
+            B.Append('<div class="prm-sub">Selecione o usu&aacute;rio e marque as telas permitidas</div></div>');
+            B.Append('</div>');
+            { Linha 1: Seletor de usuário }
+            B.Append('<div class="prm-sel-wrap">');
+            B.Append('<span class="prm-sel-lbl">Usu&aacute;rio</span>');
+            B.AppendFormat('<select class="prm-sel" onchange="permSelect(this.value)">%s</select>',
+              [SelOpts.ToString]);
+            B.Append('</div>');
+            { Linha 2: Seletor de perfil + botão salvar — só visível se usuário selecionado }
+            if ARec.UsuarioID > 0 then
+            begin
+              B.Append('<div class="prm-sel-wrap" style="margin-top:-12px">');
+              B.Append('<span class="prm-sel-lbl">Perfil</span>');
+              B.AppendFormat(
+                '<select class="prm-sel" id="perm-perfil" onchange="permPerfilChange(this.value)">%s</select>',
+                [PrfOpts.ToString]);
+              B.Append('<button class="btn-save-perm" onclick="permSavePerfil()" style="background:linear-gradient(135deg,rgba(99,102,241,.25),rgba(99,102,241,.1));border-color:rgba(99,102,241,.4);color:#818CF8">' +
+                '&#10003; Aplicar Perfil</button>');
+              B.Append('<button class="btn-save-perm" onclick="permSave()">&#10003; Salvar Individual</button>');
+              B.Append('</div>');
+            end;
+            { Cards ou hint }
+            B.Append(LCardsBlock);
+            B.Append('</div>');
+            Result := B.ToString;
+          finally
+            B.Free;
+          end;
         finally
-          B.Free;
+          Cards.Free;
         end;
       finally
-        Cards.Free;
+        PrfOpts.Free;
+        PrfJson.Free;
       end;
     finally
       SelOpts.Free;

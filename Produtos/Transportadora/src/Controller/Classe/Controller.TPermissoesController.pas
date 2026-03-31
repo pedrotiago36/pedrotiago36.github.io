@@ -6,51 +6,59 @@ uses
   Controller.IPermissoesController,
   Model.IPermissoes,
   Model.IUsuario,
+  Model.IPerfil,
   Model.IMenuItem;
 
 type
   TPermissoesController = class(TInterfacedObject, IPermissoesController)
   strict private
-    FView      : IPermissoesView;
-    FModel     : IPermissoesModel;
-    FUsuModel  : IUsuarioModel;
-    FMenuItems : TArray<TMenuItemRec>;
+    FView       : IPermissoesView;
+    FModel      : IPermissoesModel;
+    FUsuModel   : IUsuarioModel;
+    FPerfilModel: IPerfilModel;
+    FMenuItems  : TArray<TMenuItemRec>;
   public
-    constructor Create(const AModel     : IPermissoesModel;
-                       const AUsuModel  : IUsuarioModel;
-                       const AMenuItems : TArray<TMenuItemRec>);
-    procedure BindView   (const AView: IPermissoesView);
+    constructor Create(const AModel      : IPermissoesModel;
+                       const AUsuModel   : IUsuarioModel;
+                       const APerfilModel: IPerfilModel;
+                       const AMenuItems  : TArray<TMenuItemRec>);
+    procedure BindView       (const AView: IPermissoesView);
     procedure LoadList;
-    procedure SelectUser (const AUsuarioID: Integer);
-    procedure Save       (const AUsuarioID: Integer;
-                          const APerms: TArray<string>);
+    procedure SelectUser     (const AUsuarioID: Integer);
+    procedure Save           (const AUsuarioID: Integer;
+                              const APerms: TArray<string>);
+    procedure SaveWithPerfil (const AUsuarioID, APerfilID: Integer);
   end;
 
-function NewPermissoesController(const AModel     : IPermissoesModel;
-                                 const AUsuModel  : IUsuarioModel;
-                                 const AMenuItems : TArray<TMenuItemRec>)
+function NewPermissoesController(const AModel      : IPermissoesModel;
+                                 const AUsuModel   : IUsuarioModel;
+                                 const APerfilModel: IPerfilModel;
+                                 const AMenuItems  : TArray<TMenuItemRec>)
   : IPermissoesController;
 
 implementation
 
-function NewPermissoesController(const AModel     : IPermissoesModel;
-                                 const AUsuModel  : IUsuarioModel;
-                                 const AMenuItems : TArray<TMenuItemRec>)
+function NewPermissoesController(const AModel      : IPermissoesModel;
+                                 const AUsuModel   : IUsuarioModel;
+                                 const APerfilModel: IPerfilModel;
+                                 const AMenuItems  : TArray<TMenuItemRec>)
   : IPermissoesController;
 begin
-  Result := TPermissoesController.Create(AModel, AUsuModel, AMenuItems);
+  Result := TPermissoesController.Create(AModel, AUsuModel, APerfilModel, AMenuItems);
 end;
 
 { TPermissoesController }
 
-constructor TPermissoesController.Create(const AModel     : IPermissoesModel;
-                                         const AUsuModel  : IUsuarioModel;
-                                         const AMenuItems : TArray<TMenuItemRec>);
+constructor TPermissoesController.Create(const AModel      : IPermissoesModel;
+                                         const AUsuModel   : IUsuarioModel;
+                                         const APerfilModel: IPerfilModel;
+                                         const AMenuItems  : TArray<TMenuItemRec>);
 begin
   inherited Create;
-  FModel     := AModel;
-  FUsuModel  := AUsuModel;
-  FMenuItems := AMenuItems;
+  FModel       := AModel;
+  FUsuModel    := AUsuModel;
+  FPerfilModel := APerfilModel;
+  FMenuItems   := AMenuItems;
 end;
 
 procedure TPermissoesController.BindView(const AView: IPermissoesView);
@@ -66,10 +74,10 @@ begin
   LUsers   := FUsuModel.ListAll;
   LFirstID := 0;
   if Length(LUsers) > 0 then LFirstID := LUsers[0].ID;
-  { Pré-seleciona o primeiro usuário se houver algum cadastrado }
   FView.ShowPermissoes(
     FModel.FindByUsuario(LFirstID),
     LUsers,
+    FPerfilModel.ListAll,
     FMenuItems);
 end;
 
@@ -78,6 +86,7 @@ begin
   FView.ShowPermissoes(
     FModel.FindByUsuario(AUsuarioID),
     FUsuModel.ListAll,
+    FPerfilModel.ListAll,
     FMenuItems);
 end;
 
@@ -87,10 +96,24 @@ var
   LRec: TPermissoesRec;
 begin
   LRec.UsuarioID  := AUsuarioID;
+  LRec.PerfilID   := 0;
   LRec.Permissoes := APerms;
   FModel.Save(LRec);
-  { Recarrega a mesma tela já com o usuário selecionado }
-  FView.ShowPermissoes(LRec, FUsuModel.ListAll, FMenuItems);
+  FView.ShowPermissoes(
+    FModel.FindByUsuario(AUsuarioID),
+    FUsuModel.ListAll,
+    FPerfilModel.ListAll,
+    FMenuItems);
+end;
+
+procedure TPermissoesController.SaveWithPerfil(const AUsuarioID, APerfilID: Integer);
+begin
+  FModel.SaveWithPerfil(AUsuarioID, APerfilID);
+  FView.ShowPermissoes(
+    FModel.FindByUsuario(AUsuarioID),
+    FUsuModel.ListAll,
+    FPerfilModel.ListAll,
+    FMenuItems);
 end;
 
 end.
