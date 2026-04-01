@@ -408,7 +408,7 @@ begin
     FUsuarioCtrl.Save(LLogin, LSenha, LIsAdmin, LPerfilID, LID);
   end;
   LAct[11] := procedure begin FPermissoesCtrl.SelectUser(LUsrID) end;
-  LAct[12] := procedure begin FPermissoesCtrl.Save(LUsrID, LPerms) end;
+  LAct[12] := procedure begin FPermissoesCtrl.Save(LUsrID, LPerfilID, LPerms) end;
   LAct[13] := procedure begin FPermissoesCtrl.LoadList end;
   LAct[14] := procedure begin FScreenActionsCtrl.SelectUser(LUsrID) end;
   LAct[15] := procedure begin FScreenActionsCtrl.ToggleAction(LUsrID, LActionRoute, LActionKey) end;
@@ -1446,7 +1446,7 @@ begin
     'function prfDel(id){parent.ajaxRequest(_f,"prf.delete",["id="+id]);}' +
     'function prfSave(){' +
     '  var id=document.getElementById("prf-id").value;' +
-    '  var nome=encodeURIComponent(document.getElementById("prf-nome").value.trim());' +
+    '  var nome=document.getElementById("prf-nome").value.trim();' +
     '  var perms=[];' +
     '  document.querySelectorAll(".prf-chk input:checked").forEach(function(c){perms.push(c.value);});' +
     '  parent.ajaxRequest(_f,"prf.save",["id="+id,"nome="+nome,"perms="+perms.join("|")]);}' +
@@ -1457,8 +1457,8 @@ begin
     'function usrDel(id){parent.ajaxRequest(_f,"usr.delete",["id="+id]);}' +
     'function usrSave(){' +
     '  var id=document.getElementById("usr-id").value;' +
-    '  var login=encodeURIComponent(document.getElementById("usr-login").value.trim());' +
-    '  var senha=encodeURIComponent(document.getElementById("usr-senha").value.trim());' +
+    '  var login=document.getElementById("usr-login").value.trim();' +
+    '  var senha=document.getElementById("usr-senha").value.trim();' +
     '  var isadmin=document.getElementById("usr-admin").checked?"1":"0";' +
     '  var sel=document.getElementById("usr-perfil");' +
     '  var perfilid=sel?sel.value:"0";' +
@@ -1477,7 +1477,9 @@ begin
     '  var uid=document.getElementById("perm-uid").value;' +
     '  var perms=[];' +
     '  document.querySelectorAll(".prm-chk input:checked").forEach(function(c){perms.push(c.value);});' +
-    '  parent.ajaxRequest(_f,"perm.save",["userid="+uid,"perms="+perms.join("|")]);}' +
+    '  var psel=document.getElementById("perm-perfil");' +
+    '  var pid=psel?psel.value:"0";' +
+    '  parent.ajaxRequest(_f,"perm.save",["userid="+uid,"perms="+perms.join("|"),"perfilid="+pid]);}' +
     'function permSavePerfil(){' +
     '  var uid=document.getElementById("perm-uid").value;' +
     '  var sel=document.getElementById("perm-perfil");' +

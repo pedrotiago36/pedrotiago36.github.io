@@ -16,7 +16,7 @@ type
     procedure BindView       (const AView: IPermissoesView);
     procedure LoadList;
     procedure SelectUser     (const AUsuarioID: Integer);
-    procedure Save           (const AUsuarioID: Integer;
+    procedure Save           (const AUsuarioID, APerfilID: Integer;
                               const APerms: TArray<string>);
     procedure SaveWithPerfil (const AUsuarioID, APerfilID: Integer);
   end;

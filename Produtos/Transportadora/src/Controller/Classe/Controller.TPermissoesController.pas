@@ -25,7 +25,7 @@ type
     procedure BindView       (const AView: IPermissoesView);
     procedure LoadList;
     procedure SelectUser     (const AUsuarioID: Integer);
-    procedure Save           (const AUsuarioID: Integer;
+    procedure Save           (const AUsuarioID, APerfilID: Integer;
                               const APerms: TArray<string>);
     procedure SaveWithPerfil (const AUsuarioID, APerfilID: Integer);
   end;
@@ -90,13 +90,16 @@ begin
     FMenuItems);
 end;
 
-procedure TPermissoesController.Save(const AUsuarioID: Integer;
+procedure TPermissoesController.Save(const AUsuarioID, APerfilID: Integer;
   const APerms: TArray<string>);
 var
   LRec: TPermissoesRec;
 begin
+  { Se o usuario selecionou perfil diferente do que estava, sincroniza }
+  if APerfilID = 0 then
+    FModel.SaveWithPerfil(AUsuarioID, 0);  { zera perfil_id no banco }
   LRec.UsuarioID  := AUsuarioID;
-  LRec.PerfilID   := 0;
+  LRec.PerfilID   := APerfilID;
   LRec.Permissoes := APerms;
   FModel.Save(LRec);
   FView.ShowPermissoes(
