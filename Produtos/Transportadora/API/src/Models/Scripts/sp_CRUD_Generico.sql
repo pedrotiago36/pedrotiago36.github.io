@@ -75,12 +75,14 @@ BEGIN
 
         IF UPPER(p_acao) = 'INSERT' THEN
 
-            INSERT INTO tb_usuarios (login, senha, is_admin, perfil_id)
+            -- ativo = 1 garante que o novo usuario apareca na listagem imediatamente
+            INSERT INTO tb_usuarios (login, senha, is_admin, perfil_id, ativo)
             VALUES (
                 p_param1,
                 p_param2,
                 CAST(p_param3 AS UNSIGNED),
-                NULLIF(CAST(p_param4 AS UNSIGNED), 0)
+                NULLIF(CAST(p_param4 AS UNSIGNED), 0),
+                1
             );
 
         ELSEIF UPPER(p_acao) = 'UPDATE' THEN
@@ -100,7 +102,9 @@ BEGIN
 
         ELSEIF UPPER(p_acao) = 'DELETE' THEN
 
-            UPDATE tb_usuarios SET ativo = 0 WHERE id = p_id;
+            -- DELETE real: tb_permissoes_usuarios e tb_acoes_usuarios
+            -- possuem ON DELETE CASCADE, entao sao limpos automaticamente
+            DELETE FROM tb_usuarios WHERE id = p_id;
 
         END IF;
 
