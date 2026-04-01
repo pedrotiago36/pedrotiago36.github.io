@@ -1473,6 +1473,8 @@ begin
     '  var isadmin=document.getElementById("usr-admin").checked?"1":"0";' +
     '  var sel=document.getElementById("usr-perfil");' +
     '  var perfilid=sel?sel.value:"0";' +
+    '  if(!login){alert("Login \u00e9 obrigat\u00f3rio.");return;}' +
+    '  if(id==="0"&&!senha){alert("Senha \u00e9 obrigat\u00f3ria para novo usu\u00e1rio.");return;}' +
     '  parent.ajaxRequest(_f,"usr.save",' +
     '    ["id="+id,"login="+login,"senha="+senha,"isadmin="+isadmin,"perfilid="+perfilid]);}' +
     'function usrCancel(){parent.ajaxRequest(_f,"usr.insert",[]);}' +
@@ -2222,11 +2224,14 @@ begin
     { Campos }
     '.usr-field{display:flex;flex-direction:column;gap:8px;}' +
     '.usr-label{font-size:11px;font-weight:700;color:#F59E0B;letter-spacing:1px;text-transform:uppercase;}' +
-    '.usr-input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(245,158,11,.15);' +
+    '.usr-input{width:100%;background:rgba(42,16,3,0.88);border:1px solid rgba(245,158,11,.15);' +
     '  border-radius:12px;padding:12px 16px;font-size:14px;color:#FCD34D;' +
     '  font-family:"Segoe UI",system-ui,sans-serif;outline:none;transition:border-color .2s,box-shadow .2s;}' +
     '.usr-input::placeholder{color:rgba(245,158,11,.3);}' +
-    '.usr-input:focus{border-color:rgba(245,158,11,.5);box-shadow:0 0 0 3px rgba(245,158,11,.1);}' +
+    '.usr-input:focus{background:rgba(55,22,4,0.95);border-color:rgba(245,158,11,.5);box-shadow:0 0 0 3px rgba(245,158,11,.1);}' +
+    '.usr-input:-webkit-autofill,.usr-input:-webkit-autofill:hover,.usr-input:-webkit-autofill:focus{' +
+    '  -webkit-box-shadow:0 0 0px 1000px rgba(42,16,3,0.88) inset!important;' +
+    '  -webkit-text-fill-color:#FCD34D!important;transition:background-color 5000s ease-in-out 0s!important;}' +
     '.usr-select{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(245,158,11,.15);' +
     '  border-radius:12px;padding:12px 16px;font-size:14px;color:#FCD34D;' +
     '  font-family:"Segoe UI",system-ui,sans-serif;outline:none;cursor:pointer;transition:border-color .2s;}' +
