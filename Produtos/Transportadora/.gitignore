@@ -18,6 +18,8 @@
 *.tvsconfig
 *.local
 *.stat
+*.dsk
+*.dsv
 
 # Delphi backup/history
 __history/
