@@ -74,8 +74,8 @@ begin
       end;
     end;
 
-    { Busca rotas individuais do usuario }
-    LResponse := FAPI.Get('/permissoes/individual/' + IntToStr(AUsuarioID));
+    { Busca rotas efetivas (UNION individual + perfil) para marcar os checkboxes corretamente }
+    LResponse := FAPI.Get('/permissoes/usuario/' + IntToStr(AUsuarioID));
     LJson := TJSONObject.ParseJSONValue(LResponse) as TJSONObject;
     if not Assigned(LJson) then Exit;
     try
