@@ -102,21 +102,13 @@ begin
   LRec.PerfilID   := APerfilID;
   LRec.Permissoes := APerms;
   FModel.Save(LRec);
-  FView.ShowPermissoes(
-    FModel.FindByUsuario(AUsuarioID),
-    FUsuModel.ListAll,
-    FPerfilModel.ListAll,
-    FMenuItems);
+  LoadList;
 end;
 
 procedure TPermissoesController.SaveWithPerfil(const AUsuarioID, APerfilID: Integer);
 begin
   FModel.SaveWithPerfil(AUsuarioID, APerfilID);
-  FView.ShowPermissoes(
-    FModel.FindByUsuario(AUsuarioID),
-    FUsuModel.ListAll,
-    FPerfilModel.ListAll,
-    FMenuItems);
+  LoadList;
 end;
 
 end.
