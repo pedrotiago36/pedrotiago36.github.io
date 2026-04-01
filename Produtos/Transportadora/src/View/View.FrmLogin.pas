@@ -1466,7 +1466,6 @@ begin
     'function usrInsert(){parent.ajaxRequest(_f,"usr.insert",[]);}' +
     'function usrEdit(id){parent.ajaxRequest(_f,"usr.edit",["id="+id]);}' +
     'function usrDel(id){parent.ajaxRequest(_f,"usr.delete",["id="+id]);}' +
-    'function usrTogglePwd(){var i=document.getElementById("usr-senha");i.type=i.type==="password"?"text":"password";}' +
     'function usrSave(){' +
     '  var id=document.getElementById("usr-id").value;' +
     '  var login=document.getElementById("usr-login").value.trim();' +
@@ -2394,7 +2393,8 @@ begin
         'autocomplete="new-password" value="%s" ' +
         'oninput="this.classList.remove(''err'');var e=document.getElementById(''usr-err'');if(e)e.style.display=''none'';">',
         [ARec.Senha]);
-      B.Append('<button class="usr-eye-btn" type="button" onclick="usrTogglePwd()" tabindex="-1">');
+      B.Append('<button class="usr-eye-btn" type="button" tabindex="-1"' +
+        ' onclick="var i=this.parentElement.querySelector(''input'');if(i)i.type=i.type===''password''?''text'':''password'';">');
       B.Append('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">');
       B.Append('<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>');
       B.Append('</svg></button>');
