@@ -1,4 +1,4 @@
-program prjServer;
+﻿program prjServer;
 
 {$APPTYPE CONSOLE}
 
@@ -532,8 +532,8 @@ begin
           Qry := TFDQuery.Create(nil);
           try
             Qry.Connection := Conn;
-            { Atualiza perfil_id do usuario }
-            Qry.SQL.Text := 'UPDATE tb_usuarios SET perfil_id = :pid WHERE id = :uid';
+            { Atualiza perfil_id do usuario — NULLIF converte 0 em NULL para nao violar FK }
+            Qry.SQL.Text := 'UPDATE tb_usuarios SET perfil_id = NULLIF(:pid, 0) WHERE id = :uid';
             Qry.ParamByName('pid').AsInteger := LPerfilID;
             Qry.ParamByName('uid').AsInteger := LUsuarioID;
             Qry.ExecSQL;
