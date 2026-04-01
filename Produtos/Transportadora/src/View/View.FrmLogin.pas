@@ -1466,6 +1466,7 @@ begin
     'function usrInsert(){parent.ajaxRequest(_f,"usr.insert",[]);}' +
     'function usrEdit(id){parent.ajaxRequest(_f,"usr.edit",["id="+id]);}' +
     'function usrDel(id){parent.ajaxRequest(_f,"usr.delete",["id="+id]);}' +
+    'function usrTogglePwd(){var i=document.getElementById("usr-senha");i.type=i.type==="password"?"text":"password";}' +
     'function usrSave(){' +
     '  var id=document.getElementById("usr-id").value;' +
     '  var login=document.getElementById("usr-login").value.trim();' +
@@ -2239,6 +2240,12 @@ begin
     '.usr-input.err{border-color:rgba(255,72,58,.7)!important;box-shadow:0 0 0 2px rgba(255,72,58,.45)!important;animation:usrShk .26s ease!important;}' +
     '@keyframes usrShk{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}' +
     '.usr-errmsg{margin-top:5px;font-size:11.5px;color:rgba(255,90,75,0.92);display:none;}' +
+    '.usr-pwd-wrap{position:relative;}' +
+    '.usr-pwd-wrap .usr-input{padding-right:44px;}' +
+    '.usr-eye-btn{position:absolute;right:0;top:0;bottom:0;width:44px;background:none;border:none;' +
+    '  cursor:pointer;display:flex;align-items:center;justify-content:center;' +
+    '  color:rgba(245,158,11,.35);border-radius:0 12px 12px 0;transition:color .18s;}' +
+    '.usr-eye-btn:hover{color:rgba(245,158,11,.85);}' +
     '.usr-select{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(245,158,11,.15);' +
     '  border-radius:12px;padding:12px 16px;font-size:14px;color:#FCD34D;' +
     '  font-family:"Segoe UI",system-ui,sans-serif;outline:none;cursor:pointer;transition:border-color .2s;}' +
@@ -2380,12 +2387,18 @@ begin
       B.Append('<div class="usr-row">');
       B.Append('<div class="usr-field">');
       B.Append('<label class="usr-label" for="usr-senha">Senha</label>');
+      B.Append('<div class="usr-pwd-wrap">');
       B.AppendFormat(
         '<input id="usr-senha" class="usr-input" type="password" ' +
         'placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" ' +
         'autocomplete="new-password" value="%s" ' +
         'oninput="this.classList.remove(''err'');var e=document.getElementById(''usr-err'');if(e)e.style.display=''none'';">',
         [ARec.Senha]);
+      B.Append('<button class="usr-eye-btn" type="button" onclick="usrTogglePwd()" tabindex="-1">');
+      B.Append('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">');
+      B.Append('<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>');
+      B.Append('</svg></button>');
+      B.Append('</div>');
       B.Append('<div id="usr-err" class="usr-errmsg">Senha obrigat&oacute;ria para novo usu&aacute;rio.</div>');
       B.Append('</div>');
       B.Append('<div class="usr-field">');
