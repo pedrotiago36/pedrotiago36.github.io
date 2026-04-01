@@ -408,7 +408,10 @@ begin
     FUsuarioCtrl.Save(LLogin, LSenha, LIsAdmin, LPerfilID, LID);
   end;
   LAct[11] := procedure begin FPermissoesCtrl.SelectUser(LUsrID) end;
-  LAct[12] := procedure begin FPermissoesCtrl.Save(LUsrID, LPerfilID, LPerms) end;
+  LAct[12] := procedure begin
+    FPermissoesCtrl.Save(LUsrID, LPerfilID, LPerms);
+    UniSession.AddJS('showToast("Permiss\u00F5es individuais salvas!");');
+  end;
   LAct[13] := procedure begin FPermissoesCtrl.LoadList end;
   LAct[14] := procedure begin FScreenActionsCtrl.SelectUser(LUsrID) end;
   LAct[15] := procedure begin FScreenActionsCtrl.ToggleAction(LUsrID, LActionRoute, LActionKey) end;
@@ -419,6 +422,7 @@ begin
   end;
   LAct[18] := procedure begin
     FPermissoesCtrl.SaveWithPerfil(LUsrID, LPerfilID);
+    UniSession.AddJS('showToast("Perfil aplicado com sucesso!");');
   end;
 
   LAct[
@@ -1275,7 +1279,26 @@ begin
     '@keyframes fuSlide{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}' +
     '::-webkit-scrollbar{width:4px;height:4px;}' +
     '::-webkit-scrollbar-track{background:transparent;}' +
-    '::-webkit-scrollbar-thumb{background:rgba(245,158,11,.15);border-radius:4px;}';
+    '::-webkit-scrollbar-thumb{background:rgba(245,158,11,.15);border-radius:4px;}' +
+    { Toast }
+    '#toast-cnt{position:fixed;bottom:28px;right:28px;z-index:9999;' +
+    '  display:flex;flex-direction:column;gap:10px;pointer-events:none;}' +
+    '.toast{display:flex;align-items:center;gap:12px;' +
+    '  background:linear-gradient(135deg,rgba(16,185,129,.18),rgba(5,150,105,.10));' +
+    '  border:1px solid rgba(16,185,129,.45);border-left:3px solid #10B981;' +
+    '  border-radius:14px;padding:14px 20px;min-width:270px;max-width:380px;' +
+    '  box-shadow:0 8px 32px rgba(0,0,0,.45),0 0 0 1px rgba(16,185,129,.08);' +
+    '  backdrop-filter:blur(14px);pointer-events:auto;' +
+    '  animation:tIn .32s cubic-bezier(.22,1,.36,1) forwards;}' +
+    '.toast.out{animation:tOut .28s ease forwards;}' +
+    '.toast-ic{width:22px;height:22px;border-radius:50%;flex-shrink:0;' +
+    '  background:rgba(16,185,129,.18);border:1.5px solid rgba(16,185,129,.5);' +
+    '  display:flex;align-items:center;justify-content:center;' +
+    '  color:#10B981;font-size:12px;font-weight:900;}' +
+    '.toast-msg{font-size:13px;font-weight:600;color:#E2E8F0;' +
+    '  font-family:"Segoe UI",system-ui,sans-serif;line-height:1.4;}' +
+    '@keyframes tIn{from{opacity:0;transform:translateX(70px)}to{opacity:1;transform:translateX(0)}}' +
+    '@keyframes tOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(70px)}}';
 
   JS :=
     'var _f=' + FJSFrame + ';var OT={},SB=false,_favs=[];' +
@@ -1565,7 +1588,29 @@ begin
     '  var btn=document.getElementById("btn-ac-save");' +
     '  if(btn){btn.disabled=false;btn.textContent="\u2713 Salvar";}' +
     '  alert("Permiss\u00F5es de a\u00E7\u00F5es salvas com sucesso!");}' +
-    'window.addEventListener("load",function(){renderScr("","");});';
+    'window.addEventListener("load",function(){renderScr("","");});' +
+    'function showToast(msg){' +
+    '  var c=document.getElementById("toast-cnt");' +
+    '  if(!c){c=document.createElement("div");c.id="toast-cnt";document.body.appendChild(c);}' +
+    '  var t=document.createElement("div");t.className="toast";' +
+    '  t.innerHTML="<div class=toast-ic>&#10003;</div><div class=toast-msg>"+msg+"</div>";' +
+    '  c.appendChild(t);' +
+    '  setTimeout(function(){t.classList.add("out");' +
+    '    setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},300);},' +
+    '  3000);}' +
+    'function showToastErr(msg){' +
+    '  var c=document.getElementById("toast-cnt");' +
+    '  if(!c){c=document.createElement("div");c.id="toast-cnt";document.body.appendChild(c);}' +
+    '  var t=document.createElement("div");' +
+    '  t.className="toast";' +
+    '  t.style.background="linear-gradient(135deg,rgba(239,68,68,.18),rgba(220,38,38,.10))";' +
+    '  t.style.borderColor="rgba(239,68,68,.45)";t.style.borderLeftColor="#EF4444";' +
+    '  t.innerHTML="<div class=toast-ic style=''background:rgba(239,68,68,.18);border-color:rgba(239,68,68,.5);color:#EF4444''>&#10005;</div><div class=toast-msg>"+msg+"</div>";' +
+    '  c.appendChild(t);' +
+    '  setTimeout(function(){t.classList.add("out");' +
+    '    setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},300);},' +
+    '  4000);}' +
+    '';
 
   H := TStringBuilder.Create;
   try
