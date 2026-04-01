@@ -68,15 +68,14 @@ end;
 
 procedure TPermissoesController.LoadList;
 var
-  LUsers  : TArray<TUsuarioRec>;
-  LFirstID: Integer;
+  LEmpty: TPermissoesRec;
 begin
-  LUsers   := FUsuModel.ListAll;
-  LFirstID := 0;
-  if Length(LUsers) > 0 then LFirstID := LUsers[0].ID;
+  LEmpty.UsuarioID  := 0;
+  LEmpty.PerfilID   := 0;
+  SetLength(LEmpty.Permissoes, 0);
   FView.ShowPermissoes(
-    FModel.FindByUsuario(LFirstID),
-    LUsers,
+    LEmpty,
+    FUsuModel.ListAll,
     FPerfilModel.ListAll,
     FMenuItems);
 end;
