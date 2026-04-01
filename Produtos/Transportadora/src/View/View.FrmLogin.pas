@@ -557,8 +557,16 @@ end;
 
 procedure TFrmLogin.NotifyFailure(const AMessage: string);
 begin
-  { Ext.Msg.alert roda no contexto da pagina principal (ExtJS) — sempre disponivel }
-  UniSession.AddJS('Ext.Msg.alert("Aten\u00E7\u00E3o",' + QuotedStr(AMessage) + ');');
+  { HtmlLogin e TUniURLFrame — funcoes do iframe acessiveis via c.iframe.contentWindow }
+  UniSession.AddJS(
+    '(function(){' +
+    '  var c=' + HtmlLogin.JSName + ';' +
+    '  var w=c&&c.iframe&&c.iframe.contentWindow;' +
+    '  if(!w) return;' +
+    '  var btn=w.document.getElementById("btnLogin");' +
+    '  if(btn) btn.classList.remove("loading");' +
+    '  if(w.showErrMsg) w.showErrMsg(' + QuotedStr(AMessage) + ');' +
+    '})();');
 end;
 
 { ══════════════════════════════════════════════════════════════
