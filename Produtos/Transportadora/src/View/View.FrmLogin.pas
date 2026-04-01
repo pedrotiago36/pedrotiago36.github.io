@@ -1473,8 +1473,12 @@ begin
     '  var isadmin=document.getElementById("usr-admin").checked?"1":"0";' +
     '  var sel=document.getElementById("usr-perfil");' +
     '  var perfilid=sel?sel.value:"0";' +
-    '  if(!login){alert("Login \u00e9 obrigat\u00f3rio.");return;}' +
-    '  if(id==="0"&&!senha){alert("Senha \u00e9 obrigat\u00f3ria para novo usu\u00e1rio.");return;}' +
+    '  if(id==="0"&&!senha){' +
+    '    var f=document.getElementById("usr-senha");' +
+    '    var e=document.getElementById("usr-err");' +
+    '    f.classList.remove("err");void f.offsetWidth;f.classList.add("err");' +
+    '    if(e){e.style.display="block";}' +
+    '    f.focus();return;}' +
     '  parent.ajaxRequest(_f,"usr.save",' +
     '    ["id="+id,"login="+login,"senha="+senha,"isadmin="+isadmin,"perfilid="+perfilid]);}' +
     'function usrCancel(){parent.ajaxRequest(_f,"usr.insert",[]);}' +
@@ -2232,6 +2236,9 @@ begin
     '.usr-input:-webkit-autofill,.usr-input:-webkit-autofill:hover,.usr-input:-webkit-autofill:focus{' +
     '  -webkit-box-shadow:0 0 0px 1000px rgba(42,16,3,0.88) inset!important;' +
     '  -webkit-text-fill-color:#FCD34D!important;transition:background-color 5000s ease-in-out 0s!important;}' +
+    '.usr-input.err{border-color:rgba(255,72,58,.7)!important;box-shadow:0 0 0 2px rgba(255,72,58,.45)!important;animation:usrShk .26s ease!important;}' +
+    '@keyframes usrShk{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}' +
+    '.usr-errmsg{margin-top:5px;font-size:11.5px;color:rgba(255,90,75,0.92);display:none;}' +
     '.usr-select{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(245,158,11,.15);' +
     '  border-radius:12px;padding:12px 16px;font-size:14px;color:#FCD34D;' +
     '  font-family:"Segoe UI",system-ui,sans-serif;outline:none;cursor:pointer;transition:border-color .2s;}' +
@@ -2376,8 +2383,10 @@ begin
       B.AppendFormat(
         '<input id="usr-senha" class="usr-input" type="password" ' +
         'placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" ' +
-        'autocomplete="new-password" value="%s">',
+        'autocomplete="new-password" value="%s" ' +
+        'oninput="this.classList.remove(''err'');var e=document.getElementById(''usr-err'');if(e)e.style.display=''none'';">',
         [ARec.Senha]);
+      B.Append('<div id="usr-err" class="usr-errmsg">Senha obrigat&oacute;ria para novo usu&aacute;rio.</div>');
       B.Append('</div>');
       B.Append('<div class="usr-field">');
       B.Append('<label class="usr-label" for="usr-perfil">Perfil vinculado</label>');
