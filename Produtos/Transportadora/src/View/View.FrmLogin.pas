@@ -655,13 +655,16 @@ begin
     S.Append('.campo.foc .clabel{color:rgba(255,210,80,1)}.campo.err .clabel{color:rgba(255,85,70,0.85)}');
     S.Append('.cbox{position:relative;display:flex;align-items:center}');
     S.Append('.cinput{width:100%!important;height:48px!important;padding:0 46px!important;');
-    S.Append('background:rgba(255,255,255,0.08)!important;border:none!important;border-radius:12px!important;');
+    S.Append('background:rgba(42,16,3,0.90)!important;border:none!important;border-radius:12px!important;');
     S.Append('color:rgba(255,245,222,0.97)!important;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif!important;');
     S.Append('font-size:14px!important;outline:none!important;caret-color:#FFCC40!important;');
     S.Append('box-shadow:0 0 0 1.5px rgba(255,170,50,0.22),inset 0 1.5px 0 rgba(255,255,255,0.07)!important;transition:all .2s!important}');
     S.Append('.cinput::placeholder{color:rgba(255,195,110,0.28)!important;font-size:13px!important}');
-    S.Append('.cinput:-webkit-autofill{-webkit-box-shadow:0 0 0px 1000px rgba(30,12,2,0.92) inset!important;-webkit-text-fill-color:rgba(255,245,222,0.97)!important}');
-    S.Append('.campo.foc .cinput{background:rgba(255,165,38,0.13)!important;box-shadow:0 0 0 2px rgba(255,200,60,0.60),0 0 0 5px rgba(255,160,35,0.14)!important}');
+    { Autofill: mantém cor amarronzada — precisa de background-color para o Chrome nao sobrescrever }
+    S.Append('.cinput:-webkit-autofill,.cinput:-webkit-autofill:hover,.cinput:-webkit-autofill:focus{');
+    S.Append('-webkit-box-shadow:0 0 0px 1000px rgba(42,16,3,0.90) inset!important;');
+    S.Append('-webkit-text-fill-color:rgba(255,245,222,0.97)!important;transition:background-color 5000s ease-in-out 0s!important}');
+    S.Append('.campo.foc .cinput{background:rgba(60,22,4,0.95)!important;box-shadow:0 0 0 2px rgba(255,200,60,0.60),0 0 0 5px rgba(255,160,35,0.14)!important}');
     S.Append('.campo.err .cinput{box-shadow:0 0 0 2px rgba(255,72,58,0.60)!important;animation:shk .26s ease!important}');
     S.Append('@keyframes shk{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}');
     S.Append('.cicone{position:absolute;left:0;top:0;bottom:0;width:46px;display:flex;align-items:center;justify-content:center;color:rgba(255,180,60,0.28);pointer-events:none;transition:color .2s}');
