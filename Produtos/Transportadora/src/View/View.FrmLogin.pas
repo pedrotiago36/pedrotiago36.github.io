@@ -2394,9 +2394,14 @@ begin
         'oninput="this.classList.remove(''err'');var e=document.getElementById(''usr-err'');if(e)e.style.display=''none'';">',
         [ARec.Senha]);
       B.Append('<button class="usr-eye-btn" type="button" tabindex="-1"' +
-        ' onclick="var i=this.parentElement.querySelector(''input'');if(i)i.type=i.type===''password''?''text'':''password'';">');
-      B.Append('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">');
-      B.Append('<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>');
+        ' onmousedown="event.preventDefault();"' +
+        ' onclick="(function(b){var w=b.parentNode;if(!w)return;' +
+               'var i=w.querySelector(''[type=password],[type=text]'');' +
+               'if(!i)return;' +
+               'i.setAttribute(''type'',i.getAttribute(''type'')==''password''?''text'':''password'');})(this);">');
+      B.Append('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none">');
+      B.Append('<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" style="pointer-events:none"/>');
+      B.Append('<circle cx="12" cy="12" r="3" style="pointer-events:none"/>');
       B.Append('</svg></button>');
       B.Append('</div>');
       B.Append('<div id="usr-err" class="usr-errmsg">Senha obrigat&oacute;ria para novo usu&aacute;rio.</div>');
