@@ -1,0 +1,14 @@
+prjPortalBatista.exe: 00008584: 09:38:09 [TUniServerModule]:Shutting Down Server.
+prjPortalBatista.exe: 00008584: 09:38:09 [TUniServerModule]:Stopping HTTP Server.
+prjPortalBatista.exe: 00008584: 09:38:10 [TUniServerModule]:HTTP Server Stopped.
+prjPortalBatista.exe: 00008584: 09:38:10 [TUniGUISessionManager]:Terminating Session manager.
+prjPortalBatista.exe: 00008584: 09:38:10 [TUniGUISessionManager]:Stopping Cache Eraser...
+prjPortalBatista.exe: 00008584: 09:38:10 [TUniGUISessionManager]:Cache Eraser Stopped.
+prjPortalBatista.exe: 00008584: 09:38:10 [TUniGUISessionManager]:Destroying Worker Threads.
+prjPortalBatista.exe: 00008584: 09:38:10 [TUniGUISessionManager]:Session manager terminated.
+prjPortalBatista.exe: 00008584: 09:38:10 [TUniWebSocketStack]:Terminating...
+prjPortalBatista.exe: 00008584: 09:38:10 [TUniGUIMessageQ]:Terminated.
+prjPortalBatista.exe: 00008584: 09:38:10 [TUniWebSocketStack]:Terminated.
+prjPortalBatista.exe: 00008584: 09:38:10 [TUniServerModule]:Server Shutdown Completed.
+prjPortalBatista.exe: 00008584: 09:38:10 []:<-------------------------------------------------------------->
+prjPortalBatista.exe: 00008584: 09:38:10 [Terminated]:Exit Code: 0

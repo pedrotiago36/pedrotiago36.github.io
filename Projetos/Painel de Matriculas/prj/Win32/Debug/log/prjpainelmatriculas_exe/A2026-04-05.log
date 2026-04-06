@@ -1,0 +1,14 @@
+prjPainelMatriculas.exe: 0000851C: 09:38:11 [TUniServerModule]:Shutting Down Server.
+prjPainelMatriculas.exe: 0000851C: 09:38:11 [TUniServerModule]:Stopping HTTP Server.
+prjPainelMatriculas.exe: 0000851C: 09:38:12 [TUniServerModule]:HTTP Server Stopped.
+prjPainelMatriculas.exe: 0000851C: 09:38:12 [TUniGUISessionManager]:Terminating Session manager.
+prjPainelMatriculas.exe: 0000851C: 09:38:12 [TUniGUISessionManager]:Stopping Cache Eraser...
+prjPainelMatriculas.exe: 0000851C: 09:38:12 [TUniGUISessionManager]:Cache Eraser Stopped.
+prjPainelMatriculas.exe: 0000851C: 09:38:12 [TUniGUISessionManager]:Destroying Worker Threads.
+prjPainelMatriculas.exe: 0000851C: 09:38:12 [TUniGUISessionManager]:Session manager terminated.
+prjPainelMatriculas.exe: 0000851C: 09:38:12 [TUniWebSocketStack]:Terminating...
+prjPainelMatriculas.exe: 0000851C: 09:38:12 [TUniGUIMessageQ]:Terminated.
+prjPainelMatriculas.exe: 0000851C: 09:38:12 [TUniWebSocketStack]:Terminated.
+prjPainelMatriculas.exe: 0000851C: 09:38:12 [TUniServerModule]:Server Shutdown Completed.
+prjPainelMatriculas.exe: 0000851C: 09:38:13 []:<-------------------------------------------------------------->
+prjPainelMatriculas.exe: 0000851C: 09:38:13 [Terminated]:Exit Code: 0

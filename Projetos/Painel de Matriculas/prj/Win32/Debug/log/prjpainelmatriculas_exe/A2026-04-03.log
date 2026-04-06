@@ -1,0 +1,49 @@
+prjPainelMatriculas.exe: 000077CC: 10:33:57 []:>--------------------------------------------------------------<
+prjPainelMatriculas.exe: 000077CC: 10:33:57 [TUniServerModule]:Server First Init.
+prjPainelMatriculas.exe: 000077CC: 10:33:57 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Painel de Matriculas\prj\Win32\Debug\
+prjPainelMatriculas.exe: 000077CC: 10:33:57 [TUniServerModule]:Debug Mode = ON
+prjPainelMatriculas.exe: 000077CC: 10:33:57 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPainelMatriculas.exe: 000077CC: 10:33:58 [TUniServerModule]:Starting HTTP Server on Port: 8072...
+prjPainelMatriculas.exe: 000077CC: 10:33:58 [TUniServerModule]:HTTP Server Started on Port: 8072
+prjPainelMatriculas.exe: 00003874: 10:37:16 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: veWDnw7bvd112DE93EB ) : Addr: $00F7B2C3
+prjPainelMatriculas.exe: 000077CC: 10:38:36 [TUniServerModule]:Shutting Down Server.
+prjPainelMatriculas.exe: 000077CC: 10:38:36 [TUniServerModule]:Stopping HTTP Server.
+prjPainelMatriculas.exe: 000077CC: 10:38:43 [TUniServerModule]:HTTP Server Stopped.
+prjPainelMatriculas.exe: 000077CC: 10:38:43 [TUniGUISessionManager]:Terminating Session manager.
+prjPainelMatriculas.exe: 000077CC: 10:38:43 [TUniGUISessionManager]:Stopping Cache Eraser...
+prjPainelMatriculas.exe: 000077CC: 10:38:43 [TUniGUISessionManager]:Cache Eraser Stopped.
+prjPainelMatriculas.exe: 000077CC: 10:38:43 [TUniGUISessionManager]:Destroying Worker Threads.
+prjPainelMatriculas.exe: 000077CC: 10:38:43 [TUniGUISessionManager]:Session manager terminated.
+prjPainelMatriculas.exe: 000077CC: 10:38:43 [TUniWebSocketStack]:Terminating...
+prjPainelMatriculas.exe: 000077CC: 10:38:43 [TUniGUIMessageQ]:Terminated.
+prjPainelMatriculas.exe: 000077CC: 10:38:43 [TUniWebSocketStack]:Terminated.
+prjPainelMatriculas.exe: 000077CC: 10:38:43 [TUniServerModule]:Server Shutdown Completed.
+prjPainelMatriculas.exe: 000077CC: 10:38:43 []:<-------------------------------------------------------------->
+prjPainelMatriculas.exe: 000077CC: 10:38:43 [Terminated]:Exit Code: 0
+prjPainelMatriculas.exe: 00004494: 10:42:14 []:>--------------------------------------------------------------<
+prjPainelMatriculas.exe: 00004494: 10:42:14 [TUniServerModule]:Server First Init.
+prjPainelMatriculas.exe: 00004494: 10:42:14 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Painel de Matriculas\prj\Win32\Debug\
+prjPainelMatriculas.exe: 00004494: 10:42:14 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPainelMatriculas.exe: 00004494: 10:42:15 [TUniServerModule]:Starting HTTP Server on Port: 8072...
+prjPainelMatriculas.exe: 00004494: 10:42:15 [TUniServerModule]:HTTP Server Started on Port: 8072
+prjPainelMatriculas.exe: 00003D90: 10:42:22 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: gm1Qas222p112DE94BD ) : Addr: $00F7B2C3
+prjPainelMatriculas.exe: 00004494: 10:51:43 [TUniServerModule]:Shutting Down Server.
+prjPainelMatriculas.exe: 00004494: 10:51:43 [TUniServerModule]:Stopping HTTP Server.
+prjPainelMatriculas.exe: 00004494: 10:51:45 [TUniServerModule]:HTTP Server Stopped.
+prjPainelMatriculas.exe: 00004494: 10:51:45 [TUniGUISessionManager]:Terminating Session manager.
+prjPainelMatriculas.exe: 00004494: 10:51:45 [TUniGUISessionManager]:Stopping Cache Eraser...
+prjPainelMatriculas.exe: 00004494: 10:51:46 [TUniGUISessionManager]:Cache Eraser Stopped.
+prjPainelMatriculas.exe: 00004494: 10:51:47 [TUniGUISessionManager]:Destroying Worker Threads.
+prjPainelMatriculas.exe: 00004494: 10:51:47 [TUniGUISessionManager]:Session manager terminated.
+prjPainelMatriculas.exe: 00004494: 10:51:48 [TUniWebSocketStack]:Terminating...
+prjPainelMatriculas.exe: 00004494: 10:51:48 [TUniGUIMessageQ]:Terminated.
+prjPainelMatriculas.exe: 00004494: 10:51:48 [TUniWebSocketStack]:Terminated.
+prjPainelMatriculas.exe: 00004494: 10:51:48 [TUniServerModule]:Server Shutdown Completed.
+prjPainelMatriculas.exe: 00004494: 10:51:48 []:<-------------------------------------------------------------->
+prjPainelMatriculas.exe: 00004494: 10:51:48 [Terminated]:Exit Code: 0
+prjPainelMatriculas.exe: 0000851C: 10:54:44 []:>--------------------------------------------------------------<
+prjPainelMatriculas.exe: 0000851C: 10:54:44 [TUniServerModule]:Server First Init.
+prjPainelMatriculas.exe: 0000851C: 10:54:44 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Painel de Matriculas\prj\Win32\Debug\
+prjPainelMatriculas.exe: 0000851C: 10:54:44 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPainelMatriculas.exe: 0000851C: 10:54:45 [TUniServerModule]:Starting HTTP Server on Port: 8072...
+prjPainelMatriculas.exe: 0000851C: 10:54:45 [TUniServerModule]:HTTP Server Started on Port: 8072

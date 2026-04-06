@@ -1,0 +1,126 @@
+unit uPrincipal;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics,
+  Controls, Forms, uniGUITypes, uniGUIAbstractClasses,
+  uniGUIClasses, uniGUIRegClasses, uniGUIForm,
+  uniHTMLFrame,
+  System.IOUtils,
+  Controller.IPainelAgendamentos,
+  Controller.TPainelAgendamentos,
+  uniGUIBaseClasses;
+
+type
+  TMainForm = class(TUniForm)
+    HTMLAgenda: TUniHTMLFrame;
+    procedure UniFormCreate(Sender: TObject);
+    procedure UniFormDestroy(Sender: TObject);
+    procedure UniFormAjaxEvent(Sender: TComponent; EventName: string;
+      Params: TUniStrings);
+  private
+    FController: IPainelController;
+    procedure ConfigurarBridge;
+    procedure PushAgendamentos;
+    procedure OnAtualizacaoDisponivel(Sender: TObject);
+  public
+  end;
+
+function MainForm: TMainForm;
+
+implementation
+
+{$R *.dfm}
+
+uses
+  uniGUIVars, MainModule, uniGUIApplication;
+
+function MainForm: TMainForm;
+begin
+  Result := TMainForm(UniMainModule.GetFormInstance(TMainForm));
+end;
+
+procedure TMainForm.UniFormCreate(Sender: TObject);
+var
+  LLista   : TStringList;
+  LArquivo : string;
+  LPastaAg : string;
+begin
+  FController := TPainelController.Create;
+
+  LArquivo := TPath.Combine(ExtractFilePath(ParamStr(0)),
+                'files' + PathDelim + 'agenda.html');
+  LLista := TStringList.Create;
+  try
+    LLista.LoadFromFile(LArquivo, TEncoding.UTF8);
+    HTMLAgenda.HTML.Text := LLista.Text;
+  finally
+    LLista.Free;
+  end;
+
+  // Registra o callback: a thread chama OnAtualizacaoDisponivel apos cada scan
+  FController.DefinirCallbackAtualizacao(OnAtualizacaoDisponivel);
+
+  // Caminho da pasta de agendamentos gerada pelo portal Front-End.
+  // Em producao, ajuste conforme a instalacao do servidor.
+  LPastaAg := ExpandFileName(
+    ExtractFilePath(ParamStr(0)) +
+    '..\..\..\..\Front-End\prj\Win32\Debug\agendamentos');
+
+  // IniciarMonitoramento faz 1 scan sincrono e sobe a thread
+  FController.IniciarMonitoramento(LPastaAg);
+
+  ConfigurarBridge;
+end;
+
+procedure TMainForm.UniFormDestroy(Sender: TObject);
+begin
+  FController.PararMonitoramento;
+end;
+
+procedure TMainForm.ConfigurarBridge;
+begin
+  UniSession.AddJS(
+    'Ext.onReady(function() {' +
+    '  var byId  = Ext.ComponentQuery.query("[id*=HTMLAgenda]")[0];' +
+    '  var todos = Ext.ComponentQuery.query("*");' +
+    '  window._uniFormRef = byId || todos[todos.length - 1] || null;' +
+    '});' +
+
+    'window.receberAgendamentos = function(dados) {' +
+    '  var frames = document.querySelectorAll("iframe");' +
+    '  frames.forEach(function(f) {' +
+    '    try { f.contentWindow.onReceberAgendamentos(dados); } catch(e) {}' +
+    '  });' +
+    '};'
+  );
+end;
+
+procedure TMainForm.PushAgendamentos;
+var
+  LJSON: string;
+begin
+  LJSON := FController.ObterAgendamentosJSON;
+  UniSession.AddJS('window.receberAgendamentos(' + LJSON + ');');
+end;
+
+// Chamado pelo TMonitorThread via TThread.Synchronize — ja esta no thread principal
+procedure TMainForm.OnAtualizacaoDisponivel(Sender: TObject);
+begin
+  PushAgendamentos;
+end;
+
+procedure TMainForm.UniFormAjaxEvent(Sender: TComponent; EventName: string;
+  Params: TUniStrings);
+begin
+  // afterrender: browser renderizou o form — envia os dados imediatamente
+  case AnsiIndexStr(EventName, ['afterrender']) of
+    0: PushAgendamentos;
+  end;
+end;
+
+initialization
+  RegisterAppFormClass(TMainForm);
+
+end.

@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+  <Transactions>
+    <Transaction>2026/04/01 16:15:59.270,=C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\ServerModule.pas</Transaction>
+    <Transaction>2026/04/01 16:15:59.550,=C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\MainModule.pas</Transaction>
+    <Transaction>2026/04/01 16:16:01.032,=C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Main.pas</Transaction>
+    <Transaction>2026/04/01 16:16:38.971,C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\src\Service\ServerModule.dfm=C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\ServerModule.dfm</Transaction>
+    <Transaction>2026/04/01 16:16:38.971,C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\src\Service\ServerModule.pas=C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\ServerModule.pas</Transaction>
+    <Transaction>2026/04/01 16:17:10.084,C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\src\View\uPortaBatista.pas=C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Main.pas</Transaction>
+    <Transaction>2026/04/01 16:17:10.084,C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\src\View\uPortaBatista.dfm=C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Main.dfm</Transaction>
+    <Transaction>2026/04/01 16:17:26.325,C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\src\Service\MainModule.dfm=C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\MainModule.dfm</Transaction>
+    <Transaction>2026/04/01 16:17:26.325,C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\src\Service\MainModule.pas=C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\MainModule.pas</Transaction>
+    <Transaction>2026/04/01 16:17:35.228,C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\prjPortalBatista.dproj=C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\prjPortalBatista.dproj</Transaction>
+  </Transactions>
+</BorlandProject>
