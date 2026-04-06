@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir \"C:\\\\Users\\\\Casa\\\\Desktop\\\\Gestão Escolar Adm Batista\\\\Projetos\")",
+      "Bash(grep -E \"\\\\.\\(pas|dfm|dpr|dproj|res\\)$\")"
+    ]
+  }
+}

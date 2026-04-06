@@ -1,0 +1,102 @@
+prjPortalBatista.exe: 00004760: 17:11:35 []:>--------------------------------------------------------------<
+prjPortalBatista.exe: 00004760: 17:11:35 [TUniServerModule]:Server First Init.
+prjPortalBatista.exe: 00004760: 17:11:35 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\
+prjPortalBatista.exe: 00004760: 17:11:35 [TUniServerModule]:Debug Mode = ON
+prjPortalBatista.exe: 00004760: 17:11:36 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPortalBatista.exe: 00004760: 17:11:36 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPortalBatista.exe: 000057A4: 17:11:40 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\diretor\foto.jpg
+prjPortalBatista.exe: 0000372C: 17:16:16 []:>--------------------------------------------------------------<
+prjPortalBatista.exe: 0000372C: 17:16:16 [TUniServerModule]:Server First Init.
+prjPortalBatista.exe: 0000372C: 17:16:16 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\
+prjPortalBatista.exe: 0000372C: 17:16:16 [TUniServerModule]:Debug Mode = ON
+prjPortalBatista.exe: 0000372C: 17:16:16 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPortalBatista.exe: 0000372C: 17:16:17 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPortalBatista.exe: 0000372C: 17:16:17 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPortalBatista.exe: 0000B014: 17:16:22 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: MQEQxk3tY2112DBF27A ) : Addr: $00DB847F
+prjPortalBatista.exe: 000048FC: 17:18:23 []:>--------------------------------------------------------------<
+prjPortalBatista.exe: 000048FC: 17:18:23 [TUniServerModule]:Server First Init.
+prjPortalBatista.exe: 000048FC: 17:18:23 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\
+prjPortalBatista.exe: 000048FC: 17:18:23 [TUniServerModule]:Debug Mode = ON
+prjPortalBatista.exe: 000048FC: 17:18:23 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPortalBatista.exe: 000048FC: 17:18:24 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPortalBatista.exe: 000048FC: 17:18:24 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPortalBatista.exe: 00006E40: 17:18:29 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: gKNIFc3I5R112DBF3C2 ) : Addr: $00AA847F
+prjPortalBatista.exe: 000051BC: 17:20:33 []:>--------------------------------------------------------------<
+prjPortalBatista.exe: 000051BC: 17:20:33 [TUniServerModule]:Server First Init.
+prjPortalBatista.exe: 000051BC: 17:20:33 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\
+prjPortalBatista.exe: 000051BC: 17:20:33 [TUniServerModule]:Debug Mode = ON
+prjPortalBatista.exe: 000051BC: 17:20:33 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPortalBatista.exe: 000051BC: 17:20:34 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPortalBatista.exe: 000051BC: 17:20:34 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPortalBatista.exe: 00004AA4: 17:20:37 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: j2ggJi7k9H112DBF455 ) : Addr: $00A8847F
+prjPortalBatista.exe: 00006D90: 17:21:19 []:>--------------------------------------------------------------<
+prjPortalBatista.exe: 00006D90: 17:21:19 [TUniServerModule]:Server First Init.
+prjPortalBatista.exe: 00006D90: 17:21:19 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\
+prjPortalBatista.exe: 00006D90: 17:21:19 [TUniServerModule]:Debug Mode = ON
+prjPortalBatista.exe: 00006D90: 17:21:19 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPortalBatista.exe: 00006D90: 17:21:19 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPortalBatista.exe: 00006D90: 17:21:19 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPortalBatista.exe: 00009B7C: 17:21:24 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: OS8mRmfNo7112DBF4EA ) : Addr: $00A8847F
+prjPortalBatista.exe: 00005004: 17:37:03 []:>--------------------------------------------------------------<
+prjPortalBatista.exe: 00005004: 17:37:03 [TUniServerModule]:Server First Init.
+prjPortalBatista.exe: 00005004: 17:37:03 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\
+prjPortalBatista.exe: 00005004: 17:37:03 [TUniServerModule]:Debug Mode = ON
+prjPortalBatista.exe: 00005004: 17:37:04 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPortalBatista.exe: 00005004: 17:37:04 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPortalBatista.exe: 00003304: 17:37:06 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: hIPq5bdaiy112DBF5DB ) : Addr: $0081847F
+prjPortalBatista.exe: 00002408: 17:40:43 []:>--------------------------------------------------------------<
+prjPortalBatista.exe: 00002408: 17:40:43 [TUniServerModule]:Server First Init.
+prjPortalBatista.exe: 00002408: 17:40:43 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\
+prjPortalBatista.exe: 00002408: 17:40:43 [TUniServerModule]:Debug Mode = ON
+prjPortalBatista.exe: 00002408: 17:40:43 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPortalBatista.exe: 00002408: 17:40:44 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPortalBatista.exe: 00002408: 17:40:44 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPortalBatista.exe: 0000B2D0: 17:43:24 []:>--------------------------------------------------------------<
+prjPortalBatista.exe: 0000B2D0: 17:43:24 [TUniServerModule]:Server First Init.
+prjPortalBatista.exe: 0000B2D0: 17:43:24 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\
+prjPortalBatista.exe: 0000B2D0: 17:43:24 [TUniServerModule]:Debug Mode = ON
+prjPortalBatista.exe: 0000B2D0: 17:43:25 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPortalBatista.exe: 0000B2D0: 17:43:25 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPortalBatista.exe: 0000B2D0: 17:43:25 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPortalBatista.exe: 0000A7A0: 17:43:30 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: lueXe76eFc112DBFA61 ) : Addr: $0081847F
+prjPortalBatista.exe: 0000B5C0: 17:48:53 []:>--------------------------------------------------------------<
+prjPortalBatista.exe: 0000B5C0: 17:48:53 [TUniServerModule]:Server First Init.
+prjPortalBatista.exe: 0000B5C0: 17:48:53 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\
+prjPortalBatista.exe: 0000B5C0: 17:48:53 [TUniServerModule]:Debug Mode = ON
+prjPortalBatista.exe: 0000B5C0: 17:48:53 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPortalBatista.exe: 0000B5C0: 17:48:54 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPortalBatista.exe: 0000B5C0: 17:48:54 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPortalBatista.exe: 000044D8: 17:48:57 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: sIlxr8zMxk112DBFBCC ) : Addr: $0102847F
+prjPortalBatista.exe: 0000714C: 17:51:54 []:>--------------------------------------------------------------<
+prjPortalBatista.exe: 0000714C: 17:51:54 [TUniServerModule]:Server First Init.
+prjPortalBatista.exe: 0000714C: 17:51:54 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\
+prjPortalBatista.exe: 0000714C: 17:51:54 [TUniServerModule]:Debug Mode = ON
+prjPortalBatista.exe: 0000714C: 17:51:54 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPortalBatista.exe: 0000714C: 17:51:54 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPortalBatista.exe: 0000714C: 17:51:55 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPortalBatista.exe: 00003FD0: 17:51:59 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: WehKyv7Jjf112DBFC99 ) : Addr: $0097847F
+prjPortalBatista.exe: 00005F34: 18:01:47 []:>--------------------------------------------------------------<
+prjPortalBatista.exe: 00005F34: 18:01:47 [TUniServerModule]:Server First Init.
+prjPortalBatista.exe: 00005F34: 18:01:47 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\
+prjPortalBatista.exe: 00005F34: 18:01:47 [TUniServerModule]:Debug Mode = ON
+prjPortalBatista.exe: 00005F34: 18:01:48 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPortalBatista.exe: 00005F34: 18:01:48 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPortalBatista.exe: 00005F34: 18:01:49 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPortalBatista.exe: 000082F4: 18:02:16 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: cnrG5W5h6A112DBFDB4 ) : Addr: $0099847F
+prjPortalBatista.exe: 00008470: 18:02:42 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\.well-known\appspecific\com.chrome.devtools.json
+prjPortalBatista.exe: 000021D4: 18:11:00 []:>--------------------------------------------------------------<
+prjPortalBatista.exe: 000021D4: 18:11:00 [TUniServerModule]:Server First Init.
+prjPortalBatista.exe: 000021D4: 18:11:00 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\
+prjPortalBatista.exe: 000021D4: 18:11:00 [TUniServerModule]:Debug Mode = ON
+prjPortalBatista.exe: 000021D4: 18:11:00 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPortalBatista.exe: 000021D4: 18:11:00 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPortalBatista.exe: 000021D4: 18:11:00 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPortalBatista.exe: 0000A488: 18:11:05 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: nJfHdiVGUn112DC0036 ) : Addr: $00CB847F
+prjPortalBatista.exe: 00006CC8: 18:13:07 []:>--------------------------------------------------------------<
+prjPortalBatista.exe: 00006CC8: 18:13:07 [TUniServerModule]:Server First Init.
+prjPortalBatista.exe: 00006CC8: 18:13:07 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\
+prjPortalBatista.exe: 00006CC8: 18:13:07 [TUniServerModule]:Debug Mode = ON
+prjPortalBatista.exe: 00006CC8: 18:13:07 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPortalBatista.exe: 00006CC8: 18:13:07 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPortalBatista.exe: 00006CC8: 18:13:07 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPortalBatista.exe: 0000418C: 18:13:11 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: tL9dmtWvRp112DC029A ) : Addr: $0043847F

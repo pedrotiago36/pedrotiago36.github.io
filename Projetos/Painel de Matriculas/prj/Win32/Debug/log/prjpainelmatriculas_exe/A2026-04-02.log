@@ -1,0 +1,123 @@
+prjPainelMatriculas.exe: 0000180C: 10:13:00 []:>--------------------------------------------------------------<
+prjPainelMatriculas.exe: 0000180C: 10:13:00 [TUniServerModule]:Server First Init.
+prjPainelMatriculas.exe: 0000180C: 10:13:00 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Painel de Matriculas\prj\Win32\Debug\
+prjPainelMatriculas.exe: 0000180C: 10:13:00 [TUniServerModule]:Debug Mode = ON
+prjPainelMatriculas.exe: 0000180C: 10:13:00 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPainelMatriculas.exe: 0000180C: 10:13:01 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPainelMatriculas.exe: 0000180C: 10:13:01 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPainelMatriculas.exe: 00002F7C: 10:15:25 []:>--------------------------------------------------------------<
+prjPainelMatriculas.exe: 00002F7C: 10:15:25 [TUniServerModule]:Server First Init.
+prjPainelMatriculas.exe: 00002F7C: 10:15:25 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Painel de Matriculas\prj\Win32\Debug\
+prjPainelMatriculas.exe: 00002F7C: 10:15:25 [TUniServerModule]:Debug Mode = ON
+prjPainelMatriculas.exe: 00002F7C: 10:15:25 [TUniGUISessionManager]:Cache erase job created, Folder count: [2]
+prjPainelMatriculas.exe: 00002F7C: 10:15:25 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPainelMatriculas.exe: 00002F7C: 10:15:25 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPainelMatriculas.exe: 00006F28: 10:15:31 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: g527I63hQp112DD079A ) : Addr: $00D38B9B
+prjPainelMatriculas.exe: 00006AD4: 10:17:54 []:>--------------------------------------------------------------<
+prjPainelMatriculas.exe: 00006AD4: 10:17:54 [TUniServerModule]:Server First Init.
+prjPainelMatriculas.exe: 00006AD4: 10:17:54 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Painel de Matriculas\prj\Win32\Debug\
+prjPainelMatriculas.exe: 00006AD4: 10:17:55 [TUniServerModule]:Debug Mode = ON
+prjPainelMatriculas.exe: 00006AD4: 10:17:55 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPainelMatriculas.exe: 00006AD4: 10:17:55 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPainelMatriculas.exe: 00006AD4: 10:17:55 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPainelMatriculas.exe: 00005170: 10:17:58 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: EBDekht68l112DD0838 ) : Addr: $00FB8B9B
+prjPainelMatriculas.exe: 00009ED0: 10:20:04 []:>--------------------------------------------------------------<
+prjPainelMatriculas.exe: 00009ED0: 10:20:04 [TUniServerModule]:Server First Init.
+prjPainelMatriculas.exe: 00009ED0: 10:20:04 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Painel de Matriculas\prj\Win32\Debug\
+prjPainelMatriculas.exe: 00009ED0: 10:20:04 [TUniServerModule]:Debug Mode = ON
+prjPainelMatriculas.exe: 00009ED0: 10:20:04 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPainelMatriculas.exe: 00009ED0: 10:20:05 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPainelMatriculas.exe: 00009ED0: 10:20:05 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPainelMatriculas.exe: 000098DC: 10:20:16 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: 36esynNzyP112DD08E2 ) : Addr: $007C8B9B
+prjPainelMatriculas.exe: 00002C54: 10:20:16 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: 36esynNzyP112DD08E2 ) : Addr: $007C8B9B
+prjPainelMatriculas.exe: 0000AB6C: 10:20:24 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Painel de Matriculas\prj\Win32\Debug\.well-known\appspecific\com.chrome.devtools.json
+prjPainelMatriculas.exe: 0000B660: 10:23:24 []:>--------------------------------------------------------------<
+prjPainelMatriculas.exe: 0000B660: 10:23:24 [TUniServerModule]:Server First Init.
+prjPainelMatriculas.exe: 0000B660: 10:23:24 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Painel de Matriculas\prj\Win32\Debug\
+prjPainelMatriculas.exe: 0000B660: 10:23:24 [TUniServerModule]:Debug Mode = ON
+prjPainelMatriculas.exe: 0000B660: 10:23:24 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPainelMatriculas.exe: 0000B660: 10:23:25 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPainelMatriculas.exe: 0000B660: 10:23:25 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPainelMatriculas.exe: 0000A5B0: 10:23:28 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: k3tbObSJtZ112DD0982 ) : Addr: $01308B9B
+prjPainelMatriculas.exe: 000094E0: 10:23:35 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Painel de Matriculas\prj\Win32\Debug\.well-known\appspecific\com.chrome.devtools.json
+prjPainelMatriculas.exe: 00007A64: 10:30:04 []:>--------------------------------------------------------------<
+prjPainelMatriculas.exe: 00007A64: 10:30:04 [TUniServerModule]:Server First Init.
+prjPainelMatriculas.exe: 00007A64: 10:30:04 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Painel de Matriculas\prj\Win32\Debug\
+prjPainelMatriculas.exe: 00007A64: 10:30:04 [TUniServerModule]:Debug Mode = ON
+prjPainelMatriculas.exe: 00007A64: 10:30:04 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPainelMatriculas.exe: 00007A64: 10:30:05 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPainelMatriculas.exe: 00007A64: 10:30:05 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPainelMatriculas.exe: 00001FE8: 10:30:09 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: kXtgDitBhA112DD0A60 ) : Addr: $01108B9B
+prjPainelMatriculas.exe: 00008E7C: 10:33:15 []:>--------------------------------------------------------------<
+prjPainelMatriculas.exe: 00008E7C: 10:33:15 [TUniServerModule]:Server First Init.
+prjPainelMatriculas.exe: 00008E7C: 10:33:15 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Painel de Matriculas\prj\Win32\Debug\
+prjPainelMatriculas.exe: 00008E7C: 10:33:15 [TUniServerModule]:Debug Mode = ON
+prjPainelMatriculas.exe: 00008E7C: 10:33:15 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPainelMatriculas.exe: 00008E7C: 10:33:16 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPainelMatriculas.exe: 00008E7C: 10:33:16 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPainelMatriculas.exe: 0000AA40: 10:33:19 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: QROTX2NtRt112DD0C30 ) : Addr: $011F8B9B
+prjPainelMatriculas.exe: 00005990: 14:14:25 []:>--------------------------------------------------------------<
+prjPainelMatriculas.exe: 00005990: 14:14:25 [TUniServerModule]:Server First Init.
+prjPainelMatriculas.exe: 00005990: 14:14:25 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Painel de Matriculas\prj\Win32\Debug\
+prjPainelMatriculas.exe: 00005990: 14:14:25 [TUniServerModule]:Debug Mode = ON
+prjPainelMatriculas.exe: 00005990: 14:14:25 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPainelMatriculas.exe: 00005990: 14:14:26 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPainelMatriculas.exe: 00005990: 14:14:26 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPainelMatriculas.exe: 0000A5B4: 14:14:31 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: MwfodLlcEb112DD0D0D ) : Addr: $00938B9B
+prjPainelMatriculas.exe: 00004458: 14:19:36 []:>--------------------------------------------------------------<
+prjPainelMatriculas.exe: 00004458: 14:19:36 [TUniServerModule]:Server First Init.
+prjPainelMatriculas.exe: 00004458: 14:19:36 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Painel de Matriculas\prj\Win32\Debug\
+prjPainelMatriculas.exe: 00004458: 14:19:36 [TUniServerModule]:Debug Mode = ON
+prjPainelMatriculas.exe: 00004458: 14:19:36 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPainelMatriculas.exe: 00004458: 14:19:37 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPainelMatriculas.exe: 00004458: 14:19:37 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPainelMatriculas.exe: 00004F80: 14:19:43 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: BsT6mQH2Pr112DD490D ) : Addr: $008F8B9B
+prjPainelMatriculas.exe: 0000B164: 14:19:46 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: BsT6mQH2Pr112DD490D ) : Addr: $008F8B9B
+prjPainelMatriculas.exe: 0000A184: 14:47:24 []:>--------------------------------------------------------------<
+prjPainelMatriculas.exe: 0000A184: 14:47:24 [TUniServerModule]:Server First Init.
+prjPainelMatriculas.exe: 0000A184: 14:47:24 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Painel de Matriculas\prj\Win32\Debug\
+prjPainelMatriculas.exe: 0000A184: 14:47:24 [TUniServerModule]:Debug Mode = ON
+prjPainelMatriculas.exe: 0000A184: 14:47:24 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPainelMatriculas.exe: 0000A184: 14:47:25 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPainelMatriculas.exe: 0000A184: 14:47:25 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPainelMatriculas.exe: 0000B4C8: 14:47:30 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: hUzGhu7ehh112DD4A76 ) : Addr: $0110B2C3
+prjPainelMatriculas.exe: 00009598: 14:56:39 []:>--------------------------------------------------------------<
+prjPainelMatriculas.exe: 00009598: 14:56:39 [TUniServerModule]:Server First Init.
+prjPainelMatriculas.exe: 00009598: 14:56:39 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Painel de Matriculas\prj\Win32\Debug\
+prjPainelMatriculas.exe: 00009598: 14:56:39 [TUniServerModule]:Debug Mode = ON
+prjPainelMatriculas.exe: 00009598: 14:56:39 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPainelMatriculas.exe: 00009598: 14:56:39 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPainelMatriculas.exe: 00009598: 14:56:40 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPainelMatriculas.exe: 00001A98: 14:56:44 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: mcrZ6utQnI112DD5201 ) : Addr: $00DDB2C3
+prjPainelMatriculas.exe: 0000A92C: 14:56:50 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Painel de Matriculas\prj\Win32\Debug\.well-known\appspecific\com.chrome.devtools.json
+prjPainelMatriculas.exe: 00008904: 16:11:03 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: MBk1diQ9ca112DD5482 ) : Addr: $00DDB2C3
+prjPainelMatriculas.exe: 00003904: 16:11:22 []:>--------------------------------------------------------------<
+prjPainelMatriculas.exe: 00003904: 16:11:22 [TUniServerModule]:Server First Init.
+prjPainelMatriculas.exe: 00003904: 16:11:22 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Painel de Matriculas\prj\Win32\Debug\
+prjPainelMatriculas.exe: 00003904: 16:11:22 [TUniServerModule]:Debug Mode = ON
+prjPainelMatriculas.exe: 00003904: 16:11:23 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPainelMatriculas.exe: 00003904: 16:11:23 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPainelMatriculas.exe: 00009188: 16:12:07 []:>--------------------------------------------------------------<
+prjPainelMatriculas.exe: 00009188: 16:12:07 [TUniServerModule]:Server First Init.
+prjPainelMatriculas.exe: 00009188: 16:12:08 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Painel de Matriculas\prj\Win32\Debug\
+prjPainelMatriculas.exe: 00009188: 16:12:08 [TUniServerModule]:Debug Mode = ON
+prjPainelMatriculas.exe: 00009188: 16:12:08 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPainelMatriculas.exe: 00009188: 16:12:08 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPainelMatriculas.exe: 00009188: 16:12:08 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPainelMatriculas.exe: 000014D8: 16:12:21 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: Ncv5EiH38g112DD68C9 ) : Addr: $00BFB30F
+prjPainelMatriculas.exe: 0000A60C: 16:22:15 []:>--------------------------------------------------------------<
+prjPainelMatriculas.exe: 0000A60C: 16:22:15 [TUniServerModule]:Server First Init.
+prjPainelMatriculas.exe: 0000A60C: 16:22:15 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Painel de Matriculas\prj\Win32\Debug\
+prjPainelMatriculas.exe: 0000A60C: 16:22:15 [TUniServerModule]:Debug Mode = ON
+prjPainelMatriculas.exe: 0000A60C: 16:22:15 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPainelMatriculas.exe: 0000A60C: 16:22:15 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPainelMatriculas.exe: 0000A60C: 16:22:15 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPainelMatriculas.exe: 00005340: 16:22:19 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: 7kqqKX5Cqg112DD6905 ) : Addr: $00C8B2C3
+prjPainelMatriculas.exe: 00009340: 16:28:21 []:>--------------------------------------------------------------<
+prjPainelMatriculas.exe: 00009340: 16:28:21 [TUniServerModule]:Server First Init.
+prjPainelMatriculas.exe: 00009340: 16:28:21 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Painel de Matriculas\prj\Win32\Debug\
+prjPainelMatriculas.exe: 00009340: 16:28:21 [TUniServerModule]:Debug Mode = ON
+prjPainelMatriculas.exe: 00009340: 16:28:21 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPainelMatriculas.exe: 00009340: 16:28:21 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPainelMatriculas.exe: 00009340: 16:28:21 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPainelMatriculas.exe: 00003210: 16:28:25 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: sweASJNyOy112DD6BBA ) : Addr: $00C7B2C3

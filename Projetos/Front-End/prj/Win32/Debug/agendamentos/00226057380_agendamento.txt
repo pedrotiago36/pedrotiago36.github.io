@@ -1,0 +1,10 @@
+﻿============================================
+  AGENDAMENTO DE PRE-MATRICULA
+  Colegio Batista Santos Dumont
+============================================
+Data do Agendamento : 03/04/2026 10:42:42
+Data da Atualizacao : 03/04/2026 10:42:42
+CPF do Responsavel  : 00226057380
+Data para Assinatura: 13/04/2026
+Status              : PENDENTE
+============================================

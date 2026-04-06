@@ -1,0 +1,66 @@
+prjPortalBatista.exe: 00001600: 10:29:33 []:>--------------------------------------------------------------<
+prjPortalBatista.exe: 00001600: 10:29:33 [TUniServerModule]:Server First Init.
+prjPortalBatista.exe: 00001600: 10:29:33 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\
+prjPortalBatista.exe: 00001600: 10:29:33 [TUniServerModule]:Debug Mode = ON
+prjPortalBatista.exe: 00001600: 10:29:33 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPortalBatista.exe: 00001600: 10:29:34 [TUniServerModule]:Starting HTTP Server on Port: 8077...
+prjPortalBatista.exe: 00001600: 10:29:34 [TUniServerModule]:HTTP Server Started on Port: 8077
+prjPortalBatista.exe: 00006BC0: 10:29:34 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 000091EC: 10:29:34 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 000095E8: 10:29:34 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 00009104: 10:29:34 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 0000AFA4: 10:29:34 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 00009E74: 10:29:35 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 00006964: 10:29:35 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 00008078: 10:29:35 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 00006B70: 10:29:35 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 00009E20: 10:29:35 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 0000B39C: 10:29:35 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 0000A5F8: 10:29:35 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 000058C8: 10:29:35 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 0000AB7C: 10:29:35 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 00006F1C: 10:29:35 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 000086AC: 10:29:36 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 000080C8: 10:29:36 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 00008904: 10:29:36 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 00009E80: 10:29:36 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 000013A4: 10:29:36 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 0000AB04: 10:29:36 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 00000BC4: 10:29:36 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 0000306C: 10:29:36 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 00009E78: 10:29:36 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 0000A1AC: 10:29:36 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 00009CF8: 10:29:37 [HandleFileRequest[127.0.0.1]]:File not found: C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\files\agendamentos.json
+prjPortalBatista.exe: 00006978: 10:34:41 []:>--------------------------------------------------------------<
+prjPortalBatista.exe: 00006978: 10:34:41 [TUniServerModule]:Server First Init.
+prjPortalBatista.exe: 00006978: 10:34:41 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\
+prjPortalBatista.exe: 00006978: 10:34:41 [TUniServerModule]:Debug Mode = ON
+prjPortalBatista.exe: 00006978: 10:34:42 [TUniServerModule]:Starting HTTP Server on Port: 8070...
+prjPortalBatista.exe: 00006978: 10:34:42 [TUniServerModule]:HTTP Server Started on Port: 8070
+prjPortalBatista.exe: 00001E00: 10:42:09 []:>--------------------------------------------------------------<
+prjPortalBatista.exe: 00001E00: 10:42:09 [TUniServerModule]:Server First Init.
+prjPortalBatista.exe: 00001E00: 10:42:09 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\
+prjPortalBatista.exe: 00001E00: 10:42:09 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPortalBatista.exe: 00001E00: 10:42:10 [TUniServerModule]:Starting HTTP Server on Port: 8070...
+prjPortalBatista.exe: 00001E00: 10:42:10 [TUniServerModule]:HTTP Server Started on Port: 8070
+prjPortalBatista.exe: 00009B28: 10:42:25 [127.0.0.1]:EUniSessionException : Invalid session or session Timeout. (Session not found: DHN4NTSmGz112DE941A ) : Addr: $0106847F
+prjPortalBatista.exe: 00001E00: 10:51:41 [TUniServerModule]:Shutting Down Server.
+prjPortalBatista.exe: 00001E00: 10:51:41 [TUniServerModule]:Stopping HTTP Server.
+prjPortalBatista.exe: 00001E00: 10:51:43 [TUniServerModule]:HTTP Server Stopped.
+prjPortalBatista.exe: 00001E00: 10:51:43 [TUniGUISessionManager]:Terminating Session manager.
+prjPortalBatista.exe: 00001E00: 10:51:43 [TUniGUISessionManager]:Stopping Cache Eraser...
+prjPortalBatista.exe: 00001E00: 10:51:43 [TUniGUISessionManager]:Cache Eraser Stopped.
+prjPortalBatista.exe: 00001E00: 10:51:44 [TUniGUISessionManager]:Destroying Worker Threads.
+prjPortalBatista.exe: 00001E00: 10:51:45 [TUniGUISessionManager]:Session manager terminated.
+prjPortalBatista.exe: 00001E00: 10:51:45 [TUniWebSocketStack]:Terminating...
+prjPortalBatista.exe: 00001E00: 10:51:46 [TUniGUIMessageQ]:Terminated.
+prjPortalBatista.exe: 00001E00: 10:51:46 [TUniWebSocketStack]:Terminated.
+prjPortalBatista.exe: 00001E00: 10:51:47 [TUniServerModule]:Server Shutdown Completed.
+prjPortalBatista.exe: 00001E00: 10:51:47 []:<-------------------------------------------------------------->
+prjPortalBatista.exe: 00001E00: 10:51:48 [Terminated]:Exit Code: 0
+prjPortalBatista.exe: 00008584: 10:54:39 []:>--------------------------------------------------------------<
+prjPortalBatista.exe: 00008584: 10:54:39 [TUniServerModule]:Server First Init.
+prjPortalBatista.exe: 00008584: 10:54:39 [TUniServerModule]:Start Path = C:\Users\Casa\Desktop\Gestão Escolar Adm Batista\Projetos\Front-End\prj\Win32\Debug\
+prjPortalBatista.exe: 00008584: 10:54:39 [TUniGUISessionManager]:Cache erase job created, Folder count: [1]
+prjPortalBatista.exe: 00008584: 10:54:40 [TUniServerModule]:Starting HTTP Server on Port: 8070...
+prjPortalBatista.exe: 00008584: 10:54:40 [TUniServerModule]:HTTP Server Started on Port: 8070

@@ -1,0 +1,228 @@
+unit Controller.TPainelAgendamentos;
+
+interface
+
+uses
+  Controller.IPainelAgendamentos,
+  Model.IAgendamentoPainel,
+  Model.TAgendamentoPainel,
+  System.SysUtils,
+  System.Classes,
+  System.IOUtils,
+  System.SyncObjs,
+  System.Generics.Collections,
+  System.RegularExpressions;
+
+type
+  TPainelController = class;
+
+  TMonitorThread = class(TThread)
+  private
+    FController: TPainelController;
+    FEvento    : TEvent;
+  protected
+    procedure Execute; override;
+  public
+    constructor Create(const AController: TPainelController);
+    destructor Destroy; override;
+    procedure Sinalizar;
+  end;
+
+  TPainelController = class(TInterfacedObject, IPainelController)
+  private
+    FPastaAgendamentos: string;
+    FArquivoJSON      : string;
+    FThread           : TMonitorThread;
+    function ExtrairCampo(const AConteudo, APadrao: string): string;
+    function ChaveDataISO(const AConteudo: string): string;
+    function ArquivoParaAgendamento(const AConteudo: string): IAgendamentoPainel;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure ScanearEGravar;
+    procedure IniciarMonitoramento(const APastaAgendamentos: string;
+                                   const AArquivoJSON      : string);
+    procedure PararMonitoramento;
+  end;
+
+implementation
+
+{ TMonitorThread }
+
+constructor TMonitorThread.Create(const AController: TPainelController);
+begin
+  inherited Create(True);
+  FController     := AController;
+  FEvento         := TEvent.Create(nil, True, False, '');
+  FreeOnTerminate := False;
+end;
+
+destructor TMonitorThread.Destroy;
+begin
+  FEvento.Free;
+  inherited;
+end;
+
+procedure TMonitorThread.Sinalizar;
+begin
+  FEvento.SetEvent;
+end;
+
+procedure TMonitorThread.Execute;
+begin
+  repeat
+    FEvento.WaitFor(60000);
+    FEvento.ResetEvent;
+    case Ord(not Terminated) of
+      1: FController.ScanearEGravar;
+    end;
+  until Terminated;
+end;
+
+{ TPainelController }
+
+constructor TPainelController.Create;
+begin
+  inherited Create;
+  FThread := nil;
+end;
+
+destructor TPainelController.Destroy;
+begin
+  PararMonitoramento;
+  inherited;
+end;
+
+function TPainelController.ExtrairCampo(const AConteudo, APadrao: string): string;
+var
+  LMatch : TMatch;
+  LCands : array[0..1] of string;
+begin
+  LMatch    := TRegEx.Match(AConteudo, APadrao);
+  LCands[0] := '';
+  LCands[1] := LMatch.Groups[1].Value;
+  Result    := LCands[Ord(LMatch.Success)];
+end;
+
+function TPainelController.ChaveDataISO(const AConteudo: string): string;
+var
+  LMatch : TMatch;
+  LCands : array[0..1] of string;
+begin
+  LMatch    := TRegEx.Match(AConteudo,
+    'Data para Assinatura\s*:\s*(\d{2})\/(\d{2})\/(\d{4})');
+  LCands[0] := '';
+  LCands[1] := LMatch.Groups[3].Value + '-' +
+               LMatch.Groups[2].Value + '-' +
+               LMatch.Groups[1].Value;
+  Result    := LCands[Ord(LMatch.Success)];
+end;
+
+function TPainelController.ArquivoParaAgendamento(const AConteudo: string): IAgendamentoPainel;
+var
+  LCPF, LDataAg, LDataAt, LDataAs, LStatus: string;
+begin
+  LCPF    := ExtrairCampo(AConteudo, 'CPF do Responsavel\s*:\s*(\S+)');
+  LDataAg := ExtrairCampo(AConteudo, 'Data do Agendamento\s*:\s*(\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}:\d{2})');
+  LDataAt := ExtrairCampo(AConteudo, 'Data da Atualizacao\s*:\s*(\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}:\d{2})');
+  LDataAs := ExtrairCampo(AConteudo, 'Data para Assinatura\s*:\s*(\d{2}\/\d{2}\/\d{4})');
+  LStatus := ExtrairCampo(AConteudo, 'Status\s*:\s*(\w+)');
+  Result  := TAgendamentoPainel.Create(LCPF, LDataAg, LDataAt, LDataAs, LStatus);
+end;
+
+procedure TPainelController.ScanearEGravar;
+var
+  LArquivos    : TArray<string>;
+  LArquivo     : string;
+  LConteudo    : string;
+  LChave       : string;
+  LReader      : TStreamReader;
+  LDatas       : TDictionary<string, TList<IAgendamentoPainel>>;
+  LPartesDatas : TArray<string>;
+  LItensData   : TArray<string>;
+  LPar         : TPair<string, TList<IAgendamentoPainel>>;
+  LJSON        : string;
+  LWriter      : TStreamWriter;
+  I, LIdx      : Integer;
+begin
+  LDatas := TDictionary<string, TList<IAgendamentoPainel>>.Create;
+  try
+    LArquivos := TDirectory.GetFiles(FPastaAgendamentos, '*_agendamento.txt',
+                   TSearchOption.soTopDirectoryOnly);
+
+    for LArquivo in LArquivos do
+    begin
+      LReader := TStreamReader.Create(LArquivo, TEncoding.UTF8);
+      try
+        LConteudo := LReader.ReadToEnd;
+      finally
+        LReader.Free;
+      end;
+      LChave := ChaveDataISO(LConteudo);
+      case Ord(LChave <> '') of
+        1:
+          begin
+            case Ord(not LDatas.ContainsKey(LChave)) of
+              1: LDatas.Add(LChave, TList<IAgendamentoPainel>.Create);
+            end;
+            LDatas[LChave].Add(ArquivoParaAgendamento(LConteudo));
+          end;
+      end;
+    end;
+
+    SetLength(LPartesDatas, LDatas.Count);
+    LIdx := 0;
+    for LPar in LDatas do
+    begin
+      SetLength(LItensData, LPar.Value.Count);
+      for I := 0 to LPar.Value.Count - 1 do
+        LItensData[I] := LPar.Value[I].ToJSON;
+      LPartesDatas[LIdx] := '"' + LPar.Key + '":[' +
+                             string.Join(',', LItensData) + ']';
+      Inc(LIdx);
+    end;
+
+    LJSON :=
+      '{"agendamentos":{' + string.Join(',', LPartesDatas) + '},' +
+      '"totalArquivos":' + IntToStr(Length(LArquivos)) + ',' +
+      '"ultimaAtualizacao":"' + FormatDateTime('dd\/MM\/yyyy HH:nn:ss', Now) + '"}';
+
+    // Grava o JSON em arquivo — o iframe faz fetch diretamente, sem passar dados via AddJS
+    LWriter := TStreamWriter.Create(FArquivoJSON, False, TEncoding.UTF8);
+    try
+      LWriter.Write(LJSON);
+    finally
+      LWriter.Free;
+    end;
+
+  finally
+    for LPar in LDatas do
+      LPar.Value.Free;
+    LDatas.Free;
+  end;
+end;
+
+procedure TPainelController.IniciarMonitoramento(const APastaAgendamentos: string;
+                                                  const AArquivoJSON      : string);
+begin
+  FPastaAgendamentos := APastaAgendamentos;
+  FArquivoJSON       := AArquivoJSON;
+  ScanearEGravar;
+  FThread := TMonitorThread.Create(Self);
+  FThread.Start;
+end;
+
+procedure TPainelController.PararMonitoramento;
+begin
+  case Ord(FThread <> nil) of
+    1:
+      begin
+        FThread.Terminate;
+        FThread.Sinalizar;
+        FThread.WaitFor;
+        FreeAndNil(FThread);
+      end;
+  end;
+end;
+
+end.
