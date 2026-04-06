@@ -1,0 +1,16 @@
+*.dcu
+*.exe
+*.dll
+*.bpl
+*.map
+*.dcpil
+*.~*
+*.identcache
+*.tvsconfig
+*.local
+*.dproj.local
+__history/
+Win32/
+Win64/
+Debug/
+Release/
