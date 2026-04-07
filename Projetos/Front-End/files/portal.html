@@ -813,17 +813,35 @@
         if (area) renderContrato(area, 'pendente', nome);
     };
     function baixarContrato() {
+        // Limpa flag anterior e pede ao Delphi
+        try { window.parent._downloadPronto = false; } catch(e) {}
         try { window.parent.downloadContrato(cpfPaiLogado); } catch(e) {}
-    }
-    window.receberDownloadContrato = function(base64, nome) {
-        var bytes = atob(base64);
-        var arr   = new Uint8Array(bytes.length);
-        for (var i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
-        var url = URL.createObjectURL(new Blob([arr], {type:'application/pdf'}));
-        var a   = document.createElement('a');
-        a.href = url; a.download = nome || 'ContratoMatricula.pdf';
-        document.body.appendChild(a); a.click();
-        setTimeout(function(){ URL.revokeObjectURL(url); document.body.removeChild(a); }, 1000);
+
+        // Polling: aguarda Delphi gravar na janela pai
+        var tentativas = 0;
+        var timer = setInterval(function() {
+            tentativas++;
+            var pronto = false;
+            try { pronto = window.parent._downloadPronto === true; } catch(e) {}
+            if (pronto || tentativas >= 30) {
+                clearInterval(timer);
+                if (!pronto) return;
+                var base64 = '';
+                var nome   = 'ContratoMatricula.pdf';
+                try { base64 = window.parent._downloadBase64 || ''; } catch(e) {}
+                try { nome   = window.parent._downloadNome   || nome; } catch(e) {}
+                try { window.parent._downloadPronto = false; } catch(e) {}
+                if (!base64) return;
+                var bytes = atob(base64);
+                var arr   = new Uint8Array(bytes.length);
+                for (var i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+                var url = URL.createObjectURL(new Blob([arr], {type:'application/pdf'}));
+                var a   = document.createElement('a');
+                a.href = url; a.download = nome;
+                document.body.appendChild(a); a.click();
+                setTimeout(function(){ URL.revokeObjectURL(url); document.body.removeChild(a); }, 1000);
+            }
+        }, 200);
     };
 
     function abrirModalPreMatricula() {

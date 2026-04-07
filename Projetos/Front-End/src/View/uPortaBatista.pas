@@ -210,14 +210,15 @@ begin
 
   LBytes  := TFile.ReadAllBytes(LArquivo);
   LBase64 := TNetEncoding.Base64.EncodeBytesToString(LBytes);
+  // Remove quebras de linha que o Delphi insere a cada 76 chars — quebram o JS
+  LBase64 := StringReplace(LBase64, #13, '', [rfReplaceAll]);
+  LBase64 := StringReplace(LBase64, #10, '', [rfReplaceAll]);
 
+  // Mesmo padrão do contratoStatus — grava na janela pai
   UniSession.AddJS(
-    '(function(){' +
-    '  var frames = document.querySelectorAll("iframe");' +
-    '  frames.forEach(function(f){' +
-    '    try{ f.contentWindow.receberDownloadContrato("' + LBase64 + '","ContratoMatricula.pdf"); }catch(e){}' +
-    '  });' +
-    '})();'
+    'window._downloadBase64 = "' + LBase64 + '";' +
+    'window._downloadNome   = "ContratoMatricula.pdf";' +
+    'window._downloadPronto = true;'
   );
 end;
 
