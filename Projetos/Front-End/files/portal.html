@@ -760,24 +760,28 @@
             h += '<input type="file" id="inputContrato" accept=".pdf" style="display:none" onchange="selecionarArquivo(this)">';
             h += '<button id="btn-enviar" onclick="enviarContrato()" style="display:none;width:100%;margin-top:0.7rem;padding:0.85rem;background:linear-gradient(100deg,#d33327,#7d2728);color:#fff;border:none;border-radius:1.5rem;font-weight:700;font-size:1rem;cursor:pointer;">';
             h +=   '<i class="fas fa-paper-plane"></i> Enviar Contrato</button>';
-        } else if (status === 'pendente') {
-            h += '<div style="display:flex;align-items:center;justify-content:space-between;background:#fff9ec;border:1px solid rgba(243,156,18,0.4);border-radius:1rem;padding:0.8rem 1rem;">';
-            h +=   '<div style="display:flex;align-items:center;gap:10px;">';
-            h +=     '<i class="fas fa-file-pdf" style="color:#d33327;font-size:1.4rem;"></i>';
-            h +=     '<div><div style="font-size:0.7rem;color:#7d2728;font-weight:600;">Contrato Assinado</div><div style="font-weight:700;color:#2d2d2d;">' + nome + '</div></div>';
-            h +=   '</div>';
-            h +=   '<span style="background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;padding:0.3rem 0.8rem;border-radius:2rem;font-size:0.78rem;font-weight:700;"><i class="fas fa-clock"></i> Em verificação...</span>';
-            h += '</div>';
-            h += '<p style="text-align:center;color:#5a3a2e;font-size:0.85rem;margin-top:0.8rem;">Seu contrato está sendo analisado pela secretaria.</p>';
-        } else if (status === 'validado') {
-            h += '<div style="display:flex;align-items:center;justify-content:space-between;background:#edfff4;border:1px solid rgba(46,204,113,0.4);border-radius:1rem;padding:0.8rem 1rem;">';
-            h +=   '<div style="display:flex;align-items:center;gap:10px;">';
-            h +=     '<i class="fas fa-file-pdf" style="color:#27ae60;font-size:1.4rem;"></i>';
-            h +=     '<div><div style="font-size:0.7rem;color:#27ae60;font-weight:600;">Contrato Assinado</div><div style="font-weight:700;color:#2d2d2d;">' + nome + '</div></div>';
-            h +=   '</div>';
-            h +=   '<span style="background:linear-gradient(135deg,#2ecc71,#27ae60);color:#fff;padding:0.3rem 0.8rem;border-radius:2rem;font-size:0.78rem;font-weight:700;"><i class="fas fa-check-circle"></i> Validado</span>';
-            h += '</div>';
-            h += '<p style="text-align:center;color:#27ae60;font-weight:600;margin-top:0.8rem;">Matrícula confirmada!</p>';
+        } else if (status === 'pendente' || status === 'validado') {
+            var isPendente = (status === 'pendente');
+            var badgeBg    = isPendente ? 'linear-gradient(135deg,#f39c12,#e67e22)' : 'linear-gradient(135deg,#2ecc71,#27ae60)';
+            var badgeTxt   = isPendente ? '<i class="fas fa-clock"></i> Pendente' : '<i class="fas fa-check-circle"></i> Matr\u00edcula Efetuada';
+            var tblBg      = isPendente ? '#fff9ec' : '#edfff4';
+            var tblBorder  = isPendente ? 'rgba(243,156,18,0.4)' : 'rgba(46,204,113,0.4)';
+            // Tabela: Arquivo | Status | Baixar
+            h += '<table style="width:100%;border-collapse:collapse;font-size:0.88rem;">';
+            h +=   '<thead><tr>';
+            h +=     '<th style="text-align:left;padding:0.5rem 0.7rem;border-bottom:2px solid #fdcd62;color:#7d2728;">Arquivo</th>';
+            h +=     '<th style="text-align:left;padding:0.5rem 0.7rem;border-bottom:2px solid #fdcd62;color:#7d2728;">Status</th>';
+            h +=     '<th style="text-align:center;padding:0.5rem 0.7rem;border-bottom:2px solid #fdcd62;color:#7d2728;">Baixar</th>';
+            h +=   '</tr></thead>';
+            h +=   '<tbody><tr style="background:' + tblBg + ';">';
+            h +=     '<td style="padding:0.6rem 0.7rem;border-bottom:1px solid ' + tblBorder + ';"><i class="fas fa-file-pdf" style="color:#d33327;margin-right:6px;"></i>' + nome + '</td>';
+            h +=     '<td style="padding:0.6rem 0.7rem;border-bottom:1px solid ' + tblBorder + ';"><span style="background:' + badgeBg + ';color:#fff;padding:0.25rem 0.7rem;border-radius:2rem;font-size:0.76rem;font-weight:700;">' + badgeTxt + '</span></td>';
+            h +=     '<td style="padding:0.6rem 0.7rem;border-bottom:1px solid ' + tblBorder + ';text-align:center;"><button onclick="baixarContratoAssinado()" style="background:linear-gradient(135deg,#d33327,#7d2728);color:#fff;border:none;border-radius:1rem;padding:0.3rem 0.8rem;cursor:pointer;font-size:0.8rem;font-weight:600;"><i class="fas fa-download"></i> Baixar</button></td>';
+            h +=   '</tr></tbody>';
+            h += '</table>';
+            if (!isPendente) {
+                h += '<p style="text-align:center;color:#27ae60;font-weight:700;margin-top:0.8rem;font-size:0.95rem;"><i class="fas fa-graduation-cap"></i> Matr\u00edcula efetuada com sucesso!</p>';
+            }
         } else {
             h = '<p style="color:#999;text-align:center;font-size:0.85rem;">Contrato não disponível.</p>';
         }
@@ -785,6 +789,7 @@
     }
 
     var _arquivoSelecionado = null;
+
     function selecionarArquivo(input) {
         if (!input.files || !input.files[0]) return;
         _arquivoSelecionado = input.files[0];
@@ -793,6 +798,7 @@
         var btn = document.getElementById('btn-enviar');
         if (btn) btn.style.display = 'block';
     }
+
     function enviarContrato() {
         if (!_arquivoSelecionado) return;
         var btn = document.getElementById('btn-enviar');
@@ -801,36 +807,58 @@
         reader.onload = function(e) {
             var base64 = e.target.result.split(',')[1];
             var nome   = _arquivoSelecionado.name;
-            try { window.parent.uploadContrato(cpfPaiLogado, base64, nome); } catch(ex) {}
+            try {
+                window.parent._uploadPronto = false;
+                window.parent.uploadContrato(cpfPaiLogado, base64, nome);
+            } catch(ex) {}
+            // Polling — mesmo padrão do download
+            var t = 0;
+            var timer = setInterval(function() {
+                t++;
+                var pronto = false;
+                try { pronto = window.parent._uploadPronto === true; } catch(e2) {}
+                if (pronto || t >= 30) {
+                    clearInterval(timer);
+                    if (!pronto) return;
+                    var nomeOk = '';
+                    try { nomeOk = window.parent._uploadNome || ''; } catch(e2) {}
+                    try { window.parent._uploadPronto = false; } catch(e2) {}
+                    _arquivoSelecionado = null;
+                    _statusContrato  = 'pendente';
+                    _arquivoContrato = nomeOk;
+                    var area = document.getElementById('contrato-area');
+                    if (area) renderContrato(area, 'pendente', nomeOk);
+                }
+            }, 200);
         };
         reader.readAsDataURL(_arquivoSelecionado);
     }
-    window.uploadContratoOk = function(nome) {
-        _arquivoSelecionado = null;
-        _statusContrato  = 'pendente';
-        _arquivoContrato = nome;
-        var area = document.getElementById('contrato-area');
-        if (area) renderContrato(area, 'pendente', nome);
-    };
-    function baixarContrato() {
-        // Limpa flag anterior e pede ao Delphi
-        try { window.parent._downloadPronto = false; } catch(e) {}
-        try { window.parent.downloadContrato(cpfPaiLogado); } catch(e) {}
 
-        // Polling: aguarda Delphi gravar na janela pai
-        var tentativas = 0;
+    // Baixar contrato ORIGINAL (da pasta ContratoOriginal)
+    function baixarContrato() {
+        _dispararDownload('downloadContrato', '_downloadPronto', '_downloadBase64', '_downloadNome', 'ContratoMatricula.pdf');
+    }
+
+    // Baixar contrato ASSINADO (da pasta ContratoAssinado)
+    function baixarContratoAssinado() {
+        _dispararDownload('downloadContratoAssinado', '_downloadAsPronto', '_downloadAsBase64', '_downloadAsNome', _arquivoContrato || 'ContratoAssinado.pdf');
+    }
+
+    function _dispararDownload(bridge, flagP, flagB64, flagNome, nomeDefault) {
+        try { window.parent[flagP] = false; } catch(e) {}
+        try { window.parent[bridge](cpfPaiLogado); } catch(e) {}
+        var t = 0;
         var timer = setInterval(function() {
-            tentativas++;
+            t++;
             var pronto = false;
-            try { pronto = window.parent._downloadPronto === true; } catch(e) {}
-            if (pronto || tentativas >= 30) {
+            try { pronto = window.parent[flagP] === true; } catch(e) {}
+            if (pronto || t >= 30) {
                 clearInterval(timer);
                 if (!pronto) return;
-                var base64 = '';
-                var nome   = 'ContratoMatricula.pdf';
-                try { base64 = window.parent._downloadBase64 || ''; } catch(e) {}
-                try { nome   = window.parent._downloadNome   || nome; } catch(e) {}
-                try { window.parent._downloadPronto = false; } catch(e) {}
+                var base64 = '', nome = nomeDefault;
+                try { base64 = window.parent[flagB64] || ''; } catch(e) {}
+                try { nome   = window.parent[flagNome] || nome; } catch(e) {}
+                try { window.parent[flagP] = false; } catch(e) {}
                 if (!base64) return;
                 var bytes = atob(base64);
                 var arr   = new Uint8Array(bytes.length);
@@ -842,7 +870,7 @@
                 setTimeout(function(){ URL.revokeObjectURL(url); document.body.removeChild(a); }, 1000);
             }
         }, 200);
-    };
+    }
 
     function abrirModalPreMatricula() {
         var html = '';
@@ -896,8 +924,12 @@
         var arq = '';
         try { st  = window.parent._contratoStatus  || st;  } catch(e) {}
         try { arq = window.parent._contratoArquivo || arq; } catch(e) {}
-        // Fallback: variáveis locais (caso receberStatusContrato tenha chegado antes)
-        if (st === 'sem_contrato' && _statusContrato !== 'sem_contrato') { st = _statusContrato; arq = _arquivoContrato; }
+        // Se o upload foi feito nesta sessão, _statusContrato local tem prioridade
+        var prioridade = ['validado','pendente','original','sem_contrato'];
+        if (prioridade.indexOf(_statusContrato) < prioridade.indexOf(st)) {
+            st  = _statusContrato;
+            arq = _arquivoContrato;
+        }
         renderContrato(document.getElementById('contrato-area'), st, arq);
     }
 

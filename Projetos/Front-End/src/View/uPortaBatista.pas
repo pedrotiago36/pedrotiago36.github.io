@@ -28,6 +28,7 @@ type
     procedure ProcessarEntradaPai(const Params: TUniStrings);
     procedure ProcessarUploadContrato(const Params: TUniStrings);
     procedure ProcessarDownloadContrato(const Params: TUniStrings);
+    procedure ProcessarDownloadContratoAssinado(const Params: TUniStrings);
   public
   end;
 
@@ -93,6 +94,11 @@ begin
     '  if (frm) ajaxRequest(frm, "DownloadContrato", ["cpf=" + cpf]);' +
     '};' +
 
+    'window.downloadContratoAssinado = function(cpf) {' +
+    '  var frm = window._uniFormRef;' +
+    '  if (frm) ajaxRequest(frm, "DownloadContratoAssinado", ["cpf=" + cpf]);' +
+    '};' +
+
     'setTimeout(function() {' +
     '  document.querySelectorAll("iframe").forEach(function(f) {' +
     '    f.setAttribute("scrolling", "yes");' +
@@ -106,11 +112,12 @@ end;
 procedure TMainForm.UniFormAjaxEvent(Sender: TComponent; EventName: string;
   Params: TUniStrings);
 begin
-  case AnsiIndexStr(EventName, ['RegistrarMatricula', 'EntradaPai', 'UploadContrato', 'DownloadContrato']) of
+  case AnsiIndexStr(EventName, ['RegistrarMatricula', 'EntradaPai', 'UploadContrato', 'DownloadContrato', 'DownloadContratoAssinado']) of
     0: ProcessarPreMatricula(Params);
     1: ProcessarEntradaPai(Params);
     2: ProcessarUploadContrato(Params);
     3: ProcessarDownloadContrato(Params);
+    4: ProcessarDownloadContratoAssinado(Params);
   end;
 end;
 
@@ -178,18 +185,15 @@ begin
 
   LPasta   := TPath.Combine(TPath.Combine(ExtractFilePath(ParamStr(0)), LCPF), 'ContratoAssinado');
   TDirectory.CreateDirectory(LPasta);
-  LDestino := TPath.Combine(LPasta, LNome);
+  // Sempre salva como ContratoMatricula.pdf — nome fixo que o portal e o painel consultam
+  LDestino := TPath.Combine(LPasta, 'ContratoMatricula.pdf');
 
   LBytes := TNetEncoding.Base64.DecodeStringToBytes(LBase64);
   TFile.WriteAllBytes(LDestino, LBytes);
 
   UniSession.AddJS(
-    '(function(){' +
-    '  var frames = document.querySelectorAll("iframe");' +
-    '  frames.forEach(function(f){' +
-    '    try{ f.contentWindow.uploadContratoOk("' + LNome + '"); }catch(e){}' +
-    '  });' +
-    '})();'
+    'window._uploadNome   = "ContratoMatricula.pdf";' +
+    'window._uploadPronto = true;'
   );
 end;
 
@@ -219,6 +223,33 @@ begin
     'window._downloadBase64 = "' + LBase64 + '";' +
     'window._downloadNome   = "ContratoMatricula.pdf";' +
     'window._downloadPronto = true;'
+  );
+end;
+
+procedure TMainForm.ProcessarDownloadContratoAssinado(const Params: TUniStrings);
+var
+  LCPF    : string;
+  LArquivo: string;
+  LBytes  : TBytes;
+  LBase64 : string;
+begin
+  LCPF := Params.Values['cpf'];
+  LCPF := StringReplace(LCPF, '.', '', [rfReplaceAll]);
+  LCPF := StringReplace(LCPF, '-', '', [rfReplaceAll]);
+
+  LArquivo := TPath.Combine(TPath.Combine(TPath.Combine(
+                ExtractFilePath(ParamStr(0)), LCPF), 'ContratoAssinado'), 'ContratoMatricula.pdf');
+  if not TFile.Exists(LArquivo) then Exit;
+
+  LBytes  := TFile.ReadAllBytes(LArquivo);
+  LBase64 := TNetEncoding.Base64.EncodeBytesToString(LBytes);
+  LBase64 := StringReplace(LBase64, #13, '', [rfReplaceAll]);
+  LBase64 := StringReplace(LBase64, #10, '', [rfReplaceAll]);
+
+  UniSession.AddJS(
+    'window._downloadAsBase64 = "' + LBase64 + '";' +
+    'window._downloadAsNome   = "ContratoMatricula.pdf";' +
+    'window._downloadAsPronto = true;'
   );
 end;
 

@@ -10,6 +10,7 @@ type
     function DataAtualizacao: string;
     function DataAssinatura: string;
     function Status: string;
+    function ContratoStatus: string;
     function ToJSON: string;
   end;
 

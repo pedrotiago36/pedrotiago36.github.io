@@ -31,11 +31,15 @@ type
   TPainelController = class(TInterfacedObject, IPainelController)
   private
     FPastaAgendamentos: string;
+    FPastaBase        : string;
     FArquivoJSON      : string;
     FThread           : TMonitorThread;
     function ExtrairCampo(const AConteudo, APadrao: string): string;
     function ChaveDataISO(const AConteudo: string): string;
-    function ArquivoParaAgendamento(const AConteudo: string): IAgendamentoPainel;
+    function LimparCPF(const ACPF: string): string;
+    function ConsultarStatusContrato(const ACPFLimpo: string): string;
+    function ArquivoParaAgendamento(const AConteudo: string;
+                                    const AContratoStatus: string): IAgendamentoPainel;
   public
     constructor Create;
     destructor Destroy; override;
@@ -43,6 +47,7 @@ type
     procedure IniciarMonitoramento(const APastaAgendamentos: string;
                                    const AArquivoJSON      : string);
     procedure PararMonitoramento;
+    procedure ValidarContrato(const ACPF: string);
   end;
 
 implementation
@@ -71,7 +76,7 @@ end;
 procedure TMonitorThread.Execute;
 begin
   repeat
-    FEvento.WaitFor(60000);
+    FEvento.WaitFor(15000);
     FEvento.ResetEvent;
     case Ord(not Terminated) of
       1: FController.ScanearEGravar;
@@ -118,7 +123,43 @@ begin
   Result    := LCands[Ord(LMatch.Success)];
 end;
 
-function TPainelController.ArquivoParaAgendamento(const AConteudo: string): IAgendamentoPainel;
+function TPainelController.LimparCPF(const ACPF: string): string;
+begin
+  Result := StringReplace(
+    StringReplace(ACPF, '.', '', [rfReplaceAll]),
+    '-', '', [rfReplaceAll]);
+end;
+
+function TPainelController.ConsultarStatusContrato(const ACPFLimpo: string): string;
+var
+  LPastaAss  : string;
+  LPastaOrig : string;
+  LArqAss    : string;
+  LArqOrig   : string;
+  LArqValid  : string;
+begin
+  Result    := 'sem_contrato';
+  LPastaAss := TPath.Combine(TPath.Combine(FPastaBase, ACPFLimpo), 'ContratoAssinado');
+  LPastaOrig := TPath.Combine(TPath.Combine(FPastaBase, ACPFLimpo), 'ContratoOriginal');
+
+  LArqAss := TPath.Combine(LPastaAss, 'ContratoMatricula.pdf');
+  if TFile.Exists(LArqAss) then
+  begin
+    LArqValid := TPath.Combine(LPastaAss, '_VALIDADO');
+    if TFile.Exists(LArqValid) then
+      Result := 'validado'
+    else
+      Result := 'pendente';
+    Exit;
+  end;
+
+  LArqOrig := TPath.Combine(LPastaOrig, 'ContratoMatricula.pdf');
+  if TFile.Exists(LArqOrig) then
+    Result := 'original';
+end;
+
+function TPainelController.ArquivoParaAgendamento(const AConteudo: string;
+                                                   const AContratoStatus: string): IAgendamentoPainel;
 var
   LCPF, LDataAg, LDataAt, LDataAs, LStatus: string;
 begin
@@ -127,23 +168,26 @@ begin
   LDataAt := ExtrairCampo(AConteudo, 'Data da Atualizacao\s*:\s*(\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}:\d{2})');
   LDataAs := ExtrairCampo(AConteudo, 'Data para Assinatura\s*:\s*(\d{2}\/\d{2}\/\d{4})');
   LStatus := ExtrairCampo(AConteudo, 'Status\s*:\s*(\w+)');
-  Result  := TAgendamentoPainel.Create(LCPF, LDataAg, LDataAt, LDataAs, LStatus);
+  Result  := TAgendamentoPainel.Create(LCPF, LDataAg, LDataAt, LDataAs, LStatus, AContratoStatus);
 end;
 
 procedure TPainelController.ScanearEGravar;
 var
-  LArquivos    : TArray<string>;
-  LArquivo     : string;
-  LConteudo    : string;
-  LChave       : string;
-  LReader      : TStreamReader;
-  LDatas       : TDictionary<string, TList<IAgendamentoPainel>>;
-  LPartesDatas : TArray<string>;
-  LItensData   : TArray<string>;
-  LPar         : TPair<string, TList<IAgendamentoPainel>>;
-  LJSON        : string;
-  LWriter      : TStreamWriter;
-  I, LIdx      : Integer;
+  LArquivos      : TArray<string>;
+  LArquivo       : string;
+  LConteudo      : string;
+  LChave         : string;
+  LNomeArq       : string;
+  LCPFLimpo      : string;
+  LContratoStatus: string;
+  LReader        : TStreamReader;
+  LDatas         : TDictionary<string, TList<IAgendamentoPainel>>;
+  LPartesDatas   : TArray<string>;
+  LItensData     : TArray<string>;
+  LPar           : TPair<string, TList<IAgendamentoPainel>>;
+  LJSON          : string;
+  LWriter        : TStreamWriter;
+  I, LIdx        : Integer;
 begin
   LDatas := TDictionary<string, TList<IAgendamentoPainel>>.Create;
   try
@@ -162,10 +206,15 @@ begin
       case Ord(LChave <> '') of
         1:
           begin
+            // Extrai CPF limpo do nome do arquivo: {cpf}_agendamento.txt
+            LNomeArq  := TPath.GetFileNameWithoutExtension(LArquivo);
+            LCPFLimpo := StringReplace(LNomeArq, '_agendamento', '', []);
+            LContratoStatus := ConsultarStatusContrato(LCPFLimpo);
+
             case Ord(not LDatas.ContainsKey(LChave)) of
               1: LDatas.Add(LChave, TList<IAgendamentoPainel>.Create);
             end;
-            LDatas[LChave].Add(ArquivoParaAgendamento(LConteudo));
+            LDatas[LChave].Add(ArquivoParaAgendamento(LConteudo, LContratoStatus));
           end;
       end;
     end;
@@ -206,10 +255,31 @@ procedure TPainelController.IniciarMonitoramento(const APastaAgendamentos: strin
                                                   const AArquivoJSON      : string);
 begin
   FPastaAgendamentos := APastaAgendamentos;
+  FPastaBase         := TPath.GetDirectoryName(APastaAgendamentos);
   FArquivoJSON       := AArquivoJSON;
   ScanearEGravar;
   FThread := TMonitorThread.Create(Self);
   FThread.Start;
+end;
+
+procedure TPainelController.ValidarContrato(const ACPF: string);
+var
+  LCPFLimpo: string;
+  LPastaAss: string;
+  LArqAss  : string;
+  LArqValid: string;
+begin
+  LCPFLimpo := LimparCPF(ACPF);
+  LPastaAss := TPath.Combine(TPath.Combine(FPastaBase, LCPFLimpo), 'ContratoAssinado');
+  LArqAss   := TPath.Combine(LPastaAss, 'ContratoMatricula.pdf');
+  case Ord(TFile.Exists(LArqAss)) of
+    1:
+      begin
+        LArqValid := TPath.Combine(LPastaAss, '_VALIDADO');
+        TFile.WriteAllText(LArqValid, '');
+        ScanearEGravar;
+      end;
+  end;
 end;
 
 procedure TPainelController.PararMonitoramento;

@@ -13,19 +13,22 @@ type
     FDataAtualizacao: string;
     FDataAssinatura: string;
     FStatus: string;
+    FContratoStatus: string;
   public
     constructor Create(
-      const ACPF         : string;
+      const ACPF             : string;
       const ADataAgendamento : string;
       const ADataAtualizacao : string;
       const ADataAssinatura  : string;
-      const AStatus          : string
+      const AStatus          : string;
+      const AContratoStatus  : string
     );
     function CPF: string;
     function DataAgendamento: string;
     function DataAtualizacao: string;
     function DataAssinatura: string;
     function Status: string;
+    function ContratoStatus: string;
     function ToJSON: string;
   end;
 
@@ -36,7 +39,8 @@ constructor TAgendamentoPainel.Create(
   const ADataAgendamento : string;
   const ADataAtualizacao : string;
   const ADataAssinatura  : string;
-  const AStatus          : string
+  const AStatus          : string;
+  const AContratoStatus  : string
 );
 begin
   inherited Create;
@@ -45,6 +49,7 @@ begin
   FDataAtualizacao  := ADataAtualizacao;
   FDataAssinatura   := ADataAssinatura;
   FStatus           := AStatus;
+  FContratoStatus   := AContratoStatus;
 end;
 
 function TAgendamentoPainel.CPF: string;
@@ -72,6 +77,11 @@ begin
   Result := FStatus;
 end;
 
+function TAgendamentoPainel.ContratoStatus: string;
+begin
+  Result := FContratoStatus;
+end;
+
 function TAgendamentoPainel.ToJSON: string;
 begin
   Result :=
@@ -80,6 +90,7 @@ begin
     '"dataAtualizacao":"'   + FDataAtualizacao  + '",' +
     '"dataAssinatura":"'    + FDataAssinatura   + '",' +
     '"status":"'            + FStatus           + '",' +
+    '"contratoStatus":"'    + FContratoStatus   + '",' +
     '"titulo":"PRE-MATRICULA"}';
 end;
 

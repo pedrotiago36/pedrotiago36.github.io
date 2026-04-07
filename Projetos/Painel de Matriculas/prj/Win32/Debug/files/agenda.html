@@ -148,6 +148,41 @@
         .legenda-cor.hoje { background: linear-gradient(145deg, #d33327, #7d2728); }
         .badge-exemplo { background: #d33327; color: white; font-size: 0.7rem; padding: 0.1rem 0.5rem; border-radius: 20px; }
 
+        .contratos-panel {
+            background: rgba(255,255,255,0.94); backdrop-filter: blur(16px);
+            border-radius: 2.5rem; padding: 2rem; margin-top: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(125,39,40,0.25);
+            border: 1px solid rgba(253,205,98,0.5);
+        }
+        .contratos-panel h2 {
+            font-size: 1.5rem; font-weight: 800; font-family: 'Poppins', sans-serif;
+            color: #7d2728; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.6rem;
+        }
+        .contratos-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        .contratos-table th {
+            background: linear-gradient(135deg, #7d2728, #d33327); color: white;
+            padding: 0.7rem 1rem; text-align: left; font-weight: 600;
+        }
+        .contratos-table th:first-child { border-radius: 1rem 0 0 0; }
+        .contratos-table th:last-child  { border-radius: 0 1rem 0 0; text-align: center; }
+        .contratos-table td { padding: 0.7rem 1rem; border-bottom: 1px solid rgba(253,205,98,0.35); color: #3d2a25; }
+        .contratos-table tr:last-child td { border-bottom: none; }
+        .contratos-table tr:hover td { background: rgba(253,205,98,0.1); }
+        .btn-aceite {
+            background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; border: none;
+            border-radius: 1.5rem; padding: 0.4rem 1.1rem; font-weight: 700; font-size: 0.82rem;
+            cursor: pointer; display: flex; align-items: center; gap: 6px; margin: 0 auto;
+            transition: opacity 0.2s;
+        }
+        .btn-aceite:disabled { opacity: 0.5; cursor: not-allowed; }
+        .badge-pendente {
+            background: linear-gradient(135deg,#f39c12,#e67e22); color: white;
+            padding: 0.2rem 0.7rem; border-radius: 2rem; font-size: 0.76rem; font-weight: 700;
+        }
+        .empty-contratos {
+            text-align: center; color: #888; padding: 1.5rem; font-size: 0.9rem;
+        }
+
         footer {
             margin-top: 3rem;
             background: linear-gradient(135deg, #7d2728, #5a2a2b);
@@ -224,6 +259,13 @@
                     <div class="legenda-item"><div class="legenda-cor hoje"></div><span>Hoje</span></div>
                     <div class="legenda-item"><span class="badge-exemplo">3</span><span>Quantidade</span></div>
                 </div>
+            </div>
+        </div>
+
+        <div class="contratos-panel animate__animated animate__fadeInUp" id="contratosPanel">
+            <h2><i class="fas fa-file-signature"></i> Contratos Aguardando Aceite</h2>
+            <div id="contratosBody">
+                <div class="empty-contratos"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>
             </div>
         </div>
 
@@ -313,11 +355,13 @@
     }
 
     function atualizarCalendario() {
-        document.getElementById('mesNome').innerHTML = mesesNomes[mesAtual] + ' ' + anoAtual;
+        var elMes = document.getElementById('mesNome');
+        var diasGrid = document.getElementById('diasGrid');
+        if (!elMes || !diasGrid) return;
+        elMes.innerHTML = mesesNomes[mesAtual] + ' ' + anoAtual;
         var primeiroDia = new Date(anoAtual, mesAtual, 1).getDay();
         var ultimoDia   = new Date(anoAtual, mesAtual + 1, 0).getDate();
         var ultimoAnterior = new Date(anoAtual, mesAtual, 0).getDate();
-        var diasGrid = document.getElementById('diasGrid');
         diasGrid.innerHTML = '';
         var diasCount = 0;
         for (var i = primeiroDia - 1; i >= 0; i--) {
@@ -384,6 +428,7 @@
 
     function adicionarNavegacao() {
         var mesTituloDiv = document.querySelector('.mes-titulo');
+        if (!mesTituloDiv) return;
         var navContainer = document.createElement('div');
         navContainer.style.cssText = 'display:flex;justify-content:center;gap:1rem;margin-top:0.5rem;';
         var btnAnt  = document.createElement('button');
@@ -426,10 +471,12 @@
                     var dados = JSON.parse(xhr.responseText);
                     agendamentosPorData = dados.agendamentos || {};
                     atualizarCalendario();
+                    renderizarContratos();
                     document.getElementById('ultimaAtualizacao').innerHTML =
                         'Atualizado: ' + (dados.ultimaAtualizacao || new Date().toLocaleTimeString());
                 } else {
-                    // Arquivo ainda nao existe — tenta novamente em 5s
+                    // Arquivo ainda nao existe — mostra estado vazio e tenta novamente em 5s
+                    renderizarContratos();
                     setTimeout(carregarAgendamentos, 5000);
                 }
             }
@@ -437,11 +484,79 @@
         xhr.send();
     }
 
-    // Inicializa: renderiza calendario vazio, carrega dados, atualiza a cada 60s
-    adicionarNavegacao();
-    atualizarCalendario();
-    carregarAgendamentos();
-    setInterval(carregarAgendamentos, 60000);
+    // =========================================================
+    // Contratos aguardando aceite
+    // =========================================================
+    var _todosAgendamentos = [];
+
+    function renderizarContratos() {
+        var pendentes = [];
+        for (var data in agendamentosPorData) {
+            var lista = agendamentosPorData[data];
+            for (var i = 0; i < lista.length; i++) {
+                if (lista[i].contratoStatus === 'pendente') {
+                    pendentes.push(lista[i]);
+                }
+            }
+        }
+        var div = document.getElementById('contratosBody');
+        if (pendentes.length === 0) {
+            div.innerHTML = '<div class="empty-contratos"><i class="fas fa-check-circle" style="color:#2ecc71;"></i> Nenhum contrato pendente de aceite.</div>';
+            return;
+        }
+        var h = '<table class="contratos-table">';
+        h += '<thead><tr><th>CPF Responsavel</th><th>Data Assinatura</th><th>Arquivo</th><th>Status</th><th>Aceite</th></tr></thead>';
+        h += '<tbody>';
+        for (var j = 0; j < pendentes.length; j++) {
+            var p = pendentes[j];
+            h += '<tr>';
+            h += '<td>' + p.cpf + '</td>';
+            h += '<td>' + p.dataAssinatura + '</td>';
+            h += '<td><i class="fas fa-file-pdf" style="color:#d33327;margin-right:5px;"></i>ContratoMatricula.pdf</td>';
+            h += '<td><span class="badge-pendente"><i class="fas fa-clock"></i> Pendente</span></td>';
+            h += '<td><button class="btn-aceite" data-cpf="' + p.cpf + '" onclick="darAceiteBtn(this)"><i class="fas fa-check"></i> Dar Aceite</button></td>';
+            h += '</tr>';
+        }
+        h += '</tbody></table>';
+        div.innerHTML = h;
+    }
+
+    function darAceiteBtn(btn) {
+        darAceite(btn, btn.getAttribute('data-cpf'));
+    }
+
+    function darAceite(btn, cpf) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Aguardando...';
+        try {
+            window.parent._validadoPronto = false;
+            window.parent.validarContrato(cpf);
+        } catch(e) {}
+        var t = 0;
+        var timer = setInterval(function() {
+            t++;
+            var pronto = false;
+            try { pronto = window.parent._validadoPronto === true; } catch(e2) {}
+            if (pronto || t >= 30) {
+                clearInterval(timer);
+                try { window.parent._validadoPronto = false; } catch(e2) {}
+                if (pronto) {
+                    carregarAgendamentos();
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-check"></i> Dar Aceite';
+                }
+            }
+        }, 200);
+    }
+
+    setTimeout(function() {
+        adicionarNavegacao();
+        atualizarCalendario();
+        renderizarContratos();
+        carregarAgendamentos();
+        setInterval(carregarAgendamentos, 15000);
+    }, 600);
 </script>
 </body>
 </html>

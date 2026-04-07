@@ -11,6 +11,7 @@ type
     procedure IniciarMonitoramento(const APastaAgendamentos: string;
                                    const AArquivoJSON      : string);
     procedure PararMonitoramento;
+    procedure ValidarContrato(const ACPF: string);
   end;
 
 implementation

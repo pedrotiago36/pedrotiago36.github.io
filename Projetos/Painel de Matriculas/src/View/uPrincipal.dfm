@@ -6,6 +6,7 @@ object MainForm: TMainForm
   Caption = 'Col'#233'gio Batista Santos Dumont | Painel de Agendamentos'
   OldCreateOrder = False
   MonitoredKeys.Keys = <>
+  OnAjaxEvent = UniFormAjaxEvent
   OnCreate = UniFormCreate
   OnDestroy = UniFormDestroy
   TextHeight = 15
