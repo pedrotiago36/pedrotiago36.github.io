@@ -9,6 +9,7 @@ uses
   uniHTMLFrame,
   System.StrUtils,
   System.IOUtils,
+  System.NetEncoding,
   Controller.IPortal,
   Controller.TPortal,
   Model.IAgendamento,
@@ -25,6 +26,8 @@ type
     procedure ConfigurarBridge;
     procedure ProcessarPreMatricula(const Params: TUniStrings);
     procedure ProcessarEntradaPai(const Params: TUniStrings);
+    procedure ProcessarUploadContrato(const Params: TUniStrings);
+    procedure ProcessarDownloadContrato(const Params: TUniStrings);
   public
   end;
 
@@ -80,6 +83,16 @@ begin
     '  if (frm) ajaxRequest(frm, "EntradaPai", ["cpf=" + cpf]);' +
     '};' +
 
+    'window.uploadContrato = function(cpf, base64, nome) {' +
+    '  var frm = window._uniFormRef;' +
+    '  if (frm) ajaxRequest(frm, "UploadContrato", ["cpf=" + cpf, "base64=" + encodeURIComponent(base64), "nome=" + encodeURIComponent(nome)]);' +
+    '};' +
+
+    'window.downloadContrato = function(cpf) {' +
+    '  var frm = window._uniFormRef;' +
+    '  if (frm) ajaxRequest(frm, "DownloadContrato", ["cpf=" + cpf]);' +
+    '};' +
+
     'setTimeout(function() {' +
     '  document.querySelectorAll("iframe").forEach(function(f) {' +
     '    f.setAttribute("scrolling", "yes");' +
@@ -93,9 +106,11 @@ end;
 procedure TMainForm.UniFormAjaxEvent(Sender: TComponent; EventName: string;
   Params: TUniStrings);
 begin
-  case AnsiIndexStr(EventName, ['RegistrarMatricula', 'EntradaPai']) of
+  case AnsiIndexStr(EventName, ['RegistrarMatricula', 'EntradaPai', 'UploadContrato', 'DownloadContrato']) of
     0: ProcessarPreMatricula(Params);
     1: ProcessarEntradaPai(Params);
+    2: ProcessarUploadContrato(Params);
+    3: ProcessarDownloadContrato(Params);
   end;
 end;
 
@@ -124,10 +139,86 @@ end;
 
 procedure TMainForm.ProcessarEntradaPai(const Params: TUniStrings);
 var
-  LCPF: string;
+  LCPF    : string;
+  LPartes : TArray<string>;
+  LStatus : string;
+  LArquivo: string;
 begin
   LCPF := Params.Values['cpf'];
   FController.PrepararPastaPai(LCPF);
+
+  LStatus  := 'sem_contrato';
+  LArquivo := '';
+  LPartes := FController.ConsultarContrato(LCPF).Split(['|']);
+  if Length(LPartes) > 0 then LStatus  := LPartes[0];
+  if Length(LPartes) > 1 then LArquivo := LPartes[1];
+
+  // Grava na janela pai — portal.html lê via window.parent quando o modal abre
+  UniSession.AddJS(
+    'window._contratoStatus  = "' + LStatus  + '";' +
+    'window._contratoArquivo = "' + LArquivo + '";'
+  );
+end;
+
+procedure TMainForm.ProcessarUploadContrato(const Params: TUniStrings);
+var
+  LCPF    : string;
+  LNome   : string;
+  LBase64 : string;
+  LBytes  : TBytes;
+  LPasta  : string;
+  LDestino: string;
+begin
+  LCPF    := Params.Values['cpf'];
+  LNome   := Params.Values['nome'];
+  LBase64 := Params.Values['base64'];
+
+  LCPF := StringReplace(LCPF, '.', '', [rfReplaceAll]);
+  LCPF := StringReplace(LCPF, '-', '', [rfReplaceAll]);
+
+  LPasta   := TPath.Combine(TPath.Combine(ExtractFilePath(ParamStr(0)), LCPF), 'ContratoAssinado');
+  TDirectory.CreateDirectory(LPasta);
+  LDestino := TPath.Combine(LPasta, LNome);
+
+  LBytes := TNetEncoding.Base64.DecodeStringToBytes(LBase64);
+  TFile.WriteAllBytes(LDestino, LBytes);
+
+  UniSession.AddJS(
+    '(function(){' +
+    '  var frames = document.querySelectorAll("iframe");' +
+    '  frames.forEach(function(f){' +
+    '    try{ f.contentWindow.uploadContratoOk("' + LNome + '"); }catch(e){}' +
+    '  });' +
+    '})();'
+  );
+end;
+
+procedure TMainForm.ProcessarDownloadContrato(const Params: TUniStrings);
+var
+  LCPF    : string;
+  LArquivo: string;
+  LBytes  : TBytes;
+  LBase64 : string;
+begin
+  LCPF := Params.Values['cpf'];
+  LCPF := StringReplace(LCPF, '.', '', [rfReplaceAll]);
+  LCPF := StringReplace(LCPF, '-', '', [rfReplaceAll]);
+
+  LArquivo := TPath.Combine(TPath.Combine(TPath.Combine(
+                ExtractFilePath(ParamStr(0)), LCPF), 'ContratoOriginal'), 'ContratoMatricula.pdf');
+  if not TFile.Exists(LArquivo) then Exit;
+
+  LBytes  := TFile.ReadAllBytes(LArquivo);
+  LBase64 := TNetEncoding.Base64.EncodeBytesToString(LBytes);
+
+  UniSession.AddJS(
+    '(function(){' +
+    '  var frames = document.querySelectorAll("iframe");' +
+    '  frames.forEach(function(f){' +
+    '    try{ f.contentWindow.receberDownloadContrato("' + LBase64 + '","ContratoMatricula.pdf"); }catch(e){}' +
+    '  });' +
+    '})();'
+  );
 end;
 
 initialization

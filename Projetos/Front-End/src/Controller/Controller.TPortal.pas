@@ -21,6 +21,7 @@ type
     function ValidarCPF(const ACPF: string): Boolean;
     procedure RegistrarPreMatricula(const AAgendamento: IAgendamento);
     procedure PrepararPastaPai(const ACPF: string);
+    function ConsultarContrato(const ACPF: string): string;
   end;
 
 implementation
@@ -37,8 +38,6 @@ begin
   TDirectory.CreateDirectory(Result);
 end;
 
-// Le o campo "Data do Agendamento" do arquivo existente.
-// Retorna vazio silenciosamente se o arquivo nao existir.
 function TPortalController.ObterDataCriacaoOriginal(const AArquivo: string): string;
 var
   LLinhas: TStringList;
@@ -81,14 +80,12 @@ begin
         '0'..'9': LDigitos := LDigitos + C;
       end;
 
-    // Calcula primeiro digito verificador sem usar IF
     LSoma := 0;
     for I := 1 to 9 do
       LSoma := LSoma + (Ord(LDigitos[I]) - Ord('0')) * (11 - I);
     LResto := 11 - (LSoma mod 11);
     LDigito1 := LResto * Ord(LResto <= 9);
 
-    // Calcula segundo digito verificador sem usar IF
     LSoma := 0;
     for I := 1 to 10 do
       LSoma := LSoma + (Ord(LDigitos[I]) - Ord('0')) * (12 - I);
@@ -121,22 +118,56 @@ var
 begin
   LCPFLimpo := LimparCPF(ACPF);
 
-  // Pasta raiz do pai: <exe>\<CPF>\
   LPastaPai := TPath.Combine(ExtractFilePath(ParamStr(0)), LCPFLimpo);
   TDirectory.CreateDirectory(LPastaPai);
 
-  // Subpastas
   LPastaOriginal := TPath.Combine(LPastaPai, 'ContratoOriginal');
   LPastaAssinado := TPath.Combine(LPastaPai, 'ContratoAssinado');
   TDirectory.CreateDirectory(LPastaOriginal);
   TDirectory.CreateDirectory(LPastaAssinado);
 
-  // Copia ContratoMatricula.pdf para ContratoOriginal\ apenas se ainda nao existe
   LOrigemContrato  := TPath.Combine(ExtractFilePath(ParamStr(0)), 'ContratoMatricula.pdf');
   LDestinoContrato := TPath.Combine(LPastaOriginal, 'ContratoMatricula.pdf');
 
   case Ord(TFile.Exists(LOrigemContrato) and not TFile.Exists(LDestinoContrato)) of
     1: TFile.Copy(LOrigemContrato, LDestinoContrato);
+  end;
+end;
+
+function TPortalController.ConsultarContrato(const ACPF: string): string;
+var
+  LCPFLimpo  : string;
+  LPastaPai  : string;
+  LPastaAss  : string;
+  LPastaOrig : string;
+  LArqAss    : string;
+  LArqOrig   : string;
+  LArqValid  : string;
+begin
+  Result    := 'sem_contrato|';
+  LCPFLimpo := LimparCPF(ACPF);
+  LPastaPai  := TPath.Combine(ExtractFilePath(ParamStr(0)), LCPFLimpo);
+  LPastaAss  := TPath.Combine(LPastaPai, 'ContratoAssinado');
+  LPastaOrig := TPath.Combine(LPastaPai, 'ContratoOriginal');
+
+  // 1) ContratoAssinado tem PDF?
+  LArqAss := TPath.Combine(LPastaAss, 'ContratoMatricula.pdf');
+  if TFile.Exists(LArqAss) then
+  begin
+    LArqValid := TPath.Combine(LPastaAss, '_VALIDADO');
+    if TFile.Exists(LArqValid) then
+      Result := 'validado|ContratoMatricula.pdf'
+    else
+      Result := 'pendente|ContratoMatricula.pdf';
+    Exit;
+  end;
+
+  // 2) ContratoOriginal tem PDF?
+  LArqOrig := TPath.Combine(LPastaOrig, 'ContratoMatricula.pdf');
+  if TFile.Exists(LArqOrig) then
+  begin
+    Result := 'original|ContratoMatricula.pdf';
+    Exit;
   end;
 end;
 
@@ -150,15 +181,13 @@ var
 begin
   LCPFLimpo := LimparCPF(AAgendamento.CPF);
 
-  // Arquivo unico por CPF — primeira vez cria, demais atualiza
   LArquivo := TPath.Combine(FPastaAgendamentos, LCPFLimpo + '_agendamento.txt');
 
   LDataCriacao := FormatDateTime('dd/MM/yyyy HH:nn:ss', Now);
 
-  // Arquivo existe: preserva a data original do primeiro agendamento
   LDataCriacaoArq := ObterDataCriacaoOriginal(LArquivo);
-  LDatas[0] := LDataCriacao;      // fallback: arquivo novo, usa Now
-  LDatas[1] := LDataCriacaoArq;   // arquivo existente: data original preservada
+  LDatas[0] := LDataCriacao;
+  LDatas[1] := LDataCriacaoArq;
   LDataCriacao := LDatas[Ord(Length(LDataCriacaoArq) > 0)];
 
   LWriter := TStreamWriter.Create(LArquivo, False, TEncoding.UTF8);

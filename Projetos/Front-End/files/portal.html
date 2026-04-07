@@ -725,73 +725,162 @@
     // ============================================================
     // 1. PRÉ-MATRÍCULA
     // ============================================================
-    let selectedDate = null;
+    var _selectedDate   = null;
+    var _statusContrato = 'sem_contrato';
+    var _arquivoContrato = '';
+
+    // Chamado pelo Delphi (fallback — não é o canal principal)
+    window.receberStatusContrato = function(status, arquivo) {
+        _statusContrato  = status;
+        _arquivoContrato = arquivo;
+        var area = document.getElementById('contrato-area');
+        if (area) renderContrato(area, status, arquivo);
+    };
+
+    function renderContrato(area, status, arquivo) {
+        var nome = arquivo || 'ContratoMatricula.pdf';
+        var h = '';
+        if (status === 'original') {
+            h += '<p style="color:#5a3a2e;margin-bottom:0.8rem;font-size:0.88rem;">Baixe o contrato, assine e envie pelo upload abaixo.</p>';
+            h += '<div style="display:flex;align-items:center;justify-content:space-between;background:#fff5e8;border:1px solid rgba(253,205,98,0.7);border-radius:1rem;padding:0.8rem 1rem;margin-bottom:1rem;">';
+            h +=   '<div style="display:flex;align-items:center;gap:10px;">';
+            h +=     '<i class="fas fa-file-pdf" style="color:#d33327;font-size:1.4rem;"></i>';
+            h +=     '<div><div style="font-size:0.7rem;color:#7d2728;font-weight:600;">Contrato Original</div>';
+            h +=     '<div style="font-weight:700;color:#2d2d2d;">' + nome + '</div></div>';
+            h +=   '</div>';
+            h +=   '<button onclick="baixarContrato()" style="background:linear-gradient(135deg,#d33327,#7d2728);color:#fff;border:none;border-radius:1rem;padding:0.4rem 1rem;cursor:pointer;font-weight:600;font-size:0.85rem;">';
+            h +=     '<i class="fas fa-download"></i> Baixar</button>';
+            h += '</div>';
+            h += '<label style="font-weight:600;color:#7d2728;font-size:0.88rem;display:block;margin-bottom:0.4rem;"><i class="fas fa-upload"></i> Enviar Contrato Assinado</label>';
+            h += '<div onclick="document.getElementById(&quot;inputContrato&quot;).click()" style="border:2px dashed #fdcd62;border-radius:1rem;padding:1rem;text-align:center;cursor:pointer;background:#fffdf8;" onmouseenter="this.style.borderColor=&quot;#d33327&quot;" onmouseleave="this.style.borderColor=&quot;#fdcd62&quot;">';
+            h +=   '<i class="fas fa-cloud-upload-alt" style="font-size:1.6rem;color:#fdcd62;"></i>';
+            h +=   '<p style="color:#5a3a2e;font-size:0.85rem;margin:0.3rem 0 0;">Clique para selecionar o PDF assinado</p>';
+            h +=   '<p id="upload-nome" style="color:#d33327;font-weight:600;font-size:0.82rem;margin:0;"></p>';
+            h += '</div>';
+            h += '<input type="file" id="inputContrato" accept=".pdf" style="display:none" onchange="selecionarArquivo(this)">';
+            h += '<button id="btn-enviar" onclick="enviarContrato()" style="display:none;width:100%;margin-top:0.7rem;padding:0.85rem;background:linear-gradient(100deg,#d33327,#7d2728);color:#fff;border:none;border-radius:1.5rem;font-weight:700;font-size:1rem;cursor:pointer;">';
+            h +=   '<i class="fas fa-paper-plane"></i> Enviar Contrato</button>';
+        } else if (status === 'pendente') {
+            h += '<div style="display:flex;align-items:center;justify-content:space-between;background:#fff9ec;border:1px solid rgba(243,156,18,0.4);border-radius:1rem;padding:0.8rem 1rem;">';
+            h +=   '<div style="display:flex;align-items:center;gap:10px;">';
+            h +=     '<i class="fas fa-file-pdf" style="color:#d33327;font-size:1.4rem;"></i>';
+            h +=     '<div><div style="font-size:0.7rem;color:#7d2728;font-weight:600;">Contrato Assinado</div><div style="font-weight:700;color:#2d2d2d;">' + nome + '</div></div>';
+            h +=   '</div>';
+            h +=   '<span style="background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;padding:0.3rem 0.8rem;border-radius:2rem;font-size:0.78rem;font-weight:700;"><i class="fas fa-clock"></i> Em verificação...</span>';
+            h += '</div>';
+            h += '<p style="text-align:center;color:#5a3a2e;font-size:0.85rem;margin-top:0.8rem;">Seu contrato está sendo analisado pela secretaria.</p>';
+        } else if (status === 'validado') {
+            h += '<div style="display:flex;align-items:center;justify-content:space-between;background:#edfff4;border:1px solid rgba(46,204,113,0.4);border-radius:1rem;padding:0.8rem 1rem;">';
+            h +=   '<div style="display:flex;align-items:center;gap:10px;">';
+            h +=     '<i class="fas fa-file-pdf" style="color:#27ae60;font-size:1.4rem;"></i>';
+            h +=     '<div><div style="font-size:0.7rem;color:#27ae60;font-weight:600;">Contrato Assinado</div><div style="font-weight:700;color:#2d2d2d;">' + nome + '</div></div>';
+            h +=   '</div>';
+            h +=   '<span style="background:linear-gradient(135deg,#2ecc71,#27ae60);color:#fff;padding:0.3rem 0.8rem;border-radius:2rem;font-size:0.78rem;font-weight:700;"><i class="fas fa-check-circle"></i> Validado</span>';
+            h += '</div>';
+            h += '<p style="text-align:center;color:#27ae60;font-weight:600;margin-top:0.8rem;">Matrícula confirmada!</p>';
+        } else {
+            h = '<p style="color:#999;text-align:center;font-size:0.85rem;">Contrato não disponível.</p>';
+        }
+        area.innerHTML = h;
+    }
+
+    var _arquivoSelecionado = null;
+    function selecionarArquivo(input) {
+        if (!input.files || !input.files[0]) return;
+        _arquivoSelecionado = input.files[0];
+        var p = document.getElementById('upload-nome');
+        if (p) p.textContent = _arquivoSelecionado.name;
+        var btn = document.getElementById('btn-enviar');
+        if (btn) btn.style.display = 'block';
+    }
+    function enviarContrato() {
+        if (!_arquivoSelecionado) return;
+        var btn = document.getElementById('btn-enviar');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...'; }
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var base64 = e.target.result.split(',')[1];
+            var nome   = _arquivoSelecionado.name;
+            try { window.parent.uploadContrato(cpfPaiLogado, base64, nome); } catch(ex) {}
+        };
+        reader.readAsDataURL(_arquivoSelecionado);
+    }
+    window.uploadContratoOk = function(nome) {
+        _arquivoSelecionado = null;
+        _statusContrato  = 'pendente';
+        _arquivoContrato = nome;
+        var area = document.getElementById('contrato-area');
+        if (area) renderContrato(area, 'pendente', nome);
+    };
+    function baixarContrato() {
+        try { window.parent.downloadContrato(cpfPaiLogado); } catch(e) {}
+    }
+    window.receberDownloadContrato = function(base64, nome) {
+        var bytes = atob(base64);
+        var arr   = new Uint8Array(bytes.length);
+        for (var i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+        var url = URL.createObjectURL(new Blob([arr], {type:'application/pdf'}));
+        var a   = document.createElement('a');
+        a.href = url; a.download = nome || 'ContratoMatricula.pdf';
+        document.body.appendChild(a); a.click();
+        setTimeout(function(){ URL.revokeObjectURL(url); document.body.removeChild(a); }, 1000);
+    };
 
     function abrirModalPreMatricula() {
-        const html = `
-            <h3><i class="fas fa-user-graduate"></i> Pré-Matrícula 2027</h3>
-            <p style="margin-bottom: 1.2rem; color: #5a3a2e;">Selecione o dia que você virá assinar o contrato.</p>
+        var html = '';
+        html += '<h3><i class="fas fa-user-graduate"></i> Pr\u00e9-Matr\u00edcula 2027</h3>';
+        html += '<div style="background:#fff5e8;border-radius:1rem;padding:0.8rem 1.1rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:10px;border:1px solid rgba(253,205,98,0.6);">';
+        html +=   '<i class="fas fa-id-card" style="color:#d33327;font-size:1.2rem;"></i>';
+        html +=   '<div><div style="font-size:0.72rem;color:#7d2728;font-weight:600;">CPF do Respons\u00e1vel</div>';
+        html +=   '<div style="font-size:0.95rem;font-weight:700;color:#2d2d2d;">' + cpfPaiLogado + '</div></div>';
+        html += '</div>';
 
-            <div style="background:#fff5e8; border-radius:1rem; padding:0.9rem 1.2rem; margin-bottom:1.5rem;
-                        display:flex; align-items:center; gap:10px; border:1px solid rgba(253,205,98,0.6);">
-                <i class="fas fa-id-card" style="color:#d33327; font-size:1.3rem;"></i>
-                <div>
-                    <div style="font-size:0.75rem; color:#7d2728; font-weight:600;">CPF do Responsável</div>
-                    <div style="font-size:1rem; font-weight:700; color:#2d2d2d;">${cpfPaiLogado}</div>
-                </div>
-            </div>
+        // Seção agendamento
+        html += '<div style="background:#fff5e8;border-radius:1.2rem;padding:1.1rem;margin-bottom:1.2rem;border:1px solid rgba(253,205,98,0.7);">';
+        html +=   '<div style="font-weight:700;color:#7d2728;margin-bottom:0.8rem;"><i class="fas fa-calendar-alt" style="color:#d33327;"></i> Agendar Visita \u00e0 Escola</div>';
+        html +=   '<div class="form-group" style="margin-bottom:0.7rem;"><label style="font-size:0.85rem;"><i class="fas fa-calendar-check"></i> Data para Assinatura</label>';
+        html +=   '<input type="text" id="dataAssinatura" placeholder="Selecione uma data"></div>';
+        html +=   '<button class="btn-confirmar" id="confirmarAgendamento" style="margin-top:0;"><i class="fas fa-check-circle"></i> Confirmar Agendamento</button>';
+        html += '</div>';
 
-            <div class="form-group">
-                <label><i class="fas fa-calendar-alt"></i> Data para Assinatura do Contrato</label>
-                <input type="text" id="dataAssinatura" placeholder="Selecione uma data">
-            </div>
-            <button class="btn-confirmar" id="confirmarPreMatricula"><i class="fas fa-check-circle"></i> Confirmar Pré-Matrícula</button>
-            <button class="btn-fechar-modal" onclick="fecharInnerModal()"><i class="fas fa-times"></i> Cancelar</button>
-        `;
+        // Seção contrato
+        html += '<div style="background:#f9f9f9;border-radius:1.2rem;padding:1.1rem;border:1px solid rgba(200,200,200,0.5);">';
+        html +=   '<div style="font-weight:700;color:#7d2728;margin-bottom:0.8rem;"><i class="fas fa-file-contract" style="color:#d33327;"></i> Contrato de Matr\u00edcula</div>';
+        html +=   '<div id="contrato-area"></div>';
+        html += '</div>';
+
+        html += '<button class="btn-fechar-modal" onclick="fecharInnerModal()" style="margin-top:1rem;"><i class="fas fa-times"></i> Fechar</button>';
+
         abrirInnerModal(html);
-        selectedDate = null;
+        _selectedDate = null;
 
-        flatpickr("#dataAssinatura", {
-            locale: 'pt',
-            minDate: 'today',
-            dateFormat: 'd/m/Y',
-            onChange: function(selectedDates, dateStr) { selectedDate = dateStr; }
+        flatpickr('#dataAssinatura', {
+            locale: 'pt', minDate: 'today', dateFormat: 'd/m/Y',
+            onChange: function(_, dateStr) { _selectedDate = dateStr; }
         });
-
-        document.getElementById('confirmarPreMatricula').addEventListener('click', () => {
-            if (!selectedDate) {
-                Swal.fire({ icon: 'warning', title: 'Data não selecionada', text: 'Escolha o dia para a assinatura do contrato.', confirmButtonColor: '#d33327' });
+        document.getElementById('confirmarAgendamento').addEventListener('click', function() {
+            if (!_selectedDate) {
+                Swal.fire({ icon:'warning', title:'Data n\u00e3o selecionada', text:'Escolha o dia.', confirmButtonColor:'#d33327' });
                 return;
             }
-
-            // Envia ao servidor Delphi para gravar o .txt
-            const temBridge = window.parent && typeof window.parent.enviarPreMatricula === 'function';
-            const enviarFn = temBridge ? window.parent.enviarPreMatricula : (c, d) => {};
-            enviarFn(cpfPaiLogado, selectedDate);
-
+            var fn = (window.parent && typeof window.parent.enviarPreMatricula === 'function') ? window.parent.enviarPreMatricula : function(){};
+            fn(cpfPaiLogado, _selectedDate);
             fecharInnerModal();
-
-            // Mensagem de confirmação
             Swal.fire({
-                icon: 'success',
-                title: '✅ Pré-Matrícula Confirmada!',
-                html: `
-                    <p style="margin:0.4rem 0;"><i class="fas fa-id-card" style="color:#d33327;"></i>
-                        <strong> CPF:</strong> ${cpfPaiLogado}</p>
-                    <p style="margin:0.4rem 0;"><i class="fas fa-calendar-check" style="color:#d33327;"></i>
-                        <strong> Data agendada:</strong> ${selectedDate}</p>
-                    <hr style="margin:0.8rem 0; border-color:#fdcd62;">
-                    <p style="color:#5a3a2e; font-size:0.95rem;">
-                        Parabéns! Seu agendamento foi registrado com sucesso.<br>
-                        Aguardamos você no dia <strong>${selectedDate}</strong> para a assinatura do contrato.
-                    </p>`,
-                confirmButtonText: '😊 Estarei lá!',
-                confirmButtonColor: '#d33327',
-                background: '#fff9f0',
-                showClass: { popup: 'animate__animated animate__fadeInDown' },
-                hideClass: { popup: 'animate__animated animate__fadeOutUp' }
+                icon:'success', title:'\u2705 Agendamento Confirmado!',
+                html:'<p><strong>CPF:</strong> ' + cpfPaiLogado + '</p><p><strong>Data:</strong> ' + _selectedDate + '</p>',
+                confirmButtonText:'\ud83d\ude0a Estarei l\u00e1!', confirmButtonColor:'#d33327', background:'#fff9f0'
             });
         });
+
+        // Lê da janela pai — é onde o Delphi AddJS grava com certeza
+        var st  = 'sem_contrato';
+        var arq = '';
+        try { st  = window.parent._contratoStatus  || st;  } catch(e) {}
+        try { arq = window.parent._contratoArquivo || arq; } catch(e) {}
+        // Fallback: variáveis locais (caso receberStatusContrato tenha chegado antes)
+        if (st === 'sem_contrato' && _statusContrato !== 'sem_contrato') { st = _statusContrato; arq = _arquivoContrato; }
+        renderContrato(document.getElementById('contrato-area'), st, arq);
     }
 
     function validarCPF(cpf) {
