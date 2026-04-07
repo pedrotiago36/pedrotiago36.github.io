@@ -15,10 +15,12 @@ type
     FPastaAgendamentos: string;
     function ObterPastaAgendamentos: string;
     function ObterDataCriacaoOriginal(const AArquivo: string): string;
+    function LimparCPF(const ACPF: string): string;
   public
     constructor Create;
     function ValidarCPF(const ACPF: string): Boolean;
     procedure RegistrarPreMatricula(const AAgendamento: IAgendamento);
+    procedure PrepararPastaPai(const ACPF: string);
   end;
 
 implementation
@@ -101,6 +103,43 @@ begin
   end;
 end;
 
+function TPortalController.LimparCPF(const ACPF: string): string;
+begin
+  Result := StringReplace(
+    StringReplace(ACPF, '.', '', [rfReplaceAll]),
+    '-', '', [rfReplaceAll]);
+end;
+
+procedure TPortalController.PrepararPastaPai(const ACPF: string);
+var
+  LCPFLimpo       : string;
+  LPastaPai       : string;
+  LPastaOriginal  : string;
+  LPastaAssinado  : string;
+  LOrigemContrato : string;
+  LDestinoContrato: string;
+begin
+  LCPFLimpo := LimparCPF(ACPF);
+
+  // Pasta raiz do pai: <exe>\<CPF>\
+  LPastaPai := TPath.Combine(ExtractFilePath(ParamStr(0)), LCPFLimpo);
+  TDirectory.CreateDirectory(LPastaPai);
+
+  // Subpastas
+  LPastaOriginal := TPath.Combine(LPastaPai, 'ContratoOriginal');
+  LPastaAssinado := TPath.Combine(LPastaPai, 'ContratoAssinado');
+  TDirectory.CreateDirectory(LPastaOriginal);
+  TDirectory.CreateDirectory(LPastaAssinado);
+
+  // Copia ContratoMatricula.pdf para ContratoOriginal\ apenas se ainda nao existe
+  LOrigemContrato  := TPath.Combine(ExtractFilePath(ParamStr(0)), 'ContratoMatricula.pdf');
+  LDestinoContrato := TPath.Combine(LPastaOriginal, 'ContratoMatricula.pdf');
+
+  case Ord(TFile.Exists(LOrigemContrato) and not TFile.Exists(LDestinoContrato)) of
+    1: TFile.Copy(LOrigemContrato, LDestinoContrato);
+  end;
+end;
+
 procedure TPortalController.RegistrarPreMatricula(const AAgendamento: IAgendamento);
 var
   LArquivo: string;
@@ -109,10 +148,7 @@ var
   LCPFLimpo: string;
   LDatas: array[0..1] of string;
 begin
-  // Remove formatacao do CPF para usar como nome de arquivo
-  LCPFLimpo := StringReplace(
-    StringReplace(AAgendamento.CPF, '.', '', [rfReplaceAll]),
-    '-', '', [rfReplaceAll]);
+  LCPFLimpo := LimparCPF(AAgendamento.CPF);
 
   // Arquivo unico por CPF — primeira vez cria, demais atualiza
   LArquivo := TPath.Combine(FPastaAgendamentos, LCPFLimpo + '_agendamento.txt');

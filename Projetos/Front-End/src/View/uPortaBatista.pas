@@ -24,6 +24,7 @@ type
     FController: IPortalController;
     procedure ConfigurarBridge;
     procedure ProcessarPreMatricula(const Params: TUniStrings);
+    procedure ProcessarEntradaPai(const Params: TUniStrings);
   public
   end;
 
@@ -74,6 +75,11 @@ begin
     '  if (frm) ajaxRequest(frm, "RegistrarMatricula", ["cpf=" + cpf, "data=" + data]);' +
     '};' +
 
+    'window.cadastrarPai = function(cpf) {' +
+    '  var frm = window._uniFormRef;' +
+    '  if (frm) ajaxRequest(frm, "EntradaPai", ["cpf=" + cpf]);' +
+    '};' +
+
     'setTimeout(function() {' +
     '  document.querySelectorAll("iframe").forEach(function(f) {' +
     '    f.setAttribute("scrolling", "yes");' +
@@ -87,8 +93,9 @@ end;
 procedure TMainForm.UniFormAjaxEvent(Sender: TComponent; EventName: string;
   Params: TUniStrings);
 begin
-  case AnsiIndexStr(EventName, ['RegistrarMatricula']) of
+  case AnsiIndexStr(EventName, ['RegistrarMatricula', 'EntradaPai']) of
     0: ProcessarPreMatricula(Params);
+    1: ProcessarEntradaPai(Params);
   end;
 end;
 
@@ -113,6 +120,14 @@ begin
     '  });' +
     '})();'
   );
+end;
+
+procedure TMainForm.ProcessarEntradaPai(const Params: TUniStrings);
+var
+  LCPF: string;
+begin
+  LCPF := Params.Values['cpf'];
+  FController.PrepararPastaPai(LCPF);
 end;
 
 initialization
