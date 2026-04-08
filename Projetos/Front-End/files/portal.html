@@ -92,6 +92,90 @@
             box-shadow: 0 6px 14px rgba(253,205,98,0.3);
         }
         .btn-pai:hover { transform: scale(1.02); color: white !important; }
+        .btn-novato {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            padding: 0.6rem 1.5rem; border-radius: 2rem; color: white !important;
+            box-shadow: 0 6px 14px rgba(46,204,113,0.35);
+            animation: pulse-novato 2.5s infinite;
+        }
+        .btn-novato:hover { transform: scale(1.05) !important; box-shadow: 0 10px 24px rgba(46,204,113,0.5); }
+        @keyframes pulse-novato {
+            0%,100% { box-shadow: 0 6px 14px rgba(46,204,113,0.35); }
+            50%      { box-shadow: 0 6px 28px rgba(46,204,113,0.7); }
+        }
+
+        /* MODAL NOVATO */
+        .modal-novato-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65); backdrop-filter: blur(8px);
+            z-index: 5000; align-items: center; justify-content: center;
+        }
+        .modal-novato-overlay.ativo { display: flex; }
+        .modal-novato-box {
+            background: white; border-radius: 2.5rem; width: 90%; max-width: 520px;
+            padding: 0; overflow: hidden;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.3);
+            animation: fadeInUp 0.4s cubic-bezier(0.2,0.9,0.4,1.1);
+        }
+        .modal-novato-header {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            padding: 2.5rem 2rem 2rem;
+            text-align: center; position: relative; overflow: hidden;
+        }
+        .modal-novato-header::before {
+            content: ''; position: absolute; inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.07'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .modal-novato-header .icone-stars {
+            font-size: 3.5rem; margin-bottom: 0.5rem; display: block;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
+            animation: float-star 3s ease-in-out infinite;
+        }
+        @keyframes float-star {
+            0%,100% { transform: translateY(0) rotate(-5deg); }
+            50%      { transform: translateY(-10px) rotate(5deg); }
+        }
+        .modal-novato-header h2 {
+            color: white; font-size: 1.6rem; font-weight: 800;
+            font-family: 'Poppins', sans-serif; position: relative;
+        }
+        .modal-novato-header p { color: rgba(255,255,255,0.9); font-size: 0.9rem; position: relative; margin-top: 0.3rem; }
+        .modal-novato-fechar {
+            position: absolute; top: 1rem; right: 1rem;
+            background: rgba(255,255,255,0.2); border: none; color: white;
+            width: 34px; height: 34px; border-radius: 50%; cursor: pointer;
+            font-size: 1rem; display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .modal-novato-fechar:hover { background: rgba(255,255,255,0.35); }
+        .modal-novato-body { padding: 2rem; }
+        .novato-field { margin-bottom: 1.2rem; }
+        .novato-field label {
+            display: block; font-size: 0.78rem; font-weight: 700;
+            color: #7d2728; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .novato-field input {
+            width: 100%; padding: 0.75rem 1rem; border: 2px solid rgba(253,205,98,0.5);
+            border-radius: 1rem; font-size: 0.95rem; color: #2d2d2d;
+            transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .novato-field input:focus {
+            border-color: #2ecc71;
+            box-shadow: 0 0 0 4px rgba(46,204,113,0.15);
+        }
+        .novato-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .btn-novato-salvar {
+            width: 100%; padding: 1rem; margin-top: 0.5rem;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            border: none; border-radius: 1.5rem; color: white;
+            font-size: 1.05rem; font-weight: 700; cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 8px 20px rgba(46,204,113,0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-novato-salvar:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(46,204,113,0.5); }
+        .btn-novato-salvar:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
         /* HERO */
         .hero { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; margin: 3rem 0 2rem 0; gap: 2rem; }
@@ -380,6 +464,7 @@
             <ul class="nav-links">
                 <li><a href="#" id="openModalBtn" class="btn-login"><i class="fas fa-sign-in-alt"></i> Portal do Aluno</a></li>
                 <li><a href="#" id="openPortalPaiBtn" class="btn-pai"><i class="fas fa-users"></i> Portal do Pai Batista</a></li>
+                <li><a href="#" id="openNovatoBtn" class="btn-novato"><i class="fas fa-star"></i> Quero ser Batista</a></li>
             </ul>
         </nav>
 
@@ -536,6 +621,41 @@
             <div>contato@colegiobatistasantosdumont.edu.br</div>
         </div>
     </footer>
+
+    <!-- MODAL NOVATO -->
+    <div id="modalNovato" class="modal-novato-overlay">
+        <div class="modal-novato-box">
+            <div class="modal-novato-header">
+                <button class="modal-novato-fechar" id="fecharNovatoBtn"><i class="fas fa-times"></i></button>
+                <span class="icone-stars">&#127775;</span>
+                <h2>Quero ser Batista!</h2>
+                <p>Preencha seus dados e entraremos em contato</p>
+            </div>
+            <div class="modal-novato-body">
+                <div class="novato-row">
+                    <div class="novato-field">
+                        <label><i class="fas fa-user"></i> Nome *</label>
+                        <input type="text" id="novatoNome" placeholder="Seu nome">
+                    </div>
+                    <div class="novato-field">
+                        <label><i class="fas fa-user"></i> Sobrenome *</label>
+                        <input type="text" id="novatoSobrenome" placeholder="Seu sobrenome">
+                    </div>
+                </div>
+                <div class="novato-field">
+                    <label><i class="fas fa-envelope"></i> E-mail *</label>
+                    <input type="email" id="novatoEmail" placeholder="exemplo@gmail.com">
+                </div>
+                <div class="novato-field">
+                    <label><i class="fas fa-phone"></i> Telefone *</label>
+                    <input type="text" id="novatoTelefone" placeholder="(85) 99999-9999" maxlength="15">
+                </div>
+                <button class="btn-novato-salvar" id="btnNovatoSalvar">
+                    <i class="fas fa-paper-plane"></i> Enviar Interesse
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL CPF - PORTAL DO PAI -->
     <div id="modalCPFPai" class="modal">
@@ -1239,6 +1359,74 @@
     document.getElementById('fecharModalCPFPai').addEventListener('click', () => {
         modalCPFPai.style.display = 'none';
         document.body.style.overflow = 'auto';
+    });
+
+    // ============================================================
+    // MODAL NOVATO
+    // ============================================================
+    var modalNovato = document.getElementById('modalNovato');
+
+    document.getElementById('openNovatoBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        modalNovato.classList.add('ativo');
+        document.body.style.overflow = 'hidden';
+        document.getElementById('novatoNome').focus();
+    });
+
+    document.getElementById('fecharNovatoBtn').addEventListener('click', function() {
+        modalNovato.classList.remove('ativo');
+        document.body.style.overflow = 'auto';
+    });
+
+    modalNovato.addEventListener('click', function(e) {
+        if (e.target === modalNovato) {
+            modalNovato.classList.remove('ativo');
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    // Máscara telefone
+    document.getElementById('novatoTelefone').addEventListener('input', function() {
+        var v = this.value.replace(/\D/g, '');
+        if (v.length > 11) v = v.slice(0,11);
+        if (v.length > 6)       v = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7);
+        else if (v.length > 2)  v = '(' + v.slice(0,2) + ') ' + v.slice(2);
+        else if (v.length > 0)  v = '(' + v;
+        this.value = v;
+    });
+
+    document.getElementById('btnNovatoSalvar').addEventListener('click', function() {
+        var nome      = document.getElementById('novatoNome').value.trim();
+        var sobrenome = document.getElementById('novatoSobrenome').value.trim();
+        var email     = document.getElementById('novatoEmail').value.trim();
+        var telefone  = document.getElementById('novatoTelefone').value.trim();
+        if (!nome || !sobrenome || !email || !telefone) {
+            Swal.fire({ icon:'warning', title:'Campos obrigat\u00f3rios', text:'Preencha todos os campos.', confirmButtonColor:'#2ecc71' });
+            return;
+        }
+        var btn = this;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        try {
+            window.parent.cadastrarNovato(nome, sobrenome, email, telefone);
+        } catch(e) {}
+        setTimeout(function() {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Interesse';
+            document.getElementById('novatoNome').value      = '';
+            document.getElementById('novatoSobrenome').value = '';
+            document.getElementById('novatoEmail').value     = '';
+            document.getElementById('novatoTelefone').value  = '';
+            modalNovato.classList.remove('ativo');
+            document.body.style.overflow = 'auto';
+            Swal.fire({
+                icon: 'success',
+                title: '\ud83c\udf89 Interesse registrado!',
+                html: '<p>Obrigado, <strong>' + nome + '</strong>!<br>Nossa equipe entrar\u00e1 em contato em breve.</p>',
+                confirmButtonColor: '#2ecc71',
+                background: '#f0fff4'
+            });
+        }, 1500);
     });
 
     window.addEventListener('click', (e) => {

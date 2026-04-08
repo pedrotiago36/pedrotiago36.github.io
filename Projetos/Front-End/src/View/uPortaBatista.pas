@@ -30,6 +30,7 @@ type
     procedure ProcessarDownloadContrato(const Params: TUniStrings);
     procedure ProcessarDownloadContratoAssinado(const Params: TUniStrings);
     procedure ProcessarConsultarStatus(const Params: TUniStrings);
+    procedure ProcessarCadastrarNovato(const Params: TUniStrings);
   public
   end;
 
@@ -105,6 +106,16 @@ begin
     '  if (frm) ajaxRequest(frm, "ConsultarStatus", ["cpf=" + cpf]);' +
     '};' +
 
+    'window.cadastrarNovato = function(nome, sobrenome, email, tel) {' +
+    '  var frm = window._uniFormRef;' +
+    '  if (frm) ajaxRequest(frm, "CadastrarNovato", [' +
+    '    "nome=" + encodeURIComponent(nome),' +
+    '    "sobrenome=" + encodeURIComponent(sobrenome),' +
+    '    "email=" + encodeURIComponent(email),' +
+    '    "telefone=" + encodeURIComponent(tel)' +
+    '  ]);' +
+    '};' +
+
     'setTimeout(function() {' +
     '  document.querySelectorAll("iframe").forEach(function(f) {' +
     '    f.setAttribute("scrolling", "yes");' +
@@ -118,13 +129,14 @@ end;
 procedure TMainForm.UniFormAjaxEvent(Sender: TComponent; EventName: string;
   Params: TUniStrings);
 begin
-  case AnsiIndexStr(EventName, ['RegistrarMatricula', 'EntradaPai', 'UploadContrato', 'DownloadContrato', 'DownloadContratoAssinado', 'ConsultarStatus']) of
+  case AnsiIndexStr(EventName, ['RegistrarMatricula', 'EntradaPai', 'UploadContrato', 'DownloadContrato', 'DownloadContratoAssinado', 'ConsultarStatus', 'CadastrarNovato']) of
     0: ProcessarPreMatricula(Params);
     1: ProcessarEntradaPai(Params);
     2: ProcessarUploadContrato(Params);
     3: ProcessarDownloadContrato(Params);
     4: ProcessarDownloadContratoAssinado(Params);
     5: ProcessarConsultarStatus(Params);
+    6: ProcessarCadastrarNovato(Params);
   end;
 end;
 
@@ -258,6 +270,42 @@ begin
     'window._downloadAsNome   = "ContratoMatricula.pdf";' +
     'window._downloadAsPronto = true;'
   );
+end;
+
+procedure TMainForm.ProcessarCadastrarNovato(const Params: TUniStrings);
+var
+  LNome     : string;
+  LSobrenome: string;
+  LEmail    : string;
+  LTelefone : string;
+  LArquivo  : string;
+  LLista    : TStringList;
+  LRegistro : string;
+begin
+  LNome      := TNetEncoding.URL.Decode(Params.Values['nome']);
+  LSobrenome := TNetEncoding.URL.Decode(Params.Values['sobrenome']);
+  LEmail     := TNetEncoding.URL.Decode(Params.Values['email']);
+  LTelefone  := TNetEncoding.URL.Decode(Params.Values['telefone']);
+
+  LArquivo := TPath.Combine(ExtractFilePath(ParamStr(0)), 'files' + PathDelim + 'novatos.json');
+
+  LLista := TStringList.Create;
+  try
+    if TFile.Exists(LArquivo) then
+      LLista.LoadFromFile(LArquivo, TEncoding.UTF8);
+
+    LRegistro :=
+      '{"nome":"'      + LNome      + '",' +
+      '"sobrenome":"'  + LSobrenome + '",' +
+      '"email":"'      + LEmail     + '",' +
+      '"telefone":"'   + LTelefone  + '",' +
+      '"dataHora":"'   + FormatDateTime('dd\/MM\/yyyy HH:nn:ss', Now) + '"}';
+
+    LLista.Add(LRegistro);
+    LLista.SaveToFile(LArquivo, TEncoding.UTF8);
+  finally
+    LLista.Free;
+  end;
 end;
 
 procedure TMainForm.ProcessarConsultarStatus(const Params: TUniStrings);

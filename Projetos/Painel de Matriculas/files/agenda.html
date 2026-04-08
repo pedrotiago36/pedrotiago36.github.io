@@ -190,6 +190,33 @@
             text-align: center; color: #888; padding: 1.5rem; font-size: 0.9rem;
         }
 
+        .novatos-panel {
+            background: rgba(255,255,255,0.94); backdrop-filter: blur(16px);
+            border-radius: 2.5rem; padding: 2rem; margin-top: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(46,204,113,0.2);
+            border: 2px solid rgba(46,204,113,0.4);
+        }
+        .novatos-panel h2 {
+            font-size: 1.5rem; font-weight: 800; font-family: 'Poppins', sans-serif;
+            color: #27ae60; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.6rem;
+        }
+        .badge-novatos {
+            background: linear-gradient(135deg,#2ecc71,#27ae60); color: white;
+            font-size: 0.75rem; font-weight: 800; padding: 0.2rem 0.7rem;
+            border-radius: 2rem; animation: pulse-green 2s infinite;
+        }
+        .novatos-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        .novatos-table th {
+            background: linear-gradient(135deg,#27ae60,#2ecc71); color: white;
+            padding: 0.7rem 1rem; text-align: left; font-weight: 600;
+        }
+        .novatos-table th:first-child { border-radius: 1rem 0 0 0; }
+        .novatos-table th:last-child  { border-radius: 0 1rem 0 0; }
+        .novatos-table td { padding: 0.7rem 1rem; border-bottom: 1px solid rgba(46,204,113,0.2); color: #3d2a25; }
+        .novatos-table tr:last-child td { border-bottom: none; }
+        .novatos-table tr:hover td { background: rgba(46,204,113,0.06); }
+        .novatos-aviso-zero { text-align:center; color:#888; padding:1.5rem; font-size:0.9rem; }
+
         footer {
             margin-top: 3rem;
             background: linear-gradient(135deg, #7d2728, #5a2a2b);
@@ -266,6 +293,13 @@
                     <div class="legenda-item"><div class="legenda-cor hoje"></div><span>Hoje</span></div>
                     <div class="legenda-item"><span class="badge-exemplo">3</span><span>Quantidade</span></div>
                 </div>
+            </div>
+        </div>
+
+        <div class="novatos-panel animate__animated animate__fadeInUp" id="novatosPanel">
+            <h2><i class="fas fa-star"></i> Pais Interessados <span class="badge-novatos" id="badgeNovatos">0</span></h2>
+            <div id="novatosBody">
+                <div class="novatos-aviso-zero"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>
             </div>
         </div>
 
@@ -480,6 +514,7 @@
                     contratosList = dados.contratos || [];
                     atualizarCalendario();
                     renderizarContratos();
+                    renderizarNovatos(dados.novatos || []);
                     document.getElementById('ultimaAtualizacao').innerHTML =
                         'Atualizado: ' + (dados.ultimaAtualizacao || new Date().toLocaleTimeString());
                 } else {
@@ -594,6 +629,30 @@
                 }
             }
         }, 200);
+    }
+
+    function renderizarNovatos(lista) {
+        var badge = document.getElementById('badgeNovatos');
+        var div   = document.getElementById('novatosBody');
+        if (!badge || !div) return;
+        badge.textContent = lista.length;
+        if (lista.length === 0) {
+            div.innerHTML = '<div class="novatos-aviso-zero"><i class="fas fa-inbox"></i> Nenhum interesse registrado ainda.</div>';
+            return;
+        }
+        var h = '<table class="novatos-table">';
+        h += '<thead><tr><th>Nome</th><th>E-mail</th><th>Telefone</th><th>Data/Hora</th></tr></thead><tbody>';
+        for (var i = lista.length - 1; i >= 0; i--) {
+            var n = lista[i];
+            h += '<tr>';
+            h += '<td><i class="fas fa-user" style="color:#2ecc71;margin-right:6px;"></i>' + (n.nome || '') + ' ' + (n.sobrenome || '') + '</td>';
+            h += '<td><i class="fas fa-envelope" style="color:#2ecc71;margin-right:6px;"></i>' + (n.email || '') + '</td>';
+            h += '<td><i class="fas fa-phone" style="color:#2ecc71;margin-right:6px;"></i>' + (n.telefone || '') + '</td>';
+            h += '<td>' + (n.dataHora || '') + '</td>';
+            h += '</tr>';
+        }
+        h += '</tbody></table>';
+        div.innerHTML = h;
     }
 
     setTimeout(function() {

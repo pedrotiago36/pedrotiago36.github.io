@@ -50,6 +50,7 @@ type
     procedure PararMonitoramento;
     procedure ValidarContrato(const ACPF: string);
     function  PastaBase: string;
+    function  ObterNovatosJSON: string;
   end;
 
 implementation
@@ -268,6 +269,7 @@ begin
     LJSON :=
       '{"agendamentos":{' + string.Join(',', LPartesDatas) + '},' +
       '"contratos":[' + string.Join(',', LContratosItens) + '],' +
+      '"novatos":' + ObterNovatosJSON + ',' +
       '"totalArquivos":' + IntToStr(Length(LArquivos)) + ',' +
       '"ultimaAtualizacao":"' + FormatDateTime('dd\/MM\/yyyy HH:nn:ss', Now) + '"}';
 
@@ -303,6 +305,29 @@ end;
 function TPainelController.PastaBase: string;
 begin
   Result := FPastaBase;
+end;
+
+function TPainelController.ObterNovatosJSON: string;
+var
+  LArquivo: string;
+  LLista  : TStringList;
+  LLinhas : TArray<string>;
+  I       : Integer;
+begin
+  Result   := '[]';
+  // novatos.json fica em files\ dentro do exe do portal (mesmo Debug\)
+  LArquivo := TPath.Combine(FPastaBase, 'files' + PathDelim + 'novatos.json');
+  if not TFile.Exists(LArquivo) then Exit;
+  LLista := TStringList.Create;
+  try
+    LLista.LoadFromFile(LArquivo, TEncoding.UTF8);
+    SetLength(LLinhas, LLista.Count);
+    for I := 0 to LLista.Count - 1 do
+      LLinhas[I] := LLista[I];
+    Result := '[' + string.Join(',', LLinhas) + ']';
+  finally
+    LLista.Free;
+  end;
 end;
 
 procedure TPainelController.ValidarContrato(const ACPF: string);
