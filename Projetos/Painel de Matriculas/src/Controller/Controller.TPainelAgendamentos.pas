@@ -189,9 +189,17 @@ var
   LJSON          : string;
   LWriter        : TStreamWriter;
   I, LIdx        : Integer;
+  // varredura de contratos independente de agendamento
+  LPastas        : TArray<string>;
+  LPasta         : string;
+  LArqAss        : string;
+  LArqValid      : string;
+  LContratosItens: TArray<string>;
+  LContratoIdx   : Integer;
 begin
   LDatas := TDictionary<string, TList<IAgendamentoPainel>>.Create;
   try
+    // --- 1. Agendamentos (para o calendário) ---
     LArquivos := TDirectory.GetFiles(FPastaAgendamentos, '*_agendamento.txt',
                    TSearchOption.soTopDirectoryOnly);
 
@@ -207,7 +215,6 @@ begin
       case Ord(LChave <> '') of
         1:
           begin
-            // Extrai CPF limpo do nome do arquivo: {cpf}_agendamento.txt
             LNomeArq  := TPath.GetFileNameWithoutExtension(LArquivo);
             LCPFLimpo := StringReplace(LNomeArq, '_agendamento', '', []);
             LContratoStatus := ConsultarStatusContrato(LCPFLimpo);
@@ -232,8 +239,34 @@ begin
       Inc(LIdx);
     end;
 
+    // --- 2. Contratos — varre TODAS as pastas CPF em FPastaBase ---
+    SetLength(LContratosItens, 0);
+    LContratoIdx := 0;
+    if TDirectory.Exists(FPastaBase) then
+    begin
+      LPastas := TDirectory.GetDirectories(FPastaBase, '*',
+                   TSearchOption.soTopDirectoryOnly);
+      SetLength(LContratosItens, Length(LPastas));
+      for LPasta in LPastas do
+      begin
+        LArqAss := TPath.Combine(TPath.Combine(LPasta, 'ContratoAssinado'), 'ContratoMatricula.pdf');
+        if TFile.Exists(LArqAss) then
+        begin
+          LArqValid := TPath.Combine(TPath.Combine(LPasta, 'ContratoAssinado'), '_VALIDADO');
+          LCPFLimpo := TPath.GetFileName(LPasta);
+          if TFile.Exists(LArqValid) then
+            LContratosItens[LContratoIdx] := '{"cpf":"' + LCPFLimpo + '","contratoStatus":"validado"}'
+          else
+            LContratosItens[LContratoIdx] := '{"cpf":"' + LCPFLimpo + '","contratoStatus":"pendente"}';
+          Inc(LContratoIdx);
+        end;
+      end;
+    end;
+    SetLength(LContratosItens, LContratoIdx);
+
     LJSON :=
       '{"agendamentos":{' + string.Join(',', LPartesDatas) + '},' +
+      '"contratos":[' + string.Join(',', LContratosItens) + '],' +
       '"totalArquivos":' + IntToStr(Length(LArquivos)) + ',' +
       '"ultimaAtualizacao":"' + FormatDateTime('dd\/MM\/yyyy HH:nn:ss', Now) + '"}';
 

@@ -477,6 +477,7 @@
                 if (xhr.status === 200) {
                     var dados = JSON.parse(xhr.responseText);
                     agendamentosPorData = dados.agendamentos || {};
+                    contratosList = dados.contratos || [];
                     atualizarCalendario();
                     renderizarContratos();
                     document.getElementById('ultimaAtualizacao').innerHTML =
@@ -496,14 +497,13 @@
     // =========================================================
     var _todosAgendamentos = [];
 
+    var contratosList = [];
+
     function renderizarContratos() {
         var pendentes = [];
-        for (var data in agendamentosPorData) {
-            var lista = agendamentosPorData[data];
-            for (var i = 0; i < lista.length; i++) {
-                if (lista[i].contratoStatus === 'pendente') {
-                    pendentes.push(lista[i]);
-                }
+        for (var i = 0; i < contratosList.length; i++) {
+            if (contratosList[i].contratoStatus === 'pendente') {
+                pendentes.push(contratosList[i]);
             }
         }
         var div = document.getElementById('contratosBody');
