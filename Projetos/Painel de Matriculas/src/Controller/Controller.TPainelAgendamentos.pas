@@ -237,13 +237,17 @@ begin
       '"totalArquivos":' + IntToStr(Length(LArquivos)) + ',' +
       '"ultimaAtualizacao":"' + FormatDateTime('dd\/MM\/yyyy HH:nn:ss', Now) + '"}';
 
-    // Grava o JSON em arquivo — o iframe faz fetch diretamente, sem passar dados via AddJS
-    LWriter := TStreamWriter.Create(FArquivoJSON, False, TEncoding.UTF8);
+    // Grava em arquivo temporário e renomeia atomicamente
+    // Evita colisão com o XHR do browser que lê o arquivo a cada 500ms
+    LWriter := TStreamWriter.Create(FArquivoJSON + '.tmp', False, TEncoding.UTF8);
     try
       LWriter.Write(LJSON);
     finally
       LWriter.Free;
     end;
+    if TFile.Exists(FArquivoJSON) then
+      TFile.Delete(FArquivoJSON);
+    TFile.Move(FArquivoJSON + '.tmp', FArquivoJSON);
 
   finally
     for LPar in LDatas do

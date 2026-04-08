@@ -697,29 +697,9 @@
         innerModal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
-    var _timerContratoModal = null;
-
     function fecharInnerModal() {
-        if (_timerContratoModal) { clearInterval(_timerContratoModal); _timerContratoModal = null; }
         innerModal.style.display = 'none';
         document.body.style.overflow = 'auto';
-    }
-
-    function iniciarPollingContrato() {
-        if (_timerContratoModal) clearInterval(_timerContratoModal);
-        var _ultimoStatus = _statusContrato;
-        _timerContratoModal = setInterval(function() {
-            var st = '';
-            try { st = window.parent._contratoStatus || ''; } catch(e) {}
-            if (!st) st = _statusContrato;
-            if (st !== _ultimoStatus) {
-                _ultimoStatus    = st;
-                _statusContrato  = st;
-                try { _arquivoContrato = window.parent._contratoArquivo || _arquivoContrato; } catch(e) {}
-                var area = document.getElementById('contrato-area');
-                if (area) renderContrato(area, st, _arquivoContrato);
-            }
-        }, 500);
     }
     innerModal.addEventListener('click', (e) => {
         if (e.target === innerModal) fecharInnerModal();
@@ -951,7 +931,6 @@
             arq = _arquivoContrato;
         }
         renderContrato(document.getElementById('contrato-area'), st, arq);
-        iniciarPollingContrato();
     }
 
     function validarCPF(cpf) {
