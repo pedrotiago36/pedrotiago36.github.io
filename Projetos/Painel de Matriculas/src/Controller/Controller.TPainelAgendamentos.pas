@@ -77,7 +77,7 @@ end;
 procedure TMonitorThread.Execute;
 begin
   repeat
-    FEvento.WaitFor(15000);
+    FEvento.WaitFor(3000);
     FEvento.ResetEvent;
     case Ord(not Terminated) of
       1: FController.ScanearEGravar;
