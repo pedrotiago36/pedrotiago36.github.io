@@ -1386,14 +1386,17 @@
     });
 
     // Máscara telefone: (85) 9 9162-5040
-    document.getElementById('novatoTelefone').addEventListener('input', function() {
-        var v = this.value.replace(/\D/g, '');
-        if (v.length > 11) v = v.slice(0, 11);
-        if (v.length > 7)       v = '(' + v.slice(0,2) + ') ' + v.slice(2,3) + ' ' + v.slice(3,7) + '-' + v.slice(7);
-        else if (v.length > 3)  v = '(' + v.slice(0,2) + ') ' + v.slice(2,3) + ' ' + v.slice(3);
-        else if (v.length > 2)  v = '(' + v.slice(0,2) + ') ' + v.slice(2);
-        else if (v.length > 0)  v = '(' + v;
-        this.value = v;
+    var _telInput = document.getElementById('novatoTelefone');
+    _telInput.addEventListener('input', function() {
+        var pos = this.selectionStart;
+        var d = this.value.replace(/\D/g, '').slice(0, 11);
+        var r = '';
+        if (d.length === 0)      { r = ''; }
+        else if (d.length <= 2)  { r = '(' + d; }
+        else if (d.length === 3) { r = '(' + d.slice(0,2) + ') ' + d.slice(2); }
+        else if (d.length <= 7)  { r = '(' + d.slice(0,2) + ') ' + d.slice(2,3) + ' ' + d.slice(3); }
+        else                     { r = '(' + d.slice(0,2) + ') ' + d.slice(2,3) + ' ' + d.slice(3,7) + '-' + d.slice(7); }
+        this.value = r;
     });
 
     document.getElementById('btnNovatoSalvar').addEventListener('click', function() {
