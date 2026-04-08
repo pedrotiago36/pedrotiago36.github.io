@@ -697,9 +697,36 @@
         innerModal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
+    var _watchAceiteTimer = null;
+
     function fecharInnerModal() {
+        if (_watchAceiteTimer) { clearInterval(_watchAceiteTimer); _watchAceiteTimer = null; }
         innerModal.style.display = 'none';
         document.body.style.overflow = 'auto';
+    }
+
+    function iniciarWatchAceite() {
+        if (_watchAceiteTimer) clearInterval(_watchAceiteTimer);
+        // Chama cadastrarPai a cada 3s e lê o resultado — exatamente como ao reabrir o modal
+        _watchAceiteTimer = setInterval(function() {
+            if (innerModal.style.display === 'none') {
+                clearInterval(_watchAceiteTimer); _watchAceiteTimer = null; return;
+            }
+            try { window.parent.cadastrarPai(cpfPaiLogado); } catch(e) {}
+            setTimeout(function() {
+                var st = 'pendente';
+                var arq = _arquivoContrato;
+                try { st  = window.parent._contratoStatus  || st;  } catch(e) {}
+                try { arq = window.parent._contratoArquivo || arq; } catch(e) {}
+                if (st === 'validado') {
+                    clearInterval(_watchAceiteTimer); _watchAceiteTimer = null;
+                    _statusContrato  = 'validado';
+                    _arquivoContrato = arq;
+                    var area = document.getElementById('contrato-area');
+                    if (area) renderContrato(area, 'validado', arq);
+                }
+            }, 2000);
+        }, 3000);
     }
     innerModal.addEventListener('click', (e) => {
         if (e.target === innerModal) fecharInnerModal();
@@ -930,7 +957,10 @@
             st  = _statusContrato;
             arq = _arquivoContrato;
         }
+        _statusContrato  = st;
+        _arquivoContrato = arq;
         renderContrato(document.getElementById('contrato-area'), st, arq);
+        if (st === 'pendente') iniciarWatchAceite();
     }
 
     function validarCPF(cpf) {

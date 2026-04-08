@@ -29,6 +29,7 @@ type
     procedure ProcessarUploadContrato(const Params: TUniStrings);
     procedure ProcessarDownloadContrato(const Params: TUniStrings);
     procedure ProcessarDownloadContratoAssinado(const Params: TUniStrings);
+    procedure ProcessarConsultarStatus(const Params: TUniStrings);
   public
   end;
 
@@ -99,6 +100,11 @@ begin
     '  if (frm) ajaxRequest(frm, "DownloadContratoAssinado", ["cpf=" + cpf]);' +
     '};' +
 
+    'window.consultarStatus = function(cpf) {' +
+    '  var frm = window._uniFormRef;' +
+    '  if (frm) ajaxRequest(frm, "ConsultarStatus", ["cpf=" + cpf]);' +
+    '};' +
+
     'setTimeout(function() {' +
     '  document.querySelectorAll("iframe").forEach(function(f) {' +
     '    f.setAttribute("scrolling", "yes");' +
@@ -112,12 +118,13 @@ end;
 procedure TMainForm.UniFormAjaxEvent(Sender: TComponent; EventName: string;
   Params: TUniStrings);
 begin
-  case AnsiIndexStr(EventName, ['RegistrarMatricula', 'EntradaPai', 'UploadContrato', 'DownloadContrato', 'DownloadContratoAssinado']) of
+  case AnsiIndexStr(EventName, ['RegistrarMatricula', 'EntradaPai', 'UploadContrato', 'DownloadContrato', 'DownloadContratoAssinado', 'ConsultarStatus']) of
     0: ProcessarPreMatricula(Params);
     1: ProcessarEntradaPai(Params);
     2: ProcessarUploadContrato(Params);
     3: ProcessarDownloadContrato(Params);
     4: ProcessarDownloadContratoAssinado(Params);
+    5: ProcessarConsultarStatus(Params);
   end;
 end;
 
@@ -250,6 +257,25 @@ begin
     'window._downloadAsBase64 = "' + LBase64 + '";' +
     'window._downloadAsNome   = "ContratoMatricula.pdf";' +
     'window._downloadAsPronto = true;'
+  );
+end;
+
+procedure TMainForm.ProcessarConsultarStatus(const Params: TUniStrings);
+var
+  LCPF   : string;
+  LPartes: TArray<string>;
+  LStatus: string;
+  LArquivo: string;
+begin
+  LCPF := Params.Values['cpf'];
+  LStatus  := 'sem_contrato';
+  LArquivo := '';
+  LPartes := FController.ConsultarContrato(LCPF).Split(['|']);
+  if Length(LPartes) > 0 then LStatus  := LPartes[0];
+  if Length(LPartes) > 1 then LArquivo := LPartes[1];
+
+  UniSession.AddJS(
+    'window._statusCheckResult = "' + LStatus + '";'
   );
 end;
 

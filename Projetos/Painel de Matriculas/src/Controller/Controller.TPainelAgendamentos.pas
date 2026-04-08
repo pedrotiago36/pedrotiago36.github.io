@@ -11,7 +11,8 @@ uses
   System.IOUtils,
   System.SyncObjs,
   System.Generics.Collections,
-  System.RegularExpressions;
+  System.RegularExpressions,
+  Winapi.Windows;
 
 type
   TPainelController = class;
@@ -270,17 +271,16 @@ begin
       '"totalArquivos":' + IntToStr(Length(LArquivos)) + ',' +
       '"ultimaAtualizacao":"' + FormatDateTime('dd\/MM\/yyyy HH:nn:ss', Now) + '"}';
 
-    // Grava em arquivo temporário e renomeia atomicamente
-    // Evita colisão com o XHR do browser que lê o arquivo a cada 500ms
+    // Grava em .tmp e usa MoveFileEx MOVEFILE_REPLACE_EXISTING (atômico no Windows)
+    // Evita EFOpenError quando o browser tem o JSON aberto durante o XHR
     LWriter := TStreamWriter.Create(FArquivoJSON + '.tmp', False, TEncoding.UTF8);
     try
       LWriter.Write(LJSON);
     finally
       LWriter.Free;
     end;
-    if TFile.Exists(FArquivoJSON) then
-      TFile.Delete(FArquivoJSON);
-    TFile.Move(FArquivoJSON + '.tmp', FArquivoJSON);
+    MoveFileEx(PChar(FArquivoJSON + '.tmp'), PChar(FArquivoJSON),
+               MOVEFILE_REPLACE_EXISTING);
 
   finally
     for LPar in LDatas do
