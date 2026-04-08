@@ -12,6 +12,7 @@ type
                                    const AArquivoJSON      : string);
     procedure PararMonitoramento;
     procedure ValidarContrato(const ACPF: string);
+    function  PastaBase: string;
   end;
 
 implementation

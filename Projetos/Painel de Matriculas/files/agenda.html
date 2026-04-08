@@ -179,6 +179,13 @@
             background: linear-gradient(135deg,#f39c12,#e67e22); color: white;
             padding: 0.2rem 0.7rem; border-radius: 2rem; font-size: 0.76rem; font-weight: 700;
         }
+        .btn-baixar-painel {
+            background: linear-gradient(135deg, #d33327, #7d2728); color: white; border: none;
+            border-radius: 1.5rem; padding: 0.4rem 1.1rem; font-weight: 700; font-size: 0.82rem;
+            cursor: pointer; display: flex; align-items: center; gap: 6px; margin: 0 auto;
+            transition: opacity 0.2s;
+        }
+        .btn-baixar-painel:disabled { opacity: 0.5; cursor: not-allowed; }
         .empty-contratos {
             text-align: center; color: #888; padding: 1.5rem; font-size: 0.9rem;
         }
@@ -505,7 +512,7 @@
             return;
         }
         var h = '<table class="contratos-table">';
-        h += '<thead><tr><th>CPF Responsavel</th><th>Data Assinatura</th><th>Arquivo</th><th>Status</th><th>Aceite</th></tr></thead>';
+        h += '<thead><tr><th>CPF Responsavel</th><th>Data Assinatura</th><th>Arquivo</th><th>Status</th><th>Baixar</th><th>Aceite</th></tr></thead>';
         h += '<tbody>';
         for (var j = 0; j < pendentes.length; j++) {
             var p = pendentes[j];
@@ -514,11 +521,50 @@
             h += '<td>' + p.dataAssinatura + '</td>';
             h += '<td><i class="fas fa-file-pdf" style="color:#d33327;margin-right:5px;"></i>ContratoMatricula.pdf</td>';
             h += '<td><span class="badge-pendente"><i class="fas fa-clock"></i> Pendente</span></td>';
+            h += '<td style="text-align:center;"><button class="btn-baixar-painel" data-cpf="' + p.cpf + '" onclick="baixarContratoBtn(this)"><i class="fas fa-download"></i> Baixar</button></td>';
             h += '<td><button class="btn-aceite" data-cpf="' + p.cpf + '" onclick="darAceiteBtn(this)"><i class="fas fa-check"></i> Dar Aceite</button></td>';
             h += '</tr>';
         }
         h += '</tbody></table>';
         div.innerHTML = h;
+    }
+
+    function baixarContratoBtn(btn) {
+        var cpf = btn.getAttribute('data-cpf');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Aguardando...';
+        try {
+            window.parent._downloadAsPronto = false;
+            window.parent.downloadContratoAssinado(cpf);
+        } catch(e) {}
+        var t = 0;
+        var timer = setInterval(function() {
+            t++;
+            var pronto = false;
+            try { pronto = window.parent._downloadAsPronto === true; } catch(e2) {}
+            if (pronto || t >= 30) {
+                clearInterval(timer);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-download"></i> Baixar';
+                if (!pronto) return;
+                var b64  = '';
+                var nome = 'ContratoMatricula.pdf';
+                try { b64  = window.parent._downloadAsBase64 || ''; } catch(e2) {}
+                try { nome = window.parent._downloadAsNome   || nome; } catch(e2) {}
+                try { window.parent._downloadAsPronto = false; } catch(e2) {}
+                if (!b64) return;
+                var byteChars = atob(b64);
+                var byteArr   = new Uint8Array(byteChars.length);
+                for (var i = 0; i < byteChars.length; i++) byteArr[i] = byteChars.charCodeAt(i);
+                var blob = new Blob([byteArr], { type: 'application/pdf' });
+                var url  = URL.createObjectURL(blob);
+                var a    = document.createElement('a');
+                a.href = url; a.download = nome;
+                document.body.appendChild(a); a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        }, 200);
     }
 
     function darAceiteBtn(btn) {

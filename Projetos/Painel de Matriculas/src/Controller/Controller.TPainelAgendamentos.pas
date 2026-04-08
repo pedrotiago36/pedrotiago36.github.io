@@ -48,6 +48,7 @@ type
                                    const AArquivoJSON      : string);
     procedure PararMonitoramento;
     procedure ValidarContrato(const ACPF: string);
+    function  PastaBase: string;
   end;
 
 implementation
@@ -260,6 +261,11 @@ begin
   ScanearEGravar;
   FThread := TMonitorThread.Create(Self);
   FThread.Start;
+end;
+
+function TPainelController.PastaBase: string;
+begin
+  Result := FPastaBase;
 end;
 
 procedure TPainelController.ValidarContrato(const ACPF: string);
