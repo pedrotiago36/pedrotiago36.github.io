@@ -24,6 +24,8 @@ type
     procedure ConfigurarBridge;
     procedure ProcessarValidarContrato(const Params: TUniStrings);
     procedure ProcessarDownloadContratoAssinado(const Params: TUniStrings);
+    procedure ProcessarExcluirNovato(const Params: TUniStrings);
+    procedure ProcessarExcluirTodosNovatos(const Params: TUniStrings);
   public
   end;
 
@@ -91,6 +93,16 @@ begin
     'window.downloadContratoAssinado = function(cpf) {' +
     '  var frm = window._uniFormRef;' +
     '  if (frm) ajaxRequest(frm, "DownloadContratoAssinado", ["cpf=" + cpf]);' +
+    '};' +
+
+    'window.excluirNovato = function(idx) {' +
+    '  var frm = window._uniFormRef;' +
+    '  if (frm) ajaxRequest(frm, "ExcluirNovato", ["idx=" + idx]);' +
+    '};' +
+
+    'window.excluirTodosNovatos = function() {' +
+    '  var frm = window._uniFormRef;' +
+    '  if (frm) ajaxRequest(frm, "ExcluirTodosNovatos", []);' +
     '};'
   );
 end;
@@ -98,9 +110,11 @@ end;
 procedure TMainForm.UniFormAjaxEvent(Sender: TComponent; EventName: string;
   Params: TUniStrings);
 begin
-  case AnsiIndexStr(EventName, ['ValidarContrato', 'DownloadContratoAssinado']) of
+  case AnsiIndexStr(EventName, ['ValidarContrato', 'DownloadContratoAssinado', 'ExcluirNovato', 'ExcluirTodosNovatos']) of
     0: ProcessarValidarContrato(Params);
     1: ProcessarDownloadContratoAssinado(Params);
+    2: ProcessarExcluirNovato(Params);
+    3: ProcessarExcluirTodosNovatos(Params);
   end;
 end;
 
@@ -146,6 +160,18 @@ begin
     'window._downloadAsNome   = "ContratoMatricula.pdf";' +
     'window._downloadAsPronto = true;'
   );
+end;
+
+procedure TMainForm.ProcessarExcluirNovato(const Params: TUniStrings);
+begin
+  FController.ExcluirNovato(StrToIntDef(Params.Values['idx'], -1));
+  UniSession.AddJS('window._novatoExcluidoPronto = true;');
+end;
+
+procedure TMainForm.ProcessarExcluirTodosNovatos(const Params: TUniStrings);
+begin
+  FController.ExcluirTodosNovatos;
+  UniSession.AddJS('window._novatoExcluidoPronto = true;');
 end;
 
 procedure TMainForm.UniFormDestroy(Sender: TObject);

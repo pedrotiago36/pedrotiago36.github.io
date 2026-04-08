@@ -13,6 +13,8 @@ type
     procedure PararMonitoramento;
     procedure ValidarContrato(const ACPF: string);
     function  PastaBase: string;
+    procedure ExcluirNovato(const AIndex: Integer);
+    procedure ExcluirTodosNovatos;
   end;
 
 implementation

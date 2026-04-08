@@ -216,6 +216,18 @@
         .novatos-table tr:last-child td { border-bottom: none; }
         .novatos-table tr:hover td { background: rgba(46,204,113,0.06); }
         .novatos-aviso-zero { text-align:center; color:#888; padding:1.5rem; font-size:0.9rem; }
+        .btn-excluir-novato {
+            background: linear-gradient(135deg,#e74c3c,#c0392b); color:white; border:none;
+            border-radius:1rem; padding:0.3rem 0.8rem; font-size:0.78rem; font-weight:700;
+            cursor:pointer; white-space:nowrap;
+        }
+        .btn-excluir-novato:hover { opacity:0.85; }
+        .btn-excluir-todos {
+            background: linear-gradient(135deg,#e74c3c,#c0392b); color:white; border:none;
+            border-radius:1.5rem; padding:0.4rem 1.1rem; font-size:0.82rem; font-weight:700;
+            cursor:pointer; display:flex; align-items:center; gap:6px;
+        }
+        .btn-excluir-todos:hover { opacity:0.85; }
 
         footer {
             margin-top: 3rem;
@@ -297,7 +309,14 @@
         </div>
 
         <div class="novatos-panel animate__animated animate__fadeInUp" id="novatosPanel">
-            <h2><i class="fas fa-star"></i> Pais Interessados <span class="badge-novatos" id="badgeNovatos">0</span></h2>
+            <h2>
+                <span style="flex:1;display:flex;align-items:center;gap:0.6rem;">
+                    <i class="fas fa-star"></i> Pais Interessados <span class="badge-novatos" id="badgeNovatos">0</span>
+                </span>
+                <button class="btn-excluir-todos" id="btnExcluirTodos" style="display:none;" onclick="excluirTodos()">
+                    <i class="fas fa-trash-alt"></i> Excluir Todos
+                </button>
+            </h2>
             <div id="novatosBody">
                 <div class="novatos-aviso-zero"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>
             </div>
@@ -638,17 +657,22 @@
         return tel;
     }
 
+    var _novatosLista = [];
+
     function renderizarNovatos(lista) {
-        var badge = document.getElementById('badgeNovatos');
-        var div   = document.getElementById('novatosBody');
+        _novatosLista = lista;
+        var badge   = document.getElementById('badgeNovatos');
+        var div     = document.getElementById('novatosBody');
+        var btnTodos = document.getElementById('btnExcluirTodos');
         if (!badge || !div) return;
         badge.textContent = lista.length;
+        if (btnTodos) btnTodos.style.display = lista.length > 0 ? 'flex' : 'none';
         if (lista.length === 0) {
             div.innerHTML = '<div class="novatos-aviso-zero"><i class="fas fa-inbox"></i> Nenhum interesse registrado ainda.</div>';
             return;
         }
         var h = '<table class="novatos-table">';
-        h += '<thead><tr><th>Nome</th><th>E-mail</th><th>Telefone</th><th>Data/Hora</th></tr></thead><tbody>';
+        h += '<thead><tr><th>Nome</th><th>E-mail</th><th>Telefone</th><th>Data/Hora</th><th style="text-align:center;">Excluir</th></tr></thead><tbody>';
         for (var i = lista.length - 1; i >= 0; i--) {
             var n = lista[i];
             h += '<tr>';
@@ -656,10 +680,41 @@
             h += '<td><i class="fas fa-envelope" style="color:#2ecc71;margin-right:6px;"></i>' + (n.email || '') + '</td>';
             h += '<td><i class="fas fa-phone" style="color:#2ecc71;margin-right:6px;"></i>' + formatarTelefone(n.telefone) + '</td>';
             h += '<td>' + (n.dataHora || '') + '</td>';
+            h += '<td style="text-align:center;"><button class="btn-excluir-novato" data-idx="' + i + '" onclick="excluirUm(this)"><i class="fas fa-trash"></i> Excluir</button></td>';
             h += '</tr>';
         }
         h += '</tbody></table>';
         div.innerHTML = h;
+    }
+
+    function excluirUm(btn) {
+        var idx = parseInt(btn.getAttribute('data-idx'));
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        try { window.parent._novatoExcluidoPronto = false; } catch(e) {}
+        try { window.parent.excluirNovato(idx); } catch(e) {}
+        _aguardarExclusao();
+    }
+
+    function excluirTodos() {
+        if (!confirm('Excluir TODOS os pais interessados?')) return;
+        try { window.parent._novatoExcluidoPronto = false; } catch(e) {}
+        try { window.parent.excluirTodosNovatos(); } catch(e) {}
+        _aguardarExclusao();
+    }
+
+    function _aguardarExclusao() {
+        var t = 0;
+        var timer = setInterval(function() {
+            t++;
+            var pronto = false;
+            try { pronto = window.parent._novatoExcluidoPronto === true; } catch(e) {}
+            if (pronto || t >= 20) {
+                clearInterval(timer);
+                try { window.parent._novatoExcluidoPronto = false; } catch(e) {}
+                carregarAgendamentos();
+            }
+        }, 300);
     }
 
     setTimeout(function() {

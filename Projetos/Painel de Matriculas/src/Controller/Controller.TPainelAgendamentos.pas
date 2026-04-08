@@ -51,6 +51,10 @@ type
     procedure ValidarContrato(const ACPF: string);
     function  PastaBase: string;
     function  ObterNovatosJSON: string;
+    procedure ExcluirNovato(const AIndex: Integer);
+    procedure ExcluirTodosNovatos;
+  private
+    function ArquivoNovatos: string;
   end;
 
 implementation
@@ -307,20 +311,22 @@ begin
   Result := FPastaBase;
 end;
 
+function TPainelController.ArquivoNovatos: string;
+begin
+  Result := TPath.Combine(FPastaBase, 'files' + PathDelim + 'novatos.json');
+end;
+
 function TPainelController.ObterNovatosJSON: string;
 var
-  LArquivo: string;
   LLista  : TStringList;
   LLinhas : TArray<string>;
   I       : Integer;
 begin
-  Result   := '[]';
-  // novatos.json fica em files\ dentro do exe do portal (mesmo Debug\)
-  LArquivo := TPath.Combine(FPastaBase, 'files' + PathDelim + 'novatos.json');
-  if not TFile.Exists(LArquivo) then Exit;
+  Result := '[]';
+  if not TFile.Exists(ArquivoNovatos) then Exit;
   LLista := TStringList.Create;
   try
-    LLista.LoadFromFile(LArquivo, TEncoding.UTF8);
+    LLista.LoadFromFile(ArquivoNovatos, TEncoding.UTF8);
     SetLength(LLinhas, LLista.Count);
     for I := 0 to LLista.Count - 1 do
       LLinhas[I] := LLista[I];
@@ -328,6 +334,30 @@ begin
   finally
     LLista.Free;
   end;
+end;
+
+procedure TPainelController.ExcluirNovato(const AIndex: Integer);
+var
+  LLista: TStringList;
+begin
+  if not TFile.Exists(ArquivoNovatos) then Exit;
+  LLista := TStringList.Create;
+  try
+    LLista.LoadFromFile(ArquivoNovatos, TEncoding.UTF8);
+    if (AIndex >= 0) and (AIndex < LLista.Count) then
+    begin
+      LLista.Delete(AIndex);
+      LLista.SaveToFile(ArquivoNovatos, TEncoding.UTF8);
+    end;
+  finally
+    LLista.Free;
+  end;
+end;
+
+procedure TPainelController.ExcluirTodosNovatos;
+begin
+  if TFile.Exists(ArquivoNovatos) then
+    TFile.WriteAllText(ArquivoNovatos, '', TEncoding.UTF8);
 end;
 
 procedure TPainelController.ValidarContrato(const ACPF: string);
