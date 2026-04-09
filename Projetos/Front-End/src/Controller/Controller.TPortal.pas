@@ -126,12 +126,12 @@ begin
   TDirectory.CreateDirectory(LPastaOriginal);
   TDirectory.CreateDirectory(LPastaAssinado);
 
+  // Copia o template da raiz do EXE — só se destino ainda não existe (CPF novo)
   LOrigemContrato  := TPath.Combine(ExtractFilePath(ParamStr(0)), 'ContratoMatricula.pdf');
   LDestinoContrato := TPath.Combine(LPastaOriginal, 'ContratoMatricula.pdf');
 
-  case Ord(TFile.Exists(LOrigemContrato) and not TFile.Exists(LDestinoContrato)) of
-    1: TFile.Copy(LOrigemContrato, LDestinoContrato);
-  end;
+  if TFile.Exists(LOrigemContrato) and not TFile.Exists(LDestinoContrato) then
+    TFile.Copy(LOrigemContrato, LDestinoContrato);
 end;
 
 function TPortalController.ConsultarContrato(const ACPF: string): string;

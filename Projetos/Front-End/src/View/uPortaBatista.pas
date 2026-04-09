@@ -50,19 +50,16 @@ end;
 
 procedure TMainForm.UniFormCreate(Sender: TObject);
 var
-  LLista: TStringList;
+  LLista  : TStringList;
   LArquivo: string;
 begin
   FController := TPortalController.Create;
 
-  LArquivo := TPath.Combine(ExtractFilePath(ParamStr(0)), 'files' + PathDelim + 'portal.html');
-  LLista := TStringList.Create;
-  try
-    LLista.LoadFromFile(LArquivo, TEncoding.UTF8);
-    HTMLPortal.HTML.Text := LLista.Text;
-  finally
-    LLista.Free;
-  end;
+  // Carrega via iframe — evita que o Ext.globalEval processe os scripts modernos
+  HTMLPortal.HTML.Text :=
+    '<iframe src="/files/portal.html" ' +
+    'style="width:100%;height:100%;border:none;display:block;" ' +
+    'allowtransparency="true"></iframe>';
 
   ConfigurarBridge;
 end;
