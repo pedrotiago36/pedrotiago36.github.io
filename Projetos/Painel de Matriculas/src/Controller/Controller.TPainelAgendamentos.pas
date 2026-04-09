@@ -202,7 +202,40 @@ var
   LArqValid      : string;
   LContratosItens: TArray<string>;
   LContratoIdx   : Integer;
+  // limpeza de agendamentos retroativos
+  LMatch         : TMatch;
+  LDataAssinatura: TDateTime;
+  LHoje          : TDateTime;
 begin
+  // --- 0. Apaga agendamentos com data de assinatura anterior a hoje ---
+  LHoje     := Trunc(Now); // só a data, sem hora
+  LArquivos := TDirectory.GetFiles(FPastaAgendamentos, '*_agendamento.txt',
+                 TSearchOption.soTopDirectoryOnly);
+  for LArquivo in LArquivos do
+  begin
+    LReader := TStreamReader.Create(LArquivo, TEncoding.UTF8);
+    try
+      LConteudo := LReader.ReadToEnd;
+    finally
+      LReader.Free;
+    end;
+    LMatch := TRegEx.Match(LConteudo,
+      'Data para Assinatura\s*:\s*(\d{2})\/(\d{2})\/(\d{4})');
+    if LMatch.Success then
+    begin
+      try
+        LDataAssinatura := EncodeDate(
+          StrToInt(LMatch.Groups[3].Value),  // ano
+          StrToInt(LMatch.Groups[2].Value),  // mês
+          StrToInt(LMatch.Groups[1].Value)); // dia
+        if LDataAssinatura < LHoje then
+          TFile.Delete(LArquivo);
+      except
+        // data inválida no arquivo — ignora e mantém
+      end;
+    end;
+  end;
+
   LDatas := TDictionary<string, TList<IAgendamentoPainel>>.Create;
   try
     // --- 1. Agendamentos (para o calendário) ---
