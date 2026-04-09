@@ -73,6 +73,124 @@
         .section-title { text-align: center; font-size: 2rem; font-weight: 700; margin: 2.5rem 0 1.5rem; position: relative; color: #7d2728; }
         .section-title:after { content: ''; width: 80px; height: 4px; background: linear-gradient(90deg, #fdcd62, #d33327); position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); border-radius: 4px; }
 
+        /* ── TOUR VIRTUAL ── */
+        .tour-banner {
+            position: relative;
+            background: linear-gradient(135deg, #7d2728 0%, #3d1a1b 60%, #1a0a0a 100%);
+            border-radius: 2rem;
+            padding: 3rem 3.5rem;
+            margin: 2rem 0 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            flex-wrap: wrap;
+            overflow: hidden;
+            box-shadow: 0 16px 48px rgba(125,39,40,0.35);
+        }
+        .tour-banner::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 280px; height: 280px;
+            background: rgba(253,205,98,0.08);
+            border-radius: 50%;
+        }
+        .tour-banner::after {
+            content: '';
+            position: absolute;
+            bottom: -80px; left: 20%;
+            width: 200px; height: 200px;
+            background: rgba(253,205,98,0.05);
+            border-radius: 50%;
+        }
+        .tour-texto { position: relative; z-index: 1; }
+        .tour-texto h2 { font-family: 'Poppins',sans-serif; font-size: 2rem; font-weight: 800; color: white; margin-bottom: 0.5rem; line-height: 1.2; }
+        .tour-texto p { color: rgba(255,255,255,0.8); font-size: 1rem; max-width: 480px; }
+        .btn-tour {
+            position: relative; z-index: 1;
+            background: linear-gradient(135deg, #fdcd62, #f5a623);
+            color: #7d2728;
+            border: none;
+            padding: 1rem 2.2rem;
+            border-radius: 3rem;
+            font-size: 1.05rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 24px rgba(253,205,98,0.5);
+            transition: all 0.3s;
+            white-space: nowrap;
+            font-family: 'Poppins',sans-serif;
+            animation: pulse-tour 2.5s infinite;
+        }
+        .btn-tour:hover { transform: scale(1.06); box-shadow: 0 14px 32px rgba(253,205,98,0.7); }
+        @keyframes pulse-tour { 0%,100% { box-shadow: 0 8px 24px rgba(253,205,98,0.5); } 50% { box-shadow: 0 8px 40px rgba(253,205,98,0.85); } }
+        .tour-icones { position: absolute; right: 320px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px; opacity: 0.15; z-index: 0; }
+        .tour-icones i { font-size: 2.5rem; color: #fdcd62; }
+
+        /* Modal Tour */
+        .modal-tour { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 9000; align-items: center; justify-content: center; }
+        .modal-tour.aberto { display: flex; animation: fadeIn 0.3s ease; }
+        .modal-tour-inner { position: relative; width: 95vw; height: 90vh; border-radius: 1.5rem; overflow: hidden; box-shadow: 0 24px 64px rgba(0,0,0,0.8); }
+        .modal-tour-inner iframe { width: 100%; height: 100%; border: none; display: block; }
+        .btn-fechar-tour { position: absolute; top: 14px; right: 14px; background: rgba(211,51,39,0.9); color: white; border: none; width: 42px; height: 42px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.4); transition: 0.2s; }
+        .btn-fechar-tour:hover { background: #d33327; transform: scale(1.1); }
+
+        /* ── OLIMPÍADAS ── */
+        .olimpiadas-section {
+            background: linear-gradient(135deg, #1a0a0a 0%, #3d1a1b 50%, #7d2728 100%);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            margin: 0 0 3rem;
+            box-shadow: 0 16px 48px rgba(125,39,40,0.3);
+        }
+        .olimpiadas-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+        .olimpiadas-header .titulo { flex: 1; }
+        .olimpiadas-header h2 { font-family: 'Poppins',sans-serif; font-size: 1.8rem; font-weight: 800; color: white; line-height: 1.2; }
+        .olimpiadas-header p { color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-top: 0.3rem; }
+        .olimpiadas-trofeu { font-size: 3.5rem; animation: balanco 2s ease-in-out infinite; }
+        @keyframes balanco { 0%,100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
+        .olimpiadas-carrossel { position: relative; }
+        .olimpiadas-track-wrap { overflow: hidden; border-radius: 1.2rem; }
+        .olimpiadas-track { display: flex; gap: 1rem; transition: transform 0.45s cubic-bezier(0.4,0,0.2,1); will-change: transform; }
+        .olimpiada-card {
+            flex: 0 0 220px;
+            height: 220px;
+            position: relative;
+            border-radius: 1.2rem;
+            overflow: hidden;
+            cursor: pointer;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(253,205,98,0.2);
+            transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+        }
+        .olimpiada-card:hover { border-color: #fdcd62; box-shadow: 0 12px 32px rgba(0,0,0,0.5); transform: translateY(-6px); }
+        .olimpiada-card img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s; }
+        .olimpiada-card:hover img { transform: scale(1.08); }
+        .olimpiada-card-overlay { position: absolute; inset: 0; background: linear-gradient(transparent 50%, rgba(0,0,0,0.7) 100%); opacity: 0; transition: opacity 0.3s; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 0.8rem; }
+        .olimpiada-card:hover .olimpiada-card-overlay { opacity: 1; }
+        .olimpiada-card-overlay i { color: #fdcd62; font-size: 1.5rem; }
+        .olimpiadas-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.15); backdrop-filter: blur(6px); border: 2px solid rgba(255,255,255,0.3); color: white; width: 46px; height: 46px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: 0.3s; z-index: 5; }
+        .olimpiadas-btn:hover { background: rgba(211,51,39,0.85); border-color: #d33327; }
+        .olimpiadas-btn.prev { left: -22px; }
+        .olimpiadas-btn.next { right: -22px; }
+        .olimpiadas-vazio { text-align: center; color: rgba(255,255,255,0.4); padding: 2rem; font-size: 1rem; }
+
+        /* Lightbox olimpíadas */
+        .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9500; align-items: center; justify-content: center; }
+        .lightbox.aberto { display: flex; animation: fadeIn 0.25s ease; }
+        .lightbox img { max-width: 92vw; max-height: 90vh; object-fit: contain; border-radius: 1rem; box-shadow: 0 24px 64px rgba(0,0,0,0.8); }
+        .lightbox-fechar { position: fixed; top: 18px; right: 18px; background: rgba(211,51,39,0.9); color: white; border: none; width: 44px; height: 44px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .lightbox-fechar:hover { background: #d33327; transform: scale(1.1); }
+        .lightbox-nav { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.15); backdrop-filter: blur(6px); border: 2px solid rgba(255,255,255,0.3); color: white; width: 52px; height: 52px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; z-index: 10; }
+        .lightbox-nav:hover { background: rgba(211,51,39,0.8); border-color: #d33327; }
+        .lightbox-prev { left: 16px; }
+        .lightbox-next { right: 16px; }
+        .lightbox-counter { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.7); font-size: 0.9rem; background: rgba(0,0,0,0.5); padding: 0.4rem 1.2rem; border-radius: 2rem; }
+
         /* ── NÍVEIS DE ENSINO ── */
         .niveis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin: 2rem 0 3rem; }
         .nivel-card { border-radius: 1.5rem; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.07); transition: all 0.4s cubic-bezier(0.2,0.9,0.4,1.1); background: white; border: 1px solid rgba(253,205,98,0.4); cursor: pointer; }
@@ -271,6 +389,59 @@
         <!-- VERSÍCULO -->
         <div class="versiculo animate__animated animate__fadeIn" id="versiculoBox">
             <i class="fas fa-bible"></i> "Instrui o menino no caminho em que deve andar, e até quando envelhecer não se desviará dele." — Provérbios 22:6
+        </div>
+
+        <!-- TOUR VIRTUAL -->
+        <div class="tour-banner">
+            <div class="tour-icones">
+                <i class="fas fa-street-view"></i>
+                <i class="fas fa-map-marker-alt"></i>
+                <i class="fas fa-compass"></i>
+            </div>
+            <div class="tour-texto">
+                <h2><i class="fas fa-street-view" style="color:#fdcd62;margin-right:0.6rem;"></i>Venha Conhecer Nossa Escola!</h2>
+                <p>Explore cada cantinho do Colégio Batista Santos Dumont sem sair de casa. Passeio virtual 360° pelo Google Street View.</p>
+            </div>
+            <button class="btn-tour" id="btnTourVirtual">
+                <i class="fas fa-play-circle"></i> Iniciar Tour Virtual
+            </button>
+        </div>
+
+        <!-- MODAL TOUR VIRTUAL -->
+        <div class="modal-tour" id="modalTour">
+            <div class="modal-tour-inner">
+                <button class="btn-fechar-tour" id="fecharTour" title="Fechar"><i class="fas fa-times"></i></button>
+                <iframe id="iframeTour" src="" allowfullscreen></iframe>
+            </div>
+        </div>
+
+        <!-- OLIMPÍADAS -->
+        <div class="olimpiadas-section">
+            <div class="olimpiadas-header">
+                <div class="olimpiadas-trofeu">🏆</div>
+                <div class="titulo">
+                    <h2>Nossos Campeões nas Olimpíadas!</h2>
+                    <p>Alunos do Colégio Batista representando com excelência em competições regionais e nacionais.</p>
+                </div>
+            </div>
+            <div class="olimpiadas-carrossel" id="olimpiadasCarrossel">
+                <button class="olimpiadas-btn prev" id="olimpPrev"><i class="fas fa-chevron-left"></i></button>
+                <div class="olimpiadas-track-wrap">
+                    <div class="olimpiadas-track" id="olimpiadasTrack">
+                        <div class="olimpiadas-vazio"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>
+                    </div>
+                </div>
+                <button class="olimpiadas-btn next" id="olimpNext"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+
+        <!-- LIGHTBOX -->
+        <div class="lightbox" id="lightbox">
+            <button class="lightbox-fechar" id="lightboxFechar"><i class="fas fa-times"></i></button>
+            <button class="lightbox-nav lightbox-prev" id="lightboxPrev"><i class="fas fa-chevron-left"></i></button>
+            <img id="lightboxImg" src="" alt="">
+            <button class="lightbox-nav lightbox-next" id="lightboxNext"><i class="fas fa-chevron-right"></i></button>
+            <div class="lightbox-counter" id="lightboxCounter"></div>
         </div>
 
         <!-- NÍVEIS DE ENSINO -->
@@ -550,6 +721,84 @@ _heroEl.addEventListener('mouseenter', function() { clearInterval(_sliderTimer);
 _heroEl.addEventListener('mouseleave', _iniciarSlider);
 
 listarPastaPortal('slider', renderSlider);
+
+// ── OLIMPÍADAS ──
+var _olimpiadasLista = [];
+var _lightboxIdx  = 0;
+var _olimpOffset  = 0;  // quantos cards estão deslocados
+
+function _olimpVisíveis() {
+    var wrap = document.getElementById('olimpiadasCarrossel');
+    return wrap ? Math.floor(wrap.offsetWidth / 236) || 1 : 4;
+}
+
+function _olimpIrPara(offset) {
+    var track = document.getElementById('olimpiadasTrack');
+    if (!track) return;
+    var max = Math.max(0, _olimpiadasLista.length - _olimpVisíveis());
+    _olimpOffset = Math.max(0, Math.min(offset, max));
+    track.style.transform = 'translateX(-' + (_olimpOffset * 236) + 'px)';
+}
+
+function renderOlimpiadas(dados) {
+    var track = document.getElementById('olimpiadasTrack');
+    if (!track) return;
+    if (!dados || !dados.length) {
+        track.innerHTML = '<div class="olimpiadas-vazio"><i class="fas fa-trophy"></i> Nenhuma imagem encontrada na pasta olimpiadas/</div>';
+        return;
+    }
+    _olimpiadasLista = dados;
+    _olimpOffset = 0;
+    track.style.transform = 'translateX(0)';
+    track.innerHTML = dados.map(function(item, i) {
+        var src = '/files/' + item.imagem;
+        return '<div class="olimpiada-card" onclick="_abrirLightbox(' + i + ')">' +
+               '<img src="' + src + '" alt="Olimpíada ' + (i+1) + '" loading="lazy">' +
+               '<div class="olimpiada-card-overlay"><i class="fas fa-search-plus"></i></div>' +
+               '</div>';
+    }).join('');
+}
+
+document.getElementById('olimpPrev').addEventListener('click', function() { _olimpIrPara(_olimpOffset - 1); });
+document.getElementById('olimpNext').addEventListener('click', function() { _olimpIrPara(_olimpOffset + 1); });
+
+window._abrirLightbox = function(idx) {
+    _lightboxIdx = idx;
+    _lightboxAtualizar();
+    document.getElementById('lightbox').classList.add('aberto');
+    document.body.style.overflow = 'hidden';
+};
+
+function _lightboxAtualizar() {
+    var item = _olimpiadasLista[_lightboxIdx];
+    document.getElementById('lightboxImg').src = '/files/' + item.imagem;
+    document.getElementById('lightboxCounter').innerText = (_lightboxIdx + 1) + ' / ' + _olimpiadasLista.length;
+}
+
+document.getElementById('lightboxFechar').addEventListener('click', function() {
+    document.getElementById('lightbox').classList.remove('aberto');
+    document.getElementById('lightboxImg').src = '';
+    document.body.style.overflow = 'auto';
+});
+document.getElementById('lightboxPrev').addEventListener('click', function() {
+    _lightboxIdx = (_lightboxIdx - 1 + _olimpiadasLista.length) % _olimpiadasLista.length;
+    _lightboxAtualizar();
+});
+document.getElementById('lightboxNext').addEventListener('click', function() {
+    _lightboxIdx = (_lightboxIdx + 1) % _olimpiadasLista.length;
+    _lightboxAtualizar();
+});
+document.getElementById('lightbox').addEventListener('click', function(e) {
+    if (e.target === this) document.getElementById('lightboxFechar').click();
+});
+document.addEventListener('keydown', function(e) {
+    if (!document.getElementById('lightbox').classList.contains('aberto')) return;
+    if (e.key === 'ArrowLeft')  document.getElementById('lightboxPrev').click();
+    if (e.key === 'ArrowRight') document.getElementById('lightboxNext').click();
+    if (e.key === 'Escape')     document.getElementById('lightboxFechar').click();
+});
+
+listarPastaPortal('olimpiadas', renderOlimpiadas);
 
 // ── SISTEMA DE PASTAS DINÂMICAS ──
 // Chama o Delphi para listar a pasta, aguarda a resposta e chama o callback
@@ -1193,6 +1442,25 @@ document.getElementById('confirmarCPFPai').addEventListener('click', function() 
     portalPaiModal.style.display = 'flex';
 });
 document.getElementById('fecharModalCPFPai').addEventListener('click', function() { modalCPFPai.style.display = 'none'; document.body.style.overflow = 'auto'; });
+
+// ============================================================
+// TOUR VIRTUAL
+// ============================================================
+var _tourURL = 'https://www.google.com.br/local/place/fid/0x7c7488630067779:0x7383f2c1c1b9d10e/photosphere?iu=https://lh3.googleusercontent.com/gps-cs-s/AHVAweoEY9EH0sN7tGszEEfgsSBLop-MC5EwpspM1UpSFgZ_g1gEIUi8w0ltfIxvxydOowZTdmZnTYYZlihv77VOq0cdMYi4vFaQpJfMXvdMZAqpPn1jI_QcdpRyv9q74cBqQiRAQOVS%3Dw160-h106-k-no-pi-20-ya260.65-ro-0-fo100&ik=CAoSFkNJSE0wb2dLRUlDQWdJRGV4ZWpnWkE%3D';
+
+document.getElementById('btnTourVirtual').addEventListener('click', function() {
+    window.open(_tourURL, '_blank');
+});
+document.getElementById('fecharTour').addEventListener('click', function() {
+    document.getElementById('modalTour').classList.remove('aberto');
+    document.getElementById('iframeTour').src = '';
+    document.body.style.overflow = 'auto';
+});
+document.getElementById('modalTour').addEventListener('click', function(e) {
+    if (e.target === this) {
+        document.getElementById('fecharTour').click();
+    }
+});
 
 // ============================================================
 // MODAL NOVATO
