@@ -31,6 +31,7 @@ type
     procedure ProcessarDownloadContratoAssinado(const Params: TUniStrings);
     procedure ProcessarConsultarStatus(const Params: TUniStrings);
     procedure ProcessarCadastrarNovato(const Params: TUniStrings);
+    procedure ProcessarListarPasta(const Params: TUniStrings);
   public
   end;
 
@@ -103,6 +104,11 @@ begin
     '  if (frm) ajaxRequest(frm, "ConsultarStatus", ["cpf=" + cpf]);' +
     '};' +
 
+    'window.listarPasta = function(pasta) {' +
+    '  var frm = window._uniFormRef;' +
+    '  if (frm) ajaxRequest(frm, "ListarPasta", ["pasta=" + pasta]);' +
+    '};' +
+
     'window.cadastrarNovato = function(nome, sobrenome, email, tel) {' +
     '  var frm = window._uniFormRef;' +
     '  if (frm) ajaxRequest(frm, "CadastrarNovato", [' +
@@ -126,7 +132,7 @@ end;
 procedure TMainForm.UniFormAjaxEvent(Sender: TComponent; EventName: string;
   Params: TUniStrings);
 begin
-  case AnsiIndexStr(EventName, ['RegistrarMatricula', 'EntradaPai', 'UploadContrato', 'DownloadContrato', 'DownloadContratoAssinado', 'ConsultarStatus', 'CadastrarNovato']) of
+  case AnsiIndexStr(EventName, ['RegistrarMatricula', 'EntradaPai', 'UploadContrato', 'DownloadContrato', 'DownloadContratoAssinado', 'ConsultarStatus', 'CadastrarNovato', 'ListarPasta']) of
     0: ProcessarPreMatricula(Params);
     1: ProcessarEntradaPai(Params);
     2: ProcessarUploadContrato(Params);
@@ -134,6 +140,7 @@ begin
     4: ProcessarDownloadContratoAssinado(Params);
     5: ProcessarConsultarStatus(Params);
     6: ProcessarCadastrarNovato(Params);
+    7: ProcessarListarPasta(Params);
   end;
 end;
 
@@ -322,6 +329,25 @@ begin
   UniSession.AddJS(
     'window._statusCheckResult = "' + LStatus + '";'
   );
+end;
+
+procedure TMainForm.ProcessarListarPasta(const Params: TUniStrings);
+var
+  LPasta: string;
+  LJSON : string;
+  LVar  : string;
+begin
+  LPasta := Params.Values['pasta'];
+  LJSON  := FController.ListarPasta(LPasta);
+
+  // Remove caracteres que quebrariam o AddJS
+  LJSON := StringReplace(LJSON, #13, '', [rfReplaceAll]);
+  LJSON := StringReplace(LJSON, #10, '', [rfReplaceAll]);
+
+  // Variável global indexada pela pasta: window._lista_slider, _lista_niveis, etc.
+  LVar := 'window._lista_' + StringReplace(LPasta, '/', '_', [rfReplaceAll]);
+
+  UniSession.AddJS(LVar + ' = ' + LJSON + ';');
 end;
 
 initialization

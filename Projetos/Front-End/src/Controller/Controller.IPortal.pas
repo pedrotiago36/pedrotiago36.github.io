@@ -11,8 +11,9 @@ type
     function ValidarCPF(const ACPF: string): Boolean;
     procedure RegistrarPreMatricula(const AAgendamento: IAgendamento);
     procedure PrepararPastaPai(const ACPF: string);
-    // Retorna 'original|nome.pdf', 'pendente|nome.pdf', 'validado|nome.pdf' ou 'sem_contrato|'
     function ConsultarContrato(const ACPF: string): string;
+    // Varre files/{APasta}/ e retorna JSON array com os itens encontrados
+    function ListarPasta(const APasta: string): string;
   end;
 
 implementation

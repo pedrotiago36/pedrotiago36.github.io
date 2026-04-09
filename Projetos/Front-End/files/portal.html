@@ -549,8 +549,33 @@ var _heroEl = document.getElementById('heroSlider');
 _heroEl.addEventListener('mouseenter', function() { clearInterval(_sliderTimer); });
 _heroEl.addEventListener('mouseleave', _iniciarSlider);
 
-// Testa os dois caminhos possíveis
-carregarJSON('/files/slider.json', renderSlider);
+listarPastaPortal('slider', renderSlider);
+
+// ── SISTEMA DE PASTAS DINÂMICAS ──
+// Chama o Delphi para listar a pasta, aguarda a resposta e chama o callback
+function listarPastaPortal(pasta, callback) {
+    var varName = '_lista_' + pasta;
+    // Limpa resultado anterior
+    try { window.parent[varName] = null; } catch(e) {}
+    // Pede ao Delphi que varra a pasta
+    try { window.parent.listarPasta(pasta); } catch(e) {}
+    // Polling até receber a resposta (máx 5s)
+    var tentativas = 0;
+    var timer = setInterval(function() {
+        tentativas++;
+        var lista = null;
+        try { lista = window.parent[varName]; } catch(e) {}
+        if (lista !== null && lista !== undefined) {
+            clearInterval(timer);
+            try {
+                var dados = (typeof lista === 'string') ? JSON.parse(lista) : lista;
+                if (dados && dados.length) callback(dados);
+            } catch(e) {}
+        } else if (tentativas >= 25) { // 5s
+            clearInterval(timer);
+        }
+    }, 200);
+}
 
 // ── NÍVEIS DE ENSINO ──
 var _NIVEIS_DEFAULT = [
@@ -572,7 +597,7 @@ function renderNiveis(dados) {
     }).join('');
 }
 renderNiveis(_NIVEIS_DEFAULT);
-carregarJSON('/files/'+'niveis.json', renderNiveis);
+listarPastaPortal('niveis', renderNiveis);
 
 // ── NOTÍCIAS ──
 var _NOTICIAS_DEFAULT = [
@@ -589,7 +614,7 @@ function renderNoticias(dados) {
     }).join('');
 }
 renderNoticias(_NOTICIAS_DEFAULT);
-carregarJSON('/files/'+'noticias.json', renderNoticias);
+listarPastaPortal('noticias', renderNoticias);
 
 // ── EVENTOS ──
 var _EVENTOS_DEFAULT = [
@@ -606,7 +631,7 @@ function renderEventos(dados) {
     }).join('');
 }
 renderEventos(_EVENTOS_DEFAULT);
-carregarJSON('/files/'+'eventos.json', renderEventos);
+listarPastaPortal('eventos', renderEventos);
 
 // ── LÍNGUAS ──
 var _LINGUAS_DEFAULT = [
@@ -630,7 +655,7 @@ function renderLinguas(dados) {
     }).join('');
 }
 renderLinguas(_LINGUAS_DEFAULT);
-carregarJSON('/files/'+'linguas.json', renderLinguas);
+listarPastaPortal('linguas', renderLinguas);
 
 // ── MATERIAL DIDÁTICO ──
 var _materialDados = [];
@@ -655,7 +680,7 @@ window.mudarAbaMaterial = function(idx) {
         return '<' + tag + ' class="material-item"><i class="fas fa-file-pdf"></i><span>' + s.nome + '</span></' + close + '>';
     }).join('');
 };
-carregarJSON('/files/'+'material.json', renderMaterial);
+listarPastaPortal('material', renderMaterial);
 
 // ── HISTÓRIA ──
 function renderHistoria(d) {

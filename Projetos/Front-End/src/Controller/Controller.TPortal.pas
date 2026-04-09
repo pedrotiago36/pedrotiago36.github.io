@@ -7,7 +7,8 @@ uses
   Model.IAgendamento,
   System.SysUtils,
   System.Classes,
-  System.IOUtils;
+  System.IOUtils,
+  System.Types;
 
 type
   TPortalController = class(TInterfacedObject, IPortalController)
@@ -16,12 +17,14 @@ type
     function ObterPastaAgendamentos: string;
     function ObterDataCriacaoOriginal(const AArquivo: string): string;
     function LimparCPF(const ACPF: string): string;
+    function EscaparJSON(const S: string): string;
   public
     constructor Create;
     function ValidarCPF(const ACPF: string): Boolean;
     procedure RegistrarPreMatricula(const AAgendamento: IAgendamento);
     procedure PrepararPastaPai(const ACPF: string);
     function ConsultarContrato(const ACPF: string): string;
+    function ListarPasta(const APasta: string): string;
   end;
 
 implementation
@@ -168,6 +171,81 @@ begin
   begin
     Result := 'original|ContratoMatricula.pdf';
     Exit;
+  end;
+end;
+
+function TPortalController.EscaparJSON(const S: string): string;
+begin
+  Result := StringReplace(S, '\', '\\', [rfReplaceAll]);
+  Result := StringReplace(Result, '"', '\"', [rfReplaceAll]);
+  Result := StringReplace(Result, #13, '', [rfReplaceAll]);
+  Result := StringReplace(Result, #10, '\n', [rfReplaceAll]);
+end;
+
+function TPortalController.ListarPasta(const APasta: string): string;
+const
+  EXTS: array[0..5] of string = ('.jpg', '.jpeg', '.png', '.gif', '.webp', '.mp4');
+var
+  LPastaFull : string;
+  LArquivos  : TStringDynArray;
+  LArquivo   : string;
+  LExt       : string;
+  LJsonSide  : string;
+  LLinhas    : TStringList;
+  LItens     : TStringList;
+  LItem      : string;
+  LNome      : string;
+  LValido    : Boolean;
+  I          : Integer;
+begin
+  LPastaFull := TPath.Combine(TPath.Combine(ExtractFilePath(ParamStr(0)), 'files'), APasta);
+
+  if not TDirectory.Exists(LPastaFull) then
+  begin
+    Result := '[]';
+    Exit;
+  end;
+
+  LArquivos := TDirectory.GetFiles(LPastaFull);
+  LItens    := TStringList.Create;
+  LLinhas   := TStringList.Create;
+  try
+    for LArquivo in LArquivos do
+    begin
+      LExt := LowerCase(TPath.GetExtension(LArquivo));
+
+      // Só processa arquivos de imagem
+      LValido := False;
+      for I := Low(EXTS) to High(EXTS) do
+        if LExt = EXTS[I] then begin LValido := True; Break; end;
+      if not LValido then Continue;
+
+      LNome := TPath.GetFileName(LArquivo);
+
+      // Lê sidecar .json se existir (mesmo nome, extensão .json)
+      LJsonSide := TPath.ChangeExtension(LArquivo, '.json');
+      LItem := '{"imagem":"' + APasta + '/' + EscaparJSON(LNome) + '"';
+
+      if TFile.Exists(LJsonSide) then
+      begin
+        LLinhas.Clear;
+        LLinhas.LoadFromFile(LJsonSide, TEncoding.UTF8);
+        // Remove as chaves externas do JSON do sidecar e injeta os campos
+        LItem := LItem + ',' + Trim(StringReplace(
+                   StringReplace(LLinhas.Text, '{', '', []),
+                   '}', '', []));
+      end;
+
+      LItem := LItem + '}';
+      LItens.Add(LItem);
+    end;
+
+    Result := '[' + LItens.CommaText + ']';
+    // CommaText entre aspas — usa join manual
+    Result := '[' + string.Join(',', LItens.ToStringArray) + ']';
+  finally
+    LItens.Free;
+    LLinhas.Free;
   end;
 end;
 
