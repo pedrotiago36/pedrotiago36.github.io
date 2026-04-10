@@ -1,7 +1,7 @@
 object UniServerModule: TUniServerModule
   TempFolder = 'temp\'
   Port = 8072
-  Title = 'New Application'
+  Title = 'Painel Matr'#237'culas'
   SuppressErrors = []
   Bindings = <>
   MainFormDisplayMode = mfPage
