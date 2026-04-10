@@ -1,7 +1,7 @@
 object UniServerModule: TUniServerModule
   TempFolder = 'temp\'
   Port = 8070
-  Title = 'New Application'
+  Title = 'Portal Batista'
   SuppressErrors = []
   Bindings = <>
   MainFormDisplayMode = mfPage
