@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educação Infantil | Colégio Batista Santos Dumont</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #fff2e3 0%, #ffe6cc 100%); color: #2d2d2d; }
+
+        #scrollWrapper { height: 100vh; overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth; }
+
+        /* ── NAVBAR ── */
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border-bottom: 2px solid rgba(253,205,98,0.4); box-shadow: 0 4px 20px rgba(125,39,40,0.08); position: sticky; top: 0; z-index: 100; }
+        .logo img { height: 50px; width: auto; display: block; }
+        .nav-back { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #7d2728; font-weight: 600; font-size: 0.95rem; transition: 0.2s; }
+        .nav-back:hover { color: #d33327; transform: translateX(-3px); }
+        .nav-titulo { font-family: 'Poppins', sans-serif; font-size: 1.1rem; font-weight: 700; color: #7d2728; }
+
+        /* ── HERO ── */
+        .hero {
+            background: linear-gradient(135deg, #7d2728 0%, #3d1a1b 50%, #1a0a0a 100%);
+            padding: 5rem 2rem 4rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before { content: ''; position: absolute; top: -80px; left: -80px; width: 320px; height: 320px; background: rgba(253,205,98,0.07); border-radius: 50%; }
+        .hero::after  { content: ''; position: absolute; bottom: -60px; right: -60px; width: 260px; height: 260px; background: rgba(253,205,98,0.05); border-radius: 50%; }
+        .hero-badge { display: inline-block; background: #fdcd62; color: #7d2728; padding: 0.3rem 1.2rem; border-radius: 2rem; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1.2rem; }
+        .hero h1 { font-family: 'Poppins', sans-serif; font-size: 3rem; font-weight: 800; color: white; line-height: 1.2; margin-bottom: 1rem; position: relative; z-index: 1; }
+        .hero h1 span { color: #fdcd62; }
+        .hero p { color: rgba(255,255,255,0.85); font-size: 1.15rem; max-width: 620px; margin: 0 auto; line-height: 1.7; position: relative; z-index: 1; }
+        .hero-icon { font-size: 5rem; margin-bottom: 1.5rem; display: block; position: relative; z-index: 1; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+        /* ── CONTAINER ── */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+
+        /* ── SECTION TITLE ── */
+        .section-title { text-align: center; font-size: 1.9rem; font-weight: 700; margin: 3.5rem 0 2rem; position: relative; color: #7d2728; font-family: 'Poppins', sans-serif; }
+        .section-title::after { content: ''; width: 70px; height: 4px; background: linear-gradient(90deg, #fdcd62, #d33327); position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); border-radius: 4px; }
+        .section-sub { text-align: center; color: #5a3a2e; font-size: 1rem; margin-bottom: 2.5rem; margin-top: 1rem; }
+
+        /* ── DIFERENCIAIS ── */
+        .diferenciais-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 4rem; }
+        .diferencial-card { background: white; border-radius: 1.5rem; padding: 2rem 1.5rem; text-align: center; border: 1px solid rgba(253,205,98,0.4); box-shadow: 0 6px 20px rgba(0,0,0,0.05); transition: all 0.35s cubic-bezier(0.2,0.9,0.4,1.1); }
+        .diferencial-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(211,51,39,0.12); border-color: #fdcd62; }
+        .diferencial-icone { width: 68px; height: 68px; background: linear-gradient(135deg, #fff2e3, #fdcd62); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.2rem; font-size: 1.8rem; box-shadow: 0 4px 16px rgba(253,205,98,0.4); }
+        .diferencial-card h3 { color: #7d2728; font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; font-family: 'Poppins', sans-serif; }
+        .diferencial-card p { color: #5a3a2e; font-size: 0.85rem; line-height: 1.6; }
+
+        /* ── GALERIA ── */
+        .galeria-section { background: linear-gradient(135deg, #1a0a0a, #3d1a1b); border-radius: 2rem; padding: 3rem 2.5rem; margin-bottom: 4rem; }
+        .galeria-titulo { font-family: 'Poppins', sans-serif; font-size: 1.6rem; font-weight: 800; color: white; margin-bottom: 0.5rem; }
+        .galeria-sub { color: rgba(255,255,255,0.65); font-size: 0.9rem; margin-bottom: 2rem; }
+        .galeria-carrossel { position: relative; }
+        .galeria-track-wrap { overflow: hidden; border-radius: 1.2rem; }
+        .galeria-track { display: flex; gap: 1rem; transition: transform 0.45s cubic-bezier(0.4,0,0.2,1); }
+        .galeria-card { flex: 0 0 260px; height: 200px; border-radius: 1.2rem; overflow: hidden; cursor: pointer; border: 2px solid rgba(253,205,98,0.2); transition: border-color 0.3s, transform 0.3s; position: relative; background: rgba(255,255,255,0.05); }
+        .galeria-card:hover { border-color: #fdcd62; transform: translateY(-5px); }
+        .galeria-card img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s; }
+        .galeria-card:hover img { transform: scale(1.07); }
+        .galeria-card-overlay { position: absolute; inset: 0; background: linear-gradient(transparent 50%, rgba(0,0,0,0.65) 100%); opacity: 0; transition: opacity 0.3s; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 0.8rem; }
+        .galeria-card:hover .galeria-card-overlay { opacity: 1; }
+        .galeria-card-overlay i { color: #fdcd62; font-size: 1.4rem; }
+        .galeria-vazio { text-align: center; color: rgba(255,255,255,0.35); padding: 3rem; font-size: 1rem; border: 2px dashed rgba(255,255,255,0.15); border-radius: 1.2rem; }
+        .galeria-vazio i { font-size: 2.5rem; display: block; margin-bottom: 0.8rem; color: rgba(253,205,98,0.4); }
+        .galeria-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.15); backdrop-filter: blur(6px); border: 2px solid rgba(255,255,255,0.3); color: white; width: 46px; height: 46px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: 0.3s; z-index: 5; }
+        .galeria-btn:hover { background: rgba(211,51,39,0.85); border-color: #d33327; }
+        .galeria-btn.prev { left: -22px; }
+        .galeria-btn.next { right: -22px; }
+
+        /* ── ROTINA ── */
+        .rotina-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem; margin-bottom: 4rem; }
+        .rotina-item { background: white; border-radius: 1.2rem; padding: 1.5rem; display: flex; align-items: center; gap: 1rem; border-left: 4px solid #fdcd62; box-shadow: 0 4px 14px rgba(0,0,0,0.05); }
+        .rotina-hora { font-family: 'Poppins', sans-serif; font-size: 1.1rem; font-weight: 800; color: #d33327; min-width: 70px; }
+        .rotina-desc { font-size: 0.9rem; color: #5a3a2e; font-weight: 500; }
+
+        /* ── FAIXA ETÁRIA ── */
+        .faixa-section { background: white; border-radius: 2rem; padding: 3rem 2.5rem; margin-bottom: 4rem; box-shadow: 0 8px 32px rgba(0,0,0,0.06); border: 1px solid rgba(253,205,98,0.4); }
+        .faixa-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+        .faixa-card { text-align: center; padding: 1.5rem 1rem; border-radius: 1.2rem; background: linear-gradient(135deg, #fff2e3, #ffe6cc); border: 2px solid rgba(253,205,98,0.5); transition: 0.3s; }
+        .faixa-card:hover { border-color: #d33327; transform: translateY(-4px); }
+        .faixa-idade { font-family: 'Poppins', sans-serif; font-size: 2rem; font-weight: 800; color: #d33327; }
+        .faixa-nome { font-size: 0.85rem; font-weight: 600; color: #7d2728; margin-top: 0.3rem; }
+
+        /* ── CTA ── */
+        .cta-section { background: linear-gradient(135deg, #7d2728, #d33327); border-radius: 2rem; padding: 3.5rem 2rem; text-align: center; margin-bottom: 4rem; box-shadow: 0 16px 48px rgba(125,39,40,0.3); }
+        .cta-section h2 { font-family: 'Poppins', sans-serif; font-size: 2rem; font-weight: 800; color: white; margin-bottom: 0.8rem; }
+        .cta-section p { color: rgba(255,255,255,0.85); margin-bottom: 2rem; font-size: 1rem; }
+        .btn-cta { display: inline-flex; align-items: center; gap: 10px; background: #fdcd62; color: #7d2728; padding: 1rem 2.5rem; border-radius: 3rem; font-size: 1.05rem; font-weight: 800; text-decoration: none; font-family: 'Poppins', sans-serif; transition: 0.3s; box-shadow: 0 8px 24px rgba(253,205,98,0.5); }
+        .btn-cta:hover { transform: scale(1.05); box-shadow: 0 12px 32px rgba(253,205,98,0.7); }
+
+        /* ── LIGHTBOX ── */
+        .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9500; align-items: center; justify-content: center; }
+        .lightbox.aberto { display: flex; animation: fadeIn 0.25s ease; }
+        .lightbox img { max-width: 92vw; max-height: 90vh; object-fit: contain; border-radius: 1rem; box-shadow: 0 24px 64px rgba(0,0,0,0.8); }
+        .lb-fechar { position: fixed; top: 18px; right: 18px; background: rgba(211,51,39,0.9); color: white; border: none; width: 44px; height: 44px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .lb-fechar:hover { background: #d33327; transform: scale(1.1); }
+        .lb-nav { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.15); backdrop-filter: blur(6px); border: 2px solid rgba(255,255,255,0.3); color: white; width: 52px; height: 52px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; z-index: 10; }
+        .lb-nav:hover { background: rgba(211,51,39,0.8); border-color: #d33327; }
+        .lb-prev { left: 16px; }
+        .lb-next { right: 16px; }
+        .lb-counter { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.7); font-size: 0.9rem; background: rgba(0,0,0,0.5); padding: 0.4rem 1.2rem; border-radius: 2rem; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .hero { padding: 3rem 1.5rem 2.5rem; }
+            .container { padding: 0 1.2rem; }
+            .galeria-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+<div id="scrollWrapper">
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <a href="javascript:window.close()" class="nav-back"><i class="fas fa-arrow-left"></i> Voltar ao Portal</a>
+        <div class="logo">
+            <img src="/files/LogoBatista.png" alt="Colégio Batista Santos Dumont">
+        </div>
+        <span class="nav-titulo"><i class="fas fa-child" style="color:#fdcd62;margin-right:6px;"></i>Educação Infantil</span>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero">
+        <span class="hero-icon">🌱</span>
+        <div class="hero-badge">Educação Infantil</div>
+        <h1>O Primeiro Passo para um<br><span>Futuro Brilhante!</span></h1>
+        <p>No Colégio Batista Santos Dumont, cada criança é única e especial. Cultivamos o amor pelo aprendizado desde os primeiros anos, em um ambiente seguro, acolhedor e cheio de alegria.</p>
+    </div>
+
+    <div class="container">
+
+        <!-- DIFERENCIAIS -->
+        <div class="section-title">Nossos Diferenciais</div>
+        <p class="section-sub">Uma proposta pedagógica que une cuidado, afeto e excelência educacional</p>
+        <div class="diferenciais-grid">
+            <div class="diferencial-card">
+                <div class="diferencial-icone">🎨</div>
+                <h3>Arte e Criatividade</h3>
+                <p>Atividades lúdicas que estimulam a imaginação e o desenvolvimento criativo de cada criança.</p>
+            </div>
+            <div class="diferencial-card">
+                <div class="diferencial-icone">📖</div>
+                <h3>Alfabetização</h3>
+                <p>Metodologia fônica e lúdica que prepara a criança para a leitura e escrita com prazer.</p>
+            </div>
+            <div class="diferencial-card">
+                <div class="diferencial-icone">🙏</div>
+                <h3>Valores Cristãos</h3>
+                <p>Princípios bíblicos integrados ao cotidiano escolar, formando caráter desde a infância.</p>
+            </div>
+            <div class="diferencial-card">
+                <div class="diferencial-icone">🌍</div>
+                <h3>Inglês desde cedo</h3>
+                <p>Contato com a língua inglesa de forma natural e prazerosa, aproveitando a janela de aquisição.</p>
+            </div>
+            <div class="diferencial-card">
+                <div class="diferencial-icone">🏃</div>
+                <h3>Psicomotricidade</h3>
+                <p>Desenvolvimento motor coordenado com atividades físicas, jogos e brincadeiras orientadas.</p>
+            </div>
+            <div class="diferencial-card">
+                <div class="diferencial-icone">🤝</div>
+                <h3>Socialização</h3>
+                <p>Projetos coletivos que ensinam cooperação, respeito e convivência desde a primeira infância.</p>
+            </div>
+        </div>
+
+        <!-- FAIXA ETÁRIA -->
+        <div class="faixa-section">
+            <div class="section-title" style="margin-top:0;">Faixas Etárias</div>
+            <p class="section-sub" style="margin-top:1rem;">Turmas organizadas para o melhor desenvolvimento em cada fase</p>
+            <div class="faixa-grid">
+                <div class="faixa-card">
+                    <div class="faixa-idade">1–2</div>
+                    <div class="faixa-nome">Berçário</div>
+                </div>
+                <div class="faixa-card">
+                    <div class="faixa-idade">2–3</div>
+                    <div class="faixa-nome">Maternal I</div>
+                </div>
+                <div class="faixa-card">
+                    <div class="faixa-idade">3–4</div>
+                    <div class="faixa-nome">Maternal II</div>
+                </div>
+                <div class="faixa-card">
+                    <div class="faixa-idade">4–5</div>
+                    <div class="faixa-nome">Pré I</div>
+                </div>
+                <div class="faixa-card">
+                    <div class="faixa-idade">5–6</div>
+                    <div class="faixa-nome">Pré II</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GALERIA DE FOTOS -->
+        <div class="galeria-section">
+            <div class="galeria-titulo"><i class="fas fa-images" style="color:#fdcd62;margin-right:0.6rem;"></i>Nossa Galeria</div>
+            <div class="galeria-sub">Momentos especiais do dia a dia da Educação Infantil</div>
+            <div class="galeria-carrossel" id="galeriaCarrossel">
+                <button class="galeria-btn prev" id="galPrev"><i class="fas fa-chevron-left"></i></button>
+                <div class="galeria-track-wrap">
+                    <div class="galeria-track" id="galeriaTrack">
+                        <div class="galeria-vazio"><i class="fas fa-camera"></i>As fotos aparecerão aqui automaticamente.<br>Coloque as imagens na pasta <strong>educInfantil/</strong></div>
+                    </div>
+                </div>
+                <button class="galeria-btn next" id="galNext"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+
+        <!-- ROTINA DO DIA -->
+        <div class="section-title">Rotina do Dia</div>
+        <p class="section-sub">Uma jornada equilibrada entre aprendizado, brincadeira e descanso</p>
+        <div class="rotina-grid">
+            <div class="rotina-item"><div class="rotina-hora">07:00</div><div class="rotina-desc">☀️ Acolhida e café da manhã</div></div>
+            <div class="rotina-item"><div class="rotina-hora">07:30</div><div class="rotina-desc">🙏 Momento devocional</div></div>
+            <div class="rotina-item"><div class="rotina-hora">08:00</div><div class="rotina-desc">📚 Atividades pedagógicas</div></div>
+            <div class="rotina-item"><div class="rotina-hora">09:30</div><div class="rotina-desc">🎨 Arte e criatividade</div></div>
+            <div class="rotina-item"><div class="rotina-hora">10:00</div><div class="rotina-desc">🍎 Lanche e recreio</div></div>
+            <div class="rotina-item"><div class="rotina-hora">10:30</div><div class="rotina-hora-desc">🌍 Inglês</div></div>
+            <div class="rotina-item"><div class="rotina-hora">11:00</div><div class="rotina-desc">🏃 Psicomotricidade</div></div>
+            <div class="rotina-item"><div class="rotina-hora">11:30</div><div class="rotina-desc">🍽️ Almoço</div></div>
+            <div class="rotina-item"><div class="rotina-hora">12:00</div><div class="rotina-desc">😴 Soninho (Berçário/Maternal)</div></div>
+            <div class="rotina-item"><div class="rotina-hora">13:00</div><div class="rotina-desc">🎮 Atividades livres orientadas</div></div>
+            <div class="rotina-item"><div class="rotina-hora">16:30</div><div class="rotina-desc">🏠 Saída</div></div>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta-section">
+            <h2>Venha Conhecer Nossa Escola!</h2>
+            <p>Agende uma visita e veja de perto o ambiente que preparamos com tanto carinho para o seu filho.</p>
+            <a href="javascript:window.close()" class="btn-cta"><i class="fas fa-calendar-check"></i> Agendar uma Visita</a>
+        </div>
+
+    </div><!-- /container -->
+
+    <!-- LIGHTBOX -->
+    <div class="lightbox" id="lightbox">
+        <button class="lb-fechar" id="lbFechar"><i class="fas fa-times"></i></button>
+        <button class="lb-nav lb-prev" id="lbPrev"><i class="fas fa-chevron-left"></i></button>
+        <img id="lbImg" src="" alt="">
+        <button class="lb-nav lb-next" id="lbNext"><i class="fas fa-chevron-right"></i></button>
+        <div class="lb-counter" id="lbCounter"></div>
+    </div>
+
+</div><!-- /scrollWrapper -->
+
+<script>
+// ── GALERIA DINÂMICA ──
+var _galeriaLista  = [];
+var _galeriaOffset = 0;
+var _lbIdx = 0;
+
+function _galeriaVisiveis() {
+    var wrap = document.getElementById('galeriaCarrossel');
+    return wrap ? Math.floor(wrap.offsetWidth / 276) || 1 : 3;
+}
+function _galeriaIrPara(offset) {
+    var track = document.getElementById('galeriaTrack');
+    if (!track) return;
+    var max = Math.max(0, _galeriaLista.length - _galeriaVisiveis());
+    _galeriaOffset = Math.max(0, Math.min(offset, max));
+    track.style.transform = 'translateX(-' + (_galeriaOffset * 276) + 'px)';
+}
+
+function renderGaleria(dados) {
+    var track = document.getElementById('galeriaTrack');
+    if (!track) return;
+    if (!dados || !dados.length) {
+        track.innerHTML = '<div class="galeria-vazio"><i class="fas fa-camera"></i>As fotos aparecerão aqui automaticamente.<br>Coloque as imagens na pasta <strong>educInfantil/</strong></div>';
+        return;
+    }
+    _galeriaLista  = dados;
+    _galeriaOffset = 0;
+    track.style.transform = 'translateX(0)';
+    track.innerHTML = dados.map(function(item, i) {
+        return '<div class="galeria-card" onclick="_abrirLb(' + i + ')">' +
+               '<img src="/files/' + item.imagem + '" alt="Foto ' + (i+1) + '" loading="lazy">' +
+               '<div class="galeria-card-overlay"><i class="fas fa-search-plus"></i></div>' +
+               '</div>';
+    }).join('');
+}
+
+document.getElementById('galPrev').addEventListener('click', function() { _galeriaIrPara(_galeriaOffset - 1); });
+document.getElementById('galNext').addEventListener('click', function() { _galeriaIrPara(_galeriaOffset + 1); });
+
+// ── LIGHTBOX ──
+window._abrirLb = function(idx) {
+    _lbIdx = idx;
+    _lbAtualizar();
+    document.getElementById('lightbox').classList.add('aberto');
+    document.body.style.overflow = 'hidden';
+};
+function _lbAtualizar() {
+    document.getElementById('lbImg').src = '/files/' + _galeriaLista[_lbIdx].imagem;
+    document.getElementById('lbCounter').innerText = (_lbIdx + 1) + ' / ' + _galeriaLista.length;
+}
+document.getElementById('lbFechar').addEventListener('click', function() {
+    document.getElementById('lightbox').classList.remove('aberto');
+    document.getElementById('lbImg').src = '';
+    document.body.style.overflow = 'auto';
+});
+document.getElementById('lbPrev').addEventListener('click', function() {
+    _lbIdx = (_lbIdx - 1 + _galeriaLista.length) % _galeriaLista.length;
+    _lbAtualizar();
+});
+document.getElementById('lbNext').addEventListener('click', function() {
+    _lbIdx = (_lbIdx + 1) % _galeriaLista.length;
+    _lbAtualizar();
+});
+document.getElementById('lightbox').addEventListener('click', function(e) {
+    if (e.target === this) document.getElementById('lbFechar').click();
+});
+document.addEventListener('keydown', function(e) {
+    if (!document.getElementById('lightbox').classList.contains('aberto')) return;
+    if (e.key === 'ArrowLeft')  document.getElementById('lbPrev').click();
+    if (e.key === 'ArrowRight') document.getElementById('lbNext').click();
+    if (e.key === 'Escape')     document.getElementById('lbFechar').click();
+});
+
+// ── CARREGAR IMAGENS DA PASTA educInfantil/ ──
+// Usa window.parent pois esta página roda dentro do servidor UniGUI
+function listarPastaLocal(pasta, callback) {
+    var varName = '_lista_' + pasta;
+    try { window.parent[varName] = null; } catch(e) {}
+    try { window.parent.listarPasta(pasta); } catch(e) {}
+    var tentativas = 0;
+    var timer = setInterval(function() {
+        tentativas++;
+        var lista = null;
+        try { lista = window.parent[varName]; } catch(e) {}
+        if (lista !== null && lista !== undefined) {
+            clearInterval(timer);
+            try {
+                var dados = (typeof lista === 'string') ? JSON.parse(lista) : lista;
+                if (dados && dados.length) callback(dados);
+            } catch(e) {}
+        } else if (tentativas >= 25) {
+            clearInterval(timer);
+        }
+    }, 200);
+}
+
+listarPastaLocal('educInfantil', renderGaleria);
+</script>
+</body>
+</html>

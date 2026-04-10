@@ -828,25 +828,42 @@ function listarPastaPortal(pasta, callback) {
 
 // ── NÍVEIS DE ENSINO ──
 var _NIVEIS_DEFAULT = [
-    {nome:'Educação Infantil', descricao:'Jornada de descobertas em ambiente acolhedor e estimulante.', icone:'🧒'},
-    {nome:'Anos Iniciais',     descricao:'Fundamentos sólidos para o crescimento acadêmico e pessoal.', icone:'📚'},
-    {nome:'Anos Finais',       descricao:'Pensamento crítico e preparação para o Ensino Médio.', icone:'🔬'},
-    {nome:'Ensino Médio',      descricao:'Excelência acadêmica e preparação para vestibulares e a vida.', icone:'🎓'}
+    {nome:'Educação Infantil', descricao:'O primeiro passo para um futuro brilhante começa aqui!', icone:'infantil', pagina:'educInfantil.html'},
+    {nome:'Anos Iniciais',     descricao:'Fundamentos sólidos para o crescimento acadêmico e pessoal.', icone:'iniciais', pagina:''},
+    {nome:'Anos Finais',       descricao:'Pensamento crítico e preparação para o Ensino Médio.', icone:'finais', pagina:''},
+    {nome:'Ensino Médio',      descricao:'Excelência acadêmica e preparação para vestibulares e a vida.', icone:'medio', pagina:''}
 ];
+
+var _iconeNivel = {
+    infantil: '<svg viewBox="0 0 80 80" width="56" height="56" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="20" r="12" fill="#fdcd62"/><path d="M22 58 C22 44 58 44 58 58 Z" fill="#d33327"/><circle cx="25" cy="50" r="8" fill="#fdcd62" opacity="0.7"/><circle cx="55" cy="50" r="8" fill="#fdcd62" opacity="0.7"/><circle cx="35" cy="21" r="2.5" fill="#7d2728"/><circle cx="45" cy="21" r="2.5" fill="#7d2728"/><path d="M35 27 Q40 32 45 27" stroke="#7d2728" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M30 14 Q40 7 50 14" stroke="#d33327" stroke-width="2" fill="none"/></svg>',
+    iniciais:  '<svg viewBox="0 0 80 80" width="56" height="56" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="18" width="52" height="46" rx="5" fill="#fdcd62"/><rect x="14" y="18" width="52" height="12" rx="5" fill="#d33327"/><rect x="22" y="36" width="36" height="4" rx="2" fill="#7d2728" opacity="0.5"/><rect x="22" y="44" width="28" height="4" rx="2" fill="#7d2728" opacity="0.5"/><rect x="22" y="52" width="32" height="4" rx="2" fill="#7d2728" opacity="0.5"/><circle cx="40" cy="24" r="4" fill="white" opacity="0.5"/></svg>',
+    finais:    '<svg viewBox="0 0 80 80" width="56" height="56" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="22" fill="none" stroke="#fdcd62" stroke-width="5"/><path d="M40 18 L40 40 L56 40" stroke="#d33327" stroke-width="3.5" stroke-linecap="round" fill="none"/><circle cx="40" cy="40" r="4" fill="#7d2728"/><circle cx="40" cy="12" r="3" fill="#fdcd62"/><circle cx="40" cy="68" r="3" fill="#fdcd62"/><circle cx="12" cy="40" r="3" fill="#fdcd62"/><circle cx="68" cy="40" r="3" fill="#fdcd62"/></svg>',
+    medio:     '<svg viewBox="0 0 80 80" width="56" height="56" xmlns="http://www.w3.org/2000/svg"><path d="M40 10 L70 26 L70 30 L40 46 L10 30 L10 26 Z" fill="#fdcd62"/><path d="M22 34 L22 56 Q40 65 58 56 L58 34" fill="#d33327" opacity="0.85"/><rect x="64" y="28" width="7" height="22" rx="3.5" fill="#7d2728"/><circle cx="67.5" cy="52" r="5" fill="#fdcd62"/></svg>'
+};
+
 function renderNiveis(dados) {
     var g = document.getElementById('niveisGrid');
     if (!g) return;
     g.innerHTML = dados.map(function(n) {
-        var nImgSrc = n.imagem ? '/files/' + n.imagem : '';
+        var nImgSrc  = n.imagem ? '/files/' + n.imagem : '';
+        var iconeKey = n.icone || 'iniciais';
+        var svgIcon  = _iconeNivel[iconeKey] || _iconeNivel['iniciais'];
         var topo = nImgSrc
-            ? '<img src="' + nImgSrc + '" class="nivel-card-img" alt="' + n.nome + '" onerror="this.outerHTML=\'<div class=nivel-card-placeholder>' + (n.icone||'🏫') + '</div>\'">'
-            : '<div class="nivel-card-placeholder">' + (n.icone||'🏫') + '</div>';
-        return '<div class="nivel-card animate__animated animate__fadeInUp">' + topo +
-            '<div class="nivel-card-body"><h3>' + n.nome + '</h3><p>' + (n.descricao||'') + '</p></div></div>';
+            ? '<img src="' + nImgSrc + '" class="nivel-card-img" alt="' + n.nome + '" onerror="this.outerHTML=\'<div class=nivel-card-placeholder>' + svgIcon + '</div>\'">'
+            : '<div class="nivel-card-placeholder">' + svgIcon + '</div>';
+        var pagina  = n.pagina || '';
+        var onclick = pagina ? ' onclick="abrirPaginaNivel(\'' + pagina + '\')" style="cursor:pointer;"' : '';
+        var seta    = pagina ? ' <i class="fas fa-arrow-right" style="float:right;color:#d33327;font-size:0.85rem;margin-top:3px;"></i>' : '';
+        return '<div class="nivel-card animate__animated animate__fadeInUp"' + onclick + '>' + topo +
+            '<div class="nivel-card-body"><h3>' + n.nome + seta + '</h3><p>' + (n.descricao||'') + '</p></div></div>';
     }).join('');
 }
 renderNiveis(_NIVEIS_DEFAULT);
 listarPastaPortal('niveis', renderNiveis);
+
+window.abrirPaginaNivel = function(pagina) {
+    window.open('/files/' + pagina, '_blank');
+};
 
 // ── NOTÍCIAS ──
 var _NOTICIAS_DEFAULT = [
