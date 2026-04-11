@@ -333,9 +333,10 @@ end;
 
 procedure TMainForm.ProcessarListarPasta(const Params: TUniStrings);
 var
-  LPasta: string;
-  LJSON : string;
-  LVar  : string;
+  LPasta  : string;
+  LJSON   : string;
+  LVar    : string;
+  LArqJSON: string;
 begin
   LPasta := Params.Values['pasta'];
   LJSON  := FController.ListarPasta(LPasta);
@@ -344,9 +345,12 @@ begin
   LJSON := StringReplace(LJSON, #13, '', [rfReplaceAll]);
   LJSON := StringReplace(LJSON, #10, '', [rfReplaceAll]);
 
+  // Grava JSON em disco para páginas abertas em nova aba (sem window.parent)
+  LArqJSON := TPath.Combine(TPath.Combine(ExtractFilePath(ParamStr(0)), 'files'), LPasta + '.json');
+  TFile.WriteAllText(LArqJSON, LJSON, TEncoding.UTF8);
+
   // Variável global indexada pela pasta: window._lista_slider, _lista_niveis, etc.
   LVar := 'window._lista_' + StringReplace(LPasta, '/', '_', [rfReplaceAll]);
-
   UniSession.AddJS(LVar + ' = ' + LJSON + ';');
 end;
 
