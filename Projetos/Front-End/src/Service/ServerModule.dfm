@@ -1,6 +1,6 @@
 object UniServerModule: TUniServerModule
   TempFolder = 'temp\'
-  SessionTimeout = 0
+  SessionTimeout = 999999999
   Port = 8070
   Title = 'Portal Batista'
   SuppressErrors = []
