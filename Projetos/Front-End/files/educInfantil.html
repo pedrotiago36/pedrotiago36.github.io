@@ -42,7 +42,7 @@
             border-radius: 2rem;
         }
         .hero img.hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
-        .hero-overlay { position: absolute; inset: 0; background: linear-gradient(120deg, rgba(15,5,5,0.72) 0%, rgba(60,15,15,0.55) 60%, rgba(0,0,0,0.2) 100%); z-index: 1; }
+        .hero-overlay { display: none; }
         .hero-content { position: relative; z-index: 2; max-width: 640px; padding: 3rem 2.5rem; }
         .hero-badge { display: inline-block; background: #fdcd62; color: #7d2728; padding: 0.3rem 1.2rem; border-radius: 2rem; font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1.2rem; }
         .hero h1 { font-family: 'Poppins', sans-serif; font-size: 3.2rem; font-weight: 900; color: white; line-height: 1.15; margin-bottom: 1.2rem; text-shadow: 0 2px 16px rgba(0,0,0,0.4); }
@@ -140,11 +140,21 @@
         .lazer-dot.ativo { background: #fdcd62; transform: scale(1.3); }
         .lazer-vazio { display: flex; align-items: center; justify-content: center; height: 100%; color: rgba(125,39,40,0.3); font-size: 4rem; }
         .lazer-items { display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; }
-        .lazer-item { display: flex; align-items: flex-start; gap: 1rem; background: white; border-radius: 1.2rem; padding: 1rem 1.2rem; box-shadow: 0 4px 14px rgba(0,0,0,0.05); }
+        .lazer-item { display: flex; align-items: flex-start; gap: 1rem; background: white; border-radius: 1.2rem; padding: 1rem 1.2rem; box-shadow: 0 4px 14px rgba(0,0,0,0.05); cursor: pointer; transition: 0.25s; border: 2px solid transparent; }
+        .lazer-item:hover { border-color: #fdcd62; transform: translateX(4px); }
+        .lazer-item.ativo { border-color: #d33327; background: #fff5f5; box-shadow: 0 6px 20px rgba(211,51,39,0.15); }
+        .lazer-item.ativo .lazer-item-icon { background: linear-gradient(135deg,#d33327,#7d2728); }
+        .lazer-item.ativo h4 { color: #d33327; }
         .lazer-item-icon { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg,#fff2e3,#fdcd62); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
         .lazer-item h4 { font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 700; color: #7d2728; margin-bottom: 0.2rem; }
         .lazer-item p { font-size: 0.82rem; color: #6b5246; line-height: 1.5; }
-        @media (max-width: 768px) { .lazer-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) {
+            .lazer-inner { grid-template-columns: 1fr; padding-right: 1.5rem; padding-left: 1.5rem; }
+            .lazer-inner > div { padding: 0 0 1rem !important; }
+            .lazer-slide:not(.lazer-slide-mobile) { display: none; }
+            .lazer-slide-mobile { display: block !important; height: 160px; min-height: unset; border-radius: 1rem; margin-bottom: 1rem; }
+        }
+        .lazer-slide-mobile { display: none; }
 
         /* ── MOMENTOS (grade de fotos) ── */
         .momentos { padding: 5rem 0; background: white; }
@@ -369,29 +379,36 @@
                     <div class="sec-title">Área de <span>Lazer</span></div>
                     <div class="sec-line"></div>
                     <p class="sec-sub">Espaços pensados para que as crianças brinquem, se movimentem e desenvolvam habilidades motoras com segurança e alegria.</p>
-                    <div class="lazer-items">
-                        <div class="lazer-item">
+                    <!-- slide visível só no mobile: aparece entre o texto e os cards -->
+                    <div class="lazer-slide lazer-slide-mobile" id="lazerSlideMobile" style="margin:1rem 0;">
+                        <div class="lazer-slide-track" id="lazerTrackMobile"><div class="lazer-vazio">🛝</div></div>
+                        <button class="lazer-btn prev" onclick="_lazerIr(_lazerIdx-1);_lazerIniciarAuto();"><i class="fas fa-chevron-left"></i></button>
+                        <button class="lazer-btn next" onclick="_lazerIr(_lazerIdx+1);_lazerIniciarAuto();"><i class="fas fa-chevron-right"></i></button>
+                        <div class="lazer-dots" id="lazerDotsMobile"></div>
+                    </div>
+                    <div class="lazer-items" id="lazerCards">
+                        <div class="lazer-item" data-chave="parquinho" onclick="_lazerIrPorChave(this)">
                             <div class="lazer-item-icon">🛝</div>
                             <div>
                                 <h4>Parquinho Pedagógico</h4>
                                 <p>Escorregadores, balanços e estruturas que desenvolvem equilíbrio, força e coragem.</p>
                             </div>
                         </div>
-                        <div class="lazer-item">
+                        <div class="lazer-item" data-chave="quadra" onclick="_lazerIrPorChave(this)">
                             <div class="lazer-item-icon">⚽</div>
                             <div>
                                 <h4>Quadra Poliesportiva</h4>
                                 <p>Atividades físicas orientadas, jogos coletivos e psicomotricidade supervisionada.</p>
                             </div>
                         </div>
-                        <div class="lazer-item">
+                        <div class="lazer-item" data-chave="refeitorio" onclick="_lazerIrPorChave(this)">
                             <div class="lazer-item-icon">🍽️</div>
                             <div>
                                 <h4>Refeitório</h4>
                                 <p>Espaço aconchegante com alimentação balanceada e saudável, preparada com carinho para as crianças.</p>
                             </div>
                         </div>
-                        <div class="lazer-item">
+                        <div class="lazer-item" data-chave="biblioteca" onclick="_lazerIrPorChave(this)">
                             <div class="lazer-item-icon">📚</div>
                             <div>
                                 <h4>Biblioteca Infantil</h4>
@@ -653,29 +670,50 @@ var _lazerLista = [];
 var _lazerIdx   = 0;
 var _lazerTimer = null;
 
-function renderLazer(dados) {
-    var track = document.getElementById('lazerTrack');
-    var dots  = document.getElementById('lazerDots');
-    if (!track || !dados.length) return;
-    _lazerLista = dados;
-    track.innerHTML = dados.map(function(item) {
+function _lazerHtml(dados) {
+    return dados.map(function(item) {
         var nome = item.imagem.split('/').pop().replace(/\.[^.]+$/, '').replace(/_/g, ' ');
         var titulo = item.titulo || nome;
         return '<div class="lazer-slide-item">' +
                '<img src="/files/' + item.imagem + '" alt="' + titulo + '" loading="lazy">' +
-               '<div class="lazer-slide-capa">' +
-               '<div class="lazer-slide-titulo">' + titulo + '</div>' +
-               '</div></div>';
+               '<div class="lazer-slide-capa"><div class="lazer-slide-titulo">' + titulo + '</div></div></div>';
     }).join('');
-    dots.innerHTML = dados.map(function(_, i) {
+}
+function renderLazer(dados) {
+    if (!dados.length) return;
+    _lazerLista = dados;
+    var html = _lazerHtml(dados);
+    var dotHtml = dados.map(function(_, i) {
         return '<div class="lazer-dot' + (i === 0 ? ' ativo' : '') + '" onclick="_lazerIr(' + i + ')"></div>';
     }).join('');
+    document.getElementById('lazerTrack').innerHTML = html;
+    document.getElementById('lazerDots').innerHTML  = dotHtml;
+    document.getElementById('lazerTrackMobile').innerHTML = html;
+    document.getElementById('lazerDotsMobile').innerHTML  = dotHtml;
     _lazerIniciarAuto();
 }
 function _lazerIr(idx) {
     _lazerIdx = (idx + _lazerLista.length) % _lazerLista.length;
-    document.getElementById('lazerTrack').style.transform = 'translateX(-' + (_lazerIdx * 100) + '%)';
+    var tx = 'translateX(-' + (_lazerIdx * 100) + '%)';
+    document.getElementById('lazerTrack').style.transform = tx;
+    document.getElementById('lazerTrackMobile').style.transform = tx;
     document.querySelectorAll('.lazer-dot').forEach(function(d, i) { d.classList.toggle('ativo', i === _lazerIdx); });
+    // destaca o card correspondente
+    var nome = (_lazerLista[_lazerIdx].imagem || '').toLowerCase();
+    document.querySelectorAll('.lazer-item').forEach(function(el) {
+        var chave = el.getAttribute('data-chave') || '';
+        el.classList.toggle('ativo', nome.indexOf(chave) >= 0);
+    });
+}
+function _lazerIrPorChave(el) {
+    var chave = el.getAttribute('data-chave');
+    for (var i = 0; i < _lazerLista.length; i++) {
+        if ((_lazerLista[i].imagem || '').toLowerCase().indexOf(chave) >= 0) {
+            _lazerIr(i);
+            _lazerIniciarAuto();
+            return;
+        }
+    }
 }
 function _lazerIniciarAuto() {
     if (_lazerTimer) clearInterval(_lazerTimer);
