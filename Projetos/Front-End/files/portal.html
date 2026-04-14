@@ -848,7 +848,7 @@ function listarPastaPortal(pasta, callback) {
 // ── NÍVEIS DE ENSINO ──
 var _NIVEIS_DEFAULT = [
     {nome:'Educação Infantil', descricao:'O primeiro passo para um futuro brilhante começa aqui!', icone:'infantil', icone_img:'EducInfant.png', pagina:'educInfantil.html'},
-    {nome:'Anos Iniciais 2º ao 5º (Fund. I)',  descricao:'Fundamentos sólidos para o crescimento acadêmico e pessoal.', icone:'iniciais', icone_img:'AnosIniciais.png', pagina:''},
+    {nome:'Anos Iniciais 2º ao 5º (Fund. I)',  descricao:'Fundamentos sólidos para o crescimento acadêmico e pessoal.', icone:'iniciais', icone_img:'AnosIniciais.png', pagina:'fundI.html'},
     {nome:'Anos Finais 6º ao 9º (Fund. II)',   descricao:'Pensamento crítico e preparação para o Ensino Médio.', icone:'finais', icone_img:'AnosFinais.png', pagina:''},
     {nome:'Ensino Médio',      descricao:'Excelência acadêmica e preparação para vestibulares e a vida.', icone:'medio', icone_img:'EnsinoMedio.png', pagina:''}
 ];
@@ -976,9 +976,11 @@ window.mudarAbaMaterial = function(idx) {
 listarPastaPortal('material', renderMaterial);
 
 // Pré-gera os JSONs das páginas de nível para que funcionem em nova aba
-listarPastaPortal('educInfantil', function(){});
-listarPastaPortal('lazer',        function(){});
-listarPastaPortal('olimpiadas',   function(){});
+listarPastaPortal('educInfantil',   function(){});
+listarPastaPortal('lazer',         function(){});
+listarPastaPortal('olimpiadas',    function(){});
+listarPastaPortal('fundI',         function(){});
+listarPastaPortal('fundI_estrutura', function(){});
 
 // ── HISTÓRIA ──
 function renderHistoria(d) {
