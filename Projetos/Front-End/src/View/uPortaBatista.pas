@@ -56,9 +56,9 @@ var
 begin
   FController := TPortalController.Create;
 
-  // Carrega via iframe — evita que o Ext.globalEval processe os scripts modernos
+  // Carrega via iframe — timestamp evita cache do browser
   HTMLPortal.HTML.Text :=
-    '<iframe src="/files/portal.html" ' +
+    '<iframe src="/files/portal.html?v=' + FormatDateTime('yyyymmddhhnnss', Now) + '" ' +
     'style="width:100%;height:100%;border:none;display:block;" ' +
     'allowtransparency="true"></iframe>';
 
