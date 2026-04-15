@@ -1366,7 +1366,6 @@ function _conferirCodigoLGPD() {
             if (load) load.style.display = 'none';
             if (done === true) {
                 _lgpdVerificado = true;
-                fecharInnerModal();
                 Swal.fire({
                     icon: 'success',
                     title: '✅ Identidade Verificada!',
@@ -1375,7 +1374,10 @@ function _conferirCodigoLGPD() {
                     confirmButtonColor: '#d33327',
                     background: '#fff9f0',
                     zIndex: 99999
-                }).then(function() { _abrirPreMatriculaOriginal(); });
+                }).then(function() {
+                    fecharInnerModal();
+                    _abrirPreMatriculaOriginal();
+                });
             } else {
                 if (errBox) { errBox.innerHTML = '<i class="fas fa-exclamation-circle"></i> Código incorreto. Verifique e tente novamente.'; errBox.style.display = 'block'; }
             }
