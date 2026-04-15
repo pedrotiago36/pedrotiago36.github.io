@@ -4,7 +4,7 @@ interface
 
 uses
   SysUtils, IniFiles,
-  IdSMTP, IdMessage, IdText, IdSSLOpenSSL, IdExplicitTLSClientSupport;
+  IdSMTP, IdMessage, IdText, IdSSLOpenSSL, IdExplicitTLSClientServerBase;
 
 type
   TConfigEmail = record
