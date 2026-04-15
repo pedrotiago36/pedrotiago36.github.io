@@ -22,7 +22,8 @@ type
     procedure UniFormAjaxEvent(Sender: TComponent; EventName: string;
       Params: TUniStrings);
   private
-    FController: IPortalController;
+    FController  : IPortalController;
+    FLGPDCodigo  : string;
     procedure ConfigurarBridge;
     procedure ProcessarPreMatricula(const Params: TUniStrings);
     procedure ProcessarEntradaPai(const Params: TUniStrings);
@@ -32,6 +33,8 @@ type
     procedure ProcessarConsultarStatus(const Params: TUniStrings);
     procedure ProcessarCadastrarNovato(const Params: TUniStrings);
     procedure ProcessarListarPasta(const Params: TUniStrings);
+    procedure ProcessarEnviarCodigoLGPD(const Params: TUniStrings);
+    procedure ProcessarVerificarCodigoLGPD(const Params: TUniStrings);
   public
   end;
 
@@ -42,7 +45,8 @@ implementation
 {$R *.dfm}
 
 uses
-  uniGUIVars, MainModule, uniGUIApplication;
+  uniGUIVars, MainModule, uniGUIApplication,
+  UnitEnviaEmail;
 
 function MainForm: TMainForm;
 begin
@@ -119,6 +123,16 @@ begin
     '  ]);' +
     '};' +
 
+    'window.enviarCodigoLGPD = function(email) {' +
+    '  var frm = window._uniFormRef;' +
+    '  if (frm) ajaxRequest(frm, "EnviarCodigoLGPD", ["email=" + encodeURIComponent(email)]);' +
+    '};' +
+
+    'window.verificarCodigoLGPD = function(codigo) {' +
+    '  var frm = window._uniFormRef;' +
+    '  if (frm) ajaxRequest(frm, "VerificarCodigoLGPD", ["codigo=" + encodeURIComponent(codigo)]);' +
+    '};' +
+
     'setTimeout(function() {' +
     '  document.querySelectorAll("iframe").forEach(function(f) {' +
     '    f.setAttribute("scrolling", "yes");' +
@@ -132,7 +146,7 @@ end;
 procedure TMainForm.UniFormAjaxEvent(Sender: TComponent; EventName: string;
   Params: TUniStrings);
 begin
-  case AnsiIndexStr(EventName, ['RegistrarMatricula', 'EntradaPai', 'UploadContrato', 'DownloadContrato', 'DownloadContratoAssinado', 'ConsultarStatus', 'CadastrarNovato', 'ListarPasta']) of
+  case AnsiIndexStr(EventName, ['RegistrarMatricula', 'EntradaPai', 'UploadContrato', 'DownloadContrato', 'DownloadContratoAssinado', 'ConsultarStatus', 'CadastrarNovato', 'ListarPasta', 'EnviarCodigoLGPD', 'VerificarCodigoLGPD']) of
     0: ProcessarPreMatricula(Params);
     1: ProcessarEntradaPai(Params);
     2: ProcessarUploadContrato(Params);
@@ -141,6 +155,8 @@ begin
     5: ProcessarConsultarStatus(Params);
     6: ProcessarCadastrarNovato(Params);
     7: ProcessarListarPasta(Params);
+    8: ProcessarEnviarCodigoLGPD(Params);
+    9: ProcessarVerificarCodigoLGPD(Params);
   end;
 end;
 
@@ -352,6 +368,102 @@ begin
   // Variável global indexada pela pasta: window._lista_slider, _lista_niveis, etc.
   LVar := 'window._lista_' + StringReplace(LPasta, '/', '_', [rfReplaceAll]);
   UniSession.AddJS(LVar + ' = ' + LJSON + ';');
+end;
+
+function GerarCodigoAleatorio(Tamanho: Integer): string;
+const
+  CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // sem I, O, 0, 1 (fácil confusão)
+var
+  I: Integer;
+begin
+  Result := '';
+  Randomize;
+  for I := 1 to Tamanho do
+    Result := Result + CHARS[Random(Length(CHARS)) + 1];
+end;
+
+procedure TMainForm.ProcessarEnviarCodigoLGPD(const Params: TUniStrings);
+var
+  LEmail   : string;
+  LConfig  : TConfigEmail;
+  LIni     : string;
+  LCorpo   : string;
+  LRes     : string;
+begin
+  LEmail := TNetEncoding.URL.Decode(Params.Values['email']);
+
+  // Gera e armazena o código desta sessão
+  FLGPDCodigo := GerarCodigoAleatorio(6);
+
+  LIni    := TPath.Combine(ExtractFilePath(ParamStr(0)), 'Config.ini');
+  LConfig := CarregarConfig(LIni);
+  LConfig.Subject := 'Código de Verificação – Portal Batista';
+
+  LCorpo :=
+    '<div style="font-family:Arial,sans-serif;max-width:520px;margin:auto;padding:32px;' +
+    'background:#fff9f0;border-radius:16px;border:2px solid #fdcd62;">' +
+    '<h2 style="color:#7d2728;font-size:1.4rem;margin-bottom:8px;">&#127979; Colégio Batista Santos Dumont</h2>' +
+    '<p style="color:#5a3a2e;margin-bottom:20px;">Seu código de verificação para o <strong>Portal do Pai</strong> é:</p>' +
+    '<div style="text-align:center;letter-spacing:10px;font-size:2.4rem;font-weight:800;' +
+    'color:#d33327;background:#fff;border:3px dashed #fdcd62;border-radius:12px;padding:18px 8px;' +
+    'margin-bottom:24px;font-family:monospace;">' + FLGPDCodigo + '</div>' +
+    '<p style="color:#888;font-size:0.85rem;">Se você não solicitou este código, ignore este email.</p>' +
+    '</div>';
+
+  LRes := EnviarEmail(LConfig, LEmail, LCorpo);
+
+  if LRes = 'OK' then
+    UniSession.AddJS(
+      '(function(){' +
+      '  var frames = document.querySelectorAll("iframe");' +
+      '  frames.forEach(function(f){' +
+      '    try{ f.contentWindow.parent._lgpdEmailEnviado = true; }catch(e){}' +
+      '  });' +
+      '  window._lgpdEmailEnviado = true;' +
+      '})();'
+    )
+  else
+    UniSession.AddJS(
+      '(function(){' +
+      '  var frames = document.querySelectorAll("iframe");' +
+      '  frames.forEach(function(f){' +
+      '    try{ f.contentWindow.parent._lgpdEmailEnviado = false;' +
+      '         f.contentWindow.parent._lgpdEmailErro = ' + QuotedStr(LRes) + '; }catch(e){}' +
+      '  });' +
+      '  window._lgpdEmailEnviado = false;' +
+      '  window._lgpdEmailErro = ' + QuotedStr(LRes) + ';' +
+      '})();'
+    );
+end;
+
+procedure TMainForm.ProcessarVerificarCodigoLGPD(const Params: TUniStrings);
+var
+  LCodigo: string;
+  LOk    : Boolean;
+begin
+  LCodigo := UpperCase(TNetEncoding.URL.Decode(Params.Values['codigo']));
+  LOk     := (Trim(LCodigo) = Trim(FLGPDCodigo)) and (FLGPDCodigo <> '');
+
+  if LOk then
+    UniSession.AddJS(
+      '(function(){' +
+      '  var frames = document.querySelectorAll("iframe");' +
+      '  frames.forEach(function(f){' +
+      '    try{ f.contentWindow.parent._lgpdCodigoOk = true; }catch(e){}' +
+      '  });' +
+      '  window._lgpdCodigoOk = true;' +
+      '})();'
+    )
+  else
+    UniSession.AddJS(
+      '(function(){' +
+      '  var frames = document.querySelectorAll("iframe");' +
+      '  frames.forEach(function(f){' +
+      '    try{ f.contentWindow.parent._lgpdCodigoOk = false; }catch(e){}' +
+      '  });' +
+      '  window._lgpdCodigoOk = false;' +
+      '})();'
+    );
 end;
 
 initialization
