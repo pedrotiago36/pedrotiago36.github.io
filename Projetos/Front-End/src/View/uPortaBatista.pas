@@ -392,7 +392,7 @@ begin
   // Gera e armazena o código desta sessão
   FLGPDCodigo := GerarCodigoAleatorio(6);
 
-  LIni    := TPath.Combine(ExtractFilePath(ParamStr(0)), 'Config.ini');
+  LIni    := TPath.Combine(ExtractFilePath(ParamStr(0)), 'Config_email.ini');
   LConfig := CarregarConfig(LIni);
   LConfig.Subject := 'Código de Verificação – Portal Batista';
 
