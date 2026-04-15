@@ -3,8 +3,8 @@ unit UnitEnviaEmail;
 interface
 
 uses
-  SysUtils, IniFiles,
-  IdSMTP, IdMessage, IdText, IdSSLOpenSSL, IdExplicitTLSClientServerBase;
+  System.SysUtils, System.IniFiles,
+  IdSMTP, IdSSLOpenSSL, IdMessage, IdText, IdSSLOpenSSLHeaders;
 
 type
   TConfigEmail = record
@@ -17,80 +17,83 @@ type
   end;
 
 function CarregarConfig(const ArquivoIni: string): TConfigEmail;
-function EnviarEmail(const Config: TConfigEmail; const Para, CorpoHTML: string): string;
+function EnviarEmail(const Config: TConfigEmail; Para, CorpoHTML: string): string;
 
 implementation
+
+uses
+  IdExplicitTLSClientServerBase;
 
 function CarregarConfig(const ArquivoIni: string): TConfigEmail;
 var
   Ini: TIniFile;
 begin
+  if not FileExists(ArquivoIni) then
+    raise Exception.Create('Arquivo ' + ArquivoIni + ' não encontrado!');
+
   Ini := TIniFile.Create(ArquivoIni);
   try
-    Result.SMTPServer := Ini.ReadString('Email', 'SMTPServer', '');
-    Result.SMTPPort   := Ini.ReadInteger('Email', 'SMTPPort',   587);
-    Result.Username   := Ini.ReadString('Email', 'Username',   '');
-    Result.Password   := Ini.ReadString('Email', 'Password',   '');
-    Result.FromName   := Ini.ReadString('Email', 'FromName',   'Portal Batista');
-    Result.Subject    := Ini.ReadString('Email', 'Subject',    'Código de Verificação');
+    Result.SMTPServer := Ini.ReadString('EmailConfig', 'SMTPServer', 'smtp.gmail.com');
+    Result.SMTPPort   := Ini.ReadInteger('EmailConfig', 'SMTPPort',   587);
+    Result.Username   := Ini.ReadString('EmailConfig', 'Username',   '');
+    Result.Password   := Ini.ReadString('EmailConfig', 'Password',   '');
+    Result.FromName   := Ini.ReadString('EmailConfig', 'FromName',   'Portal Batista');
+    Result.Subject    := Ini.ReadString('EmailConfig', 'Subject',    'Mensagem Automática');
   finally
     Ini.Free;
   end;
 end;
 
-function EnviarEmail(const Config: TConfigEmail; const Para, CorpoHTML: string): string;
+function EnviarEmail(const Config: TConfigEmail; Para, CorpoHTML: string): string;
 var
-  SMTP   : TIdSMTP;
-  SSL    : TIdSSLIOHandlerSocketOpenSSL;
-  Msg    : TIdMessage;
-  Texto  : TIdText;
+  SMTP      : TIdSMTP;
+  SSLHandler: TIdSSLIOHandlerSocketOpenSSL;
+  Msg       : TIdMessage;
+  TextBody  : TIdText;
 begin
-  Result := '';
-  SMTP := TIdSMTP.Create(nil);
-  SSL  := TIdSSLIOHandlerSocketOpenSSL.Create(nil);
-  Msg  := TIdMessage.Create(nil);
+  Result     := '';
+  SMTP       := TIdSMTP.Create(nil);
+  SSLHandler := TIdSSLIOHandlerSocketOpenSSL.Create(nil);
+  Msg        := TIdMessage.Create(nil);
+
   try
-    try
-      // SSL/TLS
-      SSL.SSLOptions.Method  := sslvTLSv1_2;
-      SSL.SSLOptions.Mode    := sslmUnassigned;
-      SMTP.IOHandler         := SSL;
-      SMTP.UseTLS            := utUseExplicitTLS;
+    SSLHandler.SSLOptions.Method := sslvTLSv1_2;
+    SSLHandler.SSLOptions.Mode   := sslmUnassigned;
 
-      // Servidor
-      SMTP.Host     := Config.SMTPServer;
-      SMTP.Port     := Config.SMTPPort;
-      SMTP.Username := Config.Username;
-      SMTP.Password := Config.Password;
+    SMTP.IOHandler := SSLHandler;
+    SMTP.Host      := Config.SMTPServer;
+    SMTP.Port      := Config.SMTPPort;
+    SMTP.Username  := Config.Username;
+    SMTP.Password  := Config.Password;
+    SMTP.UseTLS    := utUseExplicitTLS;
 
-      // Mensagem
-      Msg.From.Address  := Config.Username;
-      Msg.From.Name     := Config.FromName;
-      Msg.Subject       := Config.Subject;
-      Msg.Recipients.EMailAddresses := Para;
-      Msg.ContentType := 'text/html; charset=UTF-8';
+    Msg.From.Name                := Config.FromName;
+    Msg.From.Address             := Config.Username;
+    Msg.Recipients.EMailAddresses := Para;
+    Msg.Subject                  := Config.Subject;
+    Msg.ContentType              := 'text/html';
 
-      Texto := TIdText.Create(Msg.MessageParts, nil);
-      Texto.ContentType := 'text/html; charset=UTF-8';
-      Texto.Body.Text   := CorpoHTML;
+    TextBody             := TIdText.Create(Msg.MessageParts);
+    TextBody.ContentType := 'text/html';
+    TextBody.Body.Text   := CorpoHTML;
 
-      SMTP.Connect;
-      try
-        SMTP.Send(Msg);
-      finally
-        SMTP.Disconnect;
-      end;
+    SMTP.Connect;
+    SMTP.Authenticate;
+    SMTP.Send(Msg);
 
-      Result := 'OK';
-    except
-      on E: Exception do
-        Result := 'ERRO: ' + E.Message;
-    end;
-  finally
-    Msg.Free;
-    SSL.Free;
-    SMTP.Free;
+    if SMTP.Connected then
+      SMTP.Disconnect;
+
+    Result := 'OK';
+  except
+    on E: Exception do
+      Result := 'ERRO: ' + E.Message;
   end;
+
+  FreeAndNil(TextBody);
+  FreeAndNil(Msg);
+  FreeAndNil(SSLHandler);
+  FreeAndNil(SMTP);
 end;
 
 end.
