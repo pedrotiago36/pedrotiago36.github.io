@@ -16,6 +16,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* SweetAlert2 sempre acima de todos os modais */
+        .swal2-container { z-index: 99999 !important; }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; overflow: hidden; }
         body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #fff2e3 0%, #ffe6cc 100%); color: #2d2d2d; }
@@ -1366,18 +1369,15 @@ function _conferirCodigoLGPD() {
             if (load) load.style.display = 'none';
             if (done === true) {
                 _lgpdVerificado = true;
+                fecharInnerModal();
                 Swal.fire({
                     icon: 'success',
                     title: '✅ Identidade Verificada!',
                     html: '<p style="color:#5a3a2e;margin-bottom:0.5rem;">Sua identidade foi confirmada com sucesso.</p><p>Você está autorizado a prosseguir com a <strong style="color:#d33327;">Pré-Matrícula 2027</strong>.</p>',
                     confirmButtonText: '🎓 Prosseguir com a Matrícula',
                     confirmButtonColor: '#d33327',
-                    background: '#fff9f0',
-                    zIndex: 99999
-                }).then(function() {
-                    fecharInnerModal();
-                    _abrirPreMatriculaOriginal();
-                });
+                    background: '#fff9f0'
+                }).then(function() { _abrirPreMatriculaOriginal(); });
             } else {
                 if (errBox) { errBox.innerHTML = '<i class="fas fa-exclamation-circle"></i> Código incorreto. Verifique e tente novamente.'; errBox.style.display = 'block'; }
             }
@@ -1414,7 +1414,7 @@ function _abrirPreMatriculaOriginal() {
     });
     document.getElementById('confirmarAgendamento').addEventListener('click', function() {
         if (!_selectedDate) {
-            Swal.fire({ icon:'warning', title:'Data não selecionada', text:'Escolha o dia.', confirmButtonColor:'#d33327', zIndex:99999 });
+            Swal.fire({ icon:'warning', title:'Data não selecionada', text:'Escolha o dia.', confirmButtonColor:'#d33327' });
             return;
         }
         var fn = (window.parent && typeof window.parent.enviarPreMatricula === 'function') ? window.parent.enviarPreMatricula : function(){};
@@ -1423,7 +1423,7 @@ function _abrirPreMatriculaOriginal() {
         Swal.fire({
             icon:'success', title:'✅ Agendamento Confirmado!',
             html:'<p><strong>CPF:</strong> ' + cpfPaiLogado + '</p><p><strong>Data:</strong> ' + _selectedDate + '</p>',
-            confirmButtonText:'😊 Estarei lá!', confirmButtonColor:'#d33327', background:'#fff9f0', zIndex:99999
+            confirmButtonText:'😊 Estarei lá!', confirmButtonColor:'#d33327', background:'#fff9f0'
         });
     });
 
