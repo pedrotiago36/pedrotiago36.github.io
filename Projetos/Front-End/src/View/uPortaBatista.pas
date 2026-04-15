@@ -392,7 +392,7 @@ begin
   FLGPDCodigo := GerarCodigoAleatorio(6);
 
   LConfig := CarregarConfig('Config_email.ini');
-  LConfig.Subject := 'Código de Verificação – Portal Batista';
+  LConfig.Subject := 'Codigo de Verificacao - Portal Batista';
 
   LCorpo :=
     '<div style="font-family:Arial,sans-serif;max-width:520px;margin:auto;padding:32px;' +
