@@ -381,19 +381,17 @@ end;
 
 procedure TMainForm.ProcessarEnviarCodigoLGPD(const Params: TUniStrings);
 var
-  LEmail   : string;
-  LConfig  : TConfigEmail;
-  LIni     : string;
-  LCorpo   : string;
-  LRes     : string;
+  LEmail  : string;
+  LConfig : TConfigEmail;
+  LCorpo  : string;
+  LRes    : string;
 begin
   LEmail := TNetEncoding.URL.Decode(Params.Values['email']);
 
   // Gera e armazena o código desta sessão
   FLGPDCodigo := GerarCodigoAleatorio(6);
 
-  LIni    := TPath.Combine(ExtractFilePath(ParamStr(0)), 'Config_email.ini');
-  LConfig := CarregarConfig(LIni);
+  LConfig := CarregarConfig('Config_email.ini');
   LConfig.Subject := 'Código de Verificação – Portal Batista';
 
   LCorpo :=

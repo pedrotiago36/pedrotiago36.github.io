@@ -27,11 +27,14 @@ uses
 function CarregarConfig(const ArquivoIni: string): TConfigEmail;
 var
   Ini: TIniFile;
+  CaminhoCompleto: string;
 begin
-  if not FileExists(ArquivoIni) then
-    raise Exception.Create('Arquivo ' + ArquivoIni + ' não encontrado!');
+  CaminhoCompleto := ExtractFilePath(ParamStr(0)) + ArquivoIni;
 
-  Ini := TIniFile.Create(ArquivoIni);
+  if not FileExists(CaminhoCompleto) then
+    raise Exception.Create('Arquivo ' + CaminhoCompleto + ' não encontrado!');
+
+  Ini := TIniFile.Create(CaminhoCompleto);
   try
     Result.SMTPServer := Ini.ReadString('EmailConfig', 'SMTPServer', 'smtp.gmail.com');
     Result.SMTPPort   := Ini.ReadInteger('EmailConfig', 'SMTPPort',   587);
