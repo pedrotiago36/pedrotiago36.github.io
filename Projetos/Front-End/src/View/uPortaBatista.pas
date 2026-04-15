@@ -54,9 +54,6 @@ begin
 end;
 
 procedure TMainForm.UniFormCreate(Sender: TObject);
-var
-  LLista  : TStringList;
-  LArquivo: string;
 begin
   FController := TPortalController.Create;
 

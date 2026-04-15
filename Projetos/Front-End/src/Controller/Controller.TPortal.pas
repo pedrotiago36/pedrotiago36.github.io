@@ -75,7 +75,6 @@ var
   LSoma, LResto, LDigito1, LDigito2, I: Integer;
   C: Char;
 begin
-  Result := False;
   try
     LDigitos := '';
     for C in ACPF do
