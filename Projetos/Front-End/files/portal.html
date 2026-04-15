@@ -1373,7 +1373,8 @@ function _conferirCodigoLGPD() {
                     html: '<p style="color:#5a3a2e;margin-bottom:0.5rem;">Sua identidade foi confirmada com sucesso.</p><p>Você está autorizado a prosseguir com a <strong style="color:#d33327;">Pré-Matrícula 2027</strong>.</p>',
                     confirmButtonText: '🎓 Prosseguir com a Matrícula',
                     confirmButtonColor: '#d33327',
-                    background: '#fff9f0'
+                    background: '#fff9f0',
+                    zIndex: 99999
                 }).then(function() { _abrirPreMatriculaOriginal(); });
             } else {
                 if (errBox) { errBox.innerHTML = '<i class="fas fa-exclamation-circle"></i> Código incorreto. Verifique e tente novamente.'; errBox.style.display = 'block'; }
@@ -1411,7 +1412,7 @@ function _abrirPreMatriculaOriginal() {
     });
     document.getElementById('confirmarAgendamento').addEventListener('click', function() {
         if (!_selectedDate) {
-            Swal.fire({ icon:'warning', title:'Data não selecionada', text:'Escolha o dia.', confirmButtonColor:'#d33327' });
+            Swal.fire({ icon:'warning', title:'Data não selecionada', text:'Escolha o dia.', confirmButtonColor:'#d33327', zIndex:99999 });
             return;
         }
         var fn = (window.parent && typeof window.parent.enviarPreMatricula === 'function') ? window.parent.enviarPreMatricula : function(){};
@@ -1420,7 +1421,7 @@ function _abrirPreMatriculaOriginal() {
         Swal.fire({
             icon:'success', title:'✅ Agendamento Confirmado!',
             html:'<p><strong>CPF:</strong> ' + cpfPaiLogado + '</p><p><strong>Data:</strong> ' + _selectedDate + '</p>',
-            confirmButtonText:'😊 Estarei lá!', confirmButtonColor:'#d33327', background:'#fff9f0'
+            confirmButtonText:'😊 Estarei lá!', confirmButtonColor:'#d33327', background:'#fff9f0', zIndex:99999
         });
     });
 
