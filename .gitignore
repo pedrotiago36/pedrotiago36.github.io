@@ -22,6 +22,9 @@ log/
 temp/
 agendamentos/
 
+# Backup local
+/Projetos/backup/
+
 # Pastas de CPF criadas pelo sistema (dados pessoais dos pais)
 /Projetos/Front-End/prj/Win32/Debug/[0-9]*/
 
