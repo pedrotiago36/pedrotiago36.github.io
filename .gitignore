@@ -18,6 +18,12 @@
 
 # Pastas geradas em runtime
 cache/
+log/
+temp/
+agendamentos/
+
+# Pastas de CPF criadas pelo sistema (dados pessoais dos pais)
+/Projetos/Front-End/prj/Win32/Debug/[0-9]*/
 
 # Arquivos temporários
 *.tmp
