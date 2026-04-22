@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batista Varjota | Colégio Batista Santos Dumont</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>var _UNIDADE_ID = 'unidade_varjota'; var _UNIDADE_NOME = 'Batista Varjota'; var _UNIDADE_COR = '#7d2728';</script>
+    <script src="/files/unidade_tpl.js?v=3"></script>
+    <link rel="stylesheet" href="/files/unidade_tpl.css">
+</head>
+<body>
+<div id="scrollWrapper">
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <a href="javascript:void(0)" onclick="fecharPagina()" class="nav-back"><i class="fas fa-arrow-left"></i> Voltar</a>
+        <div class="logo"><img src="/files/portal/LogoBatista.png" alt="Colégio Batista Santos Dumont"></div>
+        <ul class="nav-acoes">
+            <li><button class="btn-login" onclick="abrirNoPortal('aluno')"><i class="fas fa-sign-in-alt"></i> Portal do Aluno</button></li>
+            <li><button class="btn-pai" onclick="abrirNoPortal('pai')"><i class="fas fa-users"></i> Portal do Pai</button></li>
+            <li><button class="btn-novato" onclick="abrirNoPortal('novato')"><i class="fas fa-star"></i> Quero ser Batista</button></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero" id="heroSection">
+        <img src="/files/unidade_varjota/capa.png" class="hero-bg" alt="" onerror="this.src='/files/unidade_varjota/capa.jpg';">
+        <div class="hero-overlay">
+            <div class="hero-badge">Varjota</div>
+            <h1 class="hero-titulo">Colégio Batista<br><span>Varjota</span></h1>
+            <p class="hero-sub">Tradição e modernidade no bairro Varjota, oferecendo educação cristã de qualidade para sua família./p>
+            <div class="hero-stats">
+                <div class="hstat"><strong>500+</strong><span>Alunos</span></div>
+                <div class="hstat"><strong>20 anos</strong><span>de História</span></div>
+                <div class="hstat"><strong>98%</strong><span>ENEM</span></div>
+                <div class="hstat"><strong>35+</strong><span>Professores</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUICK NAV -->
+    <div class="quick-nav">
+        <a href="#sec-sobre"    class="qcard qcard-1"><div class="qcard-icon">🏫</div><span>Sobre a Unidade Varjota</span></a>
+        <a href="#sec-niveis"   class="qcard qcard-2"><div class="qcard-icon">📚</div><span>Níveis de Ensino</span></a>
+        <a href="#sec-estrutura" class="qcard qcard-3"><div class="qcard-icon">🏗️</div><span>Estrutura</span></a>
+        <a href="#sec-galeria"  class="qcard qcard-4"><div class="qcard-icon">📸</div><span>Galeria</span></a>
+        <a href="#sec-videos"   class="qcard qcard-5"><div class="qcard-icon">🎥</div><span>Vídeos</span></a>
+        <a href="#sec-contato"  class="qcard qcard-6"><div class="qcard-icon">📍</div><span>Localização</span></a>
+    </div>
+
+    <!-- SOBRE -->
+    <div class="sec-bloco" id="sec-sobre">
+        <div class="container">
+            <div class="sec-title">Sobre a <span>Unidade Varjota</span></div>
+            <div class="sec-line"></div>
+            <p class="sec-sub">A unidade sede é o coração do Colégio Batista Santos Dumont, referência em educação cristã em Fortaleza. Com estrutura completa, corpo docente altamente qualificado e uma proposta pedagógica que une excelência acadêmica e formação de caráter, somos a escolha de milhares de famílias há mais de meio século.</p>
+        </div>
+    </div>
+
+    <!-- NÍVEIS -->
+    <div class="niveis-bloco" id="sec-niveis">
+        <div class="container">
+            <div class="sec-title" style="color:white;">Níveis de <span style="color:#fdcd62;">Ensino</span></div>
+            <div class="sec-line" style="background:linear-gradient(90deg,#fdcd62,rgba(255,255,255,0.4));margin:0.8rem 0 2rem;"></div>
+            <div class="niveis-grid">
+                <div class="nivel-chip"><i class="fas fa-child"></i> Educação Infantil</div>
+                <div class="nivel-chip"><i class="fas fa-book"></i> Fundamental I</div>
+                <div class="nivel-chip"><i class="fas fa-book-open"></i> Fundamental II</div>
+                <div class="nivel-chip"><i class="fas fa-graduation-cap"></i> Ensino Médio</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ESTRUTURA SLIDE -->
+    <div class="estrutura-bloco" id="sec-estrutura">
+        <div class="container">
+            <div class="sec-title">Nossa <span>Estrutura</span></div>
+            <div class="sec-line"></div>
+            <div class="estr-carrossel">
+                <div class="estr-wrap"><div class="estr-track" id="estrTrack"><div class="estr-vazio"><i class="fas fa-school"></i></div></div></div>
+                <button class="estr-btn prev" id="estrPrev"><i class="fas fa-chevron-left"></i></button>
+                <button class="estr-btn next" id="estrNext"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GALERIA -->
+    <div class="galeria-bloco" id="sec-galeria">
+        <div class="container">
+            <div class="sec-title" style="color:white;"><i class="fas fa-images" style="color:#fdcd62;margin-right:0.5rem;"></i>Galeria de <span style="color:#fdcd62;">Fotos</span></div>
+            <div class="sec-line" style="background:linear-gradient(90deg,#fdcd62,rgba(255,255,255,0.3));margin:0.8rem auto 2rem;"></div>
+            <div class="gal-grid" id="galGrid">
+                <div class="gal-vazio"><i class="fas fa-camera"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VÍDEOS -->
+    <div class="videos-bloco" id="sec-videos">
+        <div class="container">
+            <div class="sec-title">Vídeos da <span>Varjota</span></div>
+            <div class="sec-line"></div>
+            <div class="vid-grid" id="vidGrid">
+                <div class="vid-vazio"><i class="fas fa-video"></i><span>Coloque vídeos (.mp4) na pasta unidade_varjota/galeria/</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTATO -->
+    <div class="contato-bloco" id="sec-contato">
+        <div class="container">
+            <div class="sec-title" style="color:white;">Localização & <span style="color:#fdcd62;">Contato</span></div>
+            <div class="sec-line" style="background:linear-gradient(90deg,#fdcd62,rgba(255,255,255,0.3));margin:0.8rem 0 2rem;"></div>
+            <div class="contato-grid">
+                <div class="contato-item"><i class="fas fa-map-marker-alt"></i><div><strong>Endereço</strong><span>Fortaleza, CE</span></div></div>
+                <div class="contato-item"><i class="fas fa-phone"></i><div><strong>Telefone</strong><span>(85) 0000-0000</span></div></div>
+                <div class="contato-item"><i class="fas fa-envelope"></i><div><strong>E-mail</strong><span>varjota@batista.g12.br</span></div></div>
+                <div class="contato-item"><i class="fas fa-clock"></i><div><strong>Funcionamento</strong><span>Seg–Sex: 07h–18h</span></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-bloco">
+        <h2>Faça parte da família Batista! 🏫</h2>
+        <p>Agende uma visita e conheça de perto nossa unidade sede.</p>
+        <div class="cta-btns">
+            <a href="javascript:void(0)" onclick="abrirNoPortal('novato')" class="btn-cta-main"><i class="fas fa-calendar-check"></i> Agendar Visita</a>
+            <a href="javascript:void(0)" onclick="abrirNoPortal('pai')" class="btn-cta-sec"><i class="fas fa-users"></i> Portal dos Pais</a>
+        </div>
+    </div>
+
+    <!-- LIGHTBOX -->
+    <div class="lightbox" id="lightbox">
+        <button class="lb-fechar" id="lbFechar"><i class="fas fa-times"></i></button>
+        <button class="lb-nav lb-prev" id="lbPrev"><i class="fas fa-chevron-left"></i></button>
+        <img id="lbImg" src="" alt="">
+        <button class="lb-nav lb-next" id="lbNext"><i class="fas fa-chevron-right"></i></button>
+        <div class="lb-counter" id="lbCounter"></div>
+    </div>
+
+</div>
+</body>
+</html>
