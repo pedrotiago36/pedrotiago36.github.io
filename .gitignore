@@ -1,3 +1,4 @@
+# Delphi compilados
 *.dcu
 *.exe
 *.bpl
@@ -8,8 +9,9 @@
 *.tvsconfig
 *.local
 *.dproj.local
-__history/
-Win32/
-Win64/
-Debug/
-Release/
+
+# Runtime / gerados automaticamente
+*.dll
+*.log
+*.ini
+*.pdf
