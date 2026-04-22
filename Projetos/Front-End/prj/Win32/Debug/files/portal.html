@@ -38,16 +38,17 @@
         .logo i { font-size: 2.2rem; color: #d33327; }
         .logo h1 { font-size: 1.6rem; font-weight: 800; font-family: 'Poppins', sans-serif; color: #7d2728; }
         .logo span { font-size: 0.8rem; font-weight: 400; color: #d33327; display: block; line-height: 1.2; }
-        .nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; flex-wrap: wrap; }
-        .nav-links a { text-decoration: none; font-weight: 500; color: #5a3a2e; transition: 0.3s; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+        .nav-links { display: flex; gap: 1rem; list-style: none; align-items: center; flex-wrap: nowrap; }
+        .nav-links a { text-decoration: none; font-weight: 500; color: #5a3a2e; transition: 0.3s; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
         .nav-links a i { font-size: 1.1rem; color: #fdcd62; }
         .nav-links a:hover { color: #d33327; transform: translateY(-2px); }
         .btn-login { background: linear-gradient(135deg, #d33327, #7d2728); padding: 0.6rem 1.5rem; border-radius: 2rem; color: white !important; box-shadow: 0 6px 14px rgba(211,51,39,0.3); }
         .btn-login:hover { transform: scale(1.02); box-shadow: 0 10px 20px rgba(211,51,39,0.4); }
         .btn-pai { background: linear-gradient(135deg, #fdcd62, #d33327); padding: 0.6rem 1.5rem; border-radius: 2rem; color: #7d2728 !important; box-shadow: 0 6px 14px rgba(253,205,98,0.3); }
         .btn-pai:hover { transform: scale(1.02); color: white !important; }
-        .btn-novato { background: linear-gradient(135deg, #2ecc71, #27ae60); padding: 0.6rem 1.5rem; border-radius: 2rem; color: white !important; box-shadow: 0 6px 14px rgba(46,204,113,0.35); animation: pulse-novato 2.5s infinite; }
-        .btn-novato:hover { transform: scale(1.05) !important; box-shadow: 0 10px 24px rgba(46,204,113,0.5); }
+        .btn-novato { background: linear-gradient(135deg, #f7c948, #e6a800); padding: 0.6rem 1.5rem; border-radius: 2rem; color: #7d2728 !important; font-weight: 800; box-shadow: 0 6px 18px rgba(230,168,0,0.55); animation: pulse-novato 2.5s infinite; display: inline-flex; align-items: center; gap: 0.4rem; }
+        .btn-novato img { width: 22px; height: 22px; object-fit: contain; display: inline-block; vertical-align: middle; }
+        .btn-novato:hover { transform: scale(1.07) !important; box-shadow: 0 12px 28px rgba(230,168,0,0.7); }
         .btn-unidades { background: linear-gradient(135deg, #d33327, #7d2728); padding: 0.6rem 1.5rem; border-radius: 2rem; color: white !important; box-shadow: 0 6px 14px rgba(211,51,39,0.3); display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
         .btn-unidades:hover { transform: scale(1.02); box-shadow: 0 10px 20px rgba(211,51,39,0.4); }
         .dropdown-unidades { position: relative; }
@@ -59,17 +60,15 @@
         .dropdown-unidades-menu a:hover::before { background: #fdcd62; transform: scale(1.3); }
         .dropdown-unidades-menu a.ativa { background: #edfaf3; color: #1e7e4a; border-left-color: #2ecc71; }
         .dropdown-unidades-menu a.ativa::before { background: #2ecc71; }
-        @keyframes pulse-novato { 0%,100% { box-shadow: 0 6px 14px rgba(46,204,113,0.35); } 50% { box-shadow: 0 6px 28px rgba(46,204,113,0.7); } }
+        @keyframes pulse-novato { 0%,100% { box-shadow: 0 6px 18px rgba(230,168,0,0.55); } 50% { box-shadow: 0 8px 32px rgba(230,168,0,0.9); } }
 
         /* ── HERO SLIDER ── */
-        .hero-slider { position: relative; width: 100%; margin: 1.5rem 0 0; background: #1a0a0a; }
-        /* Slides inativos: escondidos via display:none — não ocupam espaço, não cortam nada */
+        .hero-slider { position: relative; width: 100%; margin: 1.5rem 0 0; overflow: hidden; }
         .slide { display: none; position: relative; width: 100%; }
-        /* Slide ativo: visível, flui normalmente, altura ditada pela imagem */
         .slide.ativo { display: block; animation: fadeSlide 0.7s ease; }
         @keyframes fadeSlide { from { opacity: 0; } to { opacity: 1; } }
-        /* Imagem: altura fixa, object-fit:contain = imagem completa SEM corte */
-        .slide-bg { width: 100%; height: 500px; display: block; object-fit: contain; background: #1a0a0a; }
+        /* Imagem ocupa 100% da largura, altura proporcional — sem corte, responsiva por natureza */
+        .slide-bg { width: 100%; height: auto; display: block; }
         .slide-placeholder { width: 100%; min-height: 320px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg,#7d2728 0%,#5a2a2b 50%,#3d1a1b 100%); }
         .slide-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent 0%, rgba(15,5,5,0.88) 100%); padding: 2.5rem 3.5rem; color: white; z-index: 3; }
         .badge-slide { display: inline-block; background: #fdcd62; color: #7d2728; padding: 0.25rem 1rem; border-radius: 2rem; font-size: 0.75rem; font-weight: 800; margin-bottom: 0.6rem; letter-spacing: 0.5px; text-transform: uppercase; }
@@ -298,11 +297,17 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.05); } }
 
+        @media (max-width: 1200px) {
+            .nav-links { gap: 0.6rem; }
+            .nav-links a { font-size: 0.85rem; }
+            .btn-login, .btn-pai, .btn-novato, .btn-unidades { padding: 0.5rem 1rem !important; }
+        }
+
         @media (max-width: 768px) {
             .navbar { flex-direction: column; align-items: stretch; text-align: center; }
-            .nav-links { justify-content: center; }
+            .nav-links { justify-content: center; flex-wrap: wrap; }
             .container { padding: 0 1.2rem; }
-            .slide-bg { height: 260px; }
+            .slide-bg { max-height: 200px; object-fit: cover; }
             .slide-overlay { display: none; }
             .novato-row { grid-template-columns: 1fr; }
         }
@@ -333,7 +338,7 @@
                 </li>
                 <li><a href="#" id="openModalBtn" class="btn-login"><i class="fas fa-sign-in-alt"></i> Portal do Aluno</a></li>
                 <li><a href="#" id="openPortalPaiBtn" class="btn-pai"><i class="fas fa-users"></i> Portal do Pai Batista</a></li>
-                <li><a href="#" id="openNovatoBtn" class="btn-novato"><i class="fas fa-star"></i> Quero ser Batista</a></li>
+                <li><a href="#" id="openNovatoBtn" class="btn-novato"><img src="/files/portal/icones/Quero Ser Batista.png" alt=""> Quero ser Batista</a></li>
             </ul>
         </nav>
     </div>
@@ -431,7 +436,7 @@
                     <h4><i class="fas fa-church"></i> Nossa História</h4>
                     <p id="footerHistoriaTexto">O Colégio Batista Santos Dumont tem uma rica história de educação com propósito, formando gerações com excelência acadêmica e valores cristãos.</p>
                     <div class="footer-stats" id="footerStats">
-                        <div class="fstat"><h3>+76 anos</h3><p>de história</p></div>
+                        <div class="fstat"><h3>76 anos</h3><p>de história</p></div>
                     </div>
                 </div>
                 <div class="footer-col">
@@ -729,7 +734,7 @@ var _DIFERENCIAIS = [
     {nome:'Educação Cristã',    icone_img:'Nossos Diferenciais/Educacao Crista/EducaçãoCristã.png',       icone_fa:'fas fa-cross',       descricao:'Formação de valores, fé e propósito integrados ao currículo acadêmico.'},
     {nome:'Empreendedorismo',   icone_img:'Nossos Diferenciais/Empreendedorismo/Empreendedorismo.png',    icone_fa:'fas fa-lightbulb',   descricao:'Projetos práticos que desenvolvem liderança, visão de negócios e inovação.'},
     {nome:'NAF',                icone_img:'Nossos Diferenciais/NAF/NAF.png',                              icone_fa:'fas fa-running',     descricao:'Núcleo de Atividades Físicas — esporte, saúde e desenvolvimento integral.'},
-    {nome:'Bibliotecas',        icone_img:'',                                                             icone_fa:'fas fa-book-open',   descricao:'Acervo completo e espaços de leitura e pesquisa em todas as unidades.'}
+    {nome:'Bibliotecas',        icone_img:'Nossos Diferenciais/Bibliotecas/biblioteca.png',               icone_fa:'fas fa-book-open',   descricao:'Acervo completo e espaços de leitura e pesquisa em todas as unidades.'}
 ];
 
 (function() {

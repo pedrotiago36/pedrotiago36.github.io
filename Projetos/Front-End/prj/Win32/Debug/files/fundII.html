@@ -18,20 +18,31 @@
         /* ── NAVBAR ── */
         .navbar { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; flex-wrap: wrap; gap: 1rem; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); border-radius: 2rem; margin: 1rem 1rem 0; box-shadow: 0 8px 32px rgba(125,39,40,0.08); border: 1px solid rgba(253,205,98,0.3); position: sticky; top: 1rem; z-index: 100; }
         .logo img { height: 56px; width: auto; display: block; }
-        .nav-back { display: flex; align-items: center; gap: 8px; text-decoration: none; font-weight: 500; color: #5a3a2e; transition: 0.3s; font-size: 1rem; }
+        .nav-back { display: flex; align-items: center; gap: 8px; text-decoration: none; font-weight: 700; color: #5a3a2e; transition: 0.3s; font-size: 1rem; white-space: nowrap; }
         .nav-back i { font-size: 1.1rem; color: #fdcd62; }
         .nav-back:hover { color: #d33327; transform: translateY(-2px); }
-        .nav-acoes { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; list-style: none; }
-        .nav-acoes button { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; transition: 0.3s; font-size: 1rem; background: none; border: none; cursor: pointer; font-family: inherit; padding: 0; color: #5a3a2e; }
-        .nav-acoes button i { font-size: 1.1rem; color: #fdcd62; }
-        .nav-acoes button:hover { color: #d33327; transform: translateY(-2px); }
-        .btn-login  { background: linear-gradient(135deg,#7d2728,#d33327) !important; color: white !important; padding: 0.6rem 1.4rem !important; border-radius: 2rem !important; font-weight: 700 !important; }
-        .btn-login i { color: white !important; }
-        .btn-pai    { background: #fdcd62 !important; color: #7d2728 !important; padding: 0.6rem 1.4rem !important; border-radius: 2rem !important; font-weight: 700 !important; }
-        .btn-pai i  { color: #7d2728 !important; }
-        .btn-novato { background: linear-gradient(135deg,#22c55e,#16a34a) !important; color: white !important; padding: 0.6rem 1.4rem !important; border-radius: 2rem !important; font-weight: 700 !important; }
-        .btn-novato i { color: white !important; }
-        @media (max-width: 700px) { .nav-acoes { display: none; } }
+        .nav-links { display: flex; gap: 1rem; list-style: none; align-items: center; flex-wrap: nowrap; }
+        .nav-links a { text-decoration: none; font-weight: 500; color: #5a3a2e; transition: 0.3s; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+        .nav-links a i { font-size: 1.1rem; color: #fdcd62; }
+        .nav-links a:hover { color: #d33327; transform: translateY(-2px); }
+        .btn-login { background: linear-gradient(135deg, #d33327, #7d2728); padding: 0.6rem 1.5rem; border-radius: 2rem; color: white !important; box-shadow: 0 6px 14px rgba(211,51,39,0.3); }
+        .btn-login:hover { transform: scale(1.02) !important; box-shadow: 0 10px 20px rgba(211,51,39,0.4); }
+        .btn-pai { background: linear-gradient(135deg, #fdcd62, #d33327); padding: 0.6rem 1.5rem; border-radius: 2rem; color: #7d2728 !important; box-shadow: 0 6px 14px rgba(253,205,98,0.3); }
+        .btn-pai:hover { transform: scale(1.02) !important; color: white !important; }
+        .btn-novato { background: linear-gradient(135deg, #f7c948, #e6a800); padding: 0.6rem 1.5rem; border-radius: 2rem; color: #7d2728 !important; font-weight: 800; box-shadow: 0 6px 18px rgba(230,168,0,0.55); animation: pulse-novato 2.5s infinite; display: inline-flex; align-items: center; gap: 0.4rem; }
+        .btn-novato img { width: 22px; height: 22px; object-fit: contain; display: inline-block; vertical-align: middle; }
+        .btn-novato:hover { transform: scale(1.07) !important; box-shadow: 0 12px 28px rgba(230,168,0,0.7); }
+        .btn-unidades { background: linear-gradient(135deg, #d33327, #7d2728); padding: 0.6rem 1.5rem; border-radius: 2rem; color: white !important; box-shadow: 0 6px 14px rgba(211,51,39,0.3); display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
+        .btn-unidades:hover { transform: scale(1.02) !important; box-shadow: 0 10px 20px rgba(211,51,39,0.4); }
+        .dropdown-unidades { position: relative; }
+        .dropdown-unidades-menu { display: none; position: absolute; top: calc(100% + 8px); right: 0; background: white; border-radius: 0.8rem; box-shadow: 0 8px 24px rgba(0,0,0,0.15); min-width: 190px; overflow: hidden; z-index: 9999; }
+        .dropdown-unidades-menu a { display: flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.1rem; font-size: 0.9rem; font-weight: 500; color: #3d1a1b; border-left: 3px solid transparent; transition: all 0.2s; white-space: nowrap; }
+        .dropdown-unidades-menu a::before { content: ''; width: 7px; height: 7px; background: #d33327; border-radius: 50%; flex-shrink: 0; transition: all 0.2s; }
+        .dropdown-unidades-menu a:hover { background: #fdf0f0; color: #a33030; padding-left: 1.5rem; border-left-color: #fdcd62; }
+        .dropdown-unidades-menu a:hover::before { background: #fdcd62; transform: scale(1.3); }
+        @keyframes pulse-novato { 0%,100% { box-shadow: 0 6px 18px rgba(230,168,0,0.55); } 50% { box-shadow: 0 8px 32px rgba(230,168,0,0.9); } }
+        @media (max-width: 1200px) { .nav-links { gap: 0.6rem; } .nav-links a { font-size: 0.85rem; } .btn-login, .btn-pai, .btn-novato, .btn-unidades { padding: 0.5rem 1rem !important; } }
+        @media (max-width: 768px) { .navbar { flex-direction: column; align-items: stretch; text-align: center; } .nav-links { justify-content: center; flex-wrap: wrap; } }
 
         /* ── HERO ── */
         .hero { position: relative; min-height: 520px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin: 1.5rem 1rem 0; border-radius: 2rem; }
@@ -202,10 +213,19 @@
         <div class="logo">
             <img src="/files/portal/LogoBatista.png" alt="Colégio Batista Santos Dumont">
         </div>
-        <ul class="nav-acoes">
-            <li><button class="btn-login" onclick="abrirNoPortal('aluno')"><i class="fas fa-sign-in-alt"></i> Portal do Aluno</button></li>
-            <li><button class="btn-pai"   onclick="abrirNoPortal('pai')"><i class="fas fa-users"></i> Portal do Pai Batista</button></li>
-            <li><button class="btn-novato" onclick="abrirNoPortal('novato')"><i class="fas fa-star"></i> Quero ser Batista</button></li>
+        <ul class="nav-links">
+            <li class="dropdown-unidades">
+                <a href="#" class="btn-unidades" id="btnUnidades"><i class="fas fa-map-marker-alt"></i> Nossas Unidades <i class="fas fa-chevron-down" style="font-size:0.75rem;"></i></a>
+                <div class="dropdown-unidades-menu" id="menuUnidades">
+                    <a href="/files/unidade_sede.html">Aldeota</a>
+                    <a href="/files/unidade_edson.html">Edson Queiroz</a>
+                    <a href="/files/unidade_varjota.html">Varjota</a>
+                    <a href="/files/unidade_seisbocas.html">Seis Bocas</a>
+                </div>
+            </li>
+            <li><a href="javascript:void(0)" onclick="abrirNoPortal('aluno')" class="btn-login"><i class="fas fa-sign-in-alt"></i> Portal do Aluno</a></li>
+            <li><a href="javascript:void(0)" onclick="abrirNoPortal('pai')" class="btn-pai"><i class="fas fa-users"></i> Portal do Pai Batista</a></li>
+            <li><a href="javascript:void(0)" onclick="abrirNoPortal('novato')" class="btn-novato"><img src="/files/portal/icones/Quero Ser Batista.png" alt=""> Quero ser Batista</a></li>
         </ul>
     </nav>
 
@@ -503,6 +523,19 @@ document.getElementById('estruturaNext').addEventListener('click', function() { 
 function fecharPagina() {
     try { var p = window.parent.document; p.getElementById('iframeNivel').src=''; p.getElementById('modalNivel').classList.remove('aberto'); p.body.style.overflow='auto'; } catch(e) { window.close(); }
 }
+// ── DROPDOWN NOSSAS UNIDADES ──
+document.getElementById('btnUnidades').addEventListener('click', function(e) {
+    e.preventDefault();
+    var m = document.getElementById('menuUnidades');
+    m.style.display = m.style.display === 'block' ? 'none' : 'block';
+});
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown-unidades')) {
+        var m = document.getElementById('menuUnidades');
+        if (m) m.style.display = 'none';
+    }
+});
+
 function abrirNoPortal(acao) {
     try {
         var p = window.parent.document; p.getElementById('iframeNivel').src=''; p.getElementById('modalNivel').classList.remove('aberto'); p.body.style.overflow='auto';
