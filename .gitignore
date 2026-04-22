@@ -16,6 +16,9 @@
 *.ini
 *.pdf
 
+# Pastas geradas em runtime
+cache/
+
 # Arquivos temporários
 *.tmp
 *.temp
