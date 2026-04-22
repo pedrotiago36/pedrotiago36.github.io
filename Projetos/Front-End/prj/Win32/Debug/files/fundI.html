@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fundamental I | Colégio Batista Santos Dumont</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { font-family: 'Inter', sans-serif; background: #fff; color: #2d2d2d; }
+        #scrollWrapper { height: 100vh; overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth; }
+
+        /* ── NAVBAR ── */
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; flex-wrap: wrap; gap: 1rem; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); border-radius: 2rem; margin: 1rem 1rem 0; box-shadow: 0 8px 32px rgba(125,39,40,0.08); border: 1px solid rgba(253,205,98,0.3); position: sticky; top: 1rem; z-index: 100; }
+        .logo img { height: 56px; width: auto; display: block; }
+        .nav-back { display: flex; align-items: center; gap: 8px; text-decoration: none; font-weight: 500; color: #5a3a2e; transition: 0.3s; font-size: 1rem; }
+        .nav-back i { font-size: 1.1rem; color: #fdcd62; }
+        .nav-back:hover { color: #d33327; transform: translateY(-2px); }
+        .nav-acoes { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; list-style: none; }
+        .nav-acoes button { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; transition: 0.3s; font-size: 1rem; background: none; border: none; cursor: pointer; font-family: inherit; padding: 0; color: #5a3a2e; }
+        .nav-acoes button i { font-size: 1.1rem; color: #fdcd62; }
+        .nav-acoes button:hover { color: #d33327; transform: translateY(-2px); }
+        .btn-login  { background: linear-gradient(135deg,#7d2728,#d33327) !important; color: white !important; padding: 0.6rem 1.4rem !important; border-radius: 2rem !important; font-weight: 700 !important; }
+        .btn-login i { color: white !important; }
+        .btn-pai    { background: #fdcd62 !important; color: #7d2728 !important; padding: 0.6rem 1.4rem !important; border-radius: 2rem !important; font-weight: 700 !important; }
+        .btn-pai i  { color: #7d2728 !important; }
+        .btn-novato { background: linear-gradient(135deg,#22c55e,#16a34a) !important; color: white !important; padding: 0.6rem 1.4rem !important; border-radius: 2rem !important; font-weight: 700 !important; }
+        .btn-novato i { color: white !important; }
+        @media (max-width: 700px) { .nav-acoes { display: none; } }
+
+        /* ── HERO ── */
+        .hero { position: relative; min-height: 520px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin: 1.5rem 1rem 0; border-radius: 2rem; }
+        .hero img.hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+        .hero-overlay { display: none; }
+
+        /* ── QUICK NAV ── */
+        .quick-nav { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; padding: 2rem 1.5rem 0; }
+        .qcard { background: white; border-radius: 1.5rem; padding: 1.4rem 1rem; text-align: center; cursor: pointer; border: 2px solid transparent; box-shadow: 0 4px 16px rgba(0,0,0,0.06); transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1.1); text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
+        .qcard:hover { transform: translateY(-6px); border-color: #fdcd62; box-shadow: 0 16px 32px rgba(211,51,39,0.12); }
+        .qcard-icon { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 0.2rem; }
+        .qcard span { font-family: 'Poppins', sans-serif; font-size: 0.82rem; font-weight: 700; color: #7d2728; line-height: 1.3; }
+        .qcard-1 .qcard-icon { background: linear-gradient(135deg,#fff2e3,#fdcd62); }
+        .qcard-2 .qcard-icon { background: linear-gradient(135deg,#fde8e8,#f87171); }
+        .qcard-3 .qcard-icon { background: linear-gradient(135deg,#e8f5e9,#4ade80); }
+        .qcard-4 .qcard-icon { background: linear-gradient(135deg,#e8f0fe,#60a5fa); }
+        .qcard-5 .qcard-icon { background: linear-gradient(135deg,#fdf4ff,#c084fc); }
+        .qcard-6 .qcard-icon { background: linear-gradient(135deg,#fff7ed,#fb923c); }
+
+        /* ── CONTAINER ── */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* ── SECTION TITLE ── */
+        .sec-title { font-family: 'Poppins', sans-serif; font-size: 2rem; font-weight: 800; color: #7d2728; margin-bottom: 0.6rem; }
+        .sec-title span { color: #d33327; }
+        .sec-sub { color: #6b5246; font-size: 1rem; line-height: 1.6; }
+        .sec-line { width: 60px; height: 4px; background: linear-gradient(90deg, #fdcd62, #d33327); border-radius: 4px; margin: 0.8rem 0 1.5rem; }
+
+        /* ── PROPOSTA ── */
+        .proposta { padding: 5rem 0; }
+        .proposta-bloco { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; margin-bottom: 5rem; }
+        .proposta-bloco.reverse { direction: rtl; }
+        .proposta-bloco.reverse > * { direction: ltr; }
+        .proposta-img { border-radius: 2rem; overflow: hidden; box-shadow: 0 20px 60px rgba(125,39,40,0.15); }
+        .proposta-img img { width: 100%; height: 360px; object-fit: cover; display: block; transition: transform 0.5s; }
+        .proposta-img:hover img { transform: scale(1.04); }
+        .proposta-texto { padding: 1rem 0; }
+        .proposta-icone { font-size: 2.8rem; margin-bottom: 1rem; display: block; }
+        @media (max-width: 768px) { .proposta-bloco { grid-template-columns: 1fr; gap: 2rem; } .proposta-bloco.reverse { direction: ltr; } }
+
+        /* ── GALERIA ── */
+        .galeria-section { background: linear-gradient(135deg, #1a0a0a 0%, #3d1a1b 50%, #7d2728 100%); padding: 4rem 1.5rem; }
+        .galeria-header { text-align: center; margin-bottom: 2.5rem; }
+        .galeria-header .sec-title { color: white; }
+        .galeria-header .sec-sub { color: rgba(255,255,255,0.7); }
+        .galeria-header .sec-line { margin: 0.8rem auto 0; }
+        .gal-carrossel { position: relative; max-width: 1100px; margin: 0 auto; }
+        .gal-wrap { overflow: hidden; border-radius: 1.5rem; }
+        .gal-track { display: flex; gap: 1rem; transition: transform 0.45s cubic-bezier(0.4,0,0.2,1); }
+        .gal-card { flex: 0 0 280px; height: 210px; border-radius: 1.2rem; overflow: hidden; cursor: pointer; border: 2px solid rgba(253,205,98,0.2); transition: 0.3s; position: relative; }
+        .gal-card:hover { border-color: #fdcd62; transform: translateY(-5px); }
+        .gal-card img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s; }
+        .gal-card:hover img { transform: scale(1.08); }
+        .gal-card-ov { position: absolute; inset: 0; background: rgba(0,0,0,0); display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .gal-card:hover .gal-card-ov { background: rgba(0,0,0,0.35); }
+        .gal-card-ov i { color: #fdcd62; font-size: 1.8rem; opacity: 0; transition: 0.3s; }
+        .gal-card:hover .gal-card-ov i { opacity: 1; }
+        .gal-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.15); backdrop-filter: blur(6px); border: 2px solid rgba(255,255,255,0.3); color: white; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: 0.3s; z-index: 5; }
+        .gal-btn:hover { background: rgba(211,51,39,0.85); border-color: #d33327; }
+        .gal-btn.prev { left: -24px; }
+        .gal-btn.next { right: -24px; }
+        .gal-vazio { text-align: center; color: rgba(255,255,255,0.35); padding: 3rem; font-size: 1rem; border: 2px dashed rgba(255,255,255,0.15); border-radius: 1.5rem; }
+        .gal-vazio i { font-size: 2.5rem; display: block; margin-bottom: 0.8rem; color: rgba(253,205,98,0.4); }
+
+        /* ── ANOS ── */
+        .anos { padding: 5rem 0; background: #fff; }
+        .anos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1.2rem; margin-top: 2rem; }
+        .ano-card { text-align: center; padding: 2rem 1rem; border-radius: 1.5rem; background: linear-gradient(135deg, #fff2e3, #ffe6cc); border: 2px solid rgba(253,205,98,0.5); transition: 0.3s; }
+        .ano-card:hover { border-color: #d33327; transform: translateY(-5px); box-shadow: 0 16px 32px rgba(211,51,39,0.1); }
+        .ano-emoji { font-size: 2.2rem; display: block; margin-bottom: 0.6rem; }
+        .ano-num { font-family: 'Poppins', sans-serif; font-size: 2rem; font-weight: 900; color: #d33327; }
+        .ano-nome { font-size: 0.88rem; font-weight: 700; color: #7d2728; margin-top: 0.3rem; }
+        .ano-desc { font-size: 0.78rem; color: #6b5246; margin-top: 0.4rem; line-height: 1.4; }
+
+        /* ── ESTRUTURA (lazer adaptado) ── */
+        .estrutura { padding: 5rem 0; background: linear-gradient(135deg, #fff2e3 0%, #ffe6cc 100%); }
+        .estrutura-inner { display: grid; grid-template-columns: minmax(280px, 420px) 1fr; gap: 2.5rem; align-items: stretch; padding-right: 5px; }
+        .estrutura-slide { position: relative; border-radius: 1.5rem 5px 5px 1.5rem; overflow: hidden; background: rgba(125,39,40,0.08); height: 100%; min-height: 400px; }
+        .estrutura-slide-track { display: flex; height: 100%; transition: transform 0.6s cubic-bezier(0.4,0,0.2,1); }
+        .estrutura-slide-item { flex: 0 0 100%; height: 100%; position: relative; }
+        .estrutura-slide-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .estrutura-slide-capa { position: absolute; bottom: 0; left: 0; right: 0; padding: 1rem 1.2rem; display: flex; align-items: flex-end; }
+        .estrutura-slide-titulo { display: inline-block; background: #fdcd62; color: #7d2728; font-size: 0.85rem; font-weight: 800; padding: 0.35rem 0.9rem; border-radius: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3); font-family: 'Poppins', sans-serif; letter-spacing: 0.01em; }
+        .estrutura-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); backdrop-filter: blur(6px); border: 2px solid rgba(255,255,255,0.4); color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: 0.3s; z-index: 5; }
+        .estrutura-btn:hover { background: rgba(211,51,39,0.85); border-color: #d33327; }
+        .estrutura-btn.prev { left: 10px; }
+        .estrutura-btn.next { right: 10px; }
+        .estrutura-dots { position: absolute; bottom: 10px; right: 12px; display: flex; gap: 5px; z-index: 5; }
+        .estrutura-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.4); cursor: pointer; transition: 0.3s; }
+        .estrutura-dot.ativo { background: #fdcd62; transform: scale(1.3); }
+        .estrutura-vazio { display: flex; align-items: center; justify-content: center; height: 100%; color: rgba(125,39,40,0.3); font-size: 4rem; }
+        .estrutura-items { display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; }
+        .estrutura-item { display: flex; align-items: flex-start; gap: 1rem; background: white; border-radius: 1.2rem; padding: 1rem 1.2rem; box-shadow: 0 4px 14px rgba(0,0,0,0.05); cursor: pointer; transition: 0.25s; border: 2px solid transparent; }
+        .estrutura-item:hover { border-color: #fdcd62; transform: translateX(4px); }
+        .estrutura-item.ativo { border-color: #d33327; background: #fff5f5; box-shadow: 0 6px 20px rgba(211,51,39,0.15); }
+        .estrutura-item.ativo .estrutura-item-icon { background: linear-gradient(135deg,#d33327,#7d2728); }
+        .estrutura-item.ativo h4 { color: #d33327; }
+        .estrutura-item-icon { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg,#fff2e3,#fdcd62); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+        .estrutura-item h4 { font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 700; color: #7d2728; margin-bottom: 0.2rem; }
+        .estrutura-item p { font-size: 0.82rem; color: #6b5246; line-height: 1.5; }
+        .estrutura-slide-mobile { display: none; }
+        @media (max-width: 768px) {
+            .estrutura-inner { grid-template-columns: 1fr; padding-right: 1.5rem; padding-left: 1.5rem; }
+            .estrutura-inner > div { padding: 0 0 1rem !important; }
+            .estrutura-slide:not(.estrutura-slide-mobile) { display: none; }
+            .estrutura-slide-mobile { display: block !important; height: 160px; min-height: unset; border-radius: 1rem; margin-bottom: 1rem; }
+        }
+
+        /* ── MOMENTOS ── */
+        .momentos { padding: 5rem 0; background: white; }
+        .momentos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2rem; }
+        .momento-card { border-radius: 1.2rem; overflow: hidden; position: relative; cursor: pointer; background: linear-gradient(135deg,#fff2e3,#ffe6cc); aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .momento-card:hover { transform: scale(1.02); box-shadow: 0 16px 32px rgba(0,0,0,0.12); }
+        .momento-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+        .momento-card .placeholder-txt { position: relative; z-index: 1; text-align: center; color: rgba(125,39,40,0.3); }
+        .momento-card .placeholder-txt i { font-size: 2rem; display: block; margin-bottom: 0.3rem; }
+        .momento-card .placeholder-txt span { font-size: 0.75rem; font-weight: 600; }
+        .momento-destaque { grid-column: span 2; }
+        @media (max-width: 600px) { .momentos-grid { grid-template-columns: 1fr 1fr; } .momento-destaque { grid-column: span 2; } }
+
+        /* ── DIFERENCIAIS ── */
+        .diferenciais { padding: 5rem 0; background: linear-gradient(135deg, #7d2728 0%, #3d1a1b 100%); }
+        .diferenciais .sec-title { color: white; }
+        .diferenciais .sec-sub { color: rgba(255,255,255,0.7); }
+        .dif-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .dif-card { background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); border-radius: 1.5rem; padding: 2rem 1.5rem; border: 1px solid rgba(253,205,98,0.2); transition: 0.35s; }
+        .dif-card:hover { background: rgba(255,255,255,0.12); border-color: #fdcd62; transform: translateY(-6px); }
+        .dif-icone { font-size: 2.4rem; margin-bottom: 1rem; display: block; }
+        .dif-card h3 { font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 700; color: #fdcd62; margin-bottom: 0.5rem; }
+        .dif-card p { color: rgba(255,255,255,0.75); font-size: 0.88rem; line-height: 1.6; }
+
+
+        /* ── QUOTE ── */
+        .quote-section { padding: 4rem 2rem; text-align: center; background: #fff2e3; }
+        .quote-texto { font-family: 'Poppins', sans-serif; font-size: 1.6rem; font-weight: 700; color: #7d2728; max-width: 700px; margin: 0 auto 1rem; line-height: 1.5; }
+        .quote-texto::before { content: '"'; font-size: 4rem; color: #fdcd62; line-height: 0; vertical-align: -1.2rem; margin-right: 0.3rem; }
+        .quote-texto::after  { content: '"'; font-size: 4rem; color: #fdcd62; line-height: 0; vertical-align: -1.2rem; margin-left: 0.3rem; }
+        .quote-autor { color: #6b5246; font-size: 0.9rem; font-weight: 500; }
+
+        /* ── CTA ── */
+        .cta-section { background: linear-gradient(135deg, #fdcd62 0%, #f5a623 100%); padding: 5rem 2rem; text-align: center; }
+        .cta-section h2 { font-family: 'Poppins', sans-serif; font-size: 2.4rem; font-weight: 900; color: #7d2728; margin-bottom: 0.8rem; }
+        .cta-section p { color: rgba(125,39,40,0.8); font-size: 1.1rem; margin-bottom: 2.5rem; }
+        .cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .btn-cta-main { display: inline-flex; align-items: center; gap: 10px; background: #7d2728; color: white; padding: 1rem 2.5rem; border-radius: 3rem; font-size: 1.05rem; font-weight: 800; text-decoration: none; font-family: 'Poppins', sans-serif; transition: 0.3s; box-shadow: 0 8px 24px rgba(125,39,40,0.3); }
+        .btn-cta-main:hover { background: #d33327; transform: scale(1.05); }
+        .btn-cta-sec { display: inline-flex; align-items: center; gap: 10px; background: white; color: #7d2728; padding: 1rem 2.5rem; border-radius: 3rem; font-size: 1.05rem; font-weight: 800; text-decoration: none; font-family: 'Poppins', sans-serif; transition: 0.3s; }
+        .btn-cta-sec:hover { transform: scale(1.05); }
+
+        /* ── LIGHTBOX ── */
+        .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9500; align-items: center; justify-content: center; }
+        .lightbox.aberto { display: flex; animation: fadeIn 0.25s ease; }
+        .lightbox img { max-width: 92vw; max-height: 90vh; object-fit: contain; border-radius: 1rem; }
+        .lb-fechar { position: fixed; top: 18px; right: 18px; background: rgba(211,51,39,0.9); color: white; border: none; width: 44px; height: 44px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; }
+        .lb-nav { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.3); color: white; width: 52px; height: 52px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; z-index: 10; }
+        .lb-nav:hover { background: rgba(211,51,39,0.8); }
+        .lb-prev { left: 16px; }
+        .lb-next { right: 16px; }
+        .lb-counter { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.7); font-size: 0.9rem; background: rgba(0,0,0,0.5); padding: 0.4rem 1.2rem; border-radius: 2rem; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+<div id="scrollWrapper">
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <a href="javascript:void(0)" onclick="fecharPagina()" class="nav-back"><i class="fas fa-arrow-left"></i> Voltar</a>
+        <div class="logo">
+            <img src="/files/portal/LogoBatista.png" alt="Colégio Batista Santos Dumont">
+        </div>
+        <ul class="nav-acoes">
+            <li><button class="btn-login" onclick="abrirNoPortal('aluno')"><i class="fas fa-sign-in-alt"></i> Portal do Aluno</button></li>
+            <li><button class="btn-pai"   onclick="abrirNoPortal('pai')"><i class="fas fa-users"></i> Portal do Pai Batista</button></li>
+            <li><button class="btn-novato" onclick="abrirNoPortal('novato')"><i class="fas fa-star"></i> Quero ser Batista</button></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero" id="heroSection">
+        <img src="/files/fundI/capa.png" class="hero-bg" alt="" onerror="this.src='/files/fundI/capa.jpg';">
+        <div class="hero-overlay"></div>
+    </div>
+
+    <!-- QUICK NAV -->
+    <div class="quick-nav">
+        <a href="#sec-proposta" class="qcard qcard-1"><div class="qcard-icon">🎯</div><span>Nossa Proposta</span></a>
+        <a href="#sec-anos"     class="qcard qcard-2"><div class="qcard-icon">📚</div><span>Anos / Turmas</span></a>
+        <a href="#sec-estrutura" class="qcard qcard-3"><div class="qcard-icon">🏫</div><span>Estrutura</span></a>
+        <a href="#sec-momentos" class="qcard qcard-4"><div class="qcard-icon">📸</div><span>Momentos</span></a>
+        <a href="#sec-diferenciais" class="qcard qcard-5"><div class="qcard-icon">⭐</div><span>Diferenciais</span></a>
+    </div>
+
+    <!-- PROPOSTA -->
+    <div class="proposta" id="sec-proposta">
+        <div class="container">
+            <div class="proposta-bloco">
+                <div class="proposta-img">
+                    <img src="/files/fundI/proposta.png" alt="Proposta pedagógica" onerror="this.src='/files/fundI/capa.png';">
+                </div>
+                <div class="proposta-texto">
+                    <span class="proposta-icone">📖</span>
+                    <div class="sec-title">Nossa <span>Proposta</span><br>Pedagógica</div>
+                    <div class="sec-line"></div>
+                    <p class="sec-sub">O Ensino Fundamental I é o alicerce da jornada acadêmica. Do 2º ao 5º ano, trabalhamos a alfabetização completa, o raciocínio lógico-matemático e o desenvolvimento das competências socioemocionais, sempre com base nos valores cristãos.<br><br>
+                    Metodologias ativas, projetos interdisciplinares e acompanhamento individualizado garantem que cada aluno avance no seu ritmo, com confiança e motivação.</p>
+                </div>
+            </div>
+            <div class="proposta-bloco reverse">
+                <div class="proposta-img">
+                    <img src="/files/fundI/formacao.png" alt="Formação integral" onerror="this.src='/files/fundI/capa.png';">
+                </div>
+                <div class="proposta-texto">
+                    <span class="proposta-icone">🙏</span>
+                    <div class="sec-title">Formação <span>Integral</span><br>e Valores</div>
+                    <div class="sec-line"></div>
+                    <p class="sec-sub">Mais do que transmitir conhecimento, formamos cidadãos íntegros. Os princípios bíblicos permeiam todas as disciplinas, cultivando empatia, honestidade e senso de responsabilidade.<br><br>
+                    A parceria com a família é essencial — realizamos reuniões periódicas, eventos e comunicação constante para que pais e escola caminhem juntos na formação dos alunos.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUOTE -->
+    <div class="quote-section">
+        <p class="quote-texto">Instrui o menino no caminho em que deve andar, e até quando envelhecer não se desviará dele.</p>
+        <p class="quote-autor">Provérbios 22:6</p>
+    </div>
+
+    <!-- GALERIA -->
+    <div class="galeria-section" id="sec-galeria">
+        <div class="galeria-header">
+            <div class="sec-title"><i class="fas fa-images" style="color:#fdcd62;margin-right:0.5rem;"></i>Nossa Galeria</div>
+            <div class="sec-line"></div>
+            <p class="sec-sub">Momentos especiais do dia a dia do Fundamental I</p>
+        </div>
+        <div class="gal-carrossel" id="galCarrossel">
+            <button class="gal-btn prev" id="galPrev"><i class="fas fa-chevron-left"></i></button>
+            <div class="gal-wrap">
+                <div class="gal-track" id="galTrack">
+                    <div class="gal-vazio"><i class="fas fa-camera"></i></div>
+                </div>
+            </div>
+            <button class="gal-btn next" id="galNext"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <!-- ANOS / TURMAS -->
+    <div class="anos" id="sec-anos">
+        <div class="container">
+            <div class="sec-title">Anos e <span>Turmas</span></div>
+            <div class="sec-line"></div>
+            <p class="sec-sub">Cada ano com foco específico no desenvolvimento das competências essenciais</p>
+            <div class="anos-grid">
+                <div class="ano-card">
+                    <span class="ano-emoji">✏️</span>
+                    <div class="ano-num">2º</div>
+                    <div class="ano-nome">2º Ano</div>
+                    <div class="ano-desc">Consolidação da leitura, escrita e noções de numeração</div>
+                </div>
+                <div class="ano-card">
+                    <span class="ano-emoji">📐</span>
+                    <div class="ano-num">3º</div>
+                    <div class="ano-nome">3º Ano</div>
+                    <div class="ano-desc">Produção textual, operações matemáticas e ciências naturais</div>
+                </div>
+                <div class="ano-card">
+                    <span class="ano-emoji">🌍</span>
+                    <div class="ano-num">4º</div>
+                    <div class="ano-nome">4º Ano</div>
+                    <div class="ano-desc">Geografia, história, frações e interpretação avançada</div>
+                </div>
+                <div class="ano-card">
+                    <span class="ano-emoji">🚀</span>
+                    <div class="ano-num">5º</div>
+                    <div class="ano-nome">5º Ano</div>
+                    <div class="ano-desc">Preparação completa para o Fundamental II com projetos interdisciplinares</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ESTRUTURA -->
+    <div class="estrutura" id="sec-estrutura">
+        <div class="estrutura-inner">
+            <div style="padding: 5rem 0 5rem 1.5rem;">
+                <div class="sec-title">Nossa <span>Estrutura</span></div>
+                <div class="sec-line"></div>
+                <p class="sec-sub">Ambientes pensados para estimular o aprendizado, a criatividade e o convívio saudável.</p>
+                <!-- slide mobile -->
+                <div class="estrutura-slide estrutura-slide-mobile" id="estruturaSlideMobile" style="margin:1rem 0;">
+                    <div class="estrutura-slide-track" id="estruturaTrackMobile"><div class="estrutura-vazio">🏫</div></div>
+                    <button class="estrutura-btn prev" onclick="_estruturaIr(_estruturaIdx-1);_estruturaIniciarAuto();"><i class="fas fa-chevron-left"></i></button>
+                    <button class="estrutura-btn next" onclick="_estruturaIr(_estruturaIdx+1);_estruturaIniciarAuto();"><i class="fas fa-chevron-right"></i></button>
+                    <div class="estrutura-dots" id="estruturaDotsMobile"></div>
+                </div>
+                <div class="estrutura-items" id="estruturaItems">
+                    <!-- preenchido dinamicamente pelo JS -->
+                </div>
+            </div>
+            <div class="estrutura-slide" id="estruturaSlide">
+                <div class="estrutura-slide-track" id="estruturaTrack"><div class="estrutura-vazio">🏫</div></div>
+                <button class="estrutura-btn prev" id="estruturaPrev"><i class="fas fa-chevron-left"></i></button>
+                <button class="estrutura-btn next" id="estruturaNext"><i class="fas fa-chevron-right"></i></button>
+                <div class="estrutura-dots" id="estruturaDots"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOMENTOS -->
+    <div class="momentos" id="sec-momentos">
+        <div class="container">
+            <div class="sec-title">Momentos <span>Especiais</span></div>
+            <div class="sec-line"></div>
+            <p class="sec-sub">Momentos especiais do dia a dia do Fundamental I</p>
+            <div class="momentos-grid" id="momentosGrid">
+                <div class="momento-card momento-destaque"><div class="placeholder-txt"><i class="fas fa-camera"></i><span>Foto em destaque</span></div></div>
+                <div class="momento-card"><div class="placeholder-txt"><i class="fas fa-camera"></i><span>Foto</span></div></div>
+                <div class="momento-card"><div class="placeholder-txt"><i class="fas fa-camera"></i><span>Foto</span></div></div>
+                <div class="momento-card"><div class="placeholder-txt"><i class="fas fa-camera"></i><span>Foto</span></div></div>
+                <div class="momento-card"><div class="placeholder-txt"><i class="fas fa-camera"></i><span>Foto</span></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DIFERENCIAIS -->
+    <div class="diferenciais" id="sec-diferenciais">
+        <div class="container">
+            <div class="sec-title">Nossos <span style="color:#fdcd62;">Diferenciais</span></div>
+            <div class="sec-line"></div>
+            <p class="sec-sub" style="color:rgba(255,255,255,0.7);">Educação de excelência com base nos valores que transformam vidas</p>
+            <div class="dif-grid">
+                <div class="dif-card"><span class="dif-icone">🔬</span><h3>Ciências na Prática</h3><p>Experimentos reais no laboratório que estimulam a curiosidade científica desde cedo.</p></div>
+                <div class="dif-card"><span class="dif-icone">📖</span><h3>Leitura e Escrita</h3><p>Projetos de letramento que desenvolvem fluência, interpretação e criatividade textual.</p></div>
+                <div class="dif-card"><span class="dif-icone">🇺🇸</span><h3>Inglês Bilíngue</h3><p>Inglês integrado ao currículo com professores qualificados e metodologia comunicativa.</p></div>
+                <div class="dif-card"><span class="dif-icone">💻</span><h3>Tecnologia</h3><p>Pensamento computacional, projetos digitais e uso responsável das tecnologias.</p></div>
+                <div class="dif-card"><span class="dif-icone">🤝</span><h3>Socioemocional</h3><p>Programa de desenvolvimento das habilidades socioemocionais integrado ao cotidiano.</p></div>
+                <div class="dif-card"><span class="dif-icone">🙏</span><h3>Valores Cristãos</h3><p>Princípios bíblicos que formam caráter, propósito e integridade nos alunos.</p></div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- CTA -->
+    <div class="cta-section">
+        <h2>Venha Conhecer Nossa Escola! 🏫</h2>
+        <p>Agende uma visita e veja de perto o ambiente que preparamos para o seu filho.</p>
+        <div class="cta-btns">
+            <a href="javascript:void(0)" onclick="abrirNoPortal('novato')" class="btn-cta-main"><i class="fas fa-calendar-check"></i> Agendar uma Visita</a>
+            <a href="javascript:void(0)" onclick="abrirNoPortal('pai')" class="btn-cta-sec"><i class="fas fa-users"></i> Portal do Pai</a>
+        </div>
+    </div>
+
+    <!-- LIGHTBOX -->
+    <div class="lightbox" id="lightbox">
+        <button class="lb-fechar" id="lbFechar"><i class="fas fa-times"></i></button>
+        <button class="lb-nav lb-prev" id="lbPrev"><i class="fas fa-chevron-left"></i></button>
+        <img id="lbImg" src="" alt="">
+        <button class="lb-nav lb-next" id="lbNext"><i class="fas fa-chevron-right"></i></button>
+        <div class="lb-counter" id="lbCounter"></div>
+    </div>
+
+</div>
+
+<script>
+// ── GALERIA ──
+var _galLista = [], _galOffset = 0, _lbIdx = 0;
+function _galVisiveis() { var w = document.getElementById('galCarrossel'); return w ? Math.floor(w.offsetWidth / 296) || 1 : 3; }
+function _galIr(offset) {
+    var max = Math.max(0, _galLista.length - _galVisiveis());
+    _galOffset = Math.max(0, Math.min(offset, max));
+    document.getElementById('galTrack').style.transform = 'translateX(-' + (_galOffset * 296) + 'px)';
+}
+function renderGaleria(dados) {
+    var fotos = dados.filter(function(d) { return d.imagem.toLowerCase().indexOf('capa') < 0; });
+    if (!fotos.length) return;
+    _galLista = fotos;
+    document.getElementById('galTrack').innerHTML = fotos.map(function(item, i) {
+        return '<div class="gal-card" onclick="_abrirLb(' + i + ')">' +
+               '<img src="/files/' + item.imagem + '" alt="" loading="lazy">' +
+               '<div class="gal-card-ov"><i class="fas fa-search-plus"></i></div></div>';
+    }).join('');
+}
+document.getElementById('galPrev').addEventListener('click', function() { _galIr(_galOffset - 1); });
+document.getElementById('galNext').addEventListener('click', function() { _galIr(_galOffset + 1); });
+
+function renderMomentos(fotos) {
+    var grid = document.getElementById('momentosGrid');
+    if (!grid || !fotos.length) return;
+    grid.innerHTML = fotos.slice(0, 5).map(function(item, i) {
+        var cls = i === 0 ? 'momento-card momento-destaque' : 'momento-card';
+        return '<div class="' + cls + '" onclick="_abrirLb(' + i + ')">' +
+               '<img src="/files/' + item.imagem + '" alt="" loading="lazy"></div>';
+    }).join('');
+}
+
+// ── LIGHTBOX ──
+window._abrirLb = function(idx) { _lbIdx = idx; _lbAtualizar(); document.getElementById('lightbox').classList.add('aberto'); };
+function _lbAtualizar() {
+    if (!_galLista.length) return;
+    document.getElementById('lbImg').src = '/files/' + _galLista[_lbIdx].imagem;
+    document.getElementById('lbCounter').innerText = (_lbIdx + 1) + ' / ' + _galLista.length;
+}
+document.getElementById('lbFechar').addEventListener('click', function() { document.getElementById('lightbox').classList.remove('aberto'); document.getElementById('lbImg').src = ''; });
+document.getElementById('lbPrev').addEventListener('click', function() { _lbIdx = (_lbIdx - 1 + _galLista.length) % _galLista.length; _lbAtualizar(); });
+document.getElementById('lbNext').addEventListener('click', function() { _lbIdx = (_lbIdx + 1) % _galLista.length; _lbAtualizar(); });
+document.getElementById('lightbox').addEventListener('click', function(e) { if (e.target === this) document.getElementById('lbFechar').click(); });
+document.addEventListener('keydown', function(e) {
+    if (!document.getElementById('lightbox').classList.contains('aberto')) return;
+    if (e.key === 'ArrowLeft') document.getElementById('lbPrev').click();
+    if (e.key === 'ArrowRight') document.getElementById('lbNext').click();
+    if (e.key === 'Escape') document.getElementById('lbFechar').click();
+});
+
+// ── ESTRUTURA SLIDE ──
+var _estruturaLista = [], _estruturaIdx = 0, _estruturaTimer = null;
+function _estruturaHtml(dados) {
+    return dados.map(function(item) {
+        var nome = item.imagem.split('/').pop().replace(/\.[^.]+$/, '').replace(/_/g, ' ');
+        return '<div class="estrutura-slide-item">' +
+               '<img src="/files/' + item.imagem + '" alt="' + nome + '" loading="lazy">' +
+               '<div class="estrutura-slide-capa"><div class="estrutura-slide-titulo">' + (item.titulo || nome) + '</div></div></div>';
+    }).join('');
+}
+function renderEstrutura(dados) {
+    if (!dados.length) return;
+    _estruturaLista = dados;
+    var html = _estruturaHtml(dados);
+    var dotHtml = dados.map(function(_, i) { return '<div class="estrutura-dot' + (i===0?' ativo':'') + '" onclick="_estruturaIr(' + i + ')"></div>'; }).join('');
+    document.getElementById('estruturaTrack').innerHTML = html;
+    document.getElementById('estruturaDots').innerHTML  = dotHtml;
+    document.getElementById('estruturaTrackMobile').innerHTML = html;
+    document.getElementById('estruturaDotsMobile').innerHTML  = dotHtml;
+
+    // Gera cards laterais dinamicamente com o nome do arquivo
+    var icons = ['🏫','📚','⚽','🔬','💻','🎨','🏃','🎭','🌿','🎵'];
+    var itemsHtml = dados.map(function(item, i) {
+        var nome = item.imagem.split('/').pop().replace(/\.[^.]+$/, '').replace(/_/g, ' ');
+        var chave = nome.toLowerCase().replace(/\s/g, '');
+        var icone = icons[i % icons.length];
+        return '<div class="estrutura-item' + (i===0?' ativo':'') + '" data-chave="' + chave + '" data-idx="' + i + '" onclick="_estruturaIrIdx(this)">' +
+               '<div class="estrutura-item-icon">' + icone + '</div>' +
+               '<div><h4>' + nome + '</h4></div></div>';
+    }).join('');
+    document.getElementById('estruturaItems').innerHTML = itemsHtml;
+
+    _estruturaIniciarAuto();
+}
+function _estruturaIr(idx) {
+    _estruturaIdx = (idx + _estruturaLista.length) % _estruturaLista.length;
+    var tx = 'translateX(-' + (_estruturaIdx * 100) + '%)';
+    document.getElementById('estruturaTrack').style.transform = tx;
+    document.getElementById('estruturaTrackMobile').style.transform = tx;
+    document.querySelectorAll('.estrutura-dot').forEach(function(d, i) { d.classList.toggle('ativo', i === _estruturaIdx); });
+    document.querySelectorAll('.estrutura-item').forEach(function(el) {
+        el.classList.toggle('ativo', parseInt(el.getAttribute('data-idx'), 10) === _estruturaIdx);
+    });
+}
+function _estruturaIniciarAuto() {
+    if (_estruturaTimer) clearInterval(_estruturaTimer);
+    _estruturaTimer = setInterval(function() { _estruturaIr(_estruturaIdx + 1); }, 3500);
+}
+function _estruturaIrPorChave(el) {
+    var chave = el.getAttribute('data-chave');
+    for (var i = 0; i < _estruturaLista.length; i++) {
+        if ((_estruturaLista[i].imagem || '').toLowerCase().indexOf(chave) >= 0) { _estruturaIr(i); _estruturaIniciarAuto(); return; }
+    }
+}
+function _estruturaIrIdx(el) {
+    var idx = parseInt(el.getAttribute('data-idx'), 10);
+    _estruturaIr(idx);
+    _estruturaIniciarAuto();
+}
+document.getElementById('estruturaPrev').addEventListener('click', function() { _estruturaIr(_estruturaIdx - 1); _estruturaIniciarAuto(); });
+document.getElementById('estruturaNext').addEventListener('click', function() { _estruturaIr(_estruturaIdx + 1); _estruturaIniciarAuto(); });
+
+// ── FECHAR / NAVEGAR ──
+function fecharPagina() {
+    try { var p = window.parent.document; p.getElementById('iframeNivel').src=''; p.getElementById('modalNivel').classList.remove('aberto'); p.body.style.overflow='auto'; } catch(e) { window.close(); }
+}
+function abrirNoPortal(acao) {
+    try {
+        var p = window.parent.document; p.getElementById('iframeNivel').src=''; p.getElementById('modalNivel').classList.remove('aberto'); p.body.style.overflow='auto';
+        setTimeout(function() {
+            try {
+                if (acao==='aluno')  p.getElementById('openModalBtn').click();
+                if (acao==='pai')    p.getElementById('openPortalPaiBtn').click();
+                if (acao==='novato') p.getElementById('openNovatoBtn').click();
+            } catch(e) {}
+        }, 300);
+    } catch(e) {}
+}
+
+// ── CARREGAR FOTOS fundI/ ──
+function carregarDados(pasta, cb) {
+    // Tenta bridge primeiro (sempre re-escaneia a pasta real)
+    var uni = null;
+    try { uni = window.parent.parent; } catch(e) {}
+    if (!uni || typeof uni.listarPasta !== 'function') { try { uni = window.parent; } catch(e) {} }
+    if (uni && typeof uni.listarPasta === 'function') {
+        carregarViaBridge(pasta, function(d) {
+            if (d && d.length) { cb(d); return; }
+            _carregarJSON(pasta, cb);
+        });
+        // fallback por timeout: se bridge não responder em 5s, tenta JSON
+        setTimeout(function() {}, 0);
+    } else {
+        _carregarJSON(pasta, cb);
+    }
+}
+function _carregarJSON(pasta, cb) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/files/' + pasta + '.json?t=' + Date.now(), true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState !== 4) return;
+        if (xhr.status === 200 && xhr.responseText) {
+            try { var d = JSON.parse(xhr.responseText); if (d && d.length) cb(d); } catch(e) {}
+        }
+    };
+    xhr.send();
+}
+function carregarViaBridge(pasta, cb) {
+    var uni = null;
+    try { uni = window.parent.parent; } catch(e) {}
+    if (!uni) { try { uni = window.parent; } catch(e) {} }
+    if (!uni || typeof uni.listarPasta !== 'function') return;
+    var vn = '_lista_' + pasta.replace(/\//g, '_');
+    try { uni[vn] = null; } catch(e) {}
+    uni.listarPasta(pasta);
+    var t = 0, timer = setInterval(function() {
+        t++; var lista = null; try { lista = uni[vn]; } catch(e) {}
+        if (lista !== null && lista !== undefined) { clearInterval(timer); try { var d = typeof lista==='string'?JSON.parse(lista):lista; if(d&&d.length) cb(d); } catch(e) {} }
+        else if (t >= 25) { clearInterval(timer); }
+    }, 200);
+}
+
+carregarDados('fundI/galeria', renderGaleria);
+carregarDados('fundI/momentos', renderMomentos);
+
+// carrega estrutura da pasta fundI/estrutura/
+carregarDados('fundI/estrutura', renderEstrutura);
+</script>
+</body>
+</html>
