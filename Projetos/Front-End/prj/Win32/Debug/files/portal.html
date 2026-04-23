@@ -290,6 +290,56 @@
         .btn-confirmar { background: linear-gradient(100deg,#d33327,#7d2728); width: 100%; padding: 1rem; font-size: 1.1rem; border: none; border-radius: 1.5rem; color: white; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 1rem; }
         .btn-fechar-modal { background: transparent; border: 2px solid #d33327; color: #d33327; width: 100%; padding: 0.8rem; margin-top: 0.8rem; border-radius: 1.5rem; font-weight: 600; cursor: pointer; }
 
+        /* ── BOTÃO FLUTUANTE INDIQUE AMIGOS ── */
+        .btn-indicar-float { position: fixed; bottom: 2rem; right: 2rem; z-index: 8800; display: flex; align-items: center; gap: 0.55rem; background: linear-gradient(135deg, #d33327, #7d2728); color: white; padding: 0.9rem 1.5rem; border-radius: 3rem; font-weight: 700; font-size: 0.95rem; font-family: 'Inter', sans-serif; box-shadow: 0 8px 24px rgba(211,51,39,0.5); cursor: pointer; border: 2px solid rgba(253,205,98,0.4); animation: pulse-indicar-btn 2.8s infinite; transition: transform 0.2s, box-shadow 0.2s; white-space: nowrap; }
+        .btn-indicar-float:hover { transform: scale(1.07) translateY(-3px); box-shadow: 0 16px 36px rgba(211,51,39,0.65); }
+        .btn-indicar-float i { font-size: 1.1rem; }
+        @keyframes pulse-indicar-btn { 0%,100% { box-shadow: 0 8px 24px rgba(211,51,39,0.5); } 50% { box-shadow: 0 10px 38px rgba(211,51,39,0.8), 0 0 0 6px rgba(211,51,39,0.12); } }
+
+        /* ── MODAL INDIQUE AMIGOS ── */
+        .modal-indicar { display: none; position: fixed; inset: 0; background: rgba(40,8,8,0.72); backdrop-filter: blur(10px); z-index: 9500; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-indicar.ativo { display: flex; animation: fadeIn 0.3s ease; }
+        .modal-indicar-box { background: #fff8f0; max-width: 640px; width: 100%; border-radius: 2rem; overflow: hidden; box-shadow: 0 32px 80px rgba(125,39,40,0.4); animation: slideUp 0.35s ease; max-height: 92vh; display: flex; flex-direction: column; }
+        /* Banner */
+        .indicar-banner { position: relative; height: 155px; background: linear-gradient(135deg, #d33327 0%, #7d2728 55%, #3d1a1b 100%); flex-shrink: 0; overflow: hidden; }
+        .indicar-banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .indicar-banner-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.1) 100%); display: flex; align-items: center; padding: 1.5rem 2rem; gap: 1.2rem; }
+        .indicar-banner-icon { font-size: 2.8rem; color: #fdcd62; flex-shrink: 0; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4)); }
+        .indicar-banner-text h2 { color: white; font-size: 1.65rem; font-weight: 800; font-family: 'Poppins', sans-serif; text-shadow: 0 2px 8px rgba(0,0,0,0.4); line-height: 1.2; margin: 0; }
+        .indicar-banner-text p { color: rgba(255,255,255,0.85); font-size: 0.85rem; margin: 0.2rem 0 0; }
+        .btn-fechar-indicar { position: absolute; top: 0.75rem; right: 0.75rem; background: rgba(255,255,255,0.18); border: none; color: white; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 0.95rem; transition: 0.25s; display: flex; align-items: center; justify-content: center; }
+        .btn-fechar-indicar:hover { background: rgba(255,255,255,0.35); transform: rotate(90deg); }
+        /* Body */
+        .indicar-body { padding: 1.6rem 2rem 2rem; overflow-y: auto; flex: 1; }
+        /* Perfil cards */
+        .indicar-label { font-size: 0.75rem; font-weight: 800; color: #7d2728; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 0.55rem; display: flex; align-items: center; gap: 0.4rem; }
+        .indicar-perfil-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-bottom: 1.2rem; }
+        .indicar-perfil-card { border: 2px solid #f0d5c8; border-radius: 1rem; padding: 0.8rem 0.5rem; text-align: center; cursor: pointer; transition: all 0.2s; background: white; user-select: none; }
+        .indicar-perfil-card:hover { border-color: #d33327; background: #fff5f3; }
+        .indicar-perfil-card.selecionado { border-color: #d33327; background: linear-gradient(135deg, #fff2f0, #ffe5e5); box-shadow: 0 4px 14px rgba(211,51,39,0.2); }
+        .indicar-perfil-card i { font-size: 1.5rem; color: #d33327; margin-bottom: 0.35rem; display: block; }
+        .indicar-perfil-card span { font-size: 0.76rem; font-weight: 600; color: #5a3a2e; line-height: 1.3; display: block; }
+        .indicar-perfil-card input[type=radio] { display: none; }
+        /* Unidade select */
+        .indicar-select { width: 100%; padding: 0.85rem 2.5rem 0.85rem 1rem; border: 2px solid #f0d5c8; border-radius: 1rem; font-size: 0.93rem; font-family: 'Inter', sans-serif; color: #2d2d2d; background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23d33327' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") no-repeat right 1rem center; outline: none; cursor: pointer; transition: 0.2s; margin-bottom: 1rem; appearance: none; }
+        .indicar-select:focus { border-color: #d33327; box-shadow: 0 0 0 3px rgba(211,51,39,0.15); }
+        /* Regulamento */
+        .indicar-regulamento { display: flex; align-items: flex-start; gap: 0.65rem; margin-bottom: 1.3rem; cursor: pointer; background: rgba(253,205,98,0.12); padding: 0.8rem 1rem; border-radius: 0.8rem; border: 1px solid rgba(253,205,98,0.5); }
+        .indicar-regulamento input { width: 18px; height: 18px; accent-color: #d33327; flex-shrink: 0; margin-top: 1px; cursor: pointer; }
+        .indicar-regulamento span { font-size: 0.83rem; color: #5a3a2e; line-height: 1.45; }
+        /* Seção */
+        .indicar-secao { font-size: 0.75rem; font-weight: 800; color: #7d2728; text-transform: uppercase; letter-spacing: 0.6px; margin: 0 0 0.7rem; padding-bottom: 0.4rem; border-bottom: 2px solid rgba(253,205,98,0.7); display: flex; align-items: center; gap: 0.4rem; }
+        /* Grid campos */
+        .indicar-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; margin-bottom: 1.2rem; }
+        .indicar-field label { font-size: 0.77rem; font-weight: 600; color: #7d2728; display: block; margin-bottom: 0.25rem; }
+        .indicar-field input { width: 100%; padding: 0.8rem 1rem; border: 2px solid #f0d5c8; border-radius: 0.9rem; font-size: 0.9rem; font-family: 'Inter', sans-serif; color: #2d2d2d; outline: none; transition: 0.2s; background: white; }
+        .indicar-field input:focus { border-color: #d33327; box-shadow: 0 0 0 3px rgba(211,51,39,0.12); }
+        /* Botão enviar */
+        .btn-indicar-enviar { width: 100%; padding: 1rem; background: linear-gradient(135deg, #d33327, #7d2728); border: none; border-radius: 1.2rem; color: white; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; box-shadow: 0 6px 18px rgba(211,51,39,0.35); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .btn-indicar-enviar:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(211,51,39,0.5); }
+        .btn-indicar-enviar:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        @media (max-width: 600px) { .indicar-perfil-cards { grid-template-columns: 1fr; } .indicar-grid { grid-template-columns: 1fr; } .indicar-body { padding: 1.2rem; } }
+
         /* ── ANIMAÇÕES ── */
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
@@ -1653,6 +1703,73 @@ document.getElementById('closePortalPaiBtn').addEventListener('click', function(
 });
 
 // ============================================================
+// INDIQUE AMIGOS
+// ============================================================
+(function() {
+    var _unidadeDefault = '';
+
+    // Perfil cards — selecionar visualmente
+    document.querySelectorAll('.indicar-perfil-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+            document.querySelectorAll('.indicar-perfil-card').forEach(function(c) { c.classList.remove('selecionado'); });
+            this.classList.add('selecionado');
+        });
+    });
+
+    window.abrirModalIndicar = function(unidadeDefault) {
+        _unidadeDefault = unidadeDefault || '';
+        var sel = document.getElementById('indicarUnidade');
+        sel.value = _unidadeDefault;
+        document.getElementById('modalIndicar').classList.add('ativo');
+        document.getElementById('scrollWrapper').style.overflow = 'hidden';
+    };
+
+    function _fechar() {
+        document.getElementById('modalIndicar').classList.remove('ativo');
+        document.getElementById('scrollWrapper').style.overflow = '';
+    }
+
+    document.getElementById('btnFecharIndicar').addEventListener('click', _fechar);
+    document.getElementById('btnIndicarFloat').addEventListener('click', function() { window.abrirModalIndicar(); });
+    document.getElementById('modalIndicar').addEventListener('click', function(e) { if (e.target === this) _fechar(); });
+
+    document.getElementById('btnIndicarEnviar').addEventListener('click', function() {
+        var perfil   = document.querySelector('input[name="indicar_perfil"]:checked');
+        var unidade  = document.getElementById('indicarUnidade').value.trim();
+        var reg      = document.getElementById('indicarRegulamento').checked;
+        var nome     = document.getElementById('indicarNome').value.trim();
+        var email    = document.getElementById('indicarEmail').value.trim();
+        var tel      = document.getElementById('indicarTelefone').value.trim();
+        var nomeInd  = document.getElementById('indicarNomeInd').value.trim();
+        var emailInd = document.getElementById('indicarEmailInd').value.trim();
+        var telInd   = document.getElementById('indicarTelInd').value.trim();
+
+        if (!perfil || !unidade || !reg || !nome || !email || !tel || !nomeInd || !emailInd || !telInd) {
+            Swal.fire({ icon: 'warning', title: 'Campos obrigatórios', text: 'Preencha todos os campos e aceite o regulamento.', confirmButtonColor: '#d33327' });
+            return;
+        }
+
+        var btn = document.getElementById('btnIndicarEnviar');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+        setTimeout(function() {
+            _fechar();
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Indicação';
+            ['indicarNome','indicarEmail','indicarTelefone','indicarNomeInd','indicarEmailInd','indicarTelInd'].forEach(function(id) {
+                document.getElementById(id).value = '';
+            });
+            document.getElementById('indicarUnidade').value = '';
+            document.getElementById('indicarRegulamento').checked = false;
+            document.querySelectorAll('.indicar-perfil-card').forEach(function(c, i) { c.classList.toggle('selecionado', i === 0); });
+            document.querySelector('input[name="indicar_perfil"]').checked = true;
+            Swal.fire({ icon: 'success', title: 'Indicação enviada! 🎉', text: 'Obrigado! Em breve nossa equipe entrará em contato com ' + nomeInd + '.', confirmButtonColor: '#d33327' });
+        }, 1500);
+    });
+})();
+
+// ============================================================
 // ANIMAÇÕES DE ENTRADA DOS CARDS
 // ============================================================
 setTimeout(function() {
@@ -1664,6 +1781,108 @@ setTimeout(function() {
 }, 800);
 
 </script>
+
+<!-- ══ BOTÃO FLUTUANTE INDIQUE AMIGOS ══ -->
+<button class="btn-indicar-float" id="btnIndicarFloat">
+    <i class="fas fa-user-friends"></i> Indique um Amigo
+</button>
+
+<!-- ══ MODAL INDIQUE AMIGOS ══ -->
+<div id="modalIndicar" class="modal-indicar">
+    <div class="modal-indicar-box">
+
+        <!-- Banner — coloque banner.png em /files/Indique Amigos/ -->
+        <div class="indicar-banner">
+            <img src="/files/Indique Amigos/banner.png" alt="" onerror="this.style.display='none'">
+            <div class="indicar-banner-overlay">
+                <i class="fas fa-user-friends indicar-banner-icon"></i>
+                <div class="indicar-banner-text">
+                    <h2>Indique um Amigo<br>Batista!</h2>
+                    <p>Compartilhe a experiência Batista com quem você ama</p>
+                </div>
+            </div>
+            <button class="btn-fechar-indicar" id="btnFecharIndicar"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="indicar-body">
+
+            <!-- Quem é você -->
+            <p class="indicar-label"><i class="fas fa-id-badge"></i> Quem é você?</p>
+            <div class="indicar-perfil-cards">
+                <label class="indicar-perfil-card selecionado" id="cardVeterano">
+                    <input type="radio" name="indicar_perfil" value="Pais e Alunos Veteranos" checked>
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Pais e Alunos Veteranos</span>
+                </label>
+                <label class="indicar-perfil-card" id="cardFuncionario">
+                    <input type="radio" name="indicar_perfil" value="Funcionário">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Funcionário</span>
+                </label>
+                <label class="indicar-perfil-card" id="cardConvenio">
+                    <input type="radio" name="indicar_perfil" value="Programa de Convênios">
+                    <i class="fas fa-handshake"></i>
+                    <span>Programa de Convênios</span>
+                </label>
+            </div>
+
+            <!-- Unidade -->
+            <p class="indicar-label"><i class="fas fa-map-marker-alt"></i> Unidade</p>
+            <select class="indicar-select" id="indicarUnidade">
+                <option value="">Selecione uma unidade *</option>
+                <option value="Aldeota">Aldeota</option>
+                <option value="Edson Queiroz">Edson Queiroz</option>
+                <option value="Varjota">Varjota</option>
+                <option value="Seis Bocas">Seis Bocas</option>
+            </select>
+
+            <!-- Regulamento -->
+            <label class="indicar-regulamento">
+                <input type="checkbox" id="indicarRegulamento">
+                <span>Li o regulamento e estou de acordo com os critérios adotados e os procedimentos exigidos.</span>
+            </label>
+
+            <!-- Seus dados -->
+            <p class="indicar-secao"><i class="fas fa-user"></i> Seus dados</p>
+            <div class="indicar-grid">
+                <div class="indicar-field">
+                    <label>Seu nome *</label>
+                    <input type="text" id="indicarNome" placeholder="Nome completo">
+                </div>
+                <div class="indicar-field">
+                    <label>Seu e-mail *</label>
+                    <input type="email" id="indicarEmail" placeholder="seu@email.com">
+                </div>
+                <div class="indicar-field" style="grid-column: 1 / -1;">
+                    <label>Seu telefone (WhatsApp) *</label>
+                    <input type="tel" id="indicarTelefone" placeholder="(85) 9 0000-0000">
+                </div>
+            </div>
+
+            <!-- Dados do indicado -->
+            <p class="indicar-secao"><i class="fas fa-user-plus"></i> Dados do(a) indicado(a)</p>
+            <div class="indicar-grid">
+                <div class="indicar-field">
+                    <label>Nome do(a) indicado(a) *</label>
+                    <input type="text" id="indicarNomeInd" placeholder="Nome completo">
+                </div>
+                <div class="indicar-field">
+                    <label>E-mail do(a) indicado(a) *</label>
+                    <input type="email" id="indicarEmailInd" placeholder="email@exemplo.com">
+                </div>
+                <div class="indicar-field" style="grid-column: 1 / -1;">
+                    <label>Telefone do(a) indicado(a) *</label>
+                    <input type="tel" id="indicarTelInd" placeholder="(85) 9 0000-0000">
+                </div>
+            </div>
+
+            <button class="btn-indicar-enviar" id="btnIndicarEnviar">
+                <i class="fas fa-paper-plane"></i> Enviar Indicação
+            </button>
+
+        </div>
+    </div>
+</div>
 
 </div><!-- /scrollWrapper -->
 </body>

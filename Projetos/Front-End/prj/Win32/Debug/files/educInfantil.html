@@ -828,5 +828,7 @@ carregarGaleria();
     }
 })();
 </script>
+<button class="btn-indicar-float-sub" onclick="try{window.parent.abrirModalIndicar();}catch(e){}"><i class="fas fa-user-friends"></i> Indique um Amigo</button>
+<style>.btn-indicar-float-sub{position:fixed;bottom:2rem;right:2rem;z-index:999;display:flex;align-items:center;gap:.55rem;background:linear-gradient(135deg,#d33327,#7d2728);color:#fff;padding:.9rem 1.5rem;border-radius:3rem;font-weight:700;font-size:.95rem;font-family:'Inter',sans-serif;box-shadow:0 8px 24px rgba(211,51,39,.5);cursor:pointer;border:2px solid rgba(253,205,98,.4);white-space:nowrap;animation:pulse-ind 2.8s infinite;}@keyframes pulse-ind{0%,100%{box-shadow:0 8px 24px rgba(211,51,39,.5);}50%{box-shadow:0 10px 38px rgba(211,51,39,.8),0 0 0 6px rgba(211,51,39,.12);}}.btn-indicar-float-sub:hover{transform:scale(1.07) translateY(-3px);}</style>
 </body>
 </html>
