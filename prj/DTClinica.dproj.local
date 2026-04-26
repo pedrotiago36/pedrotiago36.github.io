@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+  <Transactions>
+    <Transaction>2026/04/26 11:06:40.824,=D:\DTecno\Clinica\prj\ServerModule.pas</Transaction>
+    <Transaction>2026/04/26 11:06:40.980,=D:\DTecno\Clinica\prj\MainModule.pas</Transaction>
+    <Transaction>2026/04/26 11:06:42.355,=D:\DTecno\Clinica\prj\Main.pas</Transaction>
+    <Transaction>2026/04/26 11:07:12.354,D:\DTecno\Clinica\Service\ServerModule.pas=D:\DTecno\Clinica\prj\ServerModule.pas</Transaction>
+    <Transaction>2026/04/26 11:07:12.354,D:\DTecno\Clinica\Service\ServerModule.dfm=D:\DTecno\Clinica\prj\ServerModule.dfm</Transaction>
+    <Transaction>2026/04/26 11:07:31.682,D:\DTecno\Clinica\src\View\uPrincipal.dfm=D:\DTecno\Clinica\prj\Main.dfm</Transaction>
+    <Transaction>2026/04/26 11:07:31.682,D:\DTecno\Clinica\src\View\uPrincipal.pas=D:\DTecno\Clinica\prj\Main.pas</Transaction>
+    <Transaction>2026/04/26 11:07:42.119,D:\DTecno\Clinica\Service\MainModule.pas=D:\DTecno\Clinica\prj\MainModule.pas</Transaction>
+    <Transaction>2026/04/26 11:07:42.119,D:\DTecno\Clinica\Service\MainModule.dfm=D:\DTecno\Clinica\prj\MainModule.dfm</Transaction>
+    <Transaction>2026/04/26 11:07:55.572,D:\DTecno\Clinica\prj\DTClinica.dproj=D:\DTecno\Clinica\prj\Project1.dproj</Transaction>
+  </Transactions>
+</BorlandProject>
