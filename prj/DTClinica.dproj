@@ -171,7 +171,7 @@
             <DesignClass>TUniGUIMainModule</DesignClass>
         </DCCReference>
         <DCCReference Include="..\src\View\uPrincipal.pas">
-            <Form>MainForm</Form>
+            <Form>frmPrincipal</Form>
             <FormType>dfm</FormType>
             <DesignClass>TUniForm</DesignClass>
         </DCCReference>

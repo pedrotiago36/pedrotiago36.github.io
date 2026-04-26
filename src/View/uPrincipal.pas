@@ -5,17 +5,18 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics,
   Controls, Forms, uniGUITypes, uniGUIAbstractClasses,
-  uniGUIClasses, uniGUIRegClasses, uniGUIForm;
+  uniGUIClasses, uniGUIRegClasses, uniGUIForm, uniGUIBaseClasses, uniPanel,
+  uniHTMLFrame, System.IOUtils;
 
 type
-  TMainForm = class(TUniForm)
+  TfrmPrincipal = class(TUniForm)
+    htmlPrincipal: TUniHTMLFrame;
+    procedure FormCreate(Sender: TObject);
   private
-    { Private declarations }
   public
-    { Public declarations }
   end;
 
-function MainForm: TMainForm;
+function frmPrincipal: TfrmPrincipal;
 
 implementation
 
@@ -24,12 +25,22 @@ implementation
 uses
   uniGUIVars, MainModule, uniGUIApplication;
 
-function MainForm: TMainForm;
+function frmPrincipal: TfrmPrincipal;
 begin
-  Result := TMainForm(UniMainModule.GetFormInstance(TMainForm));
+  Result := TfrmPrincipal(UniMainModule.GetFormInstance(TfrmPrincipal));
+end;
+
+procedure TfrmPrincipal.FormCreate(Sender: TObject);
+var
+  LArquivo: string;
+begin
+  LArquivo := TPath.GetFullPath(
+    TPath.Combine(ExtractFilePath(ParamStr(0)), '..\src\View\login.html')
+  );
+  htmlPrincipal.HTML.LoadFromFile(LArquivo);
 end;
 
 initialization
-  RegisterAppFormClass(TMainForm);
+  RegisterAppFormClass(TfrmPrincipal);
 
 end.

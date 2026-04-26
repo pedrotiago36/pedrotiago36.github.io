@@ -4,7 +4,7 @@ uses
   Forms,
   ServerModule in '..\Service\ServerModule.pas' {UniServerModule: TUniGUIServerModule},
   MainModule in '..\Service\MainModule.pas' {UniMainModule: TUniGUIMainModule},
-  uPrincipal in '..\src\View\uPrincipal.pas' {MainForm: TUniForm};
+  uPrincipal in '..\src\View\uPrincipal.pas' {frmPrincipal: TUniForm};
 
 {$R *.res}
 
