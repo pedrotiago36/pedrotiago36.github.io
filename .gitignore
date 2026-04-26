@@ -21,10 +21,7 @@ __history/
 *.vlb
 
 # Output do build
-exe/cache/
-exe/log/
-exe/temp/
-exe/dcu/
+exe/
 
 # IDE Delphi
 *.dproj.local
