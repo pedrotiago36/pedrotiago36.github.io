@@ -1,0 +1,35 @@
+# Delphi compilados
+*.dcu
+*.dpu
+*.exe
+*.dll
+*.bpl
+*.bpi
+*.dcp
+*.dcpil
+*.map
+*.drc
+*.rsm
+*.stat
+
+# Delphi temporários / histórico
+__history/
+*.~*
+*.identcache
+*.local
+*.dsk
+*.vlb
+
+# Output do build
+exe/cache/
+exe/log/
+exe/temp/
+exe/dcu/
+
+# IDE Delphi
+*.dproj.local
+*.deployproj
+*.cbproj.local
+
+# Claude Code
+.claude/
