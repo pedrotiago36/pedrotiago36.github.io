@@ -959,7 +959,7 @@ window.abrirModalResultados = function() {
 window.abrirModalDocumentosInscricao = function() {
     document.getElementById('modalDocInscricao').classList.add('ativo');
     document.body.style.overflow = 'hidden';
-    listarPastaPortal('portal/informativos/pdf', function(dados) {
+    listarPastaPortal('portal/documentos e inscricao', function(dados) {
         var lista = document.getElementById('docInscricaoLista');
         if (!lista || !dados || !dados.length) return;
         lista.innerHTML = dados.map(function(item) {
