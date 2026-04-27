@@ -906,33 +906,30 @@ window.abrirPDF = function(src, titulo) {
     document.getElementById('modalPDF').classList.add('ativo');
     document.getElementById('scrollWrapper').style.overflow = 'hidden';
 };
-document.getElementById('btnFecharPDF').addEventListener('click', function() {
-    document.getElementById('modalPDF').classList.remove('ativo');
-    document.getElementById('modalPDFFrame').src = '';
-    document.getElementById('scrollWrapper').style.overflow = '';
-});
-document.getElementById('modalPDF').addEventListener('click', function(e) {
-    if (e.target === this) {
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('btnFecharPDF').addEventListener('click', function() {
         document.getElementById('modalPDF').classList.remove('ativo');
         document.getElementById('modalPDFFrame').src = '';
         document.getElementById('scrollWrapper').style.overflow = '';
-    }
-});
+    });
+    document.getElementById('modalPDF').addEventListener('click', function(e) {
+        if (e.target === this) {
+            document.getElementById('modalPDF').classList.remove('ativo');
+            document.getElementById('modalPDFFrame').src = '';
+            document.getElementById('scrollWrapper').style.overflow = '';
+        }
+    });
 
-window.abrirLightbox = function(src) {
-    document.getElementById('muralLightboxImg').src = src;
-    document.getElementById('muralLightbox').classList.add('ativo');
-    document.getElementById('scrollWrapper').style.overflow = 'hidden';
-};
-document.getElementById('btnFecharLightbox').addEventListener('click', function() {
-    document.getElementById('muralLightbox').classList.remove('ativo');
-    document.getElementById('scrollWrapper').style.overflow = '';
-});
-document.getElementById('muralLightbox').addEventListener('click', function(e) {
-    if (e.target === this) {
-        this.classList.remove('ativo');
+    document.getElementById('btnFecharLightbox').addEventListener('click', function() {
+        document.getElementById('muralLightbox').classList.remove('ativo');
         document.getElementById('scrollWrapper').style.overflow = '';
-    }
+    });
+    document.getElementById('muralLightbox').addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('ativo');
+            document.getElementById('scrollWrapper').style.overflow = '';
+        }
+    });
 });
 
 // ── LÍNGUAS ──
