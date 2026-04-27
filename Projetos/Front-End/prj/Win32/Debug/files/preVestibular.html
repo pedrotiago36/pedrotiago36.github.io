@@ -224,6 +224,23 @@
         .olimpiadas-btn.prev { left: -22px; }
         .olimpiadas-btn.next { right: -22px; }
         .olimpiadas-vazio { text-align: center; color: rgba(255,255,255,0.4); padding: 2rem; font-size: 1rem; }
+        /* ── CARD FULL WIDTH ── */
+        .dif-card-full { grid-column: 1/-1; overflow: visible; }
+        .dif-card-full h3 { font-size: 1.15rem; margin-bottom: 1.2rem; }
+        .resultados-carousel-wrap { padding: 0 1.8rem; }
+        /* ── DOCUMENTAÇÃO E INSCRIÇÕES ── */
+        .doc-secao { padding: 4rem 0; background: #fff8f0; }
+        .doc-secao .sec-title { color: #7d2728; }
+        .doc-aviso { display: flex; align-items: flex-start; gap: 0.8rem; background: rgba(253,205,98,0.2); border: 1px solid rgba(253,205,98,0.6); border-radius: 1rem; padding: 1rem 1.2rem; margin-bottom: 1.2rem; font-size: 0.9rem; color: #5a3a2e; }
+        .doc-aviso i { color: #d33327; font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+        .doc-painel { background: white; border-radius: 2rem; border: 1px solid rgba(253,205,98,0.6); padding: 1.8rem; }
+        .doc-item { display: flex; align-items: center; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid rgba(211,51,39,0.1); text-decoration: none; color: inherit; transition: padding-left 0.15s; }
+        .doc-item:last-child { border-bottom: none; }
+        .doc-item:hover { padding-left: 0.5rem; }
+        .doc-item i.doc-icone { font-size: 1.6rem; color: #d33327; flex-shrink: 0; }
+        .doc-item-nome { flex: 1; font-weight: 700; font-size: 0.95rem; color: #3d1a1b; }
+        .doc-baixar { font-size: 0.8rem; font-weight: 700; color: #d33327; display: flex; align-items: center; gap: 0.3rem; white-space: nowrap; background: rgba(211,51,39,0.08); padding: 0.4rem 0.8rem; border-radius: 2rem; }
+        .doc-vazio { text-align: center; padding: 2rem; color: #7d2728; opacity: 0.5; font-size: 0.9rem; }
 
         /* ── LIGHTBOX ── */
         .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9500; align-items: center; justify-content: center; }
@@ -449,6 +466,37 @@
                 <div class="dif-card"><span class="dif-icone">🏅</span><h3>Olimpíadas Científicas</h3><p>Participação em olimpíadas de matemática, física, química e biologia com medalhas nacionais.</p></div>
                 <div class="dif-card"><span class="dif-icone">💼</span><h3>Empreendedorismo</h3><p>Projetos práticos que desenvolvem visão de negócios, liderança e inovação desde o banco escolar.</p></div>
                 <div class="dif-card"><span class="dif-icone">🙏</span><h3>Valores Cristãos</h3><p>Princípios bíblicos que formam caráter, propósito e integridade nos alunos.</p></div>
+                <!-- CARD RESULTADOS E CONCURSOS -->
+                <div class="dif-card dif-card-full">
+                    <span class="dif-icone">🏆</span>
+                    <h3>Resultados e Concursos</h3>
+                    <div class="resultados-carousel-wrap">
+                        <div class="olimpiadas-carrossel" id="resultadosCarrossel">
+                            <button class="olimpiadas-btn prev" id="resultadosPrev"><i class="fas fa-chevron-left"></i></button>
+                            <div class="olimpiadas-track-wrap">
+                                <div class="olimpiadas-track" id="resultadosTrack">
+                                    <div class="olimpiadas-vazio"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>
+                                </div>
+                            </div>
+                            <button class="olimpiadas-btn next" id="resultadosNext"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DOCUMENTAÇÃO E INSCRIÇÕES -->
+    <div class="doc-secao">
+        <div class="container">
+            <div class="sec-title">Documentação e <span>Inscrições</span></div>
+            <div class="sec-line"></div>
+            <div class="doc-aviso">
+                <i class="fas fa-info-circle"></i>
+                <span>Preencha o formulário e entregue na secretaria do Pré-Vestibular.</span>
+            </div>
+            <div class="doc-painel" id="docLista">
+                <div class="doc-vazio">Nenhum documento disponível no momento.</div>
             </div>
         </div>
     </div>
@@ -657,23 +705,31 @@ function _olimpIrPara(offset) {
     _olimpOffset = Math.max(0, Math.min(offset, max));
     document.getElementById('olimpiadasTrack').style.transform = 'translateX(-' + (_olimpOffset * 236) + 'px)';
 }
+var _resultadosOffset = 0;
+function _resultadosVisiveis() { var w = document.getElementById('resultadosCarrossel'); return w ? Math.floor(w.offsetWidth / 236) || 1 : 4; }
+function _resultadosIrPara(offset) {
+    var max = Math.max(0, _olimpiadasLista.length - _resultadosVisiveis());
+    _resultadosOffset = Math.max(0, Math.min(offset, max));
+    document.getElementById('resultadosTrack').style.transform = 'translateX(-' + (_resultadosOffset * 236) + 'px)';
+}
+function _cardOlimp(item, i) {
+    var src    = '/files/' + item.imagem;
+    var titulo = item.titulo || item.imagem.split('/').pop().replace(/\.[^.]+$/, '').replace(/_/g, ' ');
+    var badge  = '<div class="olimpiada-legenda-badge">🏅 Olimpíada</div>';
+    var capa   = '<div class="olimpiada-capa">' + badge + '<div class="olimpiada-legenda">' + titulo + '</div></div>';
+    return '<div class="olimpiada-card" onclick="_abrirLbOlimp(' + i + ')">' +
+           '<img src="' + src + '" alt="' + titulo + '" loading="lazy">' +
+           '<div class="olimpiada-card-overlay"><i class="fas fa-search-plus"></i></div>' +
+           capa + '</div>';
+}
 function renderOlimpiadas(dados) {
-    var track = document.getElementById('olimpiadasTrack');
-    if (!track || !dados || !dados.length) return;
+    if (!dados || !dados.length) return;
     _olimpiadasLista = dados;
-    _olimpOffset = 0;
-    track.style.transform = 'translateX(0)';
-    track.innerHTML = dados.map(function(item, i) {
-        var src     = '/files/' + item.imagem;
-        var nomeArq = item.imagem.split('/').pop().replace(/\.[^.]+$/, '').replace(/_/g, ' ');
-        var titulo  = item.titulo || nomeArq;
-        var badge   = '<div class="olimpiada-legenda-badge">🏅 Olimpíada</div>';
-        var capa    = '<div class="olimpiada-capa">' + badge + '<div class="olimpiada-legenda">' + titulo + '</div></div>';
-        return '<div class="olimpiada-card" onclick="_abrirLbOlimp(' + i + ')">' +
-               '<img src="' + src + '" alt="' + titulo + '" loading="lazy">' +
-               '<div class="olimpiada-card-overlay"><i class="fas fa-search-plus"></i></div>' +
-               capa + '</div>';
-    }).join('');
+    var html = dados.map(_cardOlimp).join('');
+    var t1 = document.getElementById('olimpiadasTrack');
+    var t2 = document.getElementById('resultadosTrack');
+    if (t1) { _olimpOffset = 0; t1.style.transform = 'translateX(0)'; t1.innerHTML = html; }
+    if (t2) { _resultadosOffset = 0; t2.style.transform = 'translateX(0)'; t2.innerHTML = html; }
 }
 window._abrirLbOlimp = function(idx) {
     _lbOlimpIdx = idx; _lbIdx = idx; _galLista = _olimpiadasLista;
@@ -683,8 +739,26 @@ window._abrirLbOlimp = function(idx) {
 };
 document.getElementById('olimpPrev').addEventListener('click', function() { _olimpIrPara(_olimpOffset - 1); });
 document.getElementById('olimpNext').addEventListener('click', function() { _olimpIrPara(_olimpOffset + 1); });
+document.getElementById('resultadosPrev').addEventListener('click', function() { _resultadosIrPara(_resultadosOffset - 1); });
+document.getElementById('resultadosNext').addEventListener('click', function() { _resultadosIrPara(_resultadosOffset + 1); });
 
 carregarDados('portal/olimpiadas', renderOlimpiadas);
+
+// ── DOCUMENTAÇÃO E INSCRIÇÕES ──
+function renderDocumentacao(dados) {
+    var lista = document.getElementById('docLista');
+    if (!lista || !dados || !dados.length) return;
+    lista.innerHTML = dados.map(function(item) {
+        var src  = '/files/' + item.imagem;
+        var nome = item.titulo || item.imagem.split('/').pop().replace(/\.[^.]+$/, '');
+        return '<a class="doc-item" href="' + src + '" download="' + nome + '.pdf">' +
+               '<i class="fas fa-file-pdf doc-icone"></i>' +
+               '<span class="doc-item-nome">' + nome + '</span>' +
+               '<span class="doc-baixar"><i class="fas fa-download"></i> Baixar</span>' +
+               '</a>';
+    }).join('');
+}
+carregarDados('preVestibular/documentos', renderDocumentacao);
 
 carregarDados('preVestibular/galeria',   renderGaleria);
 carregarDados('preVestibular/momentos',  renderMomentos);
