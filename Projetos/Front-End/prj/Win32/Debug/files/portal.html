@@ -550,7 +550,7 @@
             </div>
             <hr class="footer-divider">
             <div class="footer-bottom">
-                <div id="footerNome">Colégio Batista Santos Dumont | Desde 1970</div>
+                <div id="footerNome">Colégio Batista Santos Dumont | Desde de 1950</div>
                 <div style="font-size:0.78rem;opacity:0.65;">Todos os direitos reservados</div>
             </div>
         </div>
@@ -1175,7 +1175,7 @@ listarPastaPortal('fundI_estrutura', function(){});
 // ── HISTÓRIA ──
 function renderHistoria(d) {
     if (d.texto) document.getElementById('footerHistoriaTexto').textContent = d.texto;
-    if (d.fundacao) document.getElementById('footerNome').innerHTML = 'Colégio Batista Santos Dumont | Desde ' + d.fundacao;
+    if (d.fundacao) document.getElementById('footerNome').innerHTML = 'Colégio Batista Santos Dumont | Desde de ' + d.fundacao;
     if (d.totalAlunos || d.aprovacaoEnem || d.fundacao) {
         document.getElementById('footerStats').innerHTML =
             (d.fundacao    ? '<div class="fstat"><h3>+' + (new Date().getFullYear()-parseInt(d.fundacao)) + ' anos</h3><p>de história</p></div>' : '') +
