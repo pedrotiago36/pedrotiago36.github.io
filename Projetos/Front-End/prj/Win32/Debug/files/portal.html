@@ -183,6 +183,16 @@
         .mural-lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 1rem; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
         .mural-lightbox-close { position: fixed; top: 1rem; right: 1rem; background: rgba(255,255,255,0.15); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .mural-lightbox-close:hover { background: #d33327; }
+        /* ── EDITAIS ── */
+        .editais-secao { margin: 0 0 3rem; }
+        .editais-secao h3 { font-size: 1.5rem; color: #7d2728; display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
+        .editais-lista { display: flex; flex-direction: column; gap: 0.6rem; }
+        .edital-item { display: flex; align-items: center; gap: 1rem; background: rgba(255,255,255,0.85); backdrop-filter: blur(8px); border: 1px solid rgba(253,205,98,0.6); border-radius: 1rem; padding: 0.9rem 1.2rem; cursor: pointer; transition: all 0.2s; text-decoration: none; color: inherit; }
+        .edital-item:hover { border-color: #d33327; box-shadow: 0 6px 20px rgba(125,39,40,0.12); transform: translateX(4px); }
+        .edital-item i.edital-icone { font-size: 1.6rem; color: #d33327; flex-shrink: 0; }
+        .edital-nome { flex: 1; font-weight: 700; font-size: 0.95rem; color: #3d1a1b; }
+        .edital-abrir { font-size: 0.8rem; font-weight: 600; color: #d33327; display: flex; align-items: center; gap: 0.3rem; white-space: nowrap; }
+        .editais-vazio { color: #7d2728; opacity: 0.5; font-size: 0.9rem; padding: 1.5rem 0; text-align: center; }
         .news-item i, .event-item i { color: #fdcd62; font-size: 1.2rem; margin-top: 0.2rem; flex-shrink: 0; }
         .news-date, .event-date { font-size: 0.75rem; color: #d33327; margin-top: 4px; font-weight: 600; }
 
@@ -485,6 +495,14 @@
             <h3><i class="fas fa-bullhorn" style="color:#d33327;"></i> Mural de Informativos</h3>
             <div class="mural-grid" id="muralGrid">
                 <div class="mural-vazio"><i class="fas fa-image"></i>Nenhum informativo no momento.</div>
+            </div>
+        </div>
+
+        <!-- EDITAIS -->
+        <div class="editais-secao">
+            <h3><i class="fas fa-file-pdf" style="color:#d33327;"></i> Editais</h3>
+            <div class="editais-lista" id="editaisLista">
+                <div class="editais-vazio">Nenhum edital publicado no momento.</div>
             </div>
         </div>
 
@@ -849,6 +867,22 @@ function renderInformativos(dados) {
     }).join('');
 }
 listarPastaPortal('portal/informativos', renderInformativos);
+
+// ── EDITAIS ──
+function renderEditais(dados) {
+    var lista = document.getElementById('editaisLista');
+    if (!lista || !dados || !dados.length) return;
+    lista.innerHTML = dados.map(function(item) {
+        var src = '/files/' + item.imagem;
+        var nome = item.titulo || item.imagem.split('/').pop().replace(/\.[^.]+$/, '');
+        return '<a class="edital-item" href="' + src + '" target="_blank" rel="noopener">' +
+               '<i class="fas fa-file-pdf edital-icone"></i>' +
+               '<span class="edital-nome">' + nome + '</span>' +
+               '<span class="edital-abrir"><i class="fas fa-external-link-alt"></i> Abrir</span>' +
+               '</a>';
+    }).join('');
+}
+listarPastaPortal('portal/informativos/pdf', renderEditais);
 
 window.abrirLightbox = function(src) {
     document.getElementById('muralLightboxImg').src = src;
