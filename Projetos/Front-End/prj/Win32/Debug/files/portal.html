@@ -520,21 +520,6 @@
             <!-- preenchido pelo JS -->
         </div>
 
-        <!-- MURAL DE INFORMATIVOS -->
-        <div class="mural-informativos">
-            <h3><i class="fas fa-bullhorn" style="color:#d33327;"></i> Mural de Informativos</h3>
-            <div class="mural-painel" id="muralGrid">
-                <div class="mural-vazio"><i class="fas fa-image"></i>Nenhum informativo no momento.</div>
-            </div>
-        </div>
-
-        <!-- EDITAIS -->
-        <div class="editais-secao">
-            <h3><i class="fas fa-file-pdf" style="color:#d33327;"></i> Editais</h3>
-            <div class="editais-lista" id="editaisLista">
-                <div class="editais-vazio">Nenhum edital publicado no momento.</div>
-            </div>
-        </div>
 
     </div><!-- /container -->
 
@@ -900,37 +885,6 @@ window.abrirPaginaNivel = function(pagina) {
     document.body.style.overflow = 'hidden';
 };
 
-// ── MURAL DE INFORMATIVOS ──
-function renderInformativos(dados) {
-    var grid = document.getElementById('muralGrid');
-    if (!grid || !dados || !dados.length) return;
-    grid.innerHTML = dados.map(function(item) {
-        var src = '/files/' + item.imagem;
-        var nome = item.titulo || item.imagem.split('/').pop().replace(/\.[^.]+$/, '');
-        return '<div class="mural-item" onclick="abrirLightbox(\'' + src.replace(/'/g, "\\'") + '\')">' +
-               '<i class="fas fa-newspaper mural-item-icone"></i>' +
-               '<span class="mural-item-titulo">' + nome + '</span>' +
-               '<i class="fas fa-chevron-right mural-item-seta"></i>' +
-               '</div>';
-    }).join('');
-}
-listarPastaPortal('portal/informativos', renderInformativos);
-
-// ── EDITAIS ──
-function renderEditais(dados) {
-    var lista = document.getElementById('editaisLista');
-    if (!lista || !dados || !dados.length) return;
-    lista.innerHTML = dados.map(function(item) {
-        var src = '/files/' + item.imagem;
-        var nome = item.titulo || item.imagem.split('/').pop().replace(/\.[^.]+$/, '');
-        return '<div class="edital-item" onclick="abrirPDF(\'' + src.replace(/'/g, "\\'") + '\',\'' + nome.replace(/'/g, "\\'") + '\')">' +
-               '<i class="fas fa-file-pdf edital-icone"></i>' +
-               '<span class="edital-nome">' + nome + '</span>' +
-               '<span class="edital-abrir"><i class="fas fa-book-open"></i> Ler</span>' +
-               '</div>';
-    }).join('');
-}
-listarPastaPortal('portal/informativos/pdf', renderEditais);
 
 window.abrirPDF = function(src, titulo) {
     document.getElementById('modalPDFFrame').src = src;
