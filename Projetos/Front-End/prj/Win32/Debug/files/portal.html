@@ -169,12 +169,20 @@
         .nivel-card-body h3 { color: #7d2728; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; font-family: 'Poppins',sans-serif; }
         .nivel-card-body p { color: #5a3a2e; font-size: 0.85rem; line-height: 1.6; }
 
-        /* ── DOUBLE PANEL (notícias/eventos) ── */
-        .double-panel { display: flex; flex-wrap: wrap; gap: 2rem; margin: 3rem 0; }
-        .panel { flex: 1; background: rgba(255,255,255,0.85); backdrop-filter: blur(8px); border-radius: 2rem; padding: 1.8rem; border: 1px solid rgba(253,205,98,0.6); min-width: 280px; }
-        .panel h3 { font-size: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px; color: #7d2728; }
-        .news-item, .event-item { padding: 1rem 0; border-bottom: 1px solid rgba(211,51,39,0.1); display: flex; gap: 1rem; align-items: flex-start; }
-        .news-item:last-child, .event-item:last-child { border-bottom: none; }
+        /* ── MURAL DE INFORMATIVOS ── */
+        .mural-informativos { margin: 3rem 0; }
+        .mural-informativos h3 { font-size: 1.5rem; color: #7d2728; display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
+        .mural-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; }
+        .mural-card { border-radius: 1rem; overflow: hidden; cursor: pointer; border: 2px solid rgba(253,205,98,0.5); background: white; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.08); aspect-ratio: 3/4; }
+        .mural-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(125,39,40,0.2); border-color: #d33327; }
+        .mural-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .mural-vazio { text-align: center; padding: 3rem; color: #7d2728; opacity: 0.5; font-size: 0.9rem; grid-column: 1/-1; }
+        .mural-vazio i { font-size: 3rem; display: block; margin-bottom: 0.5rem; }
+        .mural-lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 9999; align-items: center; justify-content: center; padding: 1rem; }
+        .mural-lightbox.ativo { display: flex; animation: fadeIn 0.2s ease; }
+        .mural-lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 1rem; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .mural-lightbox-close { position: fixed; top: 1rem; right: 1rem; background: rgba(255,255,255,0.15); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .mural-lightbox-close:hover { background: #d33327; }
         .news-item i, .event-item i { color: #fdcd62; font-size: 1.2rem; margin-top: 0.2rem; flex-shrink: 0; }
         .news-date, .event-date { font-size: 0.75rem; color: #d33327; margin-top: 4px; font-weight: 600; }
 
@@ -472,15 +480,11 @@
             <!-- preenchido pelo JS -->
         </div>
 
-        <!-- NOTÍCIAS E EVENTOS -->
-        <div class="double-panel">
-            <div class="panel">
-                <h3><i class="fas fa-newspaper" style="color:#d33327;"></i> Comunidade Batista</h3>
-                <div id="noticiasList"></div>
-            </div>
-            <div class="panel">
-                <h3><i class="fas fa-calendar-check" style="color:#d33327;"></i> Próximos Eventos</h3>
-                <div id="eventosList"></div>
+        <!-- MURAL DE INFORMATIVOS -->
+        <div class="mural-informativos">
+            <h3><i class="fas fa-bullhorn" style="color:#d33327;"></i> Mural de Informativos</h3>
+            <div class="mural-grid" id="muralGrid">
+                <div class="mural-vazio"><i class="fas fa-image"></i>Nenhum informativo no momento.</div>
             </div>
         </div>
 
@@ -513,7 +517,7 @@
             </div>
             <hr class="footer-divider">
             <div class="footer-bottom">
-                <div id="footerNome"><i class="fas fa-cross"></i> Colégio Batista Santos Dumont | Desde 1972</div>
+                <div id="footerNome">Colégio Batista Santos Dumont | Desde 1970</div>
                 <div style="font-size:0.78rem;opacity:0.65;">Todos os direitos reservados</div>
             </div>
         </div>
@@ -833,39 +837,34 @@ window.abrirPaginaNivel = function(pagina) {
     document.body.style.overflow = 'hidden';
 };
 
-// ── NOTÍCIAS ──
-var _NOTICIAS_DEFAULT = [
-    {icone:'fas fa-church',  titulo:'Semana da Família 2026', data:'10 a 17 de Maio', texto:'Programação especial com palestras, culto e integração.'},
-    {icone:'fas fa-trophy',  titulo:'Olimpíada de Matemática', data:'Resultados divulgados', texto:'Alunos conquistaram medalhas na OBMEP este ano.'},
-    {icone:'fas fa-globe',   titulo:'Intercâmbio Cultural', data:'Inscrições abertas', texto:'Programa para os EUA e Canadá em julho — vagas limitadas.'}
-];
-function renderNoticias(dados) {
-    var el = document.getElementById('noticiasList');
-    if (!el) return;
-    el.innerHTML = dados.map(function(n) {
-        return '<div class="news-item"><i class="' + (n.icone||'fas fa-circle') + '"></i>' +
-            '<div><strong>' + n.titulo + '</strong><div class="news-date">' + n.data + '</div><p>' + (n.texto||'') + '</p></div></div>';
+// ── MURAL DE INFORMATIVOS ──
+function renderInformativos(dados) {
+    var grid = document.getElementById('muralGrid');
+    if (!grid || !dados || !dados.length) return;
+    grid.innerHTML = dados.map(function(item) {
+        var src = '/files/' + item.imagem;
+        return '<div class="mural-card" onclick="abrirLightbox(\'' + src.replace(/'/g, "\\'") + '\')">' +
+               '<img src="' + src + '" alt="' + (item.titulo || 'Informativo') + '" loading="lazy">' +
+               '</div>';
     }).join('');
 }
-renderNoticias(_NOTICIAS_DEFAULT);
-listarPastaPortal('noticias', renderNoticias);
+listarPastaPortal('portal/informativos', renderInformativos);
 
-// ── EVENTOS ──
-var _EVENTOS_DEFAULT = [
-    {icone:'fas fa-pray',       titulo:'Culto de Ação de Graças', data:'05/05 - 19h', local:'Capela do Colégio'},
-    {icone:'fas fa-futbol',     titulo:'Jogos Batistas 2026',     data:'12/05 - 8h',  local:'Complexo Esportivo'},
-    {icone:'fas fa-laptop-code',titulo:'Hackathon Jovem',          data:'19/05 - 14h', local:'Laboratório de Inovação'}
-];
-function renderEventos(dados) {
-    var el = document.getElementById('eventosList');
-    if (!el) return;
-    el.innerHTML = dados.map(function(e) {
-        return '<div class="event-item"><i class="' + (e.icone||'fas fa-circle') + '"></i>' +
-            '<div><strong>' + e.titulo + '</strong><div class="event-date">' + e.data + '</div><p>' + (e.local||'') + '</p></div></div>';
-    }).join('');
-}
-renderEventos(_EVENTOS_DEFAULT);
-listarPastaPortal('eventos', renderEventos);
+window.abrirLightbox = function(src) {
+    document.getElementById('muralLightboxImg').src = src;
+    document.getElementById('muralLightbox').classList.add('ativo');
+    document.getElementById('scrollWrapper').style.overflow = 'hidden';
+};
+document.getElementById('btnFecharLightbox').addEventListener('click', function() {
+    document.getElementById('muralLightbox').classList.remove('ativo');
+    document.getElementById('scrollWrapper').style.overflow = '';
+});
+document.getElementById('muralLightbox').addEventListener('click', function(e) {
+    if (e.target === this) {
+        this.classList.remove('ativo');
+        document.getElementById('scrollWrapper').style.overflow = '';
+    }
+});
 
 // ── LÍNGUAS ──
 var _LINGUAS_DEFAULT = [
@@ -925,7 +924,7 @@ listarPastaPortal('fundI_estrutura', function(){});
 // ── HISTÓRIA ──
 function renderHistoria(d) {
     if (d.texto) document.getElementById('footerHistoriaTexto').textContent = d.texto;
-    if (d.fundacao) document.getElementById('footerNome').innerHTML = '<i class="fas fa-cross"></i> Colégio Batista Santos Dumont | Desde ' + d.fundacao;
+    if (d.fundacao) document.getElementById('footerNome').innerHTML = 'Colégio Batista Santos Dumont | Desde ' + d.fundacao;
     if (d.totalAlunos || d.aprovacaoEnem || d.fundacao) {
         document.getElementById('footerStats').innerHTML =
             (d.fundacao    ? '<div class="fstat"><h3>+' + (new Date().getFullYear()-parseInt(d.fundacao)) + ' anos</h3><p>de história</p></div>' : '') +
@@ -1954,5 +1953,12 @@ setTimeout(function() {
 </div>
 
 </div><!-- /scrollWrapper -->
+
+<!-- LIGHTBOX MURAL -->
+<div id="muralLightbox" class="mural-lightbox">
+    <button class="mural-lightbox-close" id="btnFecharLightbox"><i class="fas fa-times"></i></button>
+    <img id="muralLightboxImg" src="" alt="Informativo">
+</div>
+
 </body>
 </html>
