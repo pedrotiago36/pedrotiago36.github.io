@@ -196,6 +196,16 @@
         .edital-nome { flex: 1; font-weight: 700; font-size: 0.95rem; color: #3d1a1b; }
         .edital-abrir { font-size: 0.8rem; font-weight: 600; color: #d33327; display: flex; align-items: center; gap: 0.3rem; white-space: nowrap; }
         .editais-vazio { color: #7d2728; opacity: 0.5; font-size: 0.9rem; padding: 1.5rem 0; text-align: center; }
+        /* ── MODAL PDF VIEWER ── */
+        .modal-pdf { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-pdf.ativo { display: flex; animation: fadeIn 0.2s ease; }
+        .modal-pdf-box { background: white; border-radius: 1rem; overflow: hidden; width: 100%; max-width: 860px; height: 90vh; display: flex; flex-direction: column; box-shadow: 0 24px 60px rgba(0,0,0,0.5); }
+        .modal-pdf-header { display: flex; align-items: center; gap: 0.8rem; padding: 0.8rem 1.2rem; background: linear-gradient(135deg, #d33327, #7d2728); color: white; flex-shrink: 0; }
+        .modal-pdf-header i { font-size: 1.2rem; }
+        .modal-pdf-titulo { flex: 1; font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .modal-pdf-fechar { background: rgba(255,255,255,0.2); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
+        .modal-pdf-fechar:hover { background: rgba(255,255,255,0.4); }
+        .modal-pdf-frame { flex: 1; border: none; width: 100%; }
         .news-item i, .event-item i { color: #fdcd62; font-size: 1.2rem; margin-top: 0.2rem; flex-shrink: 0; }
         .news-date, .event-date { font-size: 0.75rem; color: #d33327; margin-top: 4px; font-weight: 600; }
 
@@ -881,14 +891,33 @@ function renderEditais(dados) {
     lista.innerHTML = dados.map(function(item) {
         var src = '/files/' + item.imagem;
         var nome = item.titulo || item.imagem.split('/').pop().replace(/\.[^.]+$/, '');
-        return '<a class="edital-item" href="' + src + '" target="_blank" rel="noopener">' +
+        return '<div class="edital-item" onclick="abrirPDF(\'' + src.replace(/'/g, "\\'") + '\',\'' + nome.replace(/'/g, "\\'") + '\')">' +
                '<i class="fas fa-file-pdf edital-icone"></i>' +
                '<span class="edital-nome">' + nome + '</span>' +
-               '<span class="edital-abrir"><i class="fas fa-external-link-alt"></i> Abrir</span>' +
-               '</a>';
+               '<span class="edital-abrir"><i class="fas fa-book-open"></i> Ler</span>' +
+               '</div>';
     }).join('');
 }
 listarPastaPortal('portal/informativos/pdf', renderEditais);
+
+window.abrirPDF = function(src, titulo) {
+    document.getElementById('modalPDFFrame').src = src;
+    document.getElementById('modalPDFTitulo').textContent = titulo;
+    document.getElementById('modalPDF').classList.add('ativo');
+    document.getElementById('scrollWrapper').style.overflow = 'hidden';
+};
+document.getElementById('btnFecharPDF').addEventListener('click', function() {
+    document.getElementById('modalPDF').classList.remove('ativo');
+    document.getElementById('modalPDFFrame').src = '';
+    document.getElementById('scrollWrapper').style.overflow = '';
+});
+document.getElementById('modalPDF').addEventListener('click', function(e) {
+    if (e.target === this) {
+        document.getElementById('modalPDF').classList.remove('ativo');
+        document.getElementById('modalPDFFrame').src = '';
+        document.getElementById('scrollWrapper').style.overflow = '';
+    }
+});
 
 window.abrirLightbox = function(src) {
     document.getElementById('muralLightboxImg').src = src;
@@ -1993,6 +2022,18 @@ setTimeout(function() {
 </div>
 
 </div><!-- /scrollWrapper -->
+
+<!-- MODAL PDF VIEWER -->
+<div id="modalPDF" class="modal-pdf">
+    <div class="modal-pdf-box">
+        <div class="modal-pdf-header">
+            <i class="fas fa-file-pdf"></i>
+            <span class="modal-pdf-titulo" id="modalPDFTitulo"></span>
+            <button class="modal-pdf-fechar" id="btnFecharPDF"><i class="fas fa-times"></i></button>
+        </div>
+        <iframe class="modal-pdf-frame" id="modalPDFFrame" src="" allowfullscreen></iframe>
+    </div>
+</div>
 
 <!-- LIGHTBOX MURAL -->
 <div id="muralLightbox" class="mural-lightbox">
