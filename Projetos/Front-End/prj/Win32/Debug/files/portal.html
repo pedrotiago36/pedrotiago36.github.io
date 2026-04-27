@@ -220,7 +220,13 @@
         /* ── MODAIS ── */
         .modal-novato-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(125,39,40,0.6); backdrop-filter: blur(8px); z-index: 5000; align-items: center; justify-content: center; }
         .modal-novato-overlay.ativo { display: flex; }
-        .modal-novato-box { background: rgba(255,248,235,0.98); backdrop-filter: blur(20px); max-width: 420px; width: 90%; padding: 2rem; border-radius: 2rem; text-align: center; animation: scaleIn 0.2s ease-out; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border: 1px solid #fdcd62; }
+        .modal-novato-box { background: rgba(255,248,235,0.98); backdrop-filter: blur(20px); max-width: 540px; width: 90%; padding: 2rem; border-radius: 2rem; text-align: center; animation: scaleIn 0.2s ease-out; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border: 1px solid #fdcd62; }
+        .novato-unidades-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 1rem; }
+        .novato-unidade-card { border: 2px solid #fdcd62; border-radius: 1rem; padding: 0.75rem 0.5rem; cursor: pointer; text-align: center; transition: all 0.2s; background: white; }
+        .novato-unidade-card:hover { border-color: #d33327; background: #fff5f5; }
+        .novato-unidade-card.selecionado { border-color: #d33327; background: linear-gradient(135deg, #fff0f0, #ffe8e8); box-shadow: 0 4px 12px rgba(211,51,39,0.2); }
+        .novato-unidade-card i { font-size: 1.4rem; color: #d33327; display: block; margin-bottom: 0.3rem; }
+        .novato-unidade-card span { font-size: 0.88rem; font-weight: 700; color: #7d2728; }
         .novato-field { margin-bottom: 0.8rem; text-align: left; }
         .novato-field input { width: 100%; padding: 0.9rem; border: 1px solid #fdcd62; border-radius: 1rem; font-size: 0.95rem; color: #2d2d2d; outline: none; transition: 0.2s; font-family: 'Inter', sans-serif; background: white; }
         .novato-field input:focus { border-color: #d33327; box-shadow: 0 0 0 3px rgba(211,51,39,0.2); }
@@ -390,7 +396,7 @@
                 </li>
                 <li><a href="#" id="openModalBtn" class="btn-login"><i class="fas fa-sign-in-alt"></i> Portal do Aluno</a></li>
                 <li><a href="#" id="openPortalPaiBtn" class="btn-pai"><i class="fas fa-users"></i> Portal do Pai Batista</a></li>
-                <li><a href="#" id="openNovatoBtn" class="btn-novato"><img src="/files/portal/icones/Quero Ser Batista.png" alt=""> Quero ser Batista</a></li>
+                <li><a href="#" id="openNovatoBtn" class="btn-novato"><img src="/files/portal/icones/Quero Ser Batista.png" alt=""> Quero ser Batista, agende uma visita</a></li>
             </ul>
         </nav>
     </div>
@@ -522,8 +528,27 @@
 <!-- MODAL NOVATO -->
 <div id="modalNovato" class="modal-novato-overlay">
     <div class="modal-novato-box">
-        <i class="fas fa-star" style="font-size:3rem; color:#d33327;"></i>
-        <h2 style="color:#7d2728; margin:0.5rem 0 0.2rem;">Quero ser Batista!</h2>
+        <img src="/files/portal/LogoBatista.png" alt="Colégio Batista" style="height:60px;width:auto;margin-bottom:0.5rem;">
+        <h2 style="color:#7d2728; margin:0.3rem 0 0.2rem;">Quero ser Batista!</h2>
+        <p style="color:#5a3a2e; margin-bottom:0.6rem;">Selecione a unidade que deseja visitar</p>
+        <div class="novato-unidades-grid">
+            <div class="novato-unidade-card" data-unidade="Aldeota" onclick="selecionarUnidadeNovato(this)">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Aldeota</span>
+            </div>
+            <div class="novato-unidade-card" data-unidade="Edson Queiroz" onclick="selecionarUnidadeNovato(this)">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Edson Queiroz</span>
+            </div>
+            <div class="novato-unidade-card" data-unidade="Varjota" onclick="selecionarUnidadeNovato(this)">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Varjota</span>
+            </div>
+            <div class="novato-unidade-card" data-unidade="Seis Bocas" onclick="selecionarUnidadeNovato(this)">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Seis Bocas</span>
+            </div>
+        </div>
         <p style="color:#5a3a2e; margin-bottom:1rem;">Preencha com os dados do responsável</p>
         <div class="novato-row">
             <div class="novato-field">
@@ -1628,11 +1653,21 @@ modalNovato.addEventListener('click', function(e) {
     if (e.target === modalNovato) { modalNovato.classList.remove('ativo'); document.body.style.overflow = 'auto'; }
 });
 
+var novatoUnidadeSelecionada = '';
+function selecionarUnidadeNovato(card) {
+    document.querySelectorAll('.novato-unidade-card').forEach(function(c) { c.classList.remove('selecionado'); });
+    card.classList.add('selecionado');
+    novatoUnidadeSelecionada = card.getAttribute('data-unidade');
+}
 document.getElementById('btnNovatoSalvar').addEventListener('click', function() {
     var nome      = document.getElementById('novatoNome').value.trim();
     var sobrenome = document.getElementById('novatoSobrenome').value.trim();
     var email     = document.getElementById('novatoEmail').value.trim();
     var telefone  = document.getElementById('novatoTelefone').value.trim();
+    if (!novatoUnidadeSelecionada) {
+        Swal.fire({ icon:'warning', title:'Selecione uma unidade', text:'Escolha a unidade que deseja visitar.', confirmButtonColor:'#2ecc71' });
+        return;
+    }
     if (!nome || !sobrenome || !email || !telefone) {
         Swal.fire({ icon:'warning', title:'Campos obrigat\u00f3rios', text:'Preencha todos os campos.', confirmButtonColor:'#2ecc71' });
         return;
@@ -1640,7 +1675,7 @@ document.getElementById('btnNovatoSalvar').addEventListener('click', function() 
     var btn = this;
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-    try { window.parent.cadastrarNovato(nome, sobrenome, email, telefone); } catch(e) {}
+    try { window.parent.cadastrarNovato(nome, sobrenome, email, telefone, novatoUnidadeSelecionada); } catch(e) {}
     setTimeout(function() {
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Interesse';
@@ -1648,6 +1683,8 @@ document.getElementById('btnNovatoSalvar').addEventListener('click', function() 
         document.getElementById('novatoSobrenome').value = '';
         document.getElementById('novatoEmail').value     = '';
         document.getElementById('novatoTelefone').value  = '';
+        novatoUnidadeSelecionada = '';
+        document.querySelectorAll('.novato-unidade-card').forEach(function(c) { c.classList.remove('selecionado'); });
         modalNovato.classList.remove('ativo');
         document.body.style.overflow = 'auto';
         Swal.fire({
@@ -1707,14 +1744,26 @@ document.getElementById('closePortalPaiBtn').addEventListener('click', function(
 // ============================================================
 // INDIQUE AMIGOS
 // ============================================================
+var indicarUnidadeSelecionada = '';
+
+function selecionarUnidadeIndicar(card) {
+    document.querySelectorAll('#indicarUnidadeCards .novato-unidade-card').forEach(function(c) { c.classList.remove('selecionado'); });
+    card.classList.add('selecionado');
+    indicarUnidadeSelecionada = card.getAttribute('data-unidade');
+}
+
 function _fecharModalIndicar() {
     document.getElementById('modalIndicar').classList.remove('ativo');
     document.getElementById('scrollWrapper').style.overflow = '';
 }
 
 window.abrirModalIndicar = function(unidadeDefault) {
-    var sel = document.getElementById('indicarUnidade');
-    if (sel) sel.value = unidadeDefault || '';
+    indicarUnidadeSelecionada = '';
+    document.querySelectorAll('#indicarUnidadeCards .novato-unidade-card').forEach(function(c) { c.classList.remove('selecionado'); });
+    if (unidadeDefault) {
+        var alvo = document.querySelector('#indicarUnidadeCards .novato-unidade-card[data-unidade="' + unidadeDefault + '"]');
+        if (alvo) selecionarUnidadeIndicar(alvo);
+    }
     document.getElementById('modalIndicar').classList.add('ativo');
     document.getElementById('scrollWrapper').style.overflow = 'hidden';
 };
@@ -1749,7 +1798,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('btnIndicarEnviar').addEventListener('click', function() {
         var perfil   = document.querySelector('input[name="indicar_perfil"]:checked');
-        var unidade  = document.getElementById('indicarUnidade').value.trim();
+        var unidade  = indicarUnidadeSelecionada;
         var reg      = document.getElementById('indicarRegulamento').checked;
         var nome     = document.getElementById('indicarNome').value.trim();
         var email    = document.getElementById('indicarEmail').value.trim();
@@ -1774,7 +1823,8 @@ document.addEventListener('DOMContentLoaded', function() {
             ['indicarNome','indicarEmail','indicarTelefone','indicarNomeInd','indicarEmailInd','indicarTelInd'].forEach(function(id) {
                 document.getElementById(id).value = '';
             });
-            document.getElementById('indicarUnidade').value = '';
+            indicarUnidadeSelecionada = '';
+            document.querySelectorAll('#indicarUnidadeCards .novato-unidade-card').forEach(function(c) { c.classList.remove('selecionado'); });
             document.getElementById('indicarRegulamento').checked = false;
             document.querySelectorAll('.indicar-perfil-card').forEach(function(c, i) { c.classList.toggle('selecionado', i === 0); });
             document.querySelector('input[name="indicar_perfil"]').checked = true;
@@ -1838,13 +1888,25 @@ setTimeout(function() {
                 </label>
             </div>
 
-            <select class="indicar-select" id="indicarUnidade">
-                <option value="">📍 Selecione uma unidade *</option>
-                <option value="Aldeota">Aldeota</option>
-                <option value="Edson Queiroz">Edson Queiroz</option>
-                <option value="Varjota">Varjota</option>
-                <option value="Seis Bocas">Seis Bocas</option>
-            </select>
+            <p class="indicar-secao"><i class="fas fa-map-marker-alt"></i> Unidade desejada</p>
+            <div class="novato-unidades-grid" id="indicarUnidadeCards">
+                <div class="novato-unidade-card" data-unidade="Aldeota" onclick="selecionarUnidadeIndicar(this)">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Aldeota</span>
+                </div>
+                <div class="novato-unidade-card" data-unidade="Edson Queiroz" onclick="selecionarUnidadeIndicar(this)">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Edson Queiroz</span>
+                </div>
+                <div class="novato-unidade-card" data-unidade="Varjota" onclick="selecionarUnidadeIndicar(this)">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Varjota</span>
+                </div>
+                <div class="novato-unidade-card" data-unidade="Seis Bocas" onclick="selecionarUnidadeIndicar(this)">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Seis Bocas</span>
+                </div>
+            </div>
 
             <label class="indicar-regulamento">
                 <input type="checkbox" id="indicarRegulamento">
