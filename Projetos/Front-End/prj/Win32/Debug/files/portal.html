@@ -906,6 +906,12 @@ window.abrirPDF = function(src, titulo) {
     document.getElementById('modalPDF').classList.add('ativo');
     document.getElementById('scrollWrapper').style.overflow = 'hidden';
 };
+window.abrirLightbox = function(src) {
+    document.getElementById('muralLightboxImg').src = src;
+    document.getElementById('muralLightbox').classList.add('ativo');
+    document.getElementById('scrollWrapper').style.overflow = 'hidden';
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('btnFecharPDF').addEventListener('click', function() {
         document.getElementById('modalPDF').classList.remove('ativo');
