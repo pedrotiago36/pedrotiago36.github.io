@@ -822,7 +822,7 @@ var _NIVEIS_DEFAULT = [
     {nome:'Anos Iniciais 2º ao 5º (Fund. I)', descricao:'Fundamentos sólidos para o crescimento acadêmico e pessoal.',        icone:'iniciais', icone_img:'Niveis de Ensino/2_ANos Iniciais.png',      pagina:'fundI.html'},
     {nome:'Anos Finais 6º ao 9º (Fund. II)', descricao:'Pensamento crítico e preparação para o Ensino Médio.',                icone:'finais',   icone_img:'Niveis de Ensino/3_AnosFinais_Card.png',    pagina:'fundII.html'},
     {nome:'Ensino Médio',                    descricao:'Excelência acadêmica e preparação para vestibulares e a vida.',       icone:'medio',    icone_img:'Niveis de Ensino/4_Ens Médio.png',          pagina:'ensinoMedio.html'},
-    {nome:'Pré-Vestibular',                  descricao:'Preparação intensiva para o ENEM e os melhores vestibulares do país.', icone:'medio',   icone_img:'Niveis de Ensino/5_Pré Universitário.png',  pagina:'preVestibular.html'}
+    {nome:'Pré-Universitário',                descricao:'Preparação intensiva para o ENEM e os melhores vestibulares do país.', icone:'medio',   icone_img:'Niveis de Ensino/5_Pré Universitário.png',  pagina:'preVestibular.html'}
 ];
 
 var _iconeNivel = {
@@ -864,7 +864,7 @@ var _DIFERENCIAIS = [
     {nome:'Empreendedorismo',   icone_img:'Nossos Diferenciais/Empreendedorismo/Empreendedorismo.png',    icone_fa:'fas fa-lightbulb',   descricao:'Projetos práticos que desenvolvem liderança, visão de negócios e inovação.'},
     {nome:'NAF',                icone_img:'Nossos Diferenciais/NAF/NAF.png',                              icone_fa:'fas fa-running',     descricao:'Núcleo de Atividades Físicas — esporte, saúde e desenvolvimento integral.'},
     {nome:'Bibliotecas',        icone_img:'Nossos Diferenciais/Bibliotecas/biblioteca.png',               icone_fa:'fas fa-book-open',   descricao:'Acervo completo e espaços de leitura e pesquisa em todas as unidades.'},
-    {nome:'Resultados & Inscrições', icone_img:'', icone_fa:'fas fa-trophy', descricao:'', tipo:'resultados'}
+    {nome:'Olímpíadas', icone_img:'', icone_fa:'fas fa-trophy', descricao:'', tipo:'resultados'}
 ];
 
 (function() {
@@ -872,18 +872,17 @@ var _DIFERENCIAIS = [
     if (!g) return;
     g.innerHTML = _DIFERENCIAIS.map(function(d) {
         if (d.tipo === 'resultados') {
+            var _row = 'display:flex;align-items:center;gap:0.5rem;padding:0.55rem 0;border-bottom:1px solid rgba(211,51,39,0.1);cursor:pointer;color:#7d2728;font-weight:700;font-size:0.82rem;';
+            var _last = 'display:flex;align-items:center;gap:0.5rem;padding:0.55rem 0;cursor:pointer;color:#7d2728;font-weight:700;font-size:0.82rem;';
+            var _seta = '<i class="fas fa-chevron-right" style="margin-left:auto;font-size:0.7rem;color:#d33327;"></i>';
             return '<div class="nivel-card animate__animated animate__fadeInUp">' +
                 '<div class="nivel-card-placeholder"><i class="fas fa-trophy" style="font-size:3rem;color:#d33327;"></i></div>' +
                 '<div class="nivel-card-body">' +
                     '<h3>' + d.nome + '</h3>' +
-                    '<div class="res-area" onclick="abrirModalResultados()" style="display:flex;align-items:center;gap:0.5rem;padding:0.6rem 0;border-bottom:1px solid rgba(211,51,39,0.1);cursor:pointer;color:#7d2728;font-weight:700;font-size:0.85rem;">' +
-                        '<i class="fas fa-medal" style="color:#d33327;"></i> Resultados' +
-                        '<i class="fas fa-chevron-right" style="margin-left:auto;font-size:0.75rem;"></i>' +
-                    '</div>' +
-                    '<div class="res-area" onclick="abrirModalDocumentosInscricao()" style="display:flex;align-items:center;gap:0.5rem;padding:0.6rem 0;cursor:pointer;color:#7d2728;font-weight:700;font-size:0.85rem;">' +
-                        '<i class="fas fa-file-alt" style="color:#d33327;"></i> Documentos de Inscrição' +
-                        '<i class="fas fa-chevron-right" style="margin-left:auto;font-size:0.75rem;"></i>' +
-                    '</div>' +
+                    '<div onclick="abrirModalResultados()" style="' + _row + '"><i class="fas fa-medal" style="color:#d33327;"></i> Resultados' + _seta + '</div>' +
+                    '<div onclick="abrirModalMuralInformativos()" style="' + _row + '"><i class="fas fa-bullhorn" style="color:#d33327;"></i> Mural de Informativos' + _seta + '</div>' +
+                    '<div onclick="abrirModalDocumentosInscricao()" style="' + _row + '"><i class="fas fa-file-alt" style="color:#d33327;"></i> Documentos de Inscrição' + _seta + '</div>' +
+                    '<div onclick="abrirModalEditais()" style="' + _last + '"><i class="fas fa-file-pdf" style="color:#d33327;"></i> Editais' + _seta + '</div>' +
                 '</div></div>';
         }
         var topo = d.icone_img
@@ -940,6 +939,61 @@ window.abrirPDF = function(src, titulo) {
     document.getElementById('scrollWrapper').style.overflow = 'hidden';
 };
 // ── RESULTADOS & DOCUMENTOS DE INSCRIÇÃO ──
+window.abrirModalMuralInformativos = function() {
+    document.getElementById('modalMuralInformativos').classList.add('ativo');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('muralModalLista').innerHTML =
+        '<div style="text-align:center;color:#7d2728;opacity:0.5;padding:2rem;"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>';
+    var _ok = false;
+    var _t = setTimeout(function() {
+        if (_ok) return;
+        document.getElementById('muralModalLista').innerHTML =
+            '<div style="text-align:center;color:#7d2728;opacity:0.5;padding:2rem;"><i class="fas fa-image"></i><br>Nenhum informativo no momento.</div>';
+    }, 5500);
+    listarPastaPortal('portal/informativos', function(dados) {
+        _ok = true; clearTimeout(_t);
+        var el = document.getElementById('muralModalLista');
+        if (!el || !dados || !dados.length) return;
+        el.innerHTML = dados.map(function(item) {
+            var src  = '/files/' + item.imagem;
+            var nome = item.titulo || item.imagem.split('/').pop().replace(/\.[^.]+$/, '');
+            return '<div onclick="abrirLightbox(\'' + src.replace(/'/g,"\\'") + '\')" ' +
+                   'style="display:flex;align-items:center;gap:0.8rem;padding:0.8rem 0.3rem;border-bottom:1px solid rgba(211,51,39,0.1);cursor:pointer;">' +
+                   '<i class="fas fa-newspaper" style="color:#d33327;font-size:1.2rem;flex-shrink:0;"></i>' +
+                   '<span style="flex:1;font-weight:700;font-size:0.9rem;color:#3d1a1b;">' + nome + '</span>' +
+                   '<i class="fas fa-chevron-right" style="color:#d33327;font-size:0.75rem;"></i></div>';
+        }).join('');
+    });
+};
+
+window.abrirModalEditais = function() {
+    document.getElementById('modalEditais').classList.add('ativo');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('editaisModalLista').innerHTML =
+        '<div style="text-align:center;color:#7d2728;opacity:0.5;padding:2rem;"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>';
+    var _ok = false;
+    var _t = setTimeout(function() {
+        if (_ok) return;
+        document.getElementById('modalEditais').classList.remove('ativo');
+        document.body.style.overflow = '';
+        Swal.fire({ icon:'info', title:'Nenhum edital disponível', text:'Em breve novos editais serão publicados.', confirmButtonColor:'#d33327', background:'#fff8f0' });
+    }, 5500);
+    listarPastaPortal('portal/informativos/pdf', function(dados) {
+        _ok = true; clearTimeout(_t);
+        var el = document.getElementById('editaisModalLista');
+        if (!el || !dados || !dados.length) return;
+        el.innerHTML = dados.map(function(item) {
+            var src  = '/files/' + item.imagem;
+            var nome = item.titulo || item.imagem.split('/').pop().replace(/\.[^.]+$/, '');
+            return '<div onclick="abrirPDF(\'' + src.replace(/'/g,"\\'") + '\',\'' + nome.replace(/'/g,"\\'") + '\')" ' +
+                   'style="display:flex;align-items:center;gap:0.8rem;padding:0.8rem 0.3rem;border-bottom:1px solid rgba(211,51,39,0.1);cursor:pointer;">' +
+                   '<i class="fas fa-file-pdf" style="color:#d33327;font-size:1.2rem;flex-shrink:0;"></i>' +
+                   '<span style="flex:1;font-weight:700;font-size:0.9rem;color:#3d1a1b;">' + nome + '</span>' +
+                   '<span style="font-size:0.8rem;font-weight:700;color:#d33327;">Ler</span></div>';
+        }).join('');
+    });
+};
+
 window.abrirModalResultados = function() {
     document.getElementById('modalResultados').classList.add('ativo');
     document.body.style.overflow = 'hidden';
@@ -995,6 +1049,20 @@ window.abrirModalDocumentosInscricao = function() {
     });
 };
 document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('fecharModalMural').addEventListener('click', function() {
+        document.getElementById('modalMuralInformativos').classList.remove('ativo');
+        document.body.style.overflow = '';
+    });
+    document.getElementById('modalMuralInformativos').addEventListener('click', function(e) {
+        if (e.target === this) { this.classList.remove('ativo'); document.body.style.overflow = ''; }
+    });
+    document.getElementById('fecharModalEditais').addEventListener('click', function() {
+        document.getElementById('modalEditais').classList.remove('ativo');
+        document.body.style.overflow = '';
+    });
+    document.getElementById('modalEditais').addEventListener('click', function(e) {
+        if (e.target === this) { this.classList.remove('ativo'); document.body.style.overflow = ''; }
+    });
     document.getElementById('fecharModalResultados').addEventListener('click', function() {
         document.getElementById('modalResultados').classList.remove('ativo');
         document.body.style.overflow = '';
@@ -2140,6 +2208,31 @@ setTimeout(function() {
             <button class="modal-pdf-fechar" id="btnFecharPDF"><i class="fas fa-times"></i></button>
         </div>
         <iframe class="modal-pdf-frame" id="modalPDFFrame" src="" allowfullscreen></iframe>
+    </div>
+</div>
+
+<!-- MODAL MURAL DE INFORMATIVOS -->
+<div id="modalMuralInformativos" class="modal-novato-overlay">
+    <div class="modal-novato-box" style="max-width:680px;">
+        <button class="close-modal" id="fecharModalMural" style="position:absolute;top:1rem;right:1rem;"><i class="fas fa-times"></i></button>
+        <img src="/files/portal/LogoBatista.png" alt="" style="height:48px;width:auto;margin-bottom:0.5rem;">
+        <h2 style="color:#7d2728;margin:0.3rem 0 1rem;">📢 Mural de Informativos</h2>
+        <div id="muralModalLista" style="text-align:left;max-height:60vh;overflow-y:auto;width:100%;">
+            <div style="text-align:center;color:#7d2728;opacity:0.5;padding:2rem;"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDITAIS -->
+<div id="modalEditais" class="modal-novato-overlay">
+    <div class="modal-novato-box" style="max-width:560px;">
+        <button class="close-modal" id="fecharModalEditais" style="position:absolute;top:1rem;right:1rem;"><i class="fas fa-times"></i></button>
+        <img src="/files/portal/LogoBatista.png" alt="" style="height:48px;width:auto;margin-bottom:0.5rem;">
+        <h2 style="color:#7d2728;margin:0.3rem 0 0.3rem;">📋 Editais</h2>
+        <p style="color:#5a3a2e;font-size:0.85rem;margin-bottom:1rem;">Clique para ler o edital.</p>
+        <div id="editaisModalLista" style="text-align:left;max-height:60vh;overflow-y:auto;width:100%;">
+            <div style="text-align:center;color:#7d2728;opacity:0.5;padding:2rem;"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>
+        </div>
     </div>
 </div>
 
