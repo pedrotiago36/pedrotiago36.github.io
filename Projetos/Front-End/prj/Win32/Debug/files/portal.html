@@ -863,71 +863,36 @@ var _DIFERENCIAIS = [
     {nome:'Educação Cristã',    icone_img:'Nossos Diferenciais/Educacao Crista/EducaçãoCristã.png',       icone_fa:'fas fa-cross',       descricao:'Formação de valores, fé e propósito integrados ao currículo acadêmico.'},
     {nome:'Empreendedorismo',   icone_img:'Nossos Diferenciais/Empreendedorismo/Empreendedorismo.png',    icone_fa:'fas fa-lightbulb',   descricao:'Projetos práticos que desenvolvem liderança, visão de negócios e inovação.'},
     {nome:'NAF',                icone_img:'Nossos Diferenciais/NAF/NAF.png',                              icone_fa:'fas fa-running',     descricao:'Núcleo de Atividades Físicas — esporte, saúde e desenvolvimento integral.'},
-    {nome:'Bibliotecas',        icone_img:'Nossos Diferenciais/Bibliotecas/biblioteca.png',               icone_fa:'fas fa-book-open',   descricao:'Acervo completo e espaços de leitura e pesquisa em todas as unidades.'}
+    {nome:'Bibliotecas',        icone_img:'Nossos Diferenciais/Bibliotecas/biblioteca.png',               icone_fa:'fas fa-book-open',   descricao:'Acervo completo e espaços de leitura e pesquisa em todas as unidades.'},
+    {nome:'Resultados & Inscrições', icone_img:'', icone_fa:'fas fa-trophy', descricao:'', tipo:'resultados'}
 ];
 
 (function() {
     var g = document.getElementById('diferenciaisGrid');
     if (!g) return;
     g.innerHTML = _DIFERENCIAIS.map(function(d) {
+        if (d.tipo === 'resultados') {
+            return '<div class="nivel-card animate__animated animate__fadeInUp">' +
+                '<div class="nivel-card-placeholder"><i class="fas fa-trophy" style="font-size:3rem;color:#d33327;"></i></div>' +
+                '<div class="nivel-card-body">' +
+                    '<h3>' + d.nome + '</h3>' +
+                    '<div class="res-area" onclick="abrirModalResultados()" style="display:flex;align-items:center;gap:0.5rem;padding:0.6rem 0;border-bottom:1px solid rgba(211,51,39,0.1);cursor:pointer;color:#7d2728;font-weight:700;font-size:0.85rem;">' +
+                        '<i class="fas fa-medal" style="color:#d33327;"></i> Resultados' +
+                        '<i class="fas fa-chevron-right" style="margin-left:auto;font-size:0.75rem;"></i>' +
+                    '</div>' +
+                    '<div class="res-area" onclick="abrirModalDocumentosInscricao()" style="display:flex;align-items:center;gap:0.5rem;padding:0.6rem 0;cursor:pointer;color:#7d2728;font-weight:700;font-size:0.85rem;">' +
+                        '<i class="fas fa-file-alt" style="color:#d33327;"></i> Documentos de Inscrição' +
+                        '<i class="fas fa-chevron-right" style="margin-left:auto;font-size:0.75rem;"></i>' +
+                    '</div>' +
+                '</div></div>';
+        }
         var topo = d.icone_img
             ? '<div class="nivel-card-placeholder"><img src="/files/' + d.icone_img + '" style="width:90px;height:90px;object-fit:contain;" onerror="this.outerHTML=\'<i class=&quot;' + d.icone_fa + '&quot; style=&quot;font-size:3rem;color:#d33327;&quot;></i>\'"></div>'
             : '<div class="nivel-card-placeholder"><i class="' + d.icone_fa + '" style="font-size:3rem;color:#d33327;"></i></div>';
         return '<div class="nivel-card animate__animated animate__fadeInUp">' + topo +
                '<div class="nivel-card-body"><h3>' + d.nome + '</h3><p>' + d.descricao + '</p></div></div>';
     }).join('');
-
-    // Card Resultados e Concursos
-    var resCard = document.createElement('div');
-    resCard.className = 'nivel-card res-card animate__animated animate__fadeInUp';
-    resCard.innerHTML =
-        '<div class="nivel-card-body" style="padding-bottom:0.5rem;">' +
-            '<h3>🏆 Resultados e Concursos</h3>' +
-            '<p>Medalhas e conquistas dos nossos alunos nas olimpíadas científicas e concursos nacionais.</p>' +
-        '</div>' +
-        '<div class="res-carousel-wrap">' +
-            '<div class="res-carrossel" id="resCarrossel">' +
-                '<button class="res-btn prev" id="resPrev"><i class="fas fa-chevron-left"></i></button>' +
-                '<div class="res-track-wrap">' +
-                    '<div class="res-track" id="resTrack">' +
-                        '<div style="text-align:center;color:#7d2728;opacity:0.5;padding:2rem;width:100%;">' +
-                            '<i class="fas fa-spinner fa-spin"></i> Carregando...' +
-                        '</div>' +
-                    '</div>' +
-                '</div>' +
-                '<button class="res-btn next" id="resNext"><i class="fas fa-chevron-right"></i></button>' +
-            '</div>' +
-        '</div>';
-    g.appendChild(resCard);
-
-    document.getElementById('resPrev').addEventListener('click', function() { _resIrPara(_resOffset - 1); });
-    document.getElementById('resNext').addEventListener('click', function() { _resIrPara(_resOffset + 1); });
 })();
-
-var _resLista = [], _resOffset = 0;
-function _resVisiveis() { var w = document.getElementById('resCarrossel'); return w ? Math.floor(w.offsetWidth / 236) || 1 : 4; }
-function _resIrPara(offset) {
-    var max = Math.max(0, _resLista.length - _resVisiveis());
-    _resOffset = Math.max(0, Math.min(offset, max));
-    document.getElementById('resTrack').style.transform = 'translateX(-' + (_resOffset * 236) + 'px)';
-}
-function renderResultados(dados) {
-    var track = document.getElementById('resTrack');
-    if (!track || !dados || !dados.length) return;
-    _resLista = dados; _resOffset = 0;
-    track.style.transform = 'translateX(0)';
-    track.innerHTML = dados.map(function(item, i) {
-        var src    = '/files/' + item.imagem;
-        var titulo = item.titulo || item.imagem.split('/').pop().replace(/\.[^.]+$/, '').replace(/_/g, ' ');
-        return '<div class="res-olimp-card" onclick="window.open(\'' + src + '\',\'_blank\')">' +
-               '<img src="' + src + '" alt="' + titulo + '" loading="lazy">' +
-               '<div class="res-olimp-overlay">' +
-                   '<div class="res-olimp-badge">🏅 Olimpíada</div>' +
-                   '<div class="res-olimp-titulo">' + titulo + '</div>' +
-               '</div></div>';
-    }).join('');
-}
-listarPastaPortal('portal/olimpiadas', renderResultados);
 listarPastaPortal('niveis', renderNiveis);
 
 window.abrirPaginaNivel = function(pagina) {
@@ -974,6 +939,58 @@ window.abrirPDF = function(src, titulo) {
     document.getElementById('modalPDF').classList.add('ativo');
     document.getElementById('scrollWrapper').style.overflow = 'hidden';
 };
+// ── RESULTADOS & DOCUMENTOS DE INSCRIÇÃO ──
+window.abrirModalResultados = function() {
+    document.getElementById('modalResultados').classList.add('ativo');
+    document.body.style.overflow = 'hidden';
+    listarPastaPortal('portal/olimpiadas', function(dados) {
+        var grid = document.getElementById('resGrid');
+        if (!grid || !dados || !dados.length) return;
+        grid.innerHTML = dados.map(function(item) {
+            var src = '/files/' + item.imagem;
+            var titulo = item.titulo || item.imagem.split('/').pop().replace(/\.[^.]+$/, '');
+            return '<div onclick="document.getElementById(\'resLightboxImg\').src=\'' + src + '\';var lb=document.getElementById(\'resLightbox\');lb.style.display=\'flex\';" ' +
+                   'style="border-radius:0.8rem;overflow:hidden;cursor:pointer;border:2px solid rgba(253,205,98,0.4);aspect-ratio:1;background:#f5f0e8;">' +
+                   '<img src="' + src + '" alt="' + titulo + '" style="width:100%;height:100%;object-fit:cover;" loading="lazy">' +
+                   '</div>';
+        }).join('');
+    });
+};
+window.abrirModalDocumentosInscricao = function() {
+    document.getElementById('modalDocInscricao').classList.add('ativo');
+    document.body.style.overflow = 'hidden';
+    listarPastaPortal('portal/informativos/pdf', function(dados) {
+        var lista = document.getElementById('docInscricaoLista');
+        if (!lista || !dados || !dados.length) return;
+        lista.innerHTML = dados.map(function(item) {
+            var src  = '/files/' + item.imagem;
+            var nome = item.titulo || item.imagem.split('/').pop().replace(/\.[^.]+$/, '');
+            return '<a href="' + src + '" download="' + nome + '.pdf" ' +
+                   'style="display:flex;align-items:center;gap:0.8rem;padding:0.8rem 0;border-bottom:1px solid rgba(211,51,39,0.1);text-decoration:none;color:inherit;">' +
+                   '<i class="fas fa-file-pdf" style="font-size:1.4rem;color:#d33327;flex-shrink:0;"></i>' +
+                   '<span style="flex:1;font-weight:700;font-size:0.9rem;color:#3d1a1b;">' + nome + '</span>' +
+                   '<span style="font-size:0.8rem;font-weight:700;color:#d33327;display:flex;align-items:center;gap:0.3rem;"><i class="fas fa-download"></i> Baixar</span>' +
+                   '</a>';
+        }).join('');
+    });
+};
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('fecharModalResultados').addEventListener('click', function() {
+        document.getElementById('modalResultados').classList.remove('ativo');
+        document.body.style.overflow = '';
+    });
+    document.getElementById('modalResultados').addEventListener('click', function(e) {
+        if (e.target === this) { this.classList.remove('ativo'); document.body.style.overflow = ''; }
+    });
+    document.getElementById('fecharModalDocInscricao').addEventListener('click', function() {
+        document.getElementById('modalDocInscricao').classList.remove('ativo');
+        document.body.style.overflow = '';
+    });
+    document.getElementById('modalDocInscricao').addEventListener('click', function(e) {
+        if (e.target === this) { this.classList.remove('ativo'); document.body.style.overflow = ''; }
+    });
+});
+
 window.abrirLightbox = function(src) {
     document.getElementById('muralLightboxImg').src = src;
     document.getElementById('muralLightbox').classList.add('ativo');
@@ -2103,6 +2120,35 @@ setTimeout(function() {
             <button class="modal-pdf-fechar" id="btnFecharPDF"><i class="fas fa-times"></i></button>
         </div>
         <iframe class="modal-pdf-frame" id="modalPDFFrame" src="" allowfullscreen></iframe>
+    </div>
+</div>
+
+<!-- MODAL RESULTADOS -->
+<div id="modalResultados" class="modal-novato-overlay">
+    <div class="modal-novato-box" style="max-width:680px;">
+        <button class="close-modal" id="fecharModalResultados" style="position:absolute;top:1rem;right:1rem;"><i class="fas fa-times"></i></button>
+        <img src="/files/portal/LogoBatista.png" alt="" style="height:48px;width:auto;margin-bottom:0.5rem;">
+        <h2 style="color:#7d2728;margin:0.3rem 0 1rem;">🏅 Resultados</h2>
+        <div id="resGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.8rem;max-height:60vh;overflow-y:auto;">
+            <div style="grid-column:1/-1;text-align:center;color:#7d2728;opacity:0.5;padding:2rem;"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>
+        </div>
+        <div id="resLightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:99999;align-items:center;justify-content:center;">
+            <img id="resLightboxImg" src="" style="max-width:90vw;max-height:90vh;border-radius:1rem;">
+            <button onclick="document.getElementById('resLightbox').style.display='none';" style="position:fixed;top:1rem;right:1rem;background:rgba(255,255,255,0.15);border:none;color:white;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:1.2rem;"><i class="fas fa-times"></i></button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DOCUMENTOS DE INSCRIÇÃO -->
+<div id="modalDocInscricao" class="modal-novato-overlay">
+    <div class="modal-novato-box" style="max-width:560px;">
+        <button class="close-modal" id="fecharModalDocInscricao" style="position:absolute;top:1rem;right:1rem;"><i class="fas fa-times"></i></button>
+        <img src="/files/portal/LogoBatista.png" alt="" style="height:48px;width:auto;margin-bottom:0.5rem;">
+        <h2 style="color:#7d2728;margin:0.3rem 0 0.3rem;">📄 Documentos de Inscrição</h2>
+        <p style="color:#5a3a2e;font-size:0.85rem;margin-bottom:1rem;">Baixe o formulário, preencha e entregue na secretaria.</p>
+        <div id="docInscricaoLista">
+            <div style="text-align:center;color:#7d2728;opacity:0.5;padding:1.5rem;"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>
+        </div>
     </div>
 </div>
 
