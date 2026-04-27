@@ -183,7 +183,7 @@ end;
 
 function TPortalController.ListarPasta(const APasta: string): string;
 const
-  EXTS: array[0..5] of string = ('.jpg', '.jpeg', '.png', '.gif', '.webp', '.mp4');
+  EXTS: array[0..6] of string = ('.jpg', '.jpeg', '.png', '.gif', '.webp', '.mp4', '.pdf');
 var
   LPastaFull : string;
   LArquivos  : TStringDynArray;
