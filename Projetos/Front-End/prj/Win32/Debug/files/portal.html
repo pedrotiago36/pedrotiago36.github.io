@@ -959,22 +959,29 @@ window.abrirModalResultados = function() {
 window.abrirModalDocumentosInscricao = function() {
     document.getElementById('modalDocInscricao').classList.add('ativo');
     document.body.style.overflow = 'hidden';
+    document.getElementById('docInscricaoLista').innerHTML =
+        '<div style="text-align:center;color:#7d2728;opacity:0.5;padding:1.5rem;"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>';
+
+    var _docResolvido = false;
+    var _docTimer = setTimeout(function() {
+        if (_docResolvido) return;
+        document.getElementById('modalDocInscricao').classList.remove('ativo');
+        document.body.style.overflow = '';
+        Swal.fire({
+            icon: 'info',
+            title: 'Nenhum documento disponível',
+            html: '<p>Não há documentos de inscrição disponíveis no momento.<br>Em breve novos formulários serão publicados.</p>',
+            confirmButtonColor: '#d33327',
+            confirmButtonText: 'Entendido',
+            background: '#fff8f0'
+        });
+    }, 5500);
+
     listarPastaPortal('portal/documentos_inscricao', function(dados) {
+        _docResolvido = true;
+        clearTimeout(_docTimer);
         var lista = document.getElementById('docInscricaoLista');
         if (!lista) return;
-        if (!dados || !dados.length) {
-            document.getElementById('modalDocInscricao').classList.remove('ativo');
-            document.body.style.overflow = '';
-            Swal.fire({
-                icon: 'info',
-                title: 'Nenhum documento disponível',
-                html: '<p>Não há documentos de inscrição disponíveis no momento.<br>Em breve novos formulários serão publicados.</p>',
-                confirmButtonColor: '#d33327',
-                confirmButtonText: 'Entendido',
-                background: '#fff8f0'
-            });
-            return;
-        }
         lista.innerHTML = dados.map(function(item) {
             var src  = '/files/' + item.imagem;
             var nome = item.titulo || item.imagem.split('/').pop().replace(/\.[^.]+$/, '');
