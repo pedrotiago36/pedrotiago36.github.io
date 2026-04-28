@@ -163,42 +163,58 @@
 
         /* ── NÍVEIS DE ENSINO ── */
         .niveis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin: 2rem 0 3rem; }
-        .niveis-grid { perspective: 1000px; }
+        .niveis-grid { perspective: 1400px; }
         .nivel-card {
             border-radius: 1.5rem;
             overflow: hidden;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.07);
-            transition: transform 0.4s cubic-bezier(0.2,0.9,0.4,1.1),
-                        box-shadow 0.4s ease,
-                        border-color 0.3s ease;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.12);
             background: white;
-            border: 1px solid rgba(253,205,98,0.4);
+            border: 1px solid rgba(253,205,98,0.35);
             cursor: pointer;
             position: relative;
-            transform: translateZ(0);
+            transform-style: preserve-3d;
             will-change: transform;
+            transition: box-shadow 0.15s ease, border-color 0.15s ease;
         }
-        .nivel-card::before {
-            content: '';
+        /* glare overlay */
+        .nivel-card-glare {
             position: absolute;
             inset: 0;
             border-radius: 1.5rem;
-            background: linear-gradient(135deg, rgba(211,51,39,0.08), rgba(253,205,98,0.12));
-            opacity: 0;
-            transition: opacity 0.35s ease;
             pointer-events: none;
-            z-index: 0;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            mix-blend-mode: screen;
         }
-        .nivel-card:hover { transform: translateZ(60px) scale(1.05); box-shadow: 0 40px 60px -10px rgba(0,0,0,0.5), 0 0 0 3px #fdcd62; border-color: #fdcd62; }
-        .nivel-card:hover::before { opacity: 1; }
+        /* brilho dourado pulsante ao redor quando ativo */
+        .nivel-card.tilt-active {
+            border-color: #fdcd62;
+            box-shadow:
+                0 30px 60px rgba(0,0,0,0.45),
+                0 0 0 2px #fdcd62,
+                0 0 24px 4px rgba(253,205,98,0.35);
+        }
+        .nivel-card.tilt-active .nivel-card-glare { opacity: 1; }
+        /* retorno suave ao soltar */
+        .nivel-card.tilt-reset {
+            transition: transform 0.65s cubic-bezier(0.23,1,0.32,1),
+                        box-shadow 0.65s ease,
+                        border-color 0.4s ease;
+        }
         .nivel-card-placeholder, .nivel-card-body { position: relative; z-index: 1; }
-        .nivel-card-img { width: 100%; height: 170px; object-fit: cover; display: block; transition: transform 0.4s ease; }
-        .nivel-card:hover .nivel-card-img { transform: scale(1.06); }
-        .nivel-card-placeholder { width: 100%; height: 170px; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; background: linear-gradient(135deg,#fff2e3,#ffe6cc); transition: background 0.35s ease; }
-        .nivel-card:hover .nivel-card-placeholder { background: linear-gradient(135deg,#fde8e8,#ffd5b0); }
+        .nivel-card-img { width: 100%; height: 170px; object-fit: cover; display: block; }
+        .nivel-card-placeholder {
+            width: 100%; height: 170px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3.5rem;
+            background: linear-gradient(135deg,#fff2e3,#ffe6cc);
+            transition: background 0.4s ease;
+        }
+        .nivel-card.tilt-active .nivel-card-placeholder { background: linear-gradient(135deg,#fde8e8,#ffd5b0); }
         .nivel-card-body { padding: 1.3rem; }
         .nivel-card-body h3 { color: #7d2728; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; font-family: 'Poppins',sans-serif; transition: color 0.3s; }
-        .nivel-card:hover .nivel-card-body h3 { color: #990000; }
+        .nivel-card.tilt-active .nivel-card-body h3 { color: #990000; }
         .nivel-card-body p { color: #5a3a2e; font-size: 0.85rem; line-height: 1.6; }
         /* ── CARD RESULTADOS E CONCURSOS ── */
         .res-card { grid-column: 1/-1; cursor: default; }
@@ -987,7 +1003,62 @@ var _DIFERENCIAIS = [
         return '<div class="nivel-card animate__animated animate__fadeInUp">' + topo +
                '<div class="nivel-card-body"><h3>' + d.nome + '</h3><p>' + d.descricao + '</p></div></div>';
     }).join('');
+    initCardTilt();
 })();
+
+// ── TILT 3D HOLOGRÁFICO ──
+function initCardTilt() {
+    var cards = document.querySelectorAll('#diferenciaisGrid .nivel-card');
+    cards.forEach(function(card) {
+        // injeta glare
+        var glare = document.createElement('div');
+        glare.className = 'nivel-card-glare';
+        card.appendChild(glare);
+
+        var raf = null;
+
+        card.addEventListener('mousemove', function(e) {
+            if (raf) cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(function() {
+                var rect = card.getBoundingClientRect();
+                var x = e.clientX - rect.left;
+                var y = e.clientY - rect.top;
+                var cx = rect.width  / 2;
+                var cy = rect.height / 2;
+                var dx = (x - cx) / cx;   // -1 → 1
+                var dy = (y - cy) / cy;   // -1 → 1
+
+                var MAX = 20;
+                var rX = (-dy * MAX).toFixed(2);
+                var rY = ( dx * MAX).toFixed(2);
+
+                card.classList.remove('tilt-reset');
+                card.classList.add('tilt-active');
+                card.style.transform =
+                    'perspective(900px) rotateX(' + rX + 'deg) rotateY(' + rY + 'deg) scale3d(1.07,1.07,1.07)';
+
+                // glare: radial branco + arco-íris suave
+                var gx = ((x / rect.width)  * 100).toFixed(1);
+                var gy = ((y / rect.height) * 100).toFixed(1);
+                glare.style.background =
+                    'radial-gradient(circle at ' + gx + '% ' + gy + '%, ' +
+                        'rgba(255,255,255,0.55) 0%, ' +
+                        'rgba(255,234,187,0.25) 25%, ' +
+                        'rgba(211,51,39,0.12)  50%, ' +
+                        'transparent 70%)';
+            });
+        });
+
+        card.addEventListener('mouseleave', function() {
+            if (raf) cancelAnimationFrame(raf);
+            card.classList.remove('tilt-active');
+            card.classList.add('tilt-reset');
+            card.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)';
+            glare.style.background = 'none';
+        });
+    });
+}
+
 // ── VENEZIANA SEGMENTOS ──
 (function() {
     var _SEGS = [
