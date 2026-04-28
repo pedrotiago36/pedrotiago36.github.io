@@ -435,14 +435,16 @@
         .pilares-grid {
             display: flex;
             flex-direction: column;
-            gap: 2.2rem;
+            gap: 1.6rem;
             max-width: 960px;
             margin: 0 auto;
             padding: 0 1rem;
         }
         .pilar-row {
             position: relative;
-            padding-top: 2.5rem;
+            padding-top: 3rem;    /* espaço acima da pílula pra foto estourar */
+            padding-bottom: 0.5rem;
+            isolation: isolate;   /* impede foto de vazar pro row seguinte */
         }
         /* PÍLULA base */
         .pilar-card {
@@ -461,12 +463,12 @@
         .pilar-card:hover { box-shadow: 0 18px 52px rgba(0,0,0,0.35); transform: translateY(-4px); }
 
         /* ÍMPAR → foto LEFT, ícone RIGHT */
-        .pilar-row:nth-child(odd) .pilar-card   { padding-left: 200px; flex-direction: row; }
+        .pilar-row:nth-child(odd) .pilar-card   { padding-left: 210px; padding-right: 2.5rem; flex-direction: row-reverse; }
         .pilar-row:nth-child(odd) .pilar-foto-wrap,
         .pilar-row:nth-child(odd) .pilar-foto-placeholder { left: 0; right: auto; }
 
         /* PAR → foto RIGHT, ícone LEFT */
-        .pilar-row:nth-child(even) .pilar-card  { padding-right: 200px; flex-direction: row-reverse; }
+        .pilar-row:nth-child(even) .pilar-card  { padding-right: 210px; padding-left: 2.5rem; flex-direction: row; }
         .pilar-row:nth-child(even) .pilar-foto-wrap,
         .pilar-row:nth-child(even) .pilar-foto-placeholder { right: 0; left: auto; }
 
