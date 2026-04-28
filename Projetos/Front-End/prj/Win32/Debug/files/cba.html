@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBA — Centro Batista de Artes | Colégio Batista Santos Dumont</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { font-family: 'Inter', sans-serif; background: #fff; color: #2d2d2d; }
+        #scrollWrapper { height: 100vh; overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth; }
+
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; flex-wrap: wrap; gap: 1rem; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); border-radius: 2rem; margin: 1rem 1rem 0; box-shadow: 0 8px 32px rgba(125,39,40,0.08); border: 1px solid rgba(253,205,98,0.3); position: sticky; top: 1rem; z-index: 100; }
+        .logo img { height: 56px; width: auto; display: block; }
+        .nav-back { display: flex; align-items: center; gap: 8px; text-decoration: none; font-weight: 700; color: #5a3a2e; transition: 0.3s; font-size: 1rem; white-space: nowrap; }
+        .nav-back i { font-size: 1.1rem; color: #fdcd62; }
+        .nav-back:hover { color: #d33327; transform: translateY(-2px); }
+        .nav-links { display: flex; gap: 1rem; list-style: none; align-items: center; flex-wrap: nowrap; }
+        .nav-links a { text-decoration: none; font-weight: 500; color: #5a3a2e; transition: 0.3s; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+        .nav-links a i { font-size: 1.1rem; color: #fdcd62; }
+        .nav-links a:hover { color: #d33327; transform: translateY(-2px); }
+        .btn-login { background: linear-gradient(135deg, #d33327, #7d2728); padding: 0.6rem 1.5rem; border-radius: 2rem; color: white !important; box-shadow: 0 6px 14px rgba(211,51,39,0.3); }
+        .btn-login:hover { transform: scale(1.02) !important; box-shadow: 0 10px 20px rgba(211,51,39,0.4); }
+        .btn-pai { background: linear-gradient(135deg, #fdcd62, #d33327); padding: 0.6rem 1.5rem; border-radius: 2rem; color: #7d2728 !important; box-shadow: 0 6px 14px rgba(253,205,98,0.3); }
+        .btn-pai:hover { transform: scale(1.02) !important; color: white !important; }
+        .btn-novato { background: linear-gradient(135deg, #f7c948, #e6a800); padding: 0.6rem 1.5rem; border-radius: 2rem; color: #7d2728 !important; font-weight: 800; box-shadow: 0 6px 18px rgba(230,168,0,0.55); animation: pulse-novato 2.5s infinite; display: inline-flex; align-items: center; gap: 0.4rem; }
+        .btn-novato img { width: 22px; height: 22px; object-fit: contain; display: inline-block; vertical-align: middle; }
+        .btn-novato:hover { transform: scale(1.07) !important; box-shadow: 0 12px 28px rgba(230,168,0,0.7); }
+        .dropdown-unidades { position: relative; }
+        .btn-unidades { background: linear-gradient(135deg, #d33327, #7d2728); padding: 0.6rem 1.5rem; border-radius: 2rem; color: white !important; box-shadow: 0 6px 14px rgba(211,51,39,0.3); display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
+        .btn-unidades:hover { transform: scale(1.02) !important; }
+        .dropdown-unidades-menu { display: none; position: absolute; top: calc(100% + 8px); right: 0; background: white; border-radius: 0.8rem; box-shadow: 0 8px 24px rgba(0,0,0,0.15); min-width: 190px; overflow: hidden; z-index: 9999; }
+        .dropdown-unidades-menu a { display: flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.1rem; font-size: 0.9rem; font-weight: 500; color: #3d1a1b; border-left: 3px solid transparent; transition: all 0.2s; white-space: nowrap; }
+        .dropdown-unidades-menu a::before { content: ''; width: 7px; height: 7px; background: #d33327; border-radius: 50%; flex-shrink: 0; }
+        .dropdown-unidades-menu a:hover { background: #fdf0f0; color: #a33030; padding-left: 1.5rem; border-left-color: #fdcd62; }
+        @keyframes pulse-novato { 0%,100% { box-shadow: 0 6px 18px rgba(230,168,0,0.55); } 50% { box-shadow: 0 8px 32px rgba(230,168,0,0.9); } }
+        @media (max-width: 768px) { .navbar { flex-direction: column; align-items: stretch; text-align: center; } .nav-links { justify-content: center; flex-wrap: wrap; } }
+
+        .hero { position: relative; min-height: 520px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin: 1.5rem 1rem 0; border-radius: 2rem; background: linear-gradient(135deg, #3d1a1b, #7d2728); }
+        .hero img.hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+        .hero-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(61,26,27,0.7), rgba(125,39,40,0.4)); z-index: 1; }
+        .hero-content { position: relative; z-index: 2; max-width: 640px; padding: 3rem 2.5rem; }
+        .hero-badge { display: inline-block; background: #fdcd62; color: #7d2728; padding: 0.3rem 1.2rem; border-radius: 2rem; font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1.2rem; }
+        .hero h1 { font-family: 'Poppins', sans-serif; font-size: 3.2rem; font-weight: 900; color: white; line-height: 1.15; margin-bottom: 1.2rem; text-shadow: 0 2px 16px rgba(0,0,0,0.4); }
+        .hero h1 span { color: #fdcd62; }
+        .hero p { color: rgba(255,255,255,0.88); font-size: 1.1rem; line-height: 1.7; margin-bottom: 2rem; }
+
+        .quick-nav { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; padding: 2rem 1.5rem 0; }
+        .qcard { background: white; border-radius: 1.5rem; padding: 1.4rem 1rem; text-align: center; cursor: pointer; border: 2px solid transparent; box-shadow: 0 4px 16px rgba(0,0,0,0.06); transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1.1); text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
+        .qcard:hover { transform: translateY(-6px); border-color: #fdcd62; box-shadow: 0 16px 32px rgba(211,51,39,0.12); }
+        .qcard-icon { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #fff2e3, #fdcd62); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin-bottom: 0.2rem; }
+        .qcard span { font-family: 'Poppins', sans-serif; font-size: 0.92rem; font-weight: 700; color: #7d2728; line-height: 1.3; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+        .sec-title { font-family: 'Poppins', sans-serif; font-size: 2rem; font-weight: 800; color: #7d2728; margin-bottom: 0.6rem; }
+        .sec-title span { color: #d33327; }
+        .sec-sub { color: #6b5246; font-size: 1rem; line-height: 1.6; margin-bottom: 0; }
+        .sec-line { width: 60px; height: 4px; background: linear-gradient(90deg, #fdcd62, #d33327); border-radius: 4px; margin: 0.8rem 0 1.5rem; }
+
+        .proposta { padding: 5rem 0; }
+        .proposta-bloco { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; margin-bottom: 5rem; }
+        .proposta-bloco.reverse { direction: rtl; }
+        .proposta-bloco.reverse > * { direction: ltr; }
+        .proposta-img { border-radius: 2rem; overflow: hidden; box-shadow: 0 20px 60px rgba(125,39,40,0.15); }
+        .proposta-img img { width: 100%; height: 360px; object-fit: cover; display: block; transition: transform 0.5s; }
+        .proposta-img:hover img { transform: scale(1.04); }
+        .proposta-icone { font-size: 2.8rem; margin-bottom: 1rem; display: block; }
+        @media (max-width: 768px) { .proposta-bloco { grid-template-columns: 1fr; gap: 2rem; } .proposta-bloco.reverse { direction: ltr; } }
+
+        .galeria-section { background: linear-gradient(135deg, #1a0a0a 0%, #3d1a1b 50%, #7d2728 100%); padding: 4rem 1.5rem; }
+        .galeria-header { text-align: center; margin-bottom: 2.5rem; }
+        .galeria-header .sec-title { color: white; }
+        .galeria-header .sec-sub { color: rgba(255,255,255,0.7); }
+        .galeria-header .sec-line { margin: 0.8rem auto 0; }
+        .gal-carrossel { position: relative; max-width: 1100px; margin: 0 auto; }
+        .gal-wrap { overflow: hidden; border-radius: 1.5rem; }
+        .gal-track { display: flex; gap: 1rem; transition: transform 0.45s cubic-bezier(0.4,0,0.2,1); }
+        .gal-card { flex: 0 0 280px; height: 210px; border-radius: 1.2rem; overflow: hidden; cursor: pointer; border: 2px solid rgba(253,205,98,0.2); transition: 0.3s; position: relative; }
+        .gal-card:hover { border-color: #fdcd62; transform: translateY(-5px); }
+        .gal-card img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s; }
+        .gal-card:hover img { transform: scale(1.08); }
+        .gal-card-ov { position: absolute; inset: 0; background: rgba(0,0,0,0); display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .gal-card:hover .gal-card-ov { background: rgba(0,0,0,0.35); }
+        .gal-card-ov i { color: #fdcd62; font-size: 1.8rem; opacity: 0; transition: 0.3s; }
+        .gal-card:hover .gal-card-ov i { opacity: 1; }
+        .gal-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.15); backdrop-filter: blur(6px); border: 2px solid rgba(255,255,255,0.3); color: white; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: 0.3s; z-index: 5; }
+        .gal-btn:hover { background: rgba(211,51,39,0.85); border-color: #d33327; }
+        .gal-btn.prev { left: -24px; }
+        .gal-btn.next { right: -24px; }
+        .gal-vazio { text-align: center; color: rgba(255,255,255,0.35); padding: 3rem; font-size: 1rem; border: 2px dashed rgba(255,255,255,0.15); border-radius: 1.5rem; }
+        .gal-vazio i { font-size: 2.5rem; display: block; margin-bottom: 0.8rem; color: rgba(253,205,98,0.4); }
+
+        .modalidades { padding: 5rem 0; background: #fff; }
+        .mod-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1.2rem; margin-top: 2rem; }
+        .mod-card { text-align: center; padding: 2rem 1rem; border-radius: 1.5rem; background: linear-gradient(135deg, #fff2e3, #ffe6cc); border: 2px solid rgba(253,205,98,0.5); transition: 0.3s; cursor: default; }
+        .mod-card:hover { border-color: #d33327; transform: translateY(-5px); box-shadow: 0 16px 32px rgba(211,51,39,0.1); }
+        .mod-emoji { font-size: 2.2rem; display: block; margin-bottom: 0.6rem; }
+        .mod-nome { font-family: 'Poppins', sans-serif; font-size: 1.1rem; font-weight: 800; color: #d33327; }
+        .mod-desc { font-size: 0.78rem; color: #6b5246; margin-top: 0.4rem; line-height: 1.4; }
+
+        .momentos { padding: 5rem 0; background: white; }
+        .momentos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2rem; }
+        .momento-card { border-radius: 1.2rem; overflow: hidden; position: relative; cursor: pointer; background: linear-gradient(135deg,#fff2e3,#ffe6cc); aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .momento-card:hover { transform: scale(1.02); box-shadow: 0 16px 32px rgba(0,0,0,0.12); }
+        .momento-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+        .momento-card .placeholder-txt { position: relative; z-index: 1; text-align: center; color: rgba(125,39,40,0.3); }
+        .momento-card .placeholder-txt i { font-size: 2rem; display: block; margin-bottom: 0.3rem; }
+        .momento-card .placeholder-txt span { font-size: 0.75rem; font-weight: 600; }
+        .momento-destaque { grid-column: span 2; }
+        @media (max-width: 600px) { .momentos-grid { grid-template-columns: 1fr 1fr; } .momento-destaque { grid-column: span 2; } }
+
+        .diferenciais { padding: 5rem 0; background: linear-gradient(135deg, #7d2728 0%, #3d1a1b 100%); }
+        .diferenciais .sec-title { color: white; }
+        .diferenciais .sec-sub { color: rgba(255,255,255,0.7); }
+        .dif-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .dif-card { background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); border-radius: 1.5rem; padding: 2rem 1.5rem; border: 1px solid rgba(253,205,98,0.2); transition: 0.35s; }
+        .dif-card:hover { background: rgba(255,255,255,0.12); border-color: #fdcd62; transform: translateY(-6px); }
+        .dif-icone { font-size: 2.4rem; margin-bottom: 1rem; display: block; }
+        .dif-card h3 { font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 700; color: #fdcd62; margin-bottom: 0.5rem; }
+        .dif-card p { color: rgba(255,255,255,0.75); font-size: 0.88rem; line-height: 1.6; }
+
+        .cta-section { background: linear-gradient(135deg, #fdcd62 0%, #f5a623 100%); padding: 5rem 2rem; text-align: center; }
+        .cta-section h2 { font-family: 'Poppins', sans-serif; font-size: 2.4rem; font-weight: 900; color: #7d2728; margin-bottom: 0.8rem; }
+        .cta-section p { color: rgba(125,39,40,0.8); font-size: 1.1rem; margin-bottom: 2.5rem; }
+        .cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .btn-cta-main { display: inline-flex; align-items: center; gap: 10px; background: #7d2728; color: white; padding: 1rem 2.5rem; border-radius: 3rem; font-size: 1.05rem; font-weight: 800; text-decoration: none; font-family: 'Poppins', sans-serif; transition: 0.3s; box-shadow: 0 8px 24px rgba(125,39,40,0.3); }
+        .btn-cta-main:hover { background: #d33327; transform: scale(1.05); }
+        .btn-cta-sec { display: inline-flex; align-items: center; gap: 10px; background: white; color: #7d2728; padding: 1rem 2.5rem; border-radius: 3rem; font-size: 1.05rem; font-weight: 800; text-decoration: none; font-family: 'Poppins', sans-serif; transition: 0.3s; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+        .btn-cta-sec:hover { transform: scale(1.05); }
+
+        .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9500; align-items: center; justify-content: center; }
+        .lightbox.aberto { display: flex; animation: fadeIn 0.25s ease; }
+        .lightbox img { max-width: 92vw; max-height: 90vh; object-fit: contain; border-radius: 1rem; box-shadow: 0 24px 64px rgba(0,0,0,0.8); }
+        .lb-fechar { position: fixed; top: 18px; right: 18px; background: rgba(211,51,39,0.9); color: white; border: none; width: 44px; height: 44px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .lb-fechar:hover { background: #d33327; transform: scale(1.1); }
+        .lb-nav { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.15); backdrop-filter: blur(6px); border: 2px solid rgba(255,255,255,0.3); color: white; width: 52px; height: 52px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; z-index: 10; }
+        .lb-nav:hover { background: rgba(211,51,39,0.8); }
+        .lb-prev { left: 16px; }
+        .lb-next { right: 16px; }
+        .lb-counter { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.7); font-size: 0.9rem; background: rgba(0,0,0,0.5); padding: 0.4rem 1.2rem; border-radius: 2rem; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+<div id="scrollWrapper">
+
+    <nav class="navbar">
+        <a href="javascript:void(0)" onclick="fecharPagina()" class="nav-back"><i class="fas fa-arrow-left"></i> Voltar</a>
+        <div class="logo"><img src="/files/portal/LogoBatista.png" alt="Colégio Batista Santos Dumont"></div>
+        <ul class="nav-links">
+            <li class="dropdown-unidades">
+                <a href="#" class="btn-unidades" id="btnUnidades"><i class="fas fa-map-marker-alt"></i> Nossas Unidades <i class="fas fa-chevron-down" style="font-size:0.75rem;"></i></a>
+                <div class="dropdown-unidades-menu" id="menuUnidades">
+                    <a href="/files/unidade_sede.html">Aldeota</a>
+                    <a href="/files/unidade_edson.html">Edson Queiroz</a>
+                    <a href="/files/unidade_varjota.html">Varjota</a>
+                    <a href="/files/unidade_seisbocas.html">Seis Bocas</a>
+                </div>
+            </li>
+            <li><a href="javascript:void(0)" onclick="abrirNoPortal('aluno')" class="btn-login"><i class="fas fa-sign-in-alt"></i> Portal do Aluno</a></li>
+            <li><a href="javascript:void(0)" onclick="abrirNoPortal('pai')" class="btn-pai"><i class="fas fa-users"></i> Portal do Pai Batista</a></li>
+            <li><a href="javascript:void(0)" onclick="abrirNoPortal('novato')" class="btn-novato"><img src="/files/portal/icones/Quero Ser Batista.png" alt=""> Quero ser Batista</a></li>
+        </ul>
+    </nav>
+
+    <div class="hero" id="heroSection">
+        <img src="/files/cba/capa.png" class="hero-bg" alt="" onerror="this.style.display='none'">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <span class="hero-badge">Arte &amp; Cultura</span>
+            <h1>Centro Batista<br>de <span>Artes</span></h1>
+            <p>Onde a criatividade encontra propósito. Música, teatro, dança e artes visuais integrados à formação integral do aluno.</p>
+        </div>
+    </div>
+
+    <div class="quick-nav">
+        <a href="#sec-proposta" class="qcard"><div class="qcard-icon">🎨</div><span>Sobre o CBA</span></a>
+        <a href="#sec-modalidades" class="qcard"><div class="qcard-icon">🎭</div><span>Modalidades</span></a>
+        <a href="#sec-galeria" class="qcard"><div class="qcard-icon">📸</div><span>Galeria</span></a>
+        <a href="#sec-momentos" class="qcard"><div class="qcard-icon">⭐</div><span>Momentos</span></a>
+        <a href="#sec-diferenciais" class="qcard"><div class="qcard-icon">🏆</div><span>Diferenciais</span></a>
+    </div>
+
+    <div class="proposta" id="sec-proposta">
+        <div class="container">
+            <div class="proposta-bloco">
+                <div class="proposta-img">
+                    <img src="/files/cba/proposta.png" alt="Sobre o CBA" onerror="this.src='/files/cba/capa.png';">
+                </div>
+                <div class="proposta-texto">
+                    <span class="proposta-icone">🎨</span>
+                    <div class="sec-title">O que é o <span>CBA</span>?</div>
+                    <div class="sec-line"></div>
+                    <p class="sec-sub">O Centro Batista de Artes nasce da crença de que a arte é uma linguagem universal capaz de transformar vidas. Aqui, o aluno descobre e desenvolve talentos em um ambiente de acolhimento e excelência.<br><br>
+                    Música, teatro, artes visuais e dança são trabalhados de forma integrada ao currículo, enriquecendo o aprendizado acadêmico com sensibilidade, criatividade e expressão pessoal.</p>
+                </div>
+            </div>
+            <div class="proposta-bloco reverse">
+                <div class="proposta-img">
+                    <img src="/files/cba/formacao.png" alt="Arte integrada" onerror="this.src='/files/cba/capa.png';">
+                </div>
+                <div class="proposta-texto">
+                    <span class="proposta-icone">🌟</span>
+                    <div class="sec-title">Arte com <span>Propósito</span></div>
+                    <div class="sec-line"></div>
+                    <p class="sec-sub">Mais do que técnica, ensinamos expressão. Cada apresentação, cada tela e cada nota musical carregam a identidade do aluno e os valores da nossa instituição.<br><br>
+                    Ao longo do ano, shows, exposições e espetáculos reúnem a comunidade escolar em celebração à cultura, à fé e ao talento dos nossos alunos.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="galeria-section" id="sec-galeria">
+        <div class="galeria-header">
+            <div class="sec-title"><i class="fas fa-images" style="color:#fdcd62;margin-right:0.5rem;"></i>Nossa Galeria</div>
+            <div class="sec-line"></div>
+            <p class="sec-sub">Momentos inesquecíveis das apresentações e atividades do CBA</p>
+        </div>
+        <div class="gal-carrossel" id="galCarrossel">
+            <button class="gal-btn prev" id="galPrev"><i class="fas fa-chevron-left"></i></button>
+            <div class="gal-wrap">
+                <div class="gal-track" id="galTrack">
+                    <div class="gal-vazio"><i class="fas fa-palette"></i><br>Galeria sendo preparada</div>
+                </div>
+            </div>
+            <button class="gal-btn next" id="galNext"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <div class="modalidades" id="sec-modalidades">
+        <div class="container">
+            <div class="sec-title">Nossas <span>Modalidades</span></div>
+            <div class="sec-line"></div>
+            <p class="sec-sub">Cada aluno encontra sua forma de expressão dentro do CBA</p>
+            <div class="mod-grid">
+                <div class="mod-card"><span class="mod-emoji">🎵</span><div class="mod-nome">Música</div><div class="mod-desc">Teoria musical, canto coral, violão, teclado e percussão</div></div>
+                <div class="mod-card"><span class="mod-emoji">🎭</span><div class="mod-nome">Teatro</div><div class="mod-desc">Expressão corporal, interpretação e montagens teatrais</div></div>
+                <div class="mod-card"><span class="mod-emoji">🎨</span><div class="mod-nome">Artes Visuais</div><div class="mod-desc">Desenho, pintura, escultura e artes digitais</div></div>
+                <div class="mod-card"><span class="mod-emoji">💃</span><div class="mod-nome">Dança</div><div class="mod-desc">Dança contemporânea, folclórica e expressão corporal</div></div>
+                <div class="mod-card"><span class="mod-emoji">🖐️</span><div class="mod-nome">Artesanato</div><div class="mod-desc">Trabalhos manuais, cerâmica e criação de objetos</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="momentos" id="sec-momentos">
+        <div class="container">
+            <div class="sec-title">Momentos <span>Especiais</span></div>
+            <div class="sec-line"></div>
+            <p class="sec-sub">Apresentações, exposições e festivais que marcam a vida dos nossos alunos</p>
+            <div class="momentos-grid" id="momentosGrid">
+                <div class="momento-card momento-destaque"><div class="placeholder-txt"><i class="fas fa-camera"></i><span>Foto em destaque</span></div></div>
+                <div class="momento-card"><div class="placeholder-txt"><i class="fas fa-camera"></i><span>Foto</span></div></div>
+                <div class="momento-card"><div class="placeholder-txt"><i class="fas fa-camera"></i><span>Foto</span></div></div>
+                <div class="momento-card"><div class="placeholder-txt"><i class="fas fa-camera"></i><span>Foto</span></div></div>
+                <div class="momento-card"><div class="placeholder-txt"><i class="fas fa-camera"></i><span>Foto</span></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="diferenciais" id="sec-diferenciais">
+        <div class="container">
+            <div class="sec-title">Nossos <span style="color:#fdcd62;">Diferenciais</span></div>
+            <div class="sec-line"></div>
+            <p class="sec-sub" style="color:rgba(255,255,255,0.7);">O CBA transforma o talento em excelência dentro de um ambiente cristão</p>
+            <div class="dif-grid">
+                <div class="dif-card"><span class="dif-icone">👨‍🏫</span><h3>Professores Especializados</h3><p>Artistas e educadores experientes que desenvolvem o potencial máximo de cada aluno.</p></div>
+                <div class="dif-card"><span class="dif-icone">🎪</span><h3>Shows e Espetáculos</h3><p>Apresentações ao longo do ano para a comunidade, família e parceiros do colégio.</p></div>
+                <div class="dif-card"><span class="dif-icone">📜</span><h3>Certificação</h3><p>Alunos recebem certificado de participação nas atividades artísticas do CBA.</p></div>
+                <div class="dif-card"><span class="dif-icone">🔗</span><h3>Integração Curricular</h3><p>Arte aplicada às disciplinas regulares, potencializando o aprendizado acadêmico.</p></div>
+                <div class="dif-card"><span class="dif-icone">🙏</span><h3>Arte com Fé</h3><p>Expressão artística alicerçada em valores cristãos, celebrando a criação e o Criador.</p></div>
+                <div class="dif-card"><span class="dif-icone">🌍</span><h3>Festivais Culturais</h3><p>Participação em festivais, concursos e eventos artísticos dentro e fora da escola.</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cta-section">
+        <h2>Descubra o Artista em Você! 🎨</h2>
+        <p>O CBA tem uma modalidade para cada talento. Conheça e matricule-se.</p>
+        <div class="cta-btns">
+            <a href="javascript:void(0)" onclick="abrirNoPortal('novato')" class="btn-cta-main"><i class="fas fa-calendar-check"></i> Quero me Matricular</a>
+            <a href="javascript:void(0)" onclick="abrirNoPortal('pai')" class="btn-cta-sec"><i class="fas fa-users"></i> Portal do Pai</a>
+        </div>
+    </div>
+
+    <div class="lightbox" id="lightbox">
+        <button class="lb-fechar" id="lbFechar"><i class="fas fa-times"></i></button>
+        <button class="lb-nav lb-prev" id="lbPrev"><i class="fas fa-chevron-left"></i></button>
+        <img id="lbImg" src="" alt="">
+        <button class="lb-nav lb-next" id="lbNext"><i class="fas fa-chevron-right"></i></button>
+        <div class="lb-counter" id="lbCounter"></div>
+    </div>
+
+</div>
+<script>
+var _galLista = [], _galOffset = 0;
+function _galVisiveis() { var w = document.getElementById('galCarrossel'); return w ? Math.floor(w.offsetWidth / 296) || 1 : 3; }
+function _galIr(offset) { var track = document.getElementById('galTrack'); if (!track) return; var max = Math.max(0, _galLista.length - _galVisiveis()); _galOffset = Math.max(0, Math.min(offset, max)); track.style.transform = 'translateX(-' + (_galOffset * 296) + 'px)'; }
+function renderGaleria(dados) {
+    var track = document.getElementById('galTrack'); if (!track) return;
+    var fotos = dados.filter(function(d) { return d.imagem.toLowerCase().indexOf('capa') < 0; });
+    if (!fotos.length) return;
+    _galLista = fotos;
+    track.innerHTML = fotos.map(function(item, i) {
+        return '<div class="gal-card" onclick="_abrirLb(' + i + ')">' +
+               '<img src="/files/' + item.imagem + '" alt="Foto ' + (i+1) + '" loading="lazy">' +
+               '<div class="gal-card-ov"><i class="fas fa-search-plus"></i></div></div>';
+    }).join('');
+    renderMomentos(fotos);
+}
+function renderMomentos(fotos) {
+    var grid = document.getElementById('momentosGrid'); if (!grid || !fotos.length) return;
+    var html = '';
+    fotos.slice(0, 5).forEach(function(item, i) {
+        var cls = i === 0 ? 'momento-card momento-destaque' : 'momento-card';
+        html += '<div class="' + cls + '" onclick="_abrirLb(' + i + ')"><img src="/files/' + item.imagem + '" alt="" loading="lazy"></div>';
+    });
+    grid.innerHTML = html;
+}
+document.getElementById('galPrev').addEventListener('click', function() { _galIr(_galOffset - 1); });
+document.getElementById('galNext').addEventListener('click', function() { _galIr(_galOffset + 1); });
+
+var _lbIdx = 0;
+window._abrirLb = function(idx) { _lbIdx = idx; _lbAtualizar(); document.getElementById('lightbox').classList.add('aberto'); document.body.style.overflow = 'hidden'; };
+function _lbAtualizar() { if (!_galLista.length) return; document.getElementById('lbImg').src = '/files/' + _galLista[_lbIdx].imagem; document.getElementById('lbCounter').innerText = (_lbIdx + 1) + ' / ' + _galLista.length; }
+document.getElementById('lbFechar').addEventListener('click', function() { document.getElementById('lightbox').classList.remove('aberto'); document.getElementById('lbImg').src = ''; document.body.style.overflow = 'auto'; });
+document.getElementById('lbPrev').addEventListener('click', function() { _lbIdx = (_lbIdx - 1 + _galLista.length) % _galLista.length; _lbAtualizar(); });
+document.getElementById('lbNext').addEventListener('click', function() { _lbIdx = (_lbIdx + 1) % _galLista.length; _lbAtualizar(); });
+document.getElementById('lightbox').addEventListener('click', function(e) { if (e.target === this) document.getElementById('lbFechar').click(); });
+document.addEventListener('keydown', function(e) {
+    if (!document.getElementById('lightbox').classList.contains('aberto')) return;
+    if (e.key === 'ArrowLeft') document.getElementById('lbPrev').click();
+    if (e.key === 'ArrowRight') document.getElementById('lbNext').click();
+    if (e.key === 'Escape') document.getElementById('lbFechar').click();
+});
+
+function fecharPagina() { try { var p = window.parent.document; p.getElementById('iframeNivel').src = ''; p.getElementById('modalNivel').classList.remove('aberto'); p.body.style.overflow = 'auto'; } catch(e) { window.close(); } }
+document.getElementById('btnUnidades').addEventListener('click', function(e) { e.preventDefault(); var m = document.getElementById('menuUnidades'); m.style.display = m.style.display === 'block' ? 'none' : 'block'; });
+document.addEventListener('click', function(e) { if (!e.target.closest('.dropdown-unidades')) { var m = document.getElementById('menuUnidades'); if (m) m.style.display = 'none'; } });
+function abrirNoPortal(acao) { try { var p = window.parent.document; p.getElementById('iframeNivel').src = ''; p.getElementById('modalNivel').classList.remove('aberto'); p.body.style.overflow = 'auto'; setTimeout(function() { try { if (acao === 'aluno') p.getElementById('openModalBtn').click(); if (acao === 'pai') p.getElementById('openPortalPaiBtn').click(); if (acao === 'novato') p.getElementById('openNovatoBtn').click(); } catch(e) {} }, 300); } catch(e) {} }
+
+(function() {
+    var pasta = 'cba';
+    var uni = null;
+    try { uni = window.parent.parent; } catch(e) {}
+    if (!uni || typeof uni.listarPasta !== 'function') { try { uni = window.parent; } catch(e) {} }
+    if (uni && typeof uni.listarPasta === 'function') {
+        var vn = '_lista_cba';
+        try { uni[vn] = null; } catch(e) {}
+        uni.listarPasta(pasta);
+        var t = 0, timer = setInterval(function() {
+            t++; var lista = null; try { lista = uni[vn]; } catch(e) {}
+            if (lista !== null && lista !== undefined) { clearInterval(timer); try { var d = typeof lista === 'string' ? JSON.parse(lista) : lista; if (d && d.length) renderGaleria(d); } catch(e) {} }
+            else if (t >= 25) { clearInterval(timer); }
+        }, 200);
+    } else {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/files/cba/cba.json?t=' + Date.now(), true);
+        xhr.onreadystatechange = function() { if (xhr.readyState !== 4) return; if (xhr.status === 200) { try { var d = JSON.parse(xhr.responseText); if (d && d.length) renderGaleria(d); } catch(e) {} } };
+        xhr.send();
+    }
+})();
+</script>
+<button class="btn-indicar-float-sub" onclick="try{window.parent.abrirModalIndicar();}catch(e){}"><i class="fas fa-user-friends"></i> Indique um Amigo</button>
+<style>.btn-indicar-float-sub{position:fixed;bottom:2rem;right:2rem;z-index:999;display:flex;align-items:center;gap:.55rem;background:linear-gradient(135deg,#d33327,#7d2728);color:#fff;padding:.9rem 1.5rem;border-radius:3rem;font-weight:700;font-size:.95rem;font-family:'Inter',sans-serif;box-shadow:0 8px 24px rgba(211,51,39,.5);cursor:pointer;border:2px solid rgba(253,205,98,.4);white-space:nowrap;animation:pulse-ind 2.8s infinite;}@keyframes pulse-ind{0%,100%{box-shadow:0 8px 24px rgba(211,51,39,.5);}50%{box-shadow:0 10px 38px rgba(211,51,39,.8),0 0 0 6px rgba(211,51,39,.12);}}.btn-indicar-float-sub:hover{transform:scale(1.07) translateY(-3px);}</style>
+</body>
+</html>

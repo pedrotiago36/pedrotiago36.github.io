@@ -561,6 +561,31 @@
         }
         .seg-painel:hover .seg-label-btn { opacity: 1; transform: translateY(0); pointer-events: auto; }
         .seg-label-btn:hover { background: #fff; }
+        .seg-olimp-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.28rem;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.35s 0.2s, transform 0.35s 0.2s;
+            margin-top: 0.5rem;
+        }
+        .seg-painel:hover .seg-olimp-links { opacity: 1; transform: translateY(0); }
+        .seg-olimp-link-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.28rem 0.75rem;
+            background: rgba(255,255,255,0.12);
+            border-radius: 2rem;
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .seg-olimp-link-item:hover { background: rgba(253,205,98,0.3); color: #fdcd62; }
         @media (max-width: 768px) {
             .segmentos-wrapper { flex-direction: column; height: auto; gap: 4px; border-radius: 0.8rem; }
             .seg-painel { flex: none; height: 80px; min-width: unset; transition: height 0.55s cubic-bezier(0.25,0.46,0.45,0.94); }
@@ -676,7 +701,7 @@
 
         <!-- NOSSOS DIFERENCIAIS -->
         <div class="section-title">Nossos Diferenciais</div>
-        <div class="niveis-grid" id="diferenciaisGrid">
+        <div class="segmentos-wrapper" id="diferenciaisWrapper">
             <!-- preenchido pelo JS -->
         </div>
 
@@ -960,78 +985,71 @@ function listarPastaPortal(pasta, callback) {
     }, 200);
 }
 
-// ── NOSSOS DIFERENCIAIS ──
+// ── VENEZIANA DIFERENCIAIS ──
 (function() {
-    var _DIFERENCIAIS = [
-        {nome:'CBA',                icone_img:'Nossos Diferenciais/CBA/CentroDeArtes.png',                 icone_fa:'fas fa-palette',   descricao:'Centro Batista de Artes — música, teatro e expressão criativa para todos os níveis.'},
-        {nome:'Educação Cristã',    icone_img:'Nossos Diferenciais/Educacao Crista/EducaçãoCristã.png',    icone_fa:'fas fa-cross',     descricao:'Formação de valores, fé e propósito integrados ao currículo acadêmico.'},
-        {nome:'Empreendedorismo',   icone_img:'Nossos Diferenciais/Empreendedorismo/Empreendedorismo.png', icone_fa:'fas fa-lightbulb', descricao:'Projetos práticos que desenvolvem liderança, visão de negócios e inovação.'},
-        {nome:'NAF',                icone_img:'Nossos Diferenciais/NAF/NAF.png',                           icone_fa:'fas fa-running',   descricao:'Núcleo de Atividades Físicas — esporte, saúde e desenvolvimento integral.'},
-        {nome:'Olimpíadas', icone_img:'', icone_fa:'fas fa-trophy', descricao:'', tipo:'resultados'}
+    var _DIFS = [
+        { prefixo: '1', nome: 'CBA',              sub: 'Música, teatro e expressão criativa', icone: 'fas fa-palette',   cor: '#7d2728', pagina: 'cba.html'               },
+        { prefixo: '2', nome: 'Educação Cristã',  sub: 'Fé e valores integrados ao currículo', icone: 'fas fa-cross',   cor: '#4a2060', pagina: 'educCrista.html'        },
+        { prefixo: '3', nome: 'Empreendedorismo', sub: 'Liderança e visão de negócios',       icone: 'fas fa-lightbulb', cor: '#1a3a5c', pagina: 'empreendedorismo.html'  },
+        { prefixo: '4', nome: 'NAF',              sub: 'Núcleo de Atividades Físicas',        icone: 'fas fa-running',   cor: '#1a4a2a', pagina: 'naf.html'               },
+        { prefixo: '5', nome: 'Olimpíadas',       sub: null,                                  icone: 'fas fa-trophy',    cor: '#7a4800', pagina: 'olimpiadas.html', olimpiadas: true }
     ];
-    var g = document.getElementById('diferenciaisGrid');
-    if (!g) return;
-    var _row  = 'display:flex;align-items:center;gap:0.5rem;padding:0.55rem 0;border-bottom:1px solid rgba(211,51,39,0.1);cursor:pointer;color:#7d2728;font-weight:700;font-size:0.82rem;';
-    var _last = 'display:flex;align-items:center;gap:0.5rem;padding:0.55rem 0;cursor:pointer;color:#7d2728;font-weight:700;font-size:0.82rem;';
-    var _seta = '<i class="fas fa-chevron-right" style="margin-left:auto;font-size:0.7rem;color:#d33327;"></i>';
-    g.innerHTML = _DIFERENCIAIS.map(function(d) {
-        if (d.tipo === 'resultados') {
-            return '<div class="nivel-card animate__animated animate__fadeInUp">' +
-                '<div class="nivel-card-placeholder"><img src="/files/portal/icones/Olimpiadas.png" style="width:90px;height:90px;object-fit:contain;" onerror="this.outerHTML=\'<i class=&quot;fas fa-trophy&quot; style=&quot;font-size:3rem;color:#d33327;&quot;></i>\'"></div>' +
-                '<div class="nivel-card-body"><h3>' + d.nome + '</h3>' +
-                    '<div onclick="abrirModalResultados()" style="' + _row + '"><i class="fas fa-medal" style="color:#d33327;"></i> Resultados' + _seta + '</div>' +
-                    '<div onclick="abrirModalMuralInformativos()" style="' + _row + '"><i class="fas fa-bullhorn" style="color:#d33327;"></i> Mural de Informativos' + _seta + '</div>' +
-                    '<div onclick="abrirModalDocumentosInscricao()" style="' + _row + '"><i class="fas fa-file-alt" style="color:#d33327;"></i> Documentos de Inscrição' + _seta + '</div>' +
-                    '<div onclick="abrirModalEditais()" style="' + _row + '"><i class="fas fa-file-pdf" style="color:#d33327;"></i> Editais' + _seta + '</div>' +
-                    '<div onclick="abrirModalProximasCompeticoes()" style="' + _last + '"><i class="fas fa-flag-checkered" style="color:#d33327;"></i> Próximas Competições' + _seta + '</div>' +
-                '</div></div>';
-        }
-        var topo = d.icone_img
-            ? '<div class="nivel-card-placeholder"><img src="/files/' + d.icone_img + '" style="width:90px;height:90px;object-fit:contain;" onerror="this.outerHTML=\'<i class=&quot;' + d.icone_fa + '&quot; style=&quot;font-size:3rem;color:#d33327;&quot;></i>\'"></div>'
-            : '<div class="nivel-card-placeholder"><i class="' + d.icone_fa + '" style="font-size:3rem;color:#d33327;"></i></div>';
-        return '<div class="nivel-card animate__animated animate__fadeInUp">' + topo +
-               '<div class="nivel-card-body"><h3>' + d.nome + '</h3><p>' + d.descricao + '</p></div></div>';
-    }).join('');
-    initCardTilt();
-})();
 
-// ── TILT 3D HOLOGRÁFICO ──
-function initCardTilt() {
-    document.querySelectorAll('#diferenciaisGrid .nivel-card').forEach(function(card) {
-        var glare = document.createElement('div');
-        glare.className = 'nivel-card-glare';
-        card.appendChild(glare);
-        var raf = null;
-        card.addEventListener('mousemove', function(e) {
-            if (raf) cancelAnimationFrame(raf);
-            raf = requestAnimationFrame(function() {
-                var rect = card.getBoundingClientRect();
-                var dx = ((e.clientX - rect.left) / rect.width  - 0.5) * 2;
-                var dy = ((e.clientY - rect.top)  / rect.height - 0.5) * 2;
-                card.classList.remove('tilt-reset'); card.classList.add('tilt-active');
-                card.style.transform = 'perspective(600px) rotateX(' + (-dy*20).toFixed(2) + 'deg) rotateY(' + (dx*20).toFixed(2) + 'deg) scale3d(1.22,1.22,1.22) translateZ(40px)';
-                var gx = ((e.clientX - rect.left) / rect.width  * 100).toFixed(1);
-                var gy = ((e.clientY - rect.top)  / rect.height * 100).toFixed(1);
-                glare.style.background = 'radial-gradient(circle at ' + gx + '% ' + gy + '%, rgba(255,255,255,0.55) 0%, rgba(255,234,187,0.25) 25%, rgba(211,51,39,0.12) 50%, transparent 70%)';
+    function renderDiferenciais(imagens) {
+        var wrapper = document.getElementById('diferenciaisWrapper');
+        if (!wrapper) return;
+
+        var mapaImg = {};
+        if (imagens && imagens.length) {
+            imagens.forEach(function(item) {
+                var nome = item.imagem.split('/').pop();
+                var prefixo = nome.charAt(0);
+                if (!mapaImg[prefixo]) mapaImg[prefixo] = '/files/' + item.imagem;
             });
-        });
-        card.addEventListener('mouseleave', function() {
-            if (raf) cancelAnimationFrame(raf);
-            card.classList.remove('tilt-active'); card.classList.add('tilt-reset');
-            card.style.transform = 'perspective(600px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1) translateZ(0px)';
-            glare.style.background = 'none';
-        });
-    });
-}
+        }
+
+        wrapper.innerHTML = _DIFS.map(function(d) {
+            var imgSrc = mapaImg[d.prefixo] || '';
+            var interior = imgSrc
+                ? '<img src="' + imgSrc + '" alt="' + d.nome + '" loading="lazy">'
+                : '<div class="seg-fundo" style="background:' + d.cor + ';"></div>';
+
+            var labelContent = '<i class="' + d.icone + ' seg-label-icon"></i>' +
+                '<span class="seg-label-nome">' + d.nome + '</span>';
+
+            if (d.olimpiadas) {
+                labelContent += '<div class="seg-olimp-links">' +
+                    '<div class="seg-olimp-link-item" onclick="event.stopPropagation();abrirModalResultados()"><i class="fas fa-medal"></i> Resultados</div>' +
+                    '<div class="seg-olimp-link-item" onclick="event.stopPropagation();abrirModalMuralInformativos()"><i class="fas fa-bullhorn"></i> Mural de Informativos</div>' +
+                    '<div class="seg-olimp-link-item" onclick="event.stopPropagation();abrirModalDocumentosInscricao()"><i class="fas fa-file-alt"></i> Docs de Inscrição</div>' +
+                    '<div class="seg-olimp-link-item" onclick="event.stopPropagation();abrirModalEditais()"><i class="fas fa-file-pdf"></i> Editais</div>' +
+                    '<div class="seg-olimp-link-item" onclick="event.stopPropagation();abrirModalProximasCompeticoes()"><i class="fas fa-flag-checkered"></i> Próximas Competições</div>' +
+                '</div>';
+            } else {
+                labelContent += '<span class="seg-label-sub">' + d.sub + '</span>';
+            }
+
+            var onclick = d.pagina ? ' onclick="abrirPaginaNivel(\'' + d.pagina + '\')"' : '';
+            return '<div class="seg-painel"' + onclick + '>' +
+                interior +
+                '<div class="seg-overlay"></div>' +
+                '<div class="seg-label">' + labelContent + '</div>' +
+            '</div>';
+        }).join('');
+    }
+
+    renderDiferenciais([]);
+    listarPastaPortal('portal/diferenciais', renderDiferenciais);
+})();
 
 // ── VENEZIANA SEGMENTOS ──
 (function() {
     var _SEGS = [
-        { prefixo: '1', nome: 'Educação Infantil',  sub: 'Berçário ao Pré II',    icone: 'fas fa-child',          cor: '#7d2728', pagina: 'educInfantil.html'    },
-        { prefixo: '2', nome: 'Anos Iniciais',       sub: '1º ao 5º Ano',          icone: 'fas fa-pencil-alt',     cor: '#8b3a1a', pagina: 'fundI.html'           },
-        { prefixo: '3', nome: 'Anos Finais',         sub: '6º ao 9º Ano',          icone: 'fas fa-book-open',      cor: '#5a2060', pagina: 'fundII.html'          },
-        { prefixo: '4', nome: 'Ensino Médio',        sub: '1ª à 3ª Série',         icone: 'fas fa-graduation-cap', cor: '#1a3a5c', pagina: 'ensinoMedio.html'     },
-        { prefixo: '5', nome: 'Pré-Universitário',   sub: 'Cursinho Batista',       icone: 'fas fa-university',     cor: '#1a4a2a', pagina: 'preVestibular.html'   }
+        { prefixo: '1', nome: 'Educação Infantil',  sub: 'Infantil I ao Infantil 5', icone: 'fas fa-child',          cor: '#7d2728', pagina: 'educInfantil.html'    },
+        { prefixo: '2', nome: 'Anos Iniciais',       sub: '1º ao 5º Ano',            icone: 'fas fa-pencil-alt',     cor: '#8b3a1a', pagina: 'fundI.html'           },
+        { prefixo: '3', nome: 'Anos Finais',         sub: '6º ao 8º Ano',            icone: 'fas fa-book-open',      cor: '#5a2060', pagina: 'fundII.html'          },
+        { prefixo: '4', nome: 'Ensino Médio',        sub: '9º ao 2º Ano',            icone: 'fas fa-graduation-cap', cor: '#1a3a5c', pagina: 'ensinoMedio.html'     },
+        { prefixo: '5', nome: 'Pré-Universitário',   sub: '3º Ano',                  icone: 'fas fa-university',     cor: '#1a4a2a', pagina: 'preVestibular.html'   }
     ];
 
     function renderSegmentos(imagens) {
