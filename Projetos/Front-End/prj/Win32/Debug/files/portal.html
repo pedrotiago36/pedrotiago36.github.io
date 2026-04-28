@@ -163,69 +163,6 @@
 
         /* ── NÍVEIS DE ENSINO ── */
         .niveis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin: 2rem 0 3rem; }
-        .niveis-grid { perspective: 1400px; }
-        .nivel-card {
-            border-radius: 1.5rem;
-            overflow: hidden;
-            box-shadow: 0 8px 28px rgba(0,0,0,0.12);
-            background: white;
-            border: 1px solid rgba(253,205,98,0.35);
-            cursor: pointer;
-            position: relative;
-            transform-style: preserve-3d;
-            will-change: transform;
-            transition: box-shadow 0.15s ease, border-color 0.15s ease;
-        }
-        /* glare overlay */
-        .nivel-card-glare {
-            position: absolute;
-            inset: 0;
-            border-radius: 1.5rem;
-            pointer-events: none;
-            z-index: 10;
-            opacity: 0;
-            transition: opacity 0.25s ease;
-            mix-blend-mode: screen;
-        }
-        /* cards irmãos recuam quando um está em destaque */
-        .niveis-grid:has(.tilt-active) .nivel-card:not(.tilt-active) {
-            transform: perspective(900px) scale3d(0.92,0.92,0.92) !important;
-            filter: brightness(0.7);
-            transition: transform 0.35s ease, filter 0.35s ease !important;
-        }
-        /* brilho dourado pulsante ao redor quando ativo */
-        .nivel-card.tilt-active {
-            border-color: #fdcd62;
-            box-shadow:
-                0 50px 80px rgba(0,0,0,0.65),
-                0 0 0 3px #fdcd62,
-                0 0 40px 8px rgba(253,205,98,0.5),
-                0 0 80px 20px rgba(211,51,39,0.3);
-            z-index: 10;
-        }
-        .nivel-card.tilt-active .nivel-card-glare { opacity: 1; }
-        /* retorno suave ao soltar */
-        .nivel-card.tilt-reset {
-            transition: transform 0.65s cubic-bezier(0.23,1,0.32,1),
-                        box-shadow 0.65s ease,
-                        border-color 0.4s ease,
-                        filter 0.5s ease !important;
-            filter: brightness(1) !important;
-        }
-        .nivel-card-placeholder, .nivel-card-body { position: relative; z-index: 1; }
-        .nivel-card-img { width: 100%; height: 170px; object-fit: cover; display: block; }
-        .nivel-card-placeholder {
-            width: 100%; height: 170px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 3.5rem;
-            background: linear-gradient(135deg,#fff2e3,#ffe6cc);
-            transition: background 0.4s ease;
-        }
-        .nivel-card.tilt-active .nivel-card-placeholder { background: linear-gradient(135deg,#fde8e8,#ffd5b0); }
-        .nivel-card-body { padding: 1.3rem; }
-        .nivel-card-body h3 { color: #7d2728; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; font-family: 'Poppins',sans-serif; transition: color 0.3s; }
-        .nivel-card.tilt-active .nivel-card-body h3 { color: #990000; }
-        .nivel-card-body p { color: #5a3a2e; font-size: 0.85rem; line-height: 1.6; }
         /* ── CARD RESULTADOS E CONCURSOS ── */
         .res-card { grid-column: 1/-1; cursor: default; }
         .res-card:hover { transform: none; box-shadow: 0 8px 24px rgba(0,0,0,0.07); }
@@ -467,6 +404,159 @@
             .btn-login, .btn-pai, .btn-novato, .btn-unidades { padding: 0.5rem 1rem !important; }
         }
 
+        /* ── PILARES DOS DIFERENCIAIS ── */
+        .pilares-section {
+            width: 100%;
+            margin-top: 3.5rem;
+            overflow: hidden;
+        }
+        .pilares-header {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            padding: 0 2rem 2.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .pilares-header-linha {
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffeabb, transparent);
+            opacity: 0.5;
+        }
+        .pilares-titulo {
+            color: #ffeabb;
+            font-size: 1.9rem;
+            font-weight: 800;
+            font-family: 'Poppins', sans-serif;
+            white-space: nowrap;
+            text-align: center;
+            letter-spacing: 0.02em;
+        }
+        .pilares-grid {
+            display: flex;
+            width: 100%;
+            height: 520px;
+        }
+        .pilar-item {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: flex 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+        }
+        .pilar-item:hover { flex: 2.8; }
+        .pilar-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            background-color: #3d1a1b;
+            transition: transform 0.7s ease;
+        }
+        .pilar-item:hover .pilar-bg { transform: scale(1.06); }
+        .pilar-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                to top,
+                rgba(10,2,2,0.92) 0%,
+                rgba(30,5,5,0.65) 40%,
+                rgba(80,10,10,0.25) 70%,
+                transparent 100%
+            );
+            transition: background 0.5s ease;
+        }
+        .pilar-item:hover .pilar-overlay {
+            background: linear-gradient(
+                to top,
+                rgba(10,2,2,0.88) 0%,
+                rgba(153,0,0,0.45) 45%,
+                rgba(211,51,39,0.15) 75%,
+                transparent 100%
+            );
+        }
+        .pilar-num {
+            position: absolute;
+            top: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 5rem;
+            font-weight: 900;
+            font-family: 'Poppins', sans-serif;
+            color: rgba(255,234,187,0.12);
+            line-height: 1;
+            pointer-events: none;
+            transition: color 0.4s, font-size 0.4s;
+            white-space: nowrap;
+        }
+        .pilar-item:hover .pilar-num {
+            color: rgba(255,234,187,0.22);
+            font-size: 6rem;
+        }
+        .pilar-content {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            padding: 2rem 1.5rem 2.2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.6rem;
+            text-align: center;
+        }
+        .pilar-icone {
+            font-size: 2rem;
+            color: #fdcd62;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.4s 0.1s, transform 0.4s 0.1s;
+        }
+        .pilar-item:hover .pilar-icone { opacity: 1; transform: translateY(0); }
+        .pilar-nome {
+            color: #ffeabb;
+            font-weight: 800;
+            font-size: 1rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            transition: writing-mode 0s 0.15s, transform 0s 0.15s, font-size 0.35s;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+        }
+        .pilar-item:hover .pilar-nome {
+            writing-mode: horizontal-tb;
+            transform: none;
+            font-size: 1.4rem;
+            letter-spacing: 0.04em;
+        }
+        .pilar-desc {
+            color: rgba(255,234,187,0.82);
+            font-size: 0.85rem;
+            line-height: 1.55;
+            max-width: 260px;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.4s 0.15s, transform 0.4s 0.15s;
+        }
+        .pilar-item:hover .pilar-desc { opacity: 1; transform: translateY(0); }
+        .pilar-divisor {
+            width: 0;
+            height: 2px;
+            background: #fdcd62;
+            transition: width 0.45s 0.1s ease;
+            border-radius: 2px;
+            opacity: 0.7;
+        }
+        .pilar-item:hover .pilar-divisor { width: 60px; }
+        @media (max-width: 768px) {
+            .pilares-grid { flex-direction: column; height: auto; }
+            .pilar-item { flex: none; height: 90px; transition: height 0.55s cubic-bezier(0.25,0.46,0.45,0.94); }
+            .pilar-item:hover { flex: none; height: 280px; }
+            .pilar-nome { writing-mode: horizontal-tb; transform: none; font-size: 1rem; }
+            .pilar-item:hover .pilar-nome { font-size: 1.2rem; }
+            .pilares-titulo { font-size: 1.3rem; white-space: normal; }
+        }
+
         /* ── VENEZIANA DE SEGMENTOS ── */
         .segmentos-wrapper {
             display: flex;
@@ -691,14 +781,19 @@
             <!-- preenchido pelo JS -->
         </div>
 
-        <!-- NOSSOS DIFERENCIAIS -->
-        <div class="section-title section-title-claro">Nossos Diferenciais</div>
-        <div class="niveis-grid" id="diferenciaisGrid">
+    </div><!-- /container -->
+
+    <!-- PILARES DOS NOSSOS DIFERENCIAIS -->
+    <section class="pilares-section">
+        <div class="pilares-header">
+            <div class="pilares-header-linha"></div>
+            <h2 class="pilares-titulo">Pilares dos Nossos Diferenciais</h2>
+            <div class="pilares-header-linha"></div>
+        </div>
+        <div class="pilares-grid" id="diferenciaisGrid">
             <!-- preenchido pelo JS -->
         </div>
-
-
-    </div><!-- /container -->
+    </section>
 
     <!-- FOOTER EXPANDIDO -->
     <footer class="footer-expanded">
@@ -978,96 +1073,78 @@ function listarPastaPortal(pasta, callback) {
     }, 200);
 }
 
-// ── NOSSOS DIFERENCIAIS ──
-var _DIFERENCIAIS = [
-    {nome:'CBA',                icone_img:'Nossos Diferenciais/CBA/CentroDeArtes.png',                    icone_fa:'fas fa-palette',     descricao:'Centro Batista de Artes — música, teatro e expressão criativa para todos os níveis.'},
-    {nome:'Educação Cristã',    icone_img:'Nossos Diferenciais/Educacao Crista/EducaçãoCristã.png',       icone_fa:'fas fa-cross',       descricao:'Formação de valores, fé e propósito integrados ao currículo acadêmico.'},
-    {nome:'Empreendedorismo',   icone_img:'Nossos Diferenciais/Empreendedorismo/Empreendedorismo.png',    icone_fa:'fas fa-lightbulb',   descricao:'Projetos práticos que desenvolvem liderança, visão de negócios e inovação.'},
-    {nome:'NAF',                icone_img:'Nossos Diferenciais/NAF/NAF.png',                              icone_fa:'fas fa-running',     descricao:'Núcleo de Atividades Físicas — esporte, saúde e desenvolvimento integral.'},
-    {nome:'Bibliotecas',        icone_img:'Nossos Diferenciais/Bibliotecas/biblioteca.png',               icone_fa:'fas fa-book-open',   descricao:'Acervo completo e espaços de leitura e pesquisa em todas as unidades.'},
-    {nome:'Olimpíadas', icone_img:'', icone_fa:'fas fa-trophy', descricao:'', tipo:'resultados'}
+// ── PILARES DOS DIFERENCIAIS ──
+var _PILARES_DEFAULT = [
+    { prefixo:'1', nome:'CBA',               sub:'Centro Batista de Artes',         icone:'fas fa-palette',       cor:'#3d1a1b' },
+    { prefixo:'2', nome:'Educação Cristã',    sub:'Fé e valores no currículo',       icone:'fas fa-cross',         cor:'#1a2a3d' },
+    { prefixo:'3', nome:'Empreendedorismo',   sub:'Liderança e inovação',            icone:'fas fa-lightbulb',     cor:'#1a3d2a' },
+    { prefixo:'4', nome:'NAF',                sub:'Núcleo de Atividades Físicas',    icone:'fas fa-running',       cor:'#3d2a1a' },
+    { prefixo:'5', nome:'Olimpíadas',         sub:'Resultados e competições',        icone:'fas fa-trophy',        cor:'#2a1a3d', olimpiadas: true }
 ];
 
-(function() {
-    var g = document.getElementById('diferenciaisGrid');
-    if (!g) return;
-    g.innerHTML = _DIFERENCIAIS.map(function(d) {
-        if (d.tipo === 'resultados') {
-            var _row = 'display:flex;align-items:center;gap:0.5rem;padding:0.55rem 0;border-bottom:1px solid rgba(211,51,39,0.1);cursor:pointer;color:#7d2728;font-weight:700;font-size:0.82rem;';
-            var _last = 'display:flex;align-items:center;gap:0.5rem;padding:0.55rem 0;cursor:pointer;color:#7d2728;font-weight:700;font-size:0.82rem;';
-            var _seta = '<i class="fas fa-chevron-right" style="margin-left:auto;font-size:0.7rem;color:#d33327;"></i>';
-            return '<div class="nivel-card animate__animated animate__fadeInUp">' +
-                '<div class="nivel-card-placeholder"><img src="/files/portal/icones/Olimpiadas.png" style="width:90px;height:90px;object-fit:contain;" onerror="this.outerHTML=\'<i class=&quot;fas fa-trophy&quot; style=&quot;font-size:3rem;color:#d33327;&quot;></i>\'"></div>' +
-                '<div class="nivel-card-body">' +
-                    '<h3>' + d.nome + '</h3>' +
-                    '<div onclick="abrirModalResultados()" style="' + _row + '"><i class="fas fa-medal" style="color:#d33327;"></i> Resultados' + _seta + '</div>' +
-                    '<div onclick="abrirModalMuralInformativos()" style="' + _row + '"><i class="fas fa-bullhorn" style="color:#d33327;"></i> Mural de Informativos' + _seta + '</div>' +
-                    '<div onclick="abrirModalDocumentosInscricao()" style="' + _row + '"><i class="fas fa-file-alt" style="color:#d33327;"></i> Documentos de Inscrição' + _seta + '</div>' +
-                    '<div onclick="abrirModalEditais()" style="' + _row + '"><i class="fas fa-file-pdf" style="color:#d33327;"></i> Editais' + _seta + '</div>' +
-                    '<div onclick="abrirModalProximasCompeticoes()" style="' + _last + '"><i class="fas fa-flag-checkered" style="color:#d33327;"></i> Próximas Competições' + _seta + '</div>' +
-                '</div></div>';
-        }
-        var topo = d.icone_img
-            ? '<div class="nivel-card-placeholder"><img src="/files/' + d.icone_img + '" style="width:90px;height:90px;object-fit:contain;" onerror="this.outerHTML=\'<i class=&quot;' + d.icone_fa + '&quot; style=&quot;font-size:3rem;color:#d33327;&quot;></i>\'"></div>'
-            : '<div class="nivel-card-placeholder"><i class="' + d.icone_fa + '" style="font-size:3rem;color:#d33327;"></i></div>';
-        return '<div class="nivel-card animate__animated animate__fadeInUp">' + topo +
-               '<div class="nivel-card-body"><h3>' + d.nome + '</h3><p>' + d.descricao + '</p></div></div>';
-    }).join('');
-    initCardTilt();
-})();
+function renderPilares(imagens) {
+    var grid = document.getElementById('diferenciaisGrid');
+    if (!grid) return;
 
-// ── TILT 3D HOLOGRÁFICO ──
-function initCardTilt() {
-    var cards = document.querySelectorAll('#diferenciaisGrid .nivel-card');
-    cards.forEach(function(card) {
-        // injeta glare
-        var glare = document.createElement('div');
-        glare.className = 'nivel-card-glare';
-        card.appendChild(glare);
-
-        var raf = null;
-
-        card.addEventListener('mousemove', function(e) {
-            if (raf) cancelAnimationFrame(raf);
-            raf = requestAnimationFrame(function() {
-                var rect = card.getBoundingClientRect();
-                var x = e.clientX - rect.left;
-                var y = e.clientY - rect.top;
-                var cx = rect.width  / 2;
-                var cy = rect.height / 2;
-                var dx = (x - cx) / cx;   // -1 → 1
-                var dy = (y - cy) / cy;   // -1 → 1
-
-                var MAX = 20;
-                var rX = (-dy * MAX).toFixed(2);
-                var rY = ( dx * MAX).toFixed(2);
-
-                card.classList.remove('tilt-reset');
-                card.classList.add('tilt-active');
-                card.style.transform =
-                    'perspective(600px) rotateX(' + rX + 'deg) rotateY(' + rY + 'deg) scale3d(1.22,1.22,1.22) translateZ(40px)';
-
-                // glare: radial branco + arco-íris suave
-                var gx = ((x / rect.width)  * 100).toFixed(1);
-                var gy = ((y / rect.height) * 100).toFixed(1);
-                glare.style.background =
-                    'radial-gradient(circle at ' + gx + '% ' + gy + '%, ' +
-                        'rgba(255,255,255,0.55) 0%, ' +
-                        'rgba(255,234,187,0.25) 25%, ' +
-                        'rgba(211,51,39,0.12)  50%, ' +
-                        'transparent 70%)';
-            });
+    var mapaImg = {};
+    if (imagens && imagens.length) {
+        imagens.forEach(function(item) {
+            var nome = item.imagem.split('/').pop();
+            var prefixo = nome.charAt(0);
+            if (!mapaImg[prefixo]) mapaImg[prefixo] = '/files/' + item.imagem;
         });
+    }
 
-        card.addEventListener('mouseleave', function() {
-            if (raf) cancelAnimationFrame(raf);
-            card.classList.remove('tilt-active');
-            card.classList.add('tilt-reset');
-            card.style.transform = 'perspective(600px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1) translateZ(0px)';
-            glare.style.background = 'none';
+    grid.innerHTML = _PILARES_DEFAULT.map(function(p, idx) {
+        var imgSrc = mapaImg[p.prefixo] || '';
+        var bgStyle = imgSrc
+            ? 'background-image:url(\'' + imgSrc + '\');'
+            : 'background-color:' + p.cor + ';';
+
+        var corpo = '';
+        if (p.olimpiadas) {
+            var _row = 'display:flex;align-items:center;gap:0.5rem;padding:0.45rem 0;border-bottom:1px solid rgba(255,234,187,0.15);cursor:pointer;color:#ffeabb;font-weight:700;font-size:0.78rem;';
+            var _last = 'display:flex;align-items:center;gap:0.5rem;padding:0.45rem 0;cursor:pointer;color:#ffeabb;font-weight:700;font-size:0.78rem;';
+            var _arr  = '<i class="fas fa-chevron-right" style="margin-left:auto;font-size:0.65rem;color:#fdcd62;"></i>';
+            corpo =
+                '<div onclick="abrirModalResultados()" style="' + _row + '"><i class="fas fa-medal" style="color:#fdcd62;"></i> Resultados' + _arr + '</div>' +
+                '<div onclick="abrirModalMuralInformativos()" style="' + _row + '"><i class="fas fa-bullhorn" style="color:#fdcd62;"></i> Mural de Informativos' + _arr + '</div>' +
+                '<div onclick="abrirModalDocumentosInscricao()" style="' + _row + '"><i class="fas fa-file-alt" style="color:#fdcd62;"></i> Documentos de Inscrição' + _arr + '</div>' +
+                '<div onclick="abrirModalEditais()" style="' + _row + '"><i class="fas fa-file-pdf" style="color:#fdcd62;"></i> Editais' + _arr + '</div>' +
+                '<div onclick="abrirModalProximasCompeticoes()" style="' + _last + '"><i class="fas fa-flag-checkered" style="color:#fdcd62;"></i> Próximas Competições' + _arr + '</div>';
+        }
+
+        return '<div class="pilar-item animate__animated animate__fadeIn">' +
+            '<div class="pilar-bg" style="' + bgStyle + 'background-size:cover;background-position:center;"></div>' +
+            '<div class="pilar-overlay"></div>' +
+            '<div class="pilar-num">' + String(idx + 1).padStart(2,'0') + '</div>' +
+            '<div class="pilar-content">' +
+                '<i class="' + p.icone + ' pilar-icone"></i>' +
+                '<span class="pilar-nome">' + p.nome + '</span>' +
+                '<div class="pilar-divisor"></div>' +
+                (p.olimpiadas
+                    ? '<div class="pilar-menu" style="opacity:0;transform:translateY(12px);transition:opacity 0.4s 0.2s,transform 0.4s 0.2s;width:100%;">' + corpo + '</div>'
+                    : '<p class="pilar-desc">' + p.sub + '</p>'
+                ) +
+            '</div>' +
+        '</div>';
+    }).join('');
+
+    // expande menu olimpíadas ao hover
+    grid.querySelectorAll('.pilar-item').forEach(function(item) {
+        var menu = item.querySelector('.pilar-menu');
+        if (!menu) return;
+        item.addEventListener('mouseenter', function() {
+            menu.style.opacity = '1'; menu.style.transform = 'translateY(0)';
+        });
+        item.addEventListener('mouseleave', function() {
+            menu.style.opacity = '0'; menu.style.transform = 'translateY(12px)';
         });
     });
 }
+
+renderPilares([]);
+listarPastaPortal('portal/pilares', renderPilares);
 
 // ── VENEZIANA SEGMENTOS ──
 (function() {
