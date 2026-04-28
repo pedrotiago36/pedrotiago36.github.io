@@ -263,7 +263,15 @@
         /* ── MODAIS ── */
         .modal-novato-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(125,39,40,0.6); backdrop-filter: blur(8px); z-index: 5000; align-items: center; justify-content: center; }
         .modal-novato-overlay.ativo { display: flex; }
-        .modal-novato-box { background: rgba(255,248,235,0.98); backdrop-filter: blur(20px); max-width: 540px; width: 90%; padding: 2rem; border-radius: 2rem; text-align: center; animation: scaleIn 0.2s ease-out; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border: 1px solid #fdcd62; }
+        .modal-novato-box { background: rgba(255,248,235,0.98); backdrop-filter: blur(20px); max-width: 540px; width: 90%; padding: 2rem; border-radius: 2rem; text-align: center; animation: scaleIn 0.2s ease-out; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border: 1px solid #fdcd62; position: relative; }
+        .btn-fechar-novato { position: absolute; top: 0.9rem; right: 0.9rem; background: #f0d5c8; border: none; color: #7d2728; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 0.85rem; transition: 0.25s; display: flex; align-items: center; justify-content: center; }
+        .btn-fechar-novato:hover { background: #d33327; color: white; transform: rotate(90deg); }
+        .novato-etapas { background: linear-gradient(135deg, #fff8e8, #fff2d0); border: 1px solid rgba(253,205,98,0.7); border-radius: 1rem; padding: 0.9rem 1.1rem; margin: 0.8rem 0 0.6rem; text-align: left; }
+        .novato-etapas-titulo { font-family: 'Poppins', sans-serif; font-size: 0.8rem; font-weight: 800; color: #7d2728; margin-bottom: 0.55rem; display: flex; align-items: center; gap: 0.4rem; }
+        .novato-etapas-titulo i { color: #d33327; font-size: 0.9rem; }
+        .novato-etapas-lista { list-style: none; display: flex; flex-direction: column; gap: 0.32rem; }
+        .novato-etapas-lista li { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.78rem; color: #5a3a2e; font-weight: 500; line-height: 1.4; }
+        .novato-etapas-lista li i { color: #2a862a; font-size: 0.8rem; margin-top: 0.15rem; flex-shrink: 0; }
         .novato-unidades-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 1rem; }
         .novato-unidade-card { border: 2px solid #fdcd62; border-radius: 1rem; padding: 0.75rem 0.5rem; cursor: pointer; text-align: center; transition: all 0.2s; background: white; }
         .novato-unidade-card:hover { border-color: #d33327; background: #fff5f5; }
@@ -629,7 +637,7 @@
                 </li>
                 <li><a href="#" id="openModalBtn" class="btn-login"><i class="fas fa-sign-in-alt"></i> Portal do Aluno</a></li>
                 <li><a href="#" id="openPortalPaiBtn" class="btn-pai"><i class="fas fa-users"></i> Portal do Pai Batista</a></li>
-                <li><a href="#" id="openNovatoBtn" class="btn-novato"><img src="/files/portal/icones/Quero Ser Batista.png" alt=""> Quero ser Batista, agende uma visita</a></li>
+                <li><a href="#" id="openNovatoBtn" class="btn-novato"><img src="/files/portal/icones/Quero Ser Batista.png" alt=""> Quero ser Batista</a></li>
             </ul>
         </nav>
     </div>
@@ -749,6 +757,7 @@
 <!-- MODAL NOVATO -->
 <div id="modalNovato" class="modal-novato-overlay">
     <div class="modal-novato-box">
+        <button class="btn-fechar-novato" id="fecharNovatoBtn"><i class="fas fa-times"></i></button>
         <img src="/files/portal/LogoBatista.png" alt="Colégio Batista" style="height:60px;width:auto;margin-bottom:0.5rem;">
         <h2 style="color:#7d2728; margin:0.3rem 0 0.2rem;">Quero ser Batista!</h2>
         <p style="color:#5a3a2e; margin-bottom:0.6rem;">Selecione a unidade que deseja visitar</p>
@@ -770,7 +779,7 @@
                 <span>Seis Bocas</span>
             </div>
         </div>
-        <p style="color:#5a3a2e; margin-bottom:1rem;">Preencha com os dados do responsável</p>
+        <p style="color:#5a3a2e; margin-bottom:0.8rem;">Preencha com os dados do responsável</p>
         <div class="novato-row">
             <div class="novato-field">
                 <input type="text" id="novatoNome" placeholder="Nome *">
@@ -785,10 +794,21 @@
         <div class="novato-field">
             <input type="text" id="novatoTelefone" placeholder="Telefone *">
         </div>
+        <div class="novato-etapas">
+            <div class="novato-etapas-titulo">
+                <i class="fas fa-info-circle"></i> Processo de Matrícula — 5 etapas realizadas por e-mail
+            </div>
+            <ul class="novato-etapas-lista">
+                <li><i class="fas fa-check-circle"></i> Primeiro Contato / Informações</li>
+                <li><i class="fas fa-check-circle"></i> Visitação à escola, conhecer o ambiente e instalações</li>
+                <li><i class="fas fa-check-circle"></i> Entrevista com o aluno</li>
+                <li><i class="fas fa-check-circle"></i> Entrega de documentos e assinatura do contrato</li>
+                <li><i class="fas fa-check-circle"></i> Pagamento</li>
+            </ul>
+        </div>
         <button class="btn-novato-salvar" id="btnNovatoSalvar">
-            <i class="fas fa-paper-plane"></i> Enviar Interesse
+            <i class="fas fa-paper-plane"></i> Enviar Pré-Matrícula
         </button>
-        <button class="close-modal" id="fecharNovatoBtn"><i class="fas fa-times"></i> Cancelar</button>
     </div>
 </div>
 
