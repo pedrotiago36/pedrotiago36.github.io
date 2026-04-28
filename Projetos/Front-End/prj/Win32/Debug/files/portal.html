@@ -163,12 +163,40 @@
 
         /* ── NÍVEIS DE ENSINO ── */
         .niveis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin: 2rem 0 3rem; }
-        .nivel-card { border-radius: 1.5rem; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.07); transition: all 0.4s cubic-bezier(0.2,0.9,0.4,1.1); background: white; border: 1px solid rgba(253,205,98,0.4); cursor: pointer; }
-        .nivel-card:hover { transform: translateY(-10px); box-shadow: 0 28px 44px -10px rgba(211,51,39,0.22); border-color: #fdcd62; }
-        .nivel-card-img { width: 100%; height: 170px; object-fit: cover; display: block; }
-        .nivel-card-placeholder { width: 100%; height: 170px; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; background: linear-gradient(135deg,#fff2e3,#ffe6cc); }
+        .nivel-card {
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.07);
+            transition: transform 0.4s cubic-bezier(0.2,0.9,0.4,1.1),
+                        box-shadow 0.4s ease,
+                        border-color 0.3s ease,
+                        background 0.35s ease;
+            background: white;
+            border: 1px solid rgba(253,205,98,0.4);
+            cursor: pointer;
+            position: relative;
+        }
+        .nivel-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 1.5rem;
+            background: linear-gradient(135deg, rgba(211,51,39,0.08), rgba(253,205,98,0.12));
+            opacity: 0;
+            transition: opacity 0.35s ease;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .nivel-card:hover { transform: translateY(-12px) scale(1.03); box-shadow: 0 32px 48px -8px rgba(153,0,0,0.35), 0 0 0 3px #fdcd62; border-color: #fdcd62; }
+        .nivel-card:hover::before { opacity: 1; }
+        .nivel-card-placeholder, .nivel-card-body { position: relative; z-index: 1; }
+        .nivel-card-img { width: 100%; height: 170px; object-fit: cover; display: block; transition: transform 0.4s ease; }
+        .nivel-card:hover .nivel-card-img { transform: scale(1.06); }
+        .nivel-card-placeholder { width: 100%; height: 170px; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; background: linear-gradient(135deg,#fff2e3,#ffe6cc); transition: background 0.35s ease; }
+        .nivel-card:hover .nivel-card-placeholder { background: linear-gradient(135deg,#fde8e8,#ffd5b0); }
         .nivel-card-body { padding: 1.3rem; }
-        .nivel-card-body h3 { color: #7d2728; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; font-family: 'Poppins',sans-serif; }
+        .nivel-card-body h3 { color: #7d2728; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; font-family: 'Poppins',sans-serif; transition: color 0.3s; }
+        .nivel-card:hover .nivel-card-body h3 { color: #990000; }
         .nivel-card-body p { color: #5a3a2e; font-size: 0.85rem; line-height: 1.6; }
         /* ── CARD RESULTADOS E CONCURSOS ── */
         .res-card { grid-column: 1/-1; cursor: default; }
