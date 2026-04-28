@@ -454,12 +454,13 @@
         .seg-label {
             position: absolute;
             bottom: 0; left: 0; right: 0;
-            padding: 1.4rem 1rem 1.1rem;
+            padding: 1.4rem 0.7rem 1.1rem;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: flex-end;
             gap: 0.35rem;
         }
+        .seg-painel:hover .seg-label { align-items: center; }
         .seg-label-icon {
             font-size: 1.4rem;
             color: #fdcd62;
@@ -471,8 +472,9 @@
         .seg-label-nome {
             color: #fff;
             font-weight: 800;
-            font-size: 0.78rem;
-            text-align: center;
+            font-size: 0.95rem;
+            text-align: right;
+            align-self: flex-end;
             letter-spacing: 0.04em;
             text-transform: uppercase;
             white-space: nowrap;
@@ -483,8 +485,10 @@
         .seg-painel:hover .seg-label-nome {
             writing-mode: horizontal-tb;
             transform: none;
-            font-size: 1rem;
+            font-size: 1.25rem;
             white-space: normal;
+            align-self: center;
+            text-align: center;
         }
         .seg-label-sub {
             color: rgba(255,255,255,0.75);
@@ -1001,11 +1005,11 @@ listarPastaPortal('niveis', renderNiveis);
 // ── VENEZIANA SEGMENTOS ──
 (function() {
     var _SEGS = [
-        { prefixo: '1', nome: 'Educação Infantil',  sub: 'Berçário ao Pré II',    icone: 'fas fa-child',          cor: '#7d2728' },
-        { prefixo: '2', nome: 'Anos Iniciais',       sub: '1º ao 5º Ano',          icone: 'fas fa-pencil-alt',     cor: '#8b3a1a' },
-        { prefixo: '3', nome: 'Anos Finais',         sub: '6º ao 9º Ano',          icone: 'fas fa-book-open',      cor: '#5a2060' },
-        { prefixo: '4', nome: 'Ensino Médio',        sub: '1ª à 3ª Série',         icone: 'fas fa-graduation-cap', cor: '#1a3a5c' },
-        { prefixo: '5', nome: 'Pré-Universitário',   sub: 'Cursinho Batista',       icone: 'fas fa-university',     cor: '#1a4a2a' }
+        { prefixo: '1', nome: 'Educação Infantil',  sub: 'Berçário ao Pré II',    icone: 'fas fa-child',          cor: '#7d2728', pagina: 'educInfantil.html'    },
+        { prefixo: '2', nome: 'Anos Iniciais',       sub: '1º ao 5º Ano',          icone: 'fas fa-pencil-alt',     cor: '#8b3a1a', pagina: 'fundI.html'           },
+        { prefixo: '3', nome: 'Anos Finais',         sub: '6º ao 9º Ano',          icone: 'fas fa-book-open',      cor: '#5a2060', pagina: 'fundII.html'          },
+        { prefixo: '4', nome: 'Ensino Médio',        sub: '1ª à 3ª Série',         icone: 'fas fa-graduation-cap', cor: '#1a3a5c', pagina: 'ensinoMedio.html'     },
+        { prefixo: '5', nome: 'Pré-Universitário',   sub: 'Cursinho Batista',       icone: 'fas fa-university',     cor: '#1a4a2a', pagina: 'preVestibular.html'   }
     ];
 
     function renderSegmentos(imagens) {
@@ -1028,7 +1032,7 @@ listarPastaPortal('niveis', renderNiveis);
                 ? '<img src="' + imgSrc + '" alt="' + seg.nome + '" loading="lazy">'
                 : '<div class="seg-fundo" style="background:' + seg.cor + ';"></div>';
 
-            return '<div class="seg-painel">' +
+            return '<div class="seg-painel" onclick="abrirPaginaNivel(\'' + seg.pagina + '\')">' +
                 interior +
                 '<div class="seg-overlay"></div>' +
                 '<div class="seg-label">' +
