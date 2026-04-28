@@ -404,164 +404,51 @@
             .btn-login, .btn-pai, .btn-novato, .btn-unidades { padding: 0.5rem 1rem !important; }
         }
 
-        /* ── PILARES DOS DIFERENCIAIS ── */
-        /* ── PILARES (layout pílula estilo redebatista) ── */
-        .pilares-section {
-            width: 100%;
-            padding: 3.5rem 0 4rem;
+        /* ── CARDS NOSSOS DIFERENCIAIS ── */
+        .nivel-card {
+            border-radius: 1.5rem; overflow: hidden;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+            background: white; border: 1px solid rgba(253,205,98,0.35);
+            cursor: pointer; position: relative;
+            transform-style: preserve-3d; will-change: transform;
+            transition: box-shadow 0.15s ease, border-color 0.15s ease;
         }
-        .pilares-header {
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-            padding: 0 3rem 3rem;
-            max-width: 1100px;
-            margin: 0 auto;
+        .nivel-card-glare {
+            position: absolute; inset: 0; border-radius: 1.5rem;
+            pointer-events: none; z-index: 10; opacity: 0;
+            transition: opacity 0.25s ease; mix-blend-mode: screen;
         }
-        .pilares-header-linha {
-            flex: 1;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #ffeabb, transparent);
-            opacity: 0.45;
+        .niveis-grid:has(.tilt-active) .nivel-card:not(.tilt-active) {
+            transform: perspective(900px) scale3d(0.92,0.92,0.92) !important;
+            filter: brightness(0.7);
+            transition: transform 0.35s ease, filter 0.35s ease !important;
         }
-        .pilares-titulo {
-            color: #ffeabb;
-            font-size: 1.9rem;
-            font-weight: 800;
-            font-family: 'Poppins', sans-serif;
-            white-space: nowrap;
-            text-align: center;
+        .nivel-card.tilt-active {
+            border-color: #fdcd62;
+            box-shadow: 0 50px 80px rgba(0,0,0,0.65), 0 0 0 3px #fdcd62,
+                        0 0 40px 8px rgba(253,205,98,0.5), 0 0 80px 20px rgba(211,51,39,0.3);
+            z-index: 10;
         }
-        .pilares-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 1.6rem;
-            max-width: 960px;
-            margin: 0 auto;
-            padding: 0 1rem;
+        .nivel-card.tilt-active .nivel-card-glare { opacity: 1; }
+        .nivel-card.tilt-reset {
+            transition: transform 0.65s cubic-bezier(0.23,1,0.32,1),
+                        box-shadow 0.65s ease, border-color 0.4s ease,
+                        filter 0.5s ease !important;
+            filter: brightness(1) !important;
         }
-        .pilar-row {
-            position: relative;
-            padding-top: 3rem;    /* espaço acima da pílula pra foto estourar */
-            padding-bottom: 0.5rem;
-            isolation: isolate;   /* impede foto de vazar pro row seguinte */
+        .nivel-card-placeholder, .nivel-card-body { position: relative; z-index: 1; }
+        .nivel-card-img { width: 100%; height: 170px; object-fit: cover; display: block; }
+        .nivel-card-placeholder {
+            width: 100%; height: 170px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3.5rem; background: linear-gradient(135deg,#fff2e3,#ffe6cc);
+            transition: background 0.4s ease;
         }
-        /* PÍLULA base */
-        .pilar-card {
-            background: white;
-            border-radius: 9999px;
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            box-shadow: 0 8px 36px rgba(0,0,0,0.22);
-            position: relative;
-            z-index: 1;
-            min-height: 150px;
-            padding: 2rem 2.5rem;
-            transition: box-shadow 0.3s, transform 0.3s;
-        }
-        .pilar-card:hover { box-shadow: 0 18px 52px rgba(0,0,0,0.35); transform: translateY(-4px); }
-
-        /* ÍMPAR → foto LEFT, ícone RIGHT */
-        .pilar-row:nth-child(odd) .pilar-card   { padding-left: 210px; padding-right: 2.5rem; flex-direction: row-reverse; }
-        .pilar-row:nth-child(odd) .pilar-foto-wrap,
-        .pilar-row:nth-child(odd) .pilar-foto-placeholder { left: 0; right: auto; }
-
-        /* PAR → foto RIGHT, ícone LEFT */
-        .pilar-row:nth-child(even) .pilar-card  { padding-right: 210px; padding-left: 2.5rem; flex-direction: row; }
-        .pilar-row:nth-child(even) .pilar-foto-wrap,
-        .pilar-row:nth-child(even) .pilar-foto-placeholder { right: 0; left: auto; }
-
-        /* FOTO absoluta, fora da pílula */
-        .pilar-foto-wrap {
-            position: absolute;
-            bottom: 0;
-            width: 210px;
-            z-index: 2;
-            pointer-events: none;
-        }
-        .pilar-foto-wrap img {
-            width: 100%;
-            height: auto;
-            max-height: 300px;
-            object-fit: contain;
-            object-position: bottom center;
-            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
-            display: block;
-        }
-        .pilar-foto-placeholder {
-            position: absolute;
-            bottom: 0;
-            width: 200px;
-            height: 180px;
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 5rem;
-            color: rgba(255,234,187,0.2);
-            pointer-events: none;
-        }
-        .pilar-card-content { flex: 1; text-align: center; }
-        .pilar-card-nome {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #990000;
-            margin-bottom: 0.5rem;
-            font-family: 'Poppins', sans-serif;
-        }
-        .pilar-card-desc {
-            color: #555;
-            font-size: 0.87rem;
-            line-height: 1.65;
-            max-width: 360px;
-            margin: 0 auto;
-        }
-        .pilar-card-icone {
-            font-size: 3.8rem;
-            color: #d33327;
-            flex-shrink: 0;
-            opacity: 0.8;
-        }
-        .pilar-card-olimp {
-            display: flex;
-            flex-direction: column;
-            gap: 0.2rem;
-            margin-top: 0.6rem;
-        }
-        .pilar-card-olimp a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.4rem;
-            color: #990000;
-            font-weight: 700;
-            font-size: 0.8rem;
-            text-decoration: none;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .pilar-card-olimp a:hover { color: #d33327; }
-        @media (max-width: 768px) {
-            .pilar-row { padding-top: 5rem; }
-            .pilar-row:nth-child(odd) .pilar-card,
-            .pilar-row:nth-child(even) .pilar-card {
-                padding: 5.5rem 1.5rem 1.8rem;
-                flex-direction: column;
-                border-radius: 2rem;
-            }
-            .pilar-row:nth-child(odd) .pilar-foto-wrap,
-            .pilar-row:nth-child(even) .pilar-foto-wrap,
-            .pilar-row:nth-child(odd) .pilar-foto-placeholder,
-            .pilar-row:nth-child(even) .pilar-foto-placeholder {
-                left: 50%; right: auto;
-                transform: translateX(-50%);
-                bottom: auto; top: 0;
-                width: 120px;
-            }
-            .pilar-card-nome { font-size: 1.5rem; }
-            .pilares-titulo { font-size: 1.3rem; white-space: normal; }
-        }
+        .nivel-card.tilt-active .nivel-card-placeholder { background: linear-gradient(135deg,#fde8e8,#ffd5b0); }
+        .nivel-card-body { padding: 1.3rem; }
+        .nivel-card-body h3 { color: #7d2728; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; font-family: 'Poppins',sans-serif; transition: color 0.3s; }
+        .nivel-card.tilt-active .nivel-card-body h3 { color: #990000; }
+        .nivel-card-body p { color: #5a3a2e; font-size: 0.85rem; line-height: 1.6; }
 
         /* ── VENEZIANA DE SEGMENTOS ── */
         .segmentos-wrapper {
@@ -787,20 +674,13 @@
             <!-- preenchido pelo JS -->
         </div>
 
-    </div><!-- /container -->
-
-    <!-- PILARES DOS NOSSOS DIFERENCIAIS -->
-    <section class="pilares-section">
-        <div class="pilares-header">
-            <div class="pilares-header-linha"></div>
-            <h2 class="pilares-titulo">Pilares dos Nossos Diferenciais</h2>
-            <div class="pilares-header-linha"></div>
-        </div>
-        <div class="pilares-grid" id="diferenciaisGrid">
+        <!-- NOSSOS DIFERENCIAIS -->
+        <div class="section-title section-title-claro">Nossos Diferenciais</div>
+        <div class="niveis-grid" id="diferenciaisGrid">
             <!-- preenchido pelo JS -->
         </div>
-    </section>
 
+    </div><!-- /container -->
 
     <!-- FOOTER EXPANDIDO -->
     <footer class="footer-expanded">
@@ -1080,63 +960,70 @@ function listarPastaPortal(pasta, callback) {
     }, 200);
 }
 
-// ── PILARES DOS DIFERENCIAIS ──
-var _PILARES_DEFAULT = [
-    { prefixo:'1', nome:'CBA',             desc:'Centro Batista de Artes — música, teatro e expressão criativa para todos os níveis.', icone:'fas fa-palette'      },
-    { prefixo:'2', nome:'Educação Cristã', desc:'Formação de valores, fé e propósito integrados ao currículo acadêmico.',              icone:'fas fa-cross'        },
-    { prefixo:'3', nome:'Empreendedorismo',desc:'Projetos práticos que desenvolvem liderança, visão de negócios e inovação.',          icone:'fas fa-lightbulb'    },
-    { prefixo:'4', nome:'NAF',             desc:'Núcleo de Atividades Físicas — esporte, saúde e desenvolvimento integral.',           icone:'fas fa-running'      },
-    { prefixo:'5', nome:'Olimpíadas',      desc:'Resultados, editais e inscrições das competições Batista.',                           icone:'fas fa-trophy', olimpiadas:true }
-];
-
-function renderPilares(imagens) {
-    var grid = document.getElementById('diferenciaisGrid');
-    if (!grid) return;
-
-    var mapaImg = {};
-    if (imagens && imagens.length) {
-        imagens.forEach(function(item) {
-            var prefixo = item.imagem.split('/').pop().charAt(0);
-            if (!mapaImg[prefixo]) mapaImg[prefixo] = '/files/' + item.imagem;
-        });
-    }
-
-    grid.innerHTML = _PILARES_DEFAULT.map(function(p) {
-        var imgSrc = mapaImg[p.prefixo] || '';
-
-        var foto = imgSrc
-            ? '<div class="pilar-foto-wrap"><img src="' + imgSrc + '" alt="' + p.nome + '"></div>'
-            : '<div class="pilar-foto-placeholder"><i class="' + p.icone + '"></i></div>';
-
-        var conteudo = '';
-        if (p.olimpiadas) {
-            conteudo =
-                '<div class="pilar-card-nome">' + p.nome + '</div>' +
-                '<div class="pilar-card-olimp">' +
-                    '<a onclick="abrirModalResultados()"><i class="fas fa-medal"></i> Resultados</a>' +
-                    '<a onclick="abrirModalMuralInformativos()"><i class="fas fa-bullhorn"></i> Mural de Informativos</a>' +
-                    '<a onclick="abrirModalDocumentosInscricao()"><i class="fas fa-file-alt"></i> Documentos de Inscrição</a>' +
-                    '<a onclick="abrirModalEditais()"><i class="fas fa-file-pdf"></i> Editais</a>' +
-                    '<a onclick="abrirModalProximasCompeticoes()"><i class="fas fa-flag-checkered"></i> Próximas Competições</a>' +
-                '</div>';
-        } else {
-            conteudo =
-                '<div class="pilar-card-nome">' + p.nome + '</div>' +
-                '<p class="pilar-card-desc">' + p.desc + '</p>';
+// ── NOSSOS DIFERENCIAIS ──
+(function() {
+    var _DIFERENCIAIS = [
+        {nome:'CBA',                icone_img:'Nossos Diferenciais/CBA/CentroDeArtes.png',                 icone_fa:'fas fa-palette',   descricao:'Centro Batista de Artes — música, teatro e expressão criativa para todos os níveis.'},
+        {nome:'Educação Cristã',    icone_img:'Nossos Diferenciais/Educacao Crista/EducaçãoCristã.png',    icone_fa:'fas fa-cross',     descricao:'Formação de valores, fé e propósito integrados ao currículo acadêmico.'},
+        {nome:'Empreendedorismo',   icone_img:'Nossos Diferenciais/Empreendedorismo/Empreendedorismo.png', icone_fa:'fas fa-lightbulb', descricao:'Projetos práticos que desenvolvem liderança, visão de negócios e inovação.'},
+        {nome:'NAF',                icone_img:'Nossos Diferenciais/NAF/NAF.png',                           icone_fa:'fas fa-running',   descricao:'Núcleo de Atividades Físicas — esporte, saúde e desenvolvimento integral.'},
+        {nome:'Bibliotecas',        icone_img:'Nossos Diferenciais/Bibliotecas/biblioteca.png',            icone_fa:'fas fa-book-open', descricao:'Acervo completo e espaços de leitura e pesquisa em todas as unidades.'},
+        {nome:'Olimpíadas', icone_img:'', icone_fa:'fas fa-trophy', descricao:'', tipo:'resultados'}
+    ];
+    var g = document.getElementById('diferenciaisGrid');
+    if (!g) return;
+    var _row  = 'display:flex;align-items:center;gap:0.5rem;padding:0.55rem 0;border-bottom:1px solid rgba(211,51,39,0.1);cursor:pointer;color:#7d2728;font-weight:700;font-size:0.82rem;';
+    var _last = 'display:flex;align-items:center;gap:0.5rem;padding:0.55rem 0;cursor:pointer;color:#7d2728;font-weight:700;font-size:0.82rem;';
+    var _seta = '<i class="fas fa-chevron-right" style="margin-left:auto;font-size:0.7rem;color:#d33327;"></i>';
+    g.innerHTML = _DIFERENCIAIS.map(function(d) {
+        if (d.tipo === 'resultados') {
+            return '<div class="nivel-card animate__animated animate__fadeInUp">' +
+                '<div class="nivel-card-placeholder"><img src="/files/portal/icones/Olimpiadas.png" style="width:90px;height:90px;object-fit:contain;" onerror="this.outerHTML=\'<i class=&quot;fas fa-trophy&quot; style=&quot;font-size:3rem;color:#d33327;&quot;></i>\'"></div>' +
+                '<div class="nivel-card-body"><h3>' + d.nome + '</h3>' +
+                    '<div onclick="abrirModalResultados()" style="' + _row + '"><i class="fas fa-medal" style="color:#d33327;"></i> Resultados' + _seta + '</div>' +
+                    '<div onclick="abrirModalMuralInformativos()" style="' + _row + '"><i class="fas fa-bullhorn" style="color:#d33327;"></i> Mural de Informativos' + _seta + '</div>' +
+                    '<div onclick="abrirModalDocumentosInscricao()" style="' + _row + '"><i class="fas fa-file-alt" style="color:#d33327;"></i> Documentos de Inscrição' + _seta + '</div>' +
+                    '<div onclick="abrirModalEditais()" style="' + _row + '"><i class="fas fa-file-pdf" style="color:#d33327;"></i> Editais' + _seta + '</div>' +
+                    '<div onclick="abrirModalProximasCompeticoes()" style="' + _last + '"><i class="fas fa-flag-checkered" style="color:#d33327;"></i> Próximas Competições' + _seta + '</div>' +
+                '</div></div>';
         }
-
-        return '<div class="pilar-row animate__animated animate__fadeInUp">' +
-            foto +
-            '<div class="pilar-card">' +
-                '<div class="pilar-card-content">' + conteudo + '</div>' +
-                '<i class="' + p.icone + ' pilar-card-icone"></i>' +
-            '</div>' +
-        '</div>';
+        var topo = d.icone_img
+            ? '<div class="nivel-card-placeholder"><img src="/files/' + d.icone_img + '" style="width:90px;height:90px;object-fit:contain;" onerror="this.outerHTML=\'<i class=&quot;' + d.icone_fa + '&quot; style=&quot;font-size:3rem;color:#d33327;&quot;></i>\'"></div>'
+            : '<div class="nivel-card-placeholder"><i class="' + d.icone_fa + '" style="font-size:3rem;color:#d33327;"></i></div>';
+        return '<div class="nivel-card animate__animated animate__fadeInUp">' + topo +
+               '<div class="nivel-card-body"><h3>' + d.nome + '</h3><p>' + d.descricao + '</p></div></div>';
     }).join('');
-}
+    initCardTilt();
+})();
 
-renderPilares([]);
-listarPastaPortal('portal/pilares', renderPilares);
+// ── TILT 3D HOLOGRÁFICO ──
+function initCardTilt() {
+    document.querySelectorAll('#diferenciaisGrid .nivel-card').forEach(function(card) {
+        var glare = document.createElement('div');
+        glare.className = 'nivel-card-glare';
+        card.appendChild(glare);
+        var raf = null;
+        card.addEventListener('mousemove', function(e) {
+            if (raf) cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(function() {
+                var rect = card.getBoundingClientRect();
+                var dx = ((e.clientX - rect.left) / rect.width  - 0.5) * 2;
+                var dy = ((e.clientY - rect.top)  / rect.height - 0.5) * 2;
+                card.classList.remove('tilt-reset'); card.classList.add('tilt-active');
+                card.style.transform = 'perspective(600px) rotateX(' + (-dy*20).toFixed(2) + 'deg) rotateY(' + (dx*20).toFixed(2) + 'deg) scale3d(1.22,1.22,1.22) translateZ(40px)';
+                var gx = ((e.clientX - rect.left) / rect.width  * 100).toFixed(1);
+                var gy = ((e.clientY - rect.top)  / rect.height * 100).toFixed(1);
+                glare.style.background = 'radial-gradient(circle at ' + gx + '% ' + gy + '%, rgba(255,255,255,0.55) 0%, rgba(255,234,187,0.25) 25%, rgba(211,51,39,0.12) 50%, transparent 70%)';
+            });
+        });
+        card.addEventListener('mouseleave', function() {
+            if (raf) cancelAnimationFrame(raf);
+            card.classList.remove('tilt-active'); card.classList.add('tilt-reset');
+            card.style.transform = 'perspective(600px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1) translateZ(0px)';
+            glare.style.background = 'none';
+        });
+    });
+}
 
 // ── VENEZIANA SEGMENTOS ──
 (function() {
