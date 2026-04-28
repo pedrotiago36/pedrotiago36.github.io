@@ -435,69 +435,68 @@
         .pilares-grid {
             display: flex;
             flex-direction: column;
-            gap: 1.8rem;
+            gap: 2rem;
             max-width: 1100px;
             margin: 0 auto;
             padding: 0 2rem;
         }
+        /* cada pilar é um row com a pílula + foto absoluta por cima */
         .pilar-row {
-            display: flex;
-            align-items: center;
             position: relative;
-            min-height: 200px;
+            padding-top: 2.5rem; /* espaço pra foto estourar acima */
         }
-        .pilar-foto-wrap {
-            width: 260px;
-            flex-shrink: 0;
-            position: relative;
-            z-index: 2;
-            margin-right: -50px;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            align-self: flex-end;
-        }
-        .pilar-foto-wrap img {
-            width: 100%;
-            max-height: 260px;
-            object-fit: contain;
-            object-position: bottom center;
-            filter: drop-shadow(0 6px 16px rgba(0,0,0,0.4));
-            display: block;
-        }
-        .pilar-foto-placeholder {
-            width: 260px;
-            height: 220px;
-            flex-shrink: 0;
-            margin-right: -50px;
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 6rem;
-            color: rgba(255,234,187,0.25);
-        }
+        /* a PÍLULA ocupa a largura toda, com padding-left pra não cobrir a foto */
         .pilar-card {
-            flex: 1;
             background: white;
             border-radius: 9999px;
-            padding: 2.2rem 3rem 2.2rem 4rem;
+            padding: 2.4rem 3rem 2.4rem 230px;
             display: flex;
             align-items: center;
-            gap: 2rem;
-            box-shadow: 0 8px 36px rgba(0,0,0,0.22);
+            gap: 2.5rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.25);
             position: relative;
             z-index: 1;
             transition: box-shadow 0.3s ease, transform 0.3s ease;
+            min-height: 160px;
         }
         .pilar-card:hover {
-            box-shadow: 0 16px 48px rgba(0,0,0,0.35);
-            transform: translateY(-3px);
+            box-shadow: 0 18px 52px rgba(0,0,0,0.38);
+            transform: translateY(-4px);
         }
-        .pilar-card-content {
-            flex: 1;
-            text-align: center;
+        /* foto posicionada FORA da pílula, à esquerda, na frente */
+        .pilar-foto-wrap {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 240px;
+            z-index: 2;
+            display: flex;
+            align-items: flex-end;
+            pointer-events: none;
         }
+        .pilar-foto-wrap img {
+            width: 100%;
+            height: auto;
+            max-height: 320px;
+            object-fit: contain;
+            object-position: bottom center;
+            filter: drop-shadow(0 4px 14px rgba(0,0,0,0.35));
+            display: block;
+        }
+        .pilar-foto-placeholder {
+            position: absolute;
+            left: 0; bottom: 0;
+            width: 220px;
+            height: 200px;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5.5rem;
+            color: rgba(255,234,187,0.22);
+            pointer-events: none;
+        }
+        .pilar-card-content { flex: 1; text-align: center; }
         .pilar-card-nome {
             font-size: 2.2rem;
             font-weight: 800;
@@ -510,20 +509,20 @@
             color: #555;
             font-size: 0.88rem;
             line-height: 1.65;
-            max-width: 400px;
+            max-width: 380px;
             margin: 0 auto;
         }
         .pilar-card-icone {
-            font-size: 3.8rem;
+            font-size: 4rem;
             color: #d33327;
             flex-shrink: 0;
-            opacity: 0.85;
+            opacity: 0.8;
         }
         .pilar-card-olimp {
             display: flex;
             flex-direction: column;
-            gap: 0.3rem;
-            margin-top: 0.8rem;
+            gap: 0.25rem;
+            margin-top: 0.7rem;
         }
         .pilar-card-olimp a {
             display: flex;
@@ -539,10 +538,10 @@
         }
         .pilar-card-olimp a:hover { color: #d33327; }
         @media (max-width: 768px) {
-            .pilar-row { flex-direction: column; align-items: stretch; min-height: unset; }
-            .pilar-foto-wrap { width: 140px; margin-right: 0; margin-bottom: -30px; align-self: center; }
-            .pilar-foto-placeholder { width: 140px; height: 120px; margin-right: 0; margin-bottom: -30px; }
-            .pilar-card { border-radius: 2rem; padding: 2rem 1.5rem 1.5rem; flex-direction: column; text-align: center; gap: 1rem; }
+            .pilar-row { padding-top: 5rem; }
+            .pilar-card { padding: 1.8rem 1.5rem 1.8rem 1.5rem; flex-direction: column; border-radius: 2rem; text-align: center; gap: 1rem; }
+            .pilar-foto-wrap { width: 130px; left: 50%; transform: translateX(-50%); bottom: auto; top: 0; }
+            .pilar-foto-placeholder { left: 50%; transform: translateX(-50%); bottom: auto; top: 0; }
             .pilar-card-nome { font-size: 1.6rem; }
             .pilares-titulo { font-size: 1.4rem; white-space: normal; }
         }
