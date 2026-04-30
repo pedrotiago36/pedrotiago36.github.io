@@ -1,0 +1,27 @@
+# Compilados Delphi
+*.dcu
+*.exe
+*.dll
+*.bpl
+*.dcp
+*.so
+*.apk
+*.drc
+*.map
+*.dres
+*.rsm
+*.tds
+*.dcu
+*.dcuil
+*.dcpil
+*.identcache
+*.local
+*.stat
+
+# Pastas de build (exceto /files que é conteúdo web)
+prj/Win32/Debug/cache/
+prj/Win32/Debug/log/
+prj/Win32/Debug/temp/
+
+# App não relacionado
+../App/

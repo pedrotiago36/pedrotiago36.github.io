@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEB — Área Administrativa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a0a0a 0%, #3d1a1b 40%, #7d2728 80%, #d33327 100%);
+            min-height: 100vh;
+            color: #2d2d2d;
+            overflow-x: hidden;
+        }
+
+        /* ── MATERIAIS ESCOLARES CAINDO ── */
+        .falling-items-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+        .falling-item { position: absolute; animation: fall linear infinite; pointer-events: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
+        @keyframes fall {
+            0%   { transform: translateY(-20vh) rotate(0deg);   opacity: 0; }
+            10%  { opacity: 0.22; }
+            80%  { opacity: 0.22; }
+            100% { transform: translateY(120vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* ── HEADER ── */
+        header {
+            position: relative; z-index: 10;
+            padding: 1.5rem 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .logo-adm {
+            display: flex; align-items: center; gap: 14px;
+        }
+        .logo-adm-icon {
+            width: 52px; height: 52px; border-radius: 1rem;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(253,205,98,0.4);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem;
+        }
+        .logo-adm-text h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem; font-weight: 800; color: #fff;
+        }
+        .logo-adm-text span {
+            font-size: 0.75rem; color: rgba(255,255,255,0.6);
+        }
+        .header-badge {
+            background: rgba(253,205,98,0.2);
+            border: 1px solid rgba(253,205,98,0.4);
+            color: #fdcd62;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .header-badge i { font-size: 0.7rem; }
+
+        /* ── HERO TEXT ── */
+        .hero {
+            position: relative; z-index: 10;
+            text-align: center;
+            padding: 2rem 2rem 1rem;
+        }
+        .hero h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.2rem; font-weight: 800; color: #fff;
+            margin-bottom: 0.5rem;
+        }
+        .hero p {
+            color: rgba(255,255,255,0.65);
+            font-size: 1rem;
+        }
+        .hero-divider {
+            width: 80px; height: 4px;
+            background: linear-gradient(90deg, #fdcd62, #d33327);
+            border-radius: 4px;
+            margin: 1rem auto;
+        }
+
+        /* ── PORTAIS GRID ── */
+        .portais-section {
+            position: relative; z-index: 10;
+            max-width: 320px; margin: 0 auto;
+            padding: 1rem 2rem 4rem;
+        }
+        .portais-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        /* ── CARD PORTAL ── */
+        .portal-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 1.8rem;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.35s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .portal-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #fdcd62, #d33327);
+            opacity: 0;
+            transition: opacity 0.35s;
+        }
+        .portal-card:hover { transform: translateY(-6px); background: rgba(255,255,255,0.18); border-color: rgba(253,205,98,0.5); box-shadow: 0 20px 50px rgba(0,0,0,0.35); }
+        .portal-card:hover::before { opacity: 1; }
+        .portal-card.locked { cursor: default; }
+        .portal-card.locked:hover { transform: none; background: rgba(255,255,255,0.1); box-shadow: none; }
+
+        .card-icon {
+            width: 64px; height: 64px; border-radius: 1.2rem;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; margin-bottom: 1.2rem;
+        }
+        .card-icon.mkt { background: linear-gradient(135deg, #d33327, #7d2728); }
+        .card-icon.edu { background: linear-gradient(135deg, #2980b9, #1a5276); }
+        .card-icon.fin { background: linear-gradient(135deg, #27ae60, #1e8449); }
+        .card-icon.rh  { background: linear-gradient(135deg, #8e44ad, #6c3483); }
+        .card-icon.locked-icon { background: rgba(255,255,255,0.08); }
+
+        .card-responsavel {
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; color: #fdcd62; margin-bottom: 0.3rem;
+        }
+        .card-nome {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem; font-weight: 700; color: #fff; margin-bottom: 0.4rem;
+        }
+        .card-desc {
+            font-size: 0.85rem; color: rgba(255,255,255,0.55); line-height: 1.5;
+        }
+
+        .card-lock-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.4); font-size: 0.75rem; font-weight: 600;
+            padding: 0.3rem 0.8rem; border-radius: 2rem; margin-top: 0.8rem;
+        }
+        .card-enter-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: rgba(253,205,98,0.15); border: 1px solid rgba(253,205,98,0.35);
+            color: #fdcd62; font-size: 0.75rem; font-weight: 600;
+            padding: 0.3rem 0.8rem; border-radius: 2rem; margin-top: 0.8rem;
+            transition: all 0.3s;
+        }
+        .portal-card:hover .card-enter-badge {
+            background: rgba(253,205,98,0.3); border-color: #fdcd62;
+        }
+
+        /* ── MODAL SENHA ── */
+        .modal-overlay {
+            display: none; position: fixed;
+            inset: 0; z-index: 1000;
+            background: rgba(10,3,3,0.75);
+            backdrop-filter: blur(8px);
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.ativo { display: flex; animation: fadeInModal 0.25s ease; }
+        @keyframes fadeInModal { from { opacity: 0; } to { opacity: 1; } }
+
+        .modal-box {
+            background: linear-gradient(145deg, #fff5f0, #fff);
+            border-radius: 2rem; padding: 2.5rem;
+            width: 100%; max-width: 420px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+            animation: slideUpModal 0.3s ease;
+        }
+        @keyframes slideUpModal { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .modal-box .portal-icon-modal {
+            width: 72px; height: 72px; border-radius: 1.4rem;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; margin: 0 auto 1.2rem;
+            background: linear-gradient(135deg, #d33327, #7d2728);
+        }
+        .modal-box h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.4rem; font-weight: 800; color: #7d2728;
+            text-align: center; margin-bottom: 0.25rem;
+        }
+        .modal-box p.sub {
+            text-align: center; color: #a08080; font-size: 0.87rem; margin-bottom: 1.5rem;
+        }
+        .input-group {
+            position: relative; margin-bottom: 1rem;
+        }
+        .input-group i {
+            position: absolute; left: 1rem; top: 50%; transform: translateY(-50%);
+            color: #d33327; font-size: 0.9rem;
+        }
+        .input-group input {
+            width: 100%; padding: 0.85rem 1rem 0.85rem 2.6rem;
+            border: 2px solid rgba(211,51,39,0.2); border-radius: 1rem;
+            font-size: 1rem; font-family: 'Inter', sans-serif;
+            background: #fff; color: #2d2d2d;
+            transition: border-color 0.3s;
+            outline: none;
+        }
+        .input-group input:focus { border-color: #d33327; }
+        .input-group input.erro { border-color: #d33327; animation: shake 0.4s ease; }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
+        .msg-erro { color: #d33327; font-size: 0.8rem; min-height: 1.2rem; margin-bottom: 0.5rem; text-align: center; }
+
+        .btn-acessar {
+            width: 100%; padding: 0.9rem;
+            background: linear-gradient(135deg, #d33327, #7d2728);
+            color: #fff; border: none; border-radius: 1rem;
+            font-size: 1rem; font-weight: 700; font-family: 'Poppins', sans-serif;
+            cursor: pointer; transition: all 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-acessar:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(211,51,39,0.4); }
+
+        .btn-cancelar {
+            width: 100%; padding: 0.7rem;
+            background: transparent; color: #a08080;
+            border: none; font-size: 0.9rem;
+            cursor: pointer; margin-top: 0.5rem;
+            font-family: 'Inter', sans-serif;
+            transition: color 0.3s;
+        }
+        .btn-cancelar:hover { color: #d33327; }
+
+        /* ── FOOTER ── */
+        .footer-adm {
+            position: relative; z-index: 10;
+            text-align: center; padding: 1rem;
+            color: rgba(255,255,255,0.3); font-size: 0.78rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="falling-items-container" id="fallingContainer"></div>
+
+<header>
+    <div class="logo-adm">
+        <div class="logo-adm-icon"><i class="fas fa-graduation-cap" style="color:#fdcd62;"></i></div>
+        <div class="logo-adm-text">
+            <h1>Colégio Batista Santos Dumont</h1>
+            <span>Sistema de Gestão de Conteúdo</span>
+        </div>
+    </div>
+    <div class="header-badge">
+        <i class="fas fa-shield-alt"></i> Área Restrita
+    </div>
+</header>
+
+<div class="hero">
+    <h2><i class="fas fa-layer-group" style="color:#fdcd62; margin-right:0.5rem;"></i>Portais do Colégio</h2>
+    <p>Selecione o portal que deseja gerenciar</p>
+    <div class="hero-divider"></div>
+</div>
+
+<div class="portais-section">
+    <div class="portais-grid">
+
+        <!-- Portal Principal — Marketing -->
+        <div class="portal-card" onclick="abrirLogin('portal-principal', 'Portal Principal', 'fa-home', 'mkt')">
+            <div class="card-icon mkt"><i class="fas fa-home" style="color:#fff;"></i></div>
+            <div class="card-responsavel"><i class="fas fa-user"></i> Responsável: Marketing</div>
+            <div class="card-nome">Portal Principal</div>
+            <div class="card-enter-badge"><i class="fas fa-sign-in-alt"></i> Entrar no painel</div>
+        </div>
+
+    </div>
+</div>
+
+<div class="footer-adm">
+    &copy; 2026 Colégio Batista Santos Dumont — Sistema Administrativo
+</div>
+
+<!-- Modal de Senha -->
+<div class="modal-overlay" id="modalSenha">
+    <div class="modal-box">
+        <div class="portal-icon-modal" id="modalIcon">
+            <i class="fas fa-home" style="color:#fff;"></i>
+        </div>
+        <h3 id="modalTitulo">Portal Principal</h3>
+        <p class="sub">Digite sua senha para continuar</p>
+        <div class="input-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="inputSenha" placeholder="Senha de acesso" autocomplete="off">
+        </div>
+        <div class="msg-erro" id="msgErro"></div>
+        <button class="btn-acessar" id="btnAcessar">
+            <i class="fas fa-sign-in-alt"></i> Entrar
+        </button>
+        <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+    </div>
+</div>
+
+<script>
+    // ── MATERIAIS ESCOLARES CAINDO ──
+    (function() {
+        var itens = ['✏️','📚','📓','✂️','📏','🖍️','🎒','📘','📐','🖊️','📎','🔖','📕','📗'];
+        var cores  = ['#fdcd62','#fff','rgba(255,255,255,0.8)'];
+        var container = document.getElementById('fallingContainer');
+        for (var i = 0; i < 50; i++) {
+            var el = document.createElement('div');
+            el.className = 'falling-item';
+            el.innerHTML = itens[Math.floor(Math.random() * itens.length)];
+            el.style.fontSize  = (Math.random() * 1.4 + 0.9) + 'rem';
+            el.style.left      = (Math.random() * 100) + '%';
+            el.style.color     = cores[Math.floor(Math.random() * cores.length)];
+            el.style.animationDuration = (Math.random() * 7 + 5) + 's';
+            el.style.animationDelay    = (Math.random() * -25) + 's';
+            container.appendChild(el);
+        }
+    })();
+
+    // ── MODAL LÓGICA ──
+    var _senhaCorreta = '';
+    var _destino = '';
+
+    function abrirLogin(portal, titulo, icone, senha) {
+        _senhaCorreta = senha;
+        _destino = portal;
+        document.getElementById('modalTitulo').textContent = titulo;
+        document.getElementById('modalIcon').innerHTML = '<i class="fas ' + icone + '" style="color:#fff;"></i>';
+        document.getElementById('inputSenha').value = '';
+        document.getElementById('msgErro').textContent = '';
+        document.getElementById('inputSenha').classList.remove('erro');
+        document.getElementById('modalSenha').classList.add('ativo');
+        setTimeout(function() { document.getElementById('inputSenha').focus(); }, 100);
+    }
+
+    function fecharModal() {
+        document.getElementById('modalSenha').classList.remove('ativo');
+    }
+
+    document.getElementById('inputSenha').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') document.getElementById('btnAcessar').click();
+    });
+
+    document.getElementById('btnAcessar').addEventListener('click', function() {
+        var val = document.getElementById('inputSenha').value;
+        if (val === _senhaCorreta) {
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+            setTimeout(function() {
+                window.location.href = _destino + '.html';
+            }, 600);
+        } else {
+            document.getElementById('msgErro').textContent = 'Senha incorreta. Tente novamente.';
+            var inp = document.getElementById('inputSenha');
+            inp.classList.add('erro');
+            inp.value = '';
+            setTimeout(function() { inp.classList.remove('erro'); }, 500);
+        }
+    });
+
+    document.getElementById('modalSenha').addEventListener('click', function(e) {
+        if (e.target === this) fecharModal();
+    });
+</script>
+</body>
+</html>

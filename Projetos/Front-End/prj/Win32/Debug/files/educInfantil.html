@@ -182,11 +182,53 @@
         .diferenciais .sec-title { color: white; }
         .diferenciais .sec-sub { color: rgba(255,255,255,0.7); }
         .dif-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
-        .dif-card { background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); border-radius: 1.5rem; padding: 2rem 1.5rem; border: 1px solid rgba(253,205,98,0.2); transition: 0.35s; }
-        .dif-card:hover { background: rgba(255,255,255,0.12); border-color: #fdcd62; transform: translateY(-6px); }
+        .dif-card { background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); border-radius: 1.5rem; padding: 2rem 1.5rem; border: 1px solid rgba(253,205,98,0.2); transition: 0.35s; cursor: pointer; }
+        .dif-card:hover { background: rgba(255,255,255,0.12); border-color: #fdcd62; transform: translateY(-6px); box-shadow: 0 12px 28px rgba(0,0,0,0.2); }
         .dif-icone { font-size: 2.4rem; margin-bottom: 1rem; display: block; }
         .dif-card h3 { font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 700; color: #fdcd62; margin-bottom: 0.5rem; }
         .dif-card p { color: rgba(255,255,255,0.75); font-size: 0.88rem; line-height: 1.6; }
+        .dif-card-hint { font-size: 0.7rem; color: rgba(253,205,98,0.5); margin-top: 0.7rem; display: flex; align-items: center; gap: 0.3rem; }
+        /* ── MODAL DIFERENCIAL ── */
+        .modal-dif-overlay { display: none; position: fixed; inset: 0; background: rgba(61,26,27,0.7); backdrop-filter: blur(8px); z-index: 8000; align-items: center; justify-content: center; }
+        .modal-dif-overlay.ativo { display: flex; animation: fadeIn 0.2s ease; }
+        .modal-dif-box { background: white; max-width: 480px; width: 92%; border-radius: 2rem; overflow: hidden; position: relative; animation: scaleIn 0.22s ease-out; box-shadow: 0 30px 60px rgba(0,0,0,0.35); }
+        .btn-fechar-dif { position: absolute; top: 0.9rem; right: 0.9rem; background: rgba(255,255,255,0.88); border: none; color: #7d2728; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 0.9rem; transition: 0.25s; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .btn-fechar-dif:hover { background: #d33327; color: white; transform: rotate(90deg); }
+        .modal-dif-foto { width: 100%; height: 220px; background: linear-gradient(135deg, #fff2e3, #ffe6cc); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+        .modal-dif-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .modal-dif-foto-ph { color: rgba(125,39,40,0.2); font-size: 3.5rem; }
+        .modal-dif-corpo { padding: 1.5rem 1.8rem 2rem; }
+        .modal-dif-icone { font-size: 2rem; display: block; margin-bottom: 0.4rem; }
+        .modal-dif-icone img { width: 52px; height: 52px; object-fit: contain; display: block; }
+        .modal-dif-titulo { font-family: 'Poppins', sans-serif; font-size: 1.25rem; font-weight: 800; color: #7d2728; margin-bottom: 0.7rem; }
+        .modal-dif-texto { color: #5a3a2e; font-size: 0.92rem; line-height: 1.75; }
+
+        /* === MODAL AGENDA === */
+        .modal-agenda-overlay { display: none; position: fixed; inset: 0; background: rgba(61,26,27,0.72); backdrop-filter: blur(8px); z-index: 9000; align-items: center; justify-content: center; }
+        .modal-agenda-overlay.ativo { display: flex; animation: fadeIn 0.2s ease; }
+        .modal-agenda-box { background: #fff; max-width: 420px; width: 94%; border-radius: 2rem; overflow: hidden; position: relative; animation: scaleIn 0.22s ease-out; box-shadow: 0 30px 60px rgba(0,0,0,0.35); }
+        .modal-agenda-header { background: linear-gradient(135deg, #d33327, #7d2728); padding: 1.4rem 1.8rem 1.2rem; color: #fff; }
+        .modal-agenda-header h3 { margin: 0; font-family: 'Poppins', sans-serif; font-size: 1.1rem; font-weight: 800; }
+        .modal-agenda-header p { margin: 0.3rem 0 0; font-size: 0.82rem; opacity: 0.85; }
+        .btn-fechar-agenda { position: absolute; top: 0.9rem; right: 0.9rem; background: rgba(255,255,255,0.2); border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 0.9rem; transition: 0.25s; display: flex; align-items: center; justify-content: center; z-index: 10; }
+        .btn-fechar-agenda:hover { background: rgba(255,255,255,0.4); transform: rotate(90deg); }
+        .modal-agenda-corpo { padding: 1.4rem 1.6rem 1.8rem; }
+        .agenda-cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem; }
+        .agenda-cal-mes { font-family: 'Poppins', sans-serif; font-weight: 700; color: #7d2728; font-size: 1rem; }
+        .agenda-cal-btn { background: none; border: 1.5px solid #e0c0b0; color: #7d2728; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 0.85rem; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        .agenda-cal-btn:hover { background: #7d2728; color: #fff; border-color: #7d2728; }
+        .agenda-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .agenda-cal-head { text-align: center; font-size: 0.7rem; font-weight: 700; color: #aaa; padding: 4px 0; }
+        .agenda-cal-dia { text-align: center; padding: 6px 2px; border-radius: 0.5rem; font-size: 0.82rem; cursor: pointer; transition: 0.15s; border: 1.5px solid transparent; }
+        .agenda-cal-dia.disponivel:hover { background: #fff2e3; border-color: #d33327; color: #7d2728; }
+        .agenda-cal-dia.selecionado { background: #d33327; color: #fff; font-weight: 700; border-color: #d33327; }
+        .agenda-cal-dia.passado, .agenda-cal-dia.fds { color: #ccc; cursor: default; pointer-events: none; }
+        .agenda-cal-dia.vazio { pointer-events: none; }
+        .agenda-data-sel { margin-top: 1rem; background: #fff5e8; border-radius: 0.8rem; padding: 0.7rem 1rem; font-size: 0.85rem; color: #7d2728; font-weight: 600; display: none; }
+        .agenda-data-sel.visivel { display: block; }
+        .btn-agendar-visita { display: block; width: 100%; margin-top: 1.1rem; padding: 0.85rem; background: linear-gradient(135deg, #d33327, #7d2728); color: #fff; border: none; border-radius: 1rem; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+        .btn-agendar-visita:hover { opacity: 0.9; transform: translateY(-2px); }
+        .btn-agendar-visita:disabled { opacity: 0.4; cursor: default; transform: none; }
 
         /* ── ROTINA ── */
         .rotina { padding: 5rem 0; background: white; }
@@ -484,35 +526,41 @@
             <div class="sec-line"></div>
             <p class="sec-sub" style="color:rgba(255,255,255,0.7);">Uma proposta pedagógica que une cuidado, afeto e excelência educacional</p>
             <div class="dif-grid">
-                <div class="dif-card">
+                <div class="dif-card" onclick="abrirModalDif('arte')">
                     <span class="dif-icone">🎨</span>
                     <h3>Arte e Criatividade</h3>
                     <p>Atividades lúdicas que estimulam a imaginação e o desenvolvimento criativo de cada criança.</p>
+                    <div class="dif-card-hint"><i class="fas fa-expand-alt"></i> Saiba mais</div>
                 </div>
-                <div class="dif-card">
+                <div class="dif-card" onclick="abrirModalDif('alfabetizacao')">
                     <span class="dif-icone">📖</span>
                     <h3>Alfabetização Fônica</h3>
                     <p>Metodologia fônica e lúdica que prepara a criança para a leitura e escrita com prazer.</p>
+                    <div class="dif-card-hint"><i class="fas fa-expand-alt"></i> Saiba mais</div>
                 </div>
-                <div class="dif-card">
-                    <span class="dif-icone">🇺🇸</span>
-                    <h3>Inglês desde cedo</h3>
-                    <p>Contato com a língua inglesa de forma natural, aproveitando a janela de aquisição da infância.</p>
+                <div class="dif-card" onclick="abrirModalDif('jornada')">
+                    <span class="dif-icone">🕐</span>
+                    <h3>Jornada Ampliada</h3>
+                    <p>Período estendido com atividades complementares que enriquecem o desenvolvimento integral.</p>
+                    <div class="dif-card-hint"><i class="fas fa-expand-alt"></i> Saiba mais</div>
                 </div>
-                <div class="dif-card">
+                <div class="dif-card" onclick="abrirModalDif('psicomotricidade')">
                     <span class="dif-icone">🏃</span>
                     <h3>Psicomotricidade</h3>
                     <p>Desenvolvimento motor coordenado com atividades físicas, jogos e brincadeiras orientadas.</p>
+                    <div class="dif-card-hint"><i class="fas fa-expand-alt"></i> Saiba mais</div>
                 </div>
-                <div class="dif-card">
+                <div class="dif-card" onclick="abrirModalDif('socializacao')">
                     <span class="dif-icone">🤝</span>
                     <h3>Socialização</h3>
                     <p>Projetos coletivos que ensinam cooperação, respeito e convivência desde a primeira infância.</p>
+                    <div class="dif-card-hint"><i class="fas fa-expand-alt"></i> Saiba mais</div>
                 </div>
-                <div class="dif-card">
+                <div class="dif-card" onclick="abrirModalDif('valores')">
                     <span class="dif-icone">🙏</span>
                     <h3>Valores Cristãos</h3>
                     <p>Princípios bíblicos integrados ao cotidiano escolar, formando caráter e propósito desde cedo.</p>
+                    <div class="dif-card-hint"><i class="fas fa-expand-alt"></i> Saiba mais</div>
                 </div>
             </div>
         </div>
@@ -578,8 +626,7 @@
         <h2>Venha Conhecer Nossa Escola! 🏫</h2>
         <p>Agende uma visita e veja de perto o ambiente que preparamos com tanto carinho para o seu filho.</p>
         <div class="cta-btns">
-            <a href="javascript:void(0)" onclick="abrirNoPortal('novato')" class="btn-cta-main"><i class="fas fa-calendar-check"></i> Agendar uma Visita</a>
-            <a href="javascript:void(0)" onclick="abrirNoPortal('pai')" class="btn-cta-sec"><i class="fas fa-users"></i> Portal do Pai</a>
+            <a href="javascript:void(0)" onclick="abrirModalAgenda()" class="btn-cta-main"><i class="fas fa-calendar-check"></i> Agendar uma Visita</a>
         </div>
     </div>
 
@@ -590,6 +637,43 @@
         <img id="lbImg" src="" alt="">
         <button class="lb-nav lb-next" id="lbNext"><i class="fas fa-chevron-right"></i></button>
         <div class="lb-counter" id="lbCounter"></div>
+    </div>
+
+    <!-- MODAL DIFERENCIAL -->
+    <div class="modal-dif-overlay" id="modalDif">
+        <div class="modal-dif-box">
+            <button class="btn-fechar-dif" id="fecharModalDif"><i class="fas fa-times"></i></button>
+            <div class="modal-dif-foto" id="modalDifFotoArea">
+                <i class="fas fa-image modal-dif-foto-ph" id="modalDifFotoPh"></i>
+                <img id="modalDifImg" src="" alt="" style="display:none;" onload="this.style.display='block';document.getElementById('modalDifFotoPh').style.display='none';" onerror="this.style.display='none';document.getElementById('modalDifFotoPh').style.display='block';">
+            </div>
+            <div class="modal-dif-corpo">
+                <span class="modal-dif-icone" id="modalDifIcone"></span>
+                <div class="modal-dif-titulo" id="modalDifTitulo"></div>
+                <div class="modal-dif-texto" id="modalDifTexto"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL AGENDAMENTO DE VISITA -->
+    <div class="modal-agenda-overlay" id="modalAgenda">
+        <div class="modal-agenda-box">
+            <button class="btn-fechar-agenda" id="fecharModalAgenda"><i class="fas fa-times"></i></button>
+            <div class="modal-agenda-header">
+                <h3><i class="fas fa-calendar-check"></i> Agendar uma Visita</h3>
+                <p>Escolha o melhor dia para conhecer nossa escola!</p>
+            </div>
+            <div class="modal-agenda-corpo">
+                <div class="agenda-cal-nav">
+                    <button class="agenda-cal-btn" id="agendaMesAnterior"><i class="fas fa-chevron-left"></i></button>
+                    <span class="agenda-cal-mes" id="agendaMesLabel"></span>
+                    <button class="agenda-cal-btn" id="agendaMesProximo"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="agenda-cal-grid" id="agendaCalGrade"></div>
+                <div class="agenda-data-sel" id="agendaDataSel"><i class="fas fa-check-circle"></i> <span id="agendaDataTxt"></span></div>
+                <button class="btn-agendar-visita" id="btnConfirmarVisita" disabled><i class="fas fa-calendar-check"></i> Confirmar Agendamento</button>
+            </div>
+        </div>
     </div>
 
 </div><!-- /scrollWrapper -->
@@ -835,6 +919,170 @@ carregarGaleria();
         };
         xhr.send();
     }
+})();
+
+// ---- Modal Diferenciais ----
+var _dadosDif = {
+    arte: {
+        icone: '🎨',
+        titulo: 'Arte e Criatividade',
+        texto: 'Desde cedo, nossas crianças exploram o mundo através da arte. Com atividades de pintura, modelagem, música e teatro, desenvolvemos a expressão criativa, a imaginação e a autoconfiança de forma lúdica e prazerosa.',
+        foto: 'educInfantil/diferenciais/arte.jpg'
+    },
+    alfabetizacao: {
+        icone: '📚',
+        titulo: 'Alfabetização Bilíngue',
+        texto: 'Nossa metodologia de alfabetização alia o português ao inglês de forma natural e integrada, estimulando a aquisição da leitura e escrita com estratégias lúdicas, garantindo uma base sólida para toda a vida escolar.',
+        foto: 'educInfantil/diferenciais/alfabetizacao.jpg'
+    },
+    jornada: {
+        icone: '🕐',
+        titulo: 'Jornada Ampliada',
+        texto: 'Oferecemos uma jornada escolar ampliada com atividades diversificadas no contraturno, garantindo que as crianças tenham mais tempo de aprendizado, socialização e desenvolvimento integral em um ambiente seguro e estimulante.',
+        foto: 'educInfantil/diferenciais/jornada.jpg'
+    },
+    psicomotricidade: {
+        icone: '🤸',
+        titulo: 'Psicomotricidade',
+        texto: 'As aulas de psicomotricidade desenvolvem a coordenação motora, o equilíbrio e a consciência corporal das crianças por meio de jogos e brincadeiras estruturadas, preparando-as para desafios acadêmicos e físicos futuros.',
+        foto: 'educInfantil/diferenciais/psicomotricidade.jpg'
+    },
+    socializacao: {
+        icone: '🤝',
+        titulo: 'Socialização',
+        texto: 'Acreditamos que aprender a conviver é tão importante quanto aprender conteúdos. Nosso ambiente favorece a construção de amizades, o respeito às diferenças e o desenvolvimento de habilidades socioemocionais essenciais.',
+        foto: 'educInfantil/diferenciais/socializacao.jpg'
+    },
+    valores: {
+        icone: '✨',
+        titulo: 'Valores Cristãos',
+        texto: 'Integrados ao cotidiano escolar, os valores cristãos permeiam todas as atividades, cultivando o amor ao próximo, a honestidade, a gratidão e o senso de responsabilidade desde a mais tenra idade.',
+        foto: 'educInfantil/diferenciais/valores.jpg'
+    }
+};
+
+function abrirModalDif(chave) {
+    var d = _dadosDif[chave];
+    if (!d) return;
+    // Ícone: tenta imagem da pasta icones, fallback para emoji
+    var iconeEl = document.getElementById('modalDifIcone');
+    var iconeImg = new Image();
+    iconeImg.onload = function() {
+        iconeEl.innerHTML = '';
+        iconeEl.appendChild(iconeImg);
+    };
+    iconeImg.onerror = function() {
+        iconeEl.textContent = d.icone;
+    };
+    iconeImg.src = '/files/educInfantil/diferenciais/icones/' + chave + '.png';
+    iconeEl.textContent = d.icone; // mostra emoji enquanto carrega
+    document.getElementById('modalDifTitulo').textContent = d.titulo;
+    document.getElementById('modalDifTexto').textContent = d.texto;
+    var img = document.getElementById('modalDifImg');
+    var ph = document.getElementById('modalDifFotoPh');
+    img.style.display = 'none';
+    ph.style.display = 'block';
+    img.src = '/files/' + d.foto;
+    var overlay = document.getElementById('modalDif');
+    overlay.classList.add('ativo');
+}
+
+(function() {
+    function fecharDif() {
+        document.getElementById('modalDif').classList.remove('ativo');
+    }
+    document.getElementById('fecharModalDif').addEventListener('click', fecharDif);
+    document.getElementById('modalDif').addEventListener('click', function(e) {
+        if (e.target === this) fecharDif();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') { fecharDif(); fecharAgenda(); }
+    });
+})();
+
+// ---- Modal Agendamento de Visita ----
+(function() {
+    var _MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    var _SEMANA = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    var _hoje = new Date(); _hoje.setHours(0,0,0,0);
+    var _curAno = _hoje.getFullYear();
+    var _curMes = _hoje.getMonth();
+    var _dataSel = null;
+
+    function renderCal() {
+        document.getElementById('agendaMesLabel').textContent = _MESES[_curMes] + ' ' + _curAno;
+        var grade = document.getElementById('agendaCalGrade');
+        grade.innerHTML = '';
+        _SEMANA.forEach(function(d) {
+            var h = document.createElement('div');
+            h.className = 'agenda-cal-head';
+            h.textContent = d;
+            grade.appendChild(h);
+        });
+        var primeiro = new Date(_curAno, _curMes, 1).getDay();
+        var totalDias = new Date(_curAno, _curMes + 1, 0).getDate();
+        for (var i = 0; i < primeiro; i++) {
+            var v = document.createElement('div');
+            v.className = 'agenda-cal-dia vazio';
+            grade.appendChild(v);
+        }
+        for (var d = 1; d <= totalDias; d++) {
+            var dt = new Date(_curAno, _curMes, d);
+            var cel = document.createElement('div');
+            cel.textContent = d;
+            var dow = dt.getDay();
+            if (dt < _hoje) {
+                cel.className = 'agenda-cal-dia passado';
+            } else if (dow === 0 || dow === 6) {
+                cel.className = 'agenda-cal-dia fds';
+            } else {
+                cel.className = 'agenda-cal-dia disponivel';
+                if (_dataSel && dt.getTime() === _dataSel.getTime()) cel.classList.add('selecionado');
+                (function(data, el) {
+                    el.addEventListener('click', function() {
+                        _dataSel = data;
+                        var txt = data.getDate().toString().padStart(2,'0') + '/' + (data.getMonth()+1).toString().padStart(2,'0') + '/' + data.getFullYear();
+                        document.getElementById('agendaDataTxt').textContent = txt;
+                        document.getElementById('agendaDataSel').classList.add('visivel');
+                        document.getElementById('btnConfirmarVisita').disabled = false;
+                        renderCal();
+                    });
+                })(dt, cel);
+            }
+            grade.appendChild(cel);
+        }
+    }
+
+    function fecharAgenda() {
+        document.getElementById('modalAgenda').classList.remove('ativo');
+    }
+    window.fecharAgenda = fecharAgenda;
+
+    window.abrirModalAgenda = function() {
+        _dataSel = null;
+        _curAno = _hoje.getFullYear();
+        _curMes = _hoje.getMonth();
+        document.getElementById('agendaDataSel').classList.remove('visivel');
+        document.getElementById('btnConfirmarVisita').disabled = true;
+        renderCal();
+        document.getElementById('modalAgenda').classList.add('ativo');
+    };
+
+    document.getElementById('fecharModalAgenda').addEventListener('click', fecharAgenda);
+    document.getElementById('modalAgenda').addEventListener('click', function(e) { if (e.target === this) fecharAgenda(); });
+    document.getElementById('agendaMesAnterior').addEventListener('click', function() {
+        _curMes--; if (_curMes < 0) { _curMes = 11; _curAno--; } renderCal();
+    });
+    document.getElementById('agendaMesProximo').addEventListener('click', function() {
+        _curMes++; if (_curMes > 11) { _curMes = 0; _curAno++; } renderCal();
+    });
+    document.getElementById('btnConfirmarVisita').addEventListener('click', function() {
+        if (!_dataSel) return;
+        var txt = document.getElementById('agendaDataTxt').textContent;
+        try { window.parent.agendarVisitaEscola(_dataSel, txt); } catch(e) {}
+        fecharAgenda();
+        alert('✅ Visita agendada para ' + txt + '!\nEntraremos em contato para confirmar.');
+    });
 })();
 </script>
 <button class="btn-indicar-float-sub" onclick="try{window.parent.abrirModalIndicar();}catch(e){}"><i class="fas fa-user-friends"></i> Indique um Amigo</button>
