@@ -1,0 +1,65 @@
+================================================================================
+                    SGE - SISTEMA DE GESTÃO ESCOLAR
+                         IMAGENS DECORATIVAS
+================================================================================
+
+COMO ADICIONAR AS IMAGENS DOS OBJETOS CAINDO (LIVROS, LÁPIS, ETC):
+-------------------------------------------------------------------------
+
+O projeto usa 5 TImage "modelos" invisíveis em cada formulário.
+Você precisa adicionar as imagens MANUALMENTE pelo IDE do Delphi.
+
+PASSO A PASSO:
+--------------
+
+1. Abra o projeto no Delphi
+
+2. Para CADA formulário (Login, Principal, Aluno, Professor, etc.):
+
+   a) No Object Inspector, localize os 5 TImage modelos:
+      - ImgModeloBook     (livro)
+      - ImgModeloPencil   (lápis)
+      - ImgModeloEraser   (borracha)
+      - ImgModeloNotebook (caderno)
+      - ImgModeloRuler    (régua)
+
+   b) Selecione cada um e na propriedade "Bitmap":
+      - Clique nos "..." 
+      - Clique em "Edit..."
+      - Clique em "Load..." 
+      - Selecione a imagem PNG correspondente
+
+   c) Os TImage são invisíveis (Visible=False) e ficam na posição -100,-100
+      Isso é proposital! Eles são apenas "modelos" para copiar a imagem.
+
+3. As imagens recomendadas são PNG com fundo transparente, tamanho 64x64 ou maior.
+
+FORMULÁRIOS QUE PRECISAM DAS IMAGENS:
+-------------------------------------
+- UnitLogin.fmx
+- UnitPrincipal.fmx
+- UnitAluno.fmx
+- UnitProfessor.fmx
+- UnitResponsavel.fmx
+- UnitAdministrativo.fmx
+- UnitEducInfantil.fmx
+
+COMO FUNCIONA:
+--------------
+O código em CriarItensDecorativos() copia o bitmap de cada modelo
+para os 15 objetos decorativos que caem na tela:
+
+  - Objeto 0, 5, 10 = copia de ImgModeloBook
+  - Objeto 1, 6, 11 = copia de ImgModeloPencil
+  - Objeto 2, 7, 12 = copia de ImgModeloEraser
+  - Objeto 3, 8, 13 = copia de ImgModeloNotebook
+  - Objeto 4, 9, 14 = copia de ImgModeloRuler
+
+VANTAGENS:
+----------
+- Imagens embutidas no executável (não precisa de pasta externa)
+- Funciona 100% em Android, iOS, Windows
+- Você visualiza as imagens no IDE
+- Fácil de trocar as imagens depois
+
+================================================================================

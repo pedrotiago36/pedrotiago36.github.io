@@ -1,0 +1,790 @@
+﻿object FormResponsavel: TFormResponsavel
+  Left = 0
+  Top = 0
+  Caption = 'SGE - Área do Responsável'
+  ClientHeight = 750
+  ClientWidth = 450
+  Position = ScreenCenter
+  FullScreen = True
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop, iPhone, iPad]
+  OnCreate = FormCreate
+  OnShow = FormShow
+  DesignerMasterStyle = 0
+  object RectFundo: TRectangle
+    Align = Contents
+    Fill.Kind = Gradient
+    Fill.Gradient.Points = <
+      item
+        Color = xFFD33327
+        Offset = 0.000000000000000000
+      end
+      item
+        Color = xFF7D2728
+        Offset = 1.000000000000000000
+      end>
+    Fill.Gradient.StartPosition.X = 0.000000000000000000
+    Fill.Gradient.StartPosition.Y = 0.000000000000000000
+    Fill.Gradient.StopPosition.X = 1.000000000000000000
+    Fill.Gradient.StopPosition.Y = 1.000000000000000000
+    Size.Width = 450.000000000000000000
+    Size.Height = 750.000000000000000000
+    Size.PlatformDefault = False
+    Stroke.Kind = None
+    object LayoutDecor: TLayout
+      Align = Contents
+      Size.Width = 450.000000000000000000
+      Size.Height = 750.000000000000000000
+      Size.PlatformDefault = False
+      HitTest = False
+    end
+    object RectHeader: TRectangle
+      Fill.Color = x30000000
+      Position.X = 0.000000000000000000
+      Position.Y = 0.000000000000000000
+      Size.Width = 450.000000000000000000
+      Size.Height = 80.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Kind = None
+      object ShadowHeader: TShadowEffect
+        Distance = 4.000000000000000000
+        Direction = 90.000000000000000000
+        Softness = 0.300000000000000000
+        Opacity = 0.350000000000000000
+        ShadowColor = claBlack
+      end
+      object RectBtnVoltar: TRectangle
+        Cursor = crHandPoint
+        Fill.Color = x20FFFFFF
+        Position.X = 15.000000000000000000
+        Position.Y = 20.000000000000000000
+        Size.Width = 45.000000000000000000
+        Size.Height = 45.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Color = x40FDCD62
+        Stroke.Thickness = 1.500000000000000000
+        XRadius = 10.000000000000000000
+        YRadius = 10.000000000000000000
+        OnClick = RectBtnVoltarClick
+        object LblBtnVoltar: TLabel
+          Align = Client
+          HitTest = False
+          StyledSettings = []
+          Text = #8592
+          TextSettings.Font.Size = 24.000000000000000000
+          TextSettings.FontColor = claWhite
+          TextSettings.HorzAlign = Center
+        end
+      end
+      object RectBtnMenu: TRectangle
+        Cursor = crHandPoint
+        Fill.Color = x20FFFFFF
+        Position.X = 390.000000000000000000
+        Position.Y = 20.000000000000000000
+        Size.Width = 45.000000000000000000
+        Size.Height = 45.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Color = x40FDCD62
+        Stroke.Thickness = 1.500000000000000000
+        XRadius = 10.000000000000000000
+        YRadius = 10.000000000000000000
+        OnClick = RectBtnMenuClick
+        object LblBtnMenu: TLabel
+          Align = Client
+          HitTest = False
+          StyledSettings = []
+          Text = #9776
+          TextSettings.Font.Size = 22.000000000000000000
+          TextSettings.FontColor = claWhite
+          TextSettings.HorzAlign = Center
+        end
+      end
+      object ImgLogoHeader: TImage
+        HitTest = False
+        Position.X = 75.000000000000000000
+        Position.Y = 18.000000000000000000
+        Size.Width = 45.000000000000000000
+        Size.Height = 45.000000000000000000
+        Size.PlatformDefault = False
+        WrapMode = Fit
+      end
+      object LblTituloHeader: TLabel
+        Position.X = 130.000000000000000000
+        Position.Y = 18.000000000000000000
+        Size.Width = 200.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        Text = 'Área do Responsável'
+        TextSettings.Font.Size = 15.000000000000000000
+        TextSettings.Font.Style = [fsBold]
+        TextSettings.FontColor = claWhite
+      end
+      object LblSubtituloHeader: TLabel
+        Position.X = 130.000000000000000000
+        Position.Y = 44.000000000000000000
+        Size.Width = 200.000000000000000000
+        Size.Height = 20.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        Text = 'Olá, Responsável!'
+        TextSettings.Font.Size = 12.000000000000000000
+        TextSettings.FontColor = xFFFDCD62
+      end
+    end
+    object RectConteudo: TRectangle
+      Fill.Kind = None
+      Position.X = 15.000000000000000000
+      Position.Y = 95.000000000000000000
+      Size.Width = 420.000000000000000000
+      Size.Height = 640.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Kind = None
+      object RectConteudoHeader: TRectangle
+        Fill.Kind = None
+        Position.X = 0.000000000000000000
+        Position.Y = 0.000000000000000000
+        Size.Width = 420.000000000000000000
+        Size.Height = 60.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Kind = None
+        object LblConteudoTitulo: TLabel
+          Position.X = 0.000000000000000000
+          Position.Y = 5.000000000000000000
+          Size.Width = 420.000000000000000000
+          Size.Height = 30.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Área do Responsável'
+          TextSettings.Font.Size = 22.000000000000000000
+          TextSettings.Font.Style = [fsBold]
+          TextSettings.FontColor = claWhite
+        end
+        object LblConteudoSubtitulo: TLabel
+          Position.X = 0.000000000000000000
+          Position.Y = 38.000000000000000000
+          Size.Width = 420.000000000000000000
+          Size.Height = 18.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Acompanhe a vida escolar do seu filho'
+          TextSettings.Font.Size = 12.000000000000000000
+          TextSettings.FontColor = xCCFFFFFF
+        end
+      end
+      object RectCard1: TRectangle
+        Cursor = crHandPoint
+        Fill.Color = x20FFFFFF
+        Position.X = 0.000000000000000000
+        Position.Y = 75.000000000000000000
+        Size.Width = 420.000000000000000000
+        Size.Height = 120.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Color = x4DFDCD62
+        Stroke.Thickness = 1.500000000000000000
+        XRadius = 15.000000000000000000
+        YRadius = 15.000000000000000000
+        OnClick = CardClick
+        OnMouseEnter = CardMouseEnter
+        OnMouseLeave = CardMouseLeave
+        object ShadowCard1: TShadowEffect
+          Distance = 6.000000000000000000
+          Direction = 45.000000000000000000
+          Softness = 0.350000000000000000
+          Opacity = 0.300000000000000000
+          ShadowColor = claBlack
+        end
+        object ImgCard1: TImage
+          HitTest = False
+          Position.X = 20.000000000000000000
+          Position.Y = 20.000000000000000000
+          Size.Width = 55.000000000000000000
+          Size.Height = 55.000000000000000000
+          Size.PlatformDefault = False
+          WrapMode = Fit
+        end
+        object LblCard1Titulo: TLabel
+          HitTest = False
+          Position.X = 95.000000000000000000
+          Position.Y = 25.000000000000000000
+          Size.Width = 300.000000000000000000
+          Size.Height = 28.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Boletim Escolar'
+          TextSettings.Font.Size = 18.000000000000000000
+          TextSettings.Font.Style = [fsBold]
+          TextSettings.FontColor = claWhite
+        end
+        object LblCard1Desc: TLabel
+          HitTest = False
+          Position.X = 95.000000000000000000
+          Position.Y = 55.000000000000000000
+          Size.Width = 300.000000000000000000
+          Size.Height = 40.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Acompanhe as notas e o desempenho do aluno em todas as matérias'
+          TextSettings.Font.Size = 11.000000000000000000
+          TextSettings.FontColor = xFFFDCD62
+          TextSettings.WordWrap = True
+        end
+      end
+      object RectCard2: TRectangle
+        Cursor = crHandPoint
+        Fill.Color = x20FFFFFF
+        Position.X = 0.000000000000000000
+        Position.Y = 210.000000000000000000
+        Size.Width = 420.000000000000000000
+        Size.Height = 120.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Color = x4DFDCD62
+        Stroke.Thickness = 1.500000000000000000
+        XRadius = 15.000000000000000000
+        YRadius = 15.000000000000000000
+        OnClick = CardClick
+        OnMouseEnter = CardMouseEnter
+        OnMouseLeave = CardMouseLeave
+        object ShadowCard2: TShadowEffect
+          Distance = 6.000000000000000000
+          Direction = 45.000000000000000000
+          Softness = 0.350000000000000000
+          Opacity = 0.300000000000000000
+          ShadowColor = claBlack
+        end
+        object ImgCard2: TImage
+          HitTest = False
+          Position.X = 20.000000000000000000
+          Position.Y = 20.000000000000000000
+          Size.Width = 55.000000000000000000
+          Size.Height = 55.000000000000000000
+          Size.PlatformDefault = False
+          WrapMode = Fit
+        end
+        object LblCard2Titulo: TLabel
+          HitTest = False
+          Position.X = 95.000000000000000000
+          Position.Y = 25.000000000000000000
+          Size.Width = 300.000000000000000000
+          Size.Height = 28.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Faturas e Mensalidades'
+          TextSettings.Font.Size = 18.000000000000000000
+          TextSettings.Font.Style = [fsBold]
+          TextSettings.FontColor = claWhite
+        end
+        object LblCard2Desc: TLabel
+          HitTest = False
+          Position.X = 95.000000000000000000
+          Position.Y = 55.000000000000000000
+          Size.Width = 300.000000000000000000
+          Size.Height = 40.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Visualize e gerencie todas as faturas de mensalidades escolares'
+          TextSettings.Font.Size = 11.000000000000000000
+          TextSettings.FontColor = xFFFDCD62
+          TextSettings.WordWrap = True
+        end
+      end
+      object RectCard3: TRectangle
+        Cursor = crHandPoint
+        Fill.Color = x20FFFFFF
+        Position.X = 0.000000000000000000
+        Position.Y = 345.000000000000000000
+        Size.Width = 420.000000000000000000
+        Size.Height = 120.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Color = x4DFDCD62
+        Stroke.Thickness = 1.500000000000000000
+        XRadius = 15.000000000000000000
+        YRadius = 15.000000000000000000
+        OnClick = CardClick
+        OnMouseEnter = CardMouseEnter
+        OnMouseLeave = CardMouseLeave
+        object ShadowCard3: TShadowEffect
+          Distance = 6.000000000000000000
+          Direction = 45.000000000000000000
+          Softness = 0.350000000000000000
+          Opacity = 0.300000000000000000
+          ShadowColor = claBlack
+        end
+        object ImgCard3: TImage
+          HitTest = False
+          Position.X = 20.000000000000000000
+          Position.Y = 20.000000000000000000
+          Size.Width = 55.000000000000000000
+          Size.Height = 55.000000000000000000
+          Size.PlatformDefault = False
+          WrapMode = Fit
+        end
+        object LblCard3Titulo: TLabel
+          HitTest = False
+          Position.X = 95.000000000000000000
+          Position.Y = 25.000000000000000000
+          Size.Width = 300.000000000000000000
+          Size.Height = 28.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Notificações'
+          TextSettings.Font.Size = 18.000000000000000000
+          TextSettings.Font.Style = [fsBold]
+          TextSettings.FontColor = claWhite
+        end
+        object LblCard3Desc: TLabel
+          HitTest = False
+          Position.X = 95.000000000000000000
+          Position.Y = 55.000000000000000000
+          Size.Width = 300.000000000000000000
+          Size.Height = 40.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Promoções, avisos de rematrícula e eventos importantes'
+          TextSettings.Font.Size = 11.000000000000000000
+          TextSettings.FontColor = xFFFDCD62
+          TextSettings.WordWrap = True
+        end
+      end
+    end
+    object RectDetalhe: TRectangle
+      Fill.Color = x20000000
+      Position.X = 15.000000000000000000
+      Position.Y = 95.000000000000000000
+      Size.Width = 420.000000000000000000
+      Size.Height = 640.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Color = x4DFDCD62
+      Stroke.Thickness = 1.500000000000000000
+      Visible = False
+      XRadius = 15.000000000000000000
+      YRadius = 15.000000000000000000
+      object RectDetalheHeader: TRectangle
+        Fill.Kind = Gradient
+        Fill.Gradient.Points = <
+          item
+            Color = xFFD33327
+            Offset = 0.000000000000000000
+          end
+          item
+            Color = xFF7D2728
+            Offset = 1.000000000000000000
+          end>
+        Fill.Gradient.StartPosition.X = 0.000000000000000000
+        Fill.Gradient.StopPosition.X = 1.000000000000000000
+        Position.X = 0.000000000000000000
+        Position.Y = 0.000000000000000000
+        Size.Width = 420.000000000000000000
+        Size.Height = 60.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Kind = None
+        XRadius = 15.000000000000000000
+        YRadius = 15.000000000000000000
+        Corners = [TopLeft, TopRight]
+        object LblDetalheTitulo: TLabel
+          Position.X = 15.000000000000000000
+          Position.Y = 15.000000000000000000
+          Size.Width = 320.000000000000000000
+          Size.Height = 30.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Título'
+          TextSettings.Font.Size = 18.000000000000000000
+          TextSettings.Font.Style = [fsBold]
+          TextSettings.FontColor = claWhite
+        end
+        object RectBtnFecharDetalhe: TRectangle
+          Cursor = crHandPoint
+          Fill.Color = x30FFFFFF
+          Position.X = 355.000000000000000000
+          Position.Y = 10.000000000000000000
+          Size.Width = 50.000000000000000000
+          Size.Height = 40.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = x60FFFFFF
+          Stroke.Thickness = 1.000000000000000000
+          XRadius = 8.000000000000000000
+          YRadius = 8.000000000000000000
+          OnClick = RectBtnFecharDetalheClick
+          object LblBtnFecharDetalhe: TLabel
+            Align = Client
+            HitTest = False
+            StyledSettings = []
+            Text = #10005
+            TextSettings.Font.Size = 18.000000000000000000
+            TextSettings.FontColor = claWhite
+            TextSettings.HorzAlign = Center
+          end
+        end
+      end
+      object RectDetalheConteudo: TRectangle
+        Fill.Kind = None
+        Position.X = 10.000000000000000000
+        Position.Y = 70.000000000000000000
+        Size.Width = 400.000000000000000000
+        Size.Height = 555.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Kind = None
+        object VertScrollBox: TVertScrollBox
+          Align = Client
+          Size.Width = 400.000000000000000000
+          Size.Height = 555.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+        end
+      end
+    end
+    object RectMenuOverlay: TRectangle
+      Fill.Color = x99000000
+      Position.X = 0.000000000000000000
+      Position.Y = 0.000000000000000000
+      Size.Width = 450.000000000000000000
+      Size.Height = 750.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Kind = None
+      Visible = False
+      OnClick = RectMenuOverlayClick
+    end
+    object RectMenuLateral: TRectangle
+      Fill.Color = xE8501818
+      Position.X = -280.000000000000000000
+      Position.Y = 0.000000000000000000
+      Size.Width = 280.000000000000000000
+      Size.Height = 750.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Kind = None
+      object ShadowMenu: TShadowEffect
+        Distance = 8.000000000000000000
+        Direction = 0.000000000000000000
+        Softness = 0.400000000000000000
+        Opacity = 0.500000000000000000
+        ShadowColor = claBlack
+      end
+      object RectMenuHeader: TRectangle
+        Fill.Kind = Gradient
+        Fill.Gradient.Points = <
+          item
+            Color = xFFD33327
+            Offset = 0.000000000000000000
+          end
+          item
+            Color = xFF7D2728
+            Offset = 1.000000000000000000
+          end>
+        Fill.Gradient.StartPosition.X = 0.000000000000000000
+        Fill.Gradient.StopPosition.X = 1.000000000000000000
+        Position.X = 0.000000000000000000
+        Position.Y = 0.000000000000000000
+        Size.Width = 280.000000000000000000
+        Size.Height = 180.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Kind = None
+        object CircleLogoMenu: TCircle
+          Fill.Kind = Gradient
+          Fill.Gradient.Points = <
+            item
+              Color = xFF7D2728
+              Offset = 0.000000000000000000
+            end
+            item
+              Color = xFF501818
+              Offset = 1.000000000000000000
+            end>
+          Position.X = 100.000000000000000000
+          Position.Y = 20.000000000000000000
+          Size.Width = 80.000000000000000000
+          Size.Height = 80.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = xFFFDCD62
+          Stroke.Thickness = 2.500000000000000000
+          object ImgLogoMenu: TImage
+            HitTest = False
+            Position.X = 15.000000000000000000
+            Position.Y = 15.000000000000000000
+            Size.Width = 50.000000000000000000
+            Size.Height = 50.000000000000000000
+            Size.PlatformDefault = False
+            WrapMode = Fit
+          end
+        end
+        object LblNomeUsuario: TLabel
+          Position.X = 10.000000000000000000
+          Position.Y = 115.000000000000000000
+          Size.Width = 260.000000000000000000
+          Size.Height = 28.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Nome do Responsável'
+          TextSettings.Font.Size = 18.000000000000000000
+          TextSettings.Font.Style = [fsBold]
+          TextSettings.FontColor = claWhite
+          TextSettings.HorzAlign = Center
+        end
+        object LblTipoUsuario: TLabel
+          Position.X = 10.000000000000000000
+          Position.Y = 145.000000000000000000
+          Size.Width = 260.000000000000000000
+          Size.Height = 22.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Área do Responsável'
+          TextSettings.Font.Size = 13.000000000000000000
+          TextSettings.FontColor = xFFFDCD62
+          TextSettings.HorzAlign = Center
+        end
+      end
+      object RectMenuDivider: TRectangle
+        Fill.Color = x40FDCD62
+        Position.X = 20.000000000000000000
+        Position.Y = 190.000000000000000000
+        Size.Width = 240.000000000000000000
+        Size.Height = 1.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Kind = None
+      end
+      object RectMenuItem1: TRectangle
+        Cursor = crHandPoint
+        Fill.Color = x10FFFFFF
+        Position.X = 10.000000000000000000
+        Position.Y = 205.000000000000000000
+        Size.Width = 260.000000000000000000
+        Size.Height = 55.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Kind = None
+        XRadius = 12.000000000000000000
+        YRadius = 12.000000000000000000
+        OnClick = MenuItemClick
+        OnMouseEnter = MenuItemMouseEnter
+        OnMouseLeave = MenuItemMouseLeave
+        object ImgMenuItem1: TImage
+          HitTest = False
+          Position.X = 15.000000000000000000
+          Position.Y = 12.000000000000000000
+          Size.Width = 30.000000000000000000
+          Size.Height = 30.000000000000000000
+          Size.PlatformDefault = False
+          WrapMode = Fit
+        end
+        object LblMenuItem1: TLabel
+          HitTest = False
+          Position.X = 55.000000000000000000
+          Position.Y = 0.000000000000000000
+          Size.Width = 195.000000000000000000
+          Size.Height = 55.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Boletim Escolar'
+          TextSettings.Font.Size = 15.000000000000000000
+          TextSettings.Font.Style = [fsBold]
+          TextSettings.FontColor = claWhite
+          TextSettings.VertAlign = Center
+        end
+      end
+      object RectMenuItem2: TRectangle
+        Cursor = crHandPoint
+        Fill.Color = x10FFFFFF
+        Position.X = 10.000000000000000000
+        Position.Y = 270.000000000000000000
+        Size.Width = 260.000000000000000000
+        Size.Height = 55.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Kind = None
+        XRadius = 12.000000000000000000
+        YRadius = 12.000000000000000000
+        OnClick = MenuItemClick
+        OnMouseEnter = MenuItemMouseEnter
+        OnMouseLeave = MenuItemMouseLeave
+        object ImgMenuItem2: TImage
+          HitTest = False
+          Position.X = 15.000000000000000000
+          Position.Y = 12.000000000000000000
+          Size.Width = 30.000000000000000000
+          Size.Height = 30.000000000000000000
+          Size.PlatformDefault = False
+          WrapMode = Fit
+        end
+        object LblMenuItem2: TLabel
+          HitTest = False
+          Position.X = 55.000000000000000000
+          Position.Y = 0.000000000000000000
+          Size.Width = 195.000000000000000000
+          Size.Height = 55.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Faturas'
+          TextSettings.Font.Size = 15.000000000000000000
+          TextSettings.Font.Style = [fsBold]
+          TextSettings.FontColor = claWhite
+          TextSettings.VertAlign = Center
+        end
+      end
+      object RectMenuItem3: TRectangle
+        Cursor = crHandPoint
+        Fill.Color = x10FFFFFF
+        Position.X = 10.000000000000000000
+        Position.Y = 335.000000000000000000
+        Size.Width = 260.000000000000000000
+        Size.Height = 55.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Kind = None
+        XRadius = 12.000000000000000000
+        YRadius = 12.000000000000000000
+        OnClick = MenuItemClick
+        OnMouseEnter = MenuItemMouseEnter
+        OnMouseLeave = MenuItemMouseLeave
+        object ImgMenuItem3: TImage
+          HitTest = False
+          Position.X = 15.000000000000000000
+          Position.Y = 12.000000000000000000
+          Size.Width = 30.000000000000000000
+          Size.Height = 30.000000000000000000
+          Size.PlatformDefault = False
+          WrapMode = Fit
+        end
+        object LblMenuItem3: TLabel
+          HitTest = False
+          Position.X = 55.000000000000000000
+          Position.Y = 0.000000000000000000
+          Size.Width = 195.000000000000000000
+          Size.Height = 55.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Notificações'
+          TextSettings.Font.Size = 15.000000000000000000
+          TextSettings.Font.Style = [fsBold]
+          TextSettings.FontColor = claWhite
+          TextSettings.VertAlign = Center
+        end
+      end
+      object RectMenuFooter: TRectangle
+        Fill.Kind = None
+        Position.X = 0.000000000000000000
+        Position.Y = 620.000000000000000000
+        Size.Width = 280.000000000000000000
+        Size.Height = 130.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Kind = None
+        object RectBtnSair: TRectangle
+          Cursor = crHandPoint
+          Fill.Kind = Gradient
+          Fill.Gradient.Points = <
+            item
+              Color = xFFD33327
+              Offset = 0.000000000000000000
+            end
+            item
+              Color = xFF7D2728
+              Offset = 1.000000000000000000
+            end>
+          Fill.Gradient.StartPosition.X = 0.000000000000000000
+          Fill.Gradient.StopPosition.X = 1.000000000000000000
+          Position.X = 10.000000000000000000
+          Position.Y = 10.000000000000000000
+          Size.Width = 260.000000000000000000
+          Size.Height = 50.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = xFFFDCD62
+          Stroke.Thickness = 1.500000000000000000
+          XRadius = 12.000000000000000000
+          YRadius = 12.000000000000000000
+          OnClick = RectBtnSairClick
+          object ImgBtnSair: TImage
+            HitTest = False
+            Position.X = 15.000000000000000000
+            Position.Y = 10.000000000000000000
+            Size.Width = 28.000000000000000000
+            Size.Height = 28.000000000000000000
+            Size.PlatformDefault = False
+            WrapMode = Fit
+          end
+          object LblBtnSair: TLabel
+            HitTest = False
+            Position.X = 55.000000000000000000
+            Position.Y = 0.000000000000000000
+            Size.Width = 195.000000000000000000
+            Size.Height = 50.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            Text = 'Voltar'
+            TextSettings.Font.Size = 15.000000000000000000
+            TextSettings.Font.Style = [fsBold]
+            TextSettings.FontColor = claWhite
+            TextSettings.VertAlign = Center
+          end
+        end
+        object LblVersao: TLabel
+          Position.X = 10.000000000000000000
+          Position.Y = 75.000000000000000000
+          Size.Width = 260.000000000000000000
+          Size.Height = 45.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'SGE v2.0'#13#10'Área do Responsável'
+          TextSettings.Font.Size = 10.000000000000000000
+          TextSettings.FontColor = x80FFFFFF
+          TextSettings.HorzAlign = Center
+        end
+      end
+    end
+  end
+  object TimerDecor: TTimer
+    Enabled = False
+    Interval = 50
+    OnTimer = TimerDecorTimer
+    Left = 392
+    Top = 16
+  end
+  object TimerLogoMenu: TTimer
+    Enabled = False
+    Interval = 30
+    OnTimer = TimerLogoMenuTimer
+    Left = 392
+    Top = 56
+  end
+  object ImgModeloBook: TImage
+    Position.X = -100.000000000000000000
+    Position.Y = -100.000000000000000000
+    Size.Width = 40.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    Visible = False
+    WrapMode = Fit
+  end
+  object ImgModeloPencil: TImage
+    Position.X = -100.000000000000000000
+    Position.Y = -100.000000000000000000
+    Size.Width = 40.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    Visible = False
+    WrapMode = Fit
+  end
+  object ImgModeloEraser: TImage
+    Position.X = -100.000000000000000000
+    Position.Y = -100.000000000000000000
+    Size.Width = 40.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    Visible = False
+    WrapMode = Fit
+  end
+  object ImgModeloNotebook: TImage
+    Position.X = -100.000000000000000000
+    Position.Y = -100.000000000000000000
+    Size.Width = 40.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    Visible = False
+    WrapMode = Fit
+  end
+  object ImgModeloRuler: TImage
+    Position.X = -100.000000000000000000
+    Position.Y = -100.000000000000000000
+    Size.Width = 40.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    Visible = False
+    WrapMode = Fit
+  end
+end
