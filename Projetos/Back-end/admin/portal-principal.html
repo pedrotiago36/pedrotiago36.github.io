@@ -175,8 +175,17 @@
         }
         .nivel-ph i { font-size: 1.8rem; color: #d33327; opacity: 0.2; }
         .nivel-ph span { font-size: 0.68rem; color: #ccc; text-align: center; padding: 0 0.4rem; word-break: break-all; }
+        .nivel-empty-img {
+            width: 100%; aspect-ratio: 3/4;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #f9f1ef, #f0e8e6); gap: 0.5rem;
+            border-radius: 0 0 0 0;
+        }
+        .nivel-empty-img i { font-size: 2.2rem; color: #d33327; opacity: 0.18; }
+        .nivel-empty-img span { font-size: 0.65rem; color: #bbb; }
         .nivel-info { padding: 0.6rem; }
-        .nivel-name { font-size: 0.76rem; font-weight: 700; color: #5a3a2e; text-align: center; margin-bottom: 0.45rem; }
+        .nivel-name { font-size: 0.76rem; font-weight: 700; color: #5a3a2e; text-align: center; margin-bottom: 0.2rem; }
+        .nivel-sub  { font-size: 0.65rem; color: #999; text-align: center; margin-bottom: 0.4rem; }
         .nivel-actions { display: flex; gap: 0.3rem; justify-content: center; }
 
         /* ── DROP ZONE ── */
@@ -329,24 +338,15 @@
             <div class="ph">
                 <div>
                     <h2><i class="fas fa-layer-group" style="color:#fdcd62;margin-right:8px;"></i>Níveis de Ensino</h2>
-                    <p>Imagens das venezianas exibidas no portal</p>
+                    <p>Clique em "Adicionar" ou "Trocar" em cada nível para definir a imagem</p>
                 </div>
-                <button class="btn-add" onclick="document.getElementById('upNivel').click()">
-                    <i class="fas fa-plus"></i> Adicionar Nível
-                </button>
-                <input type="file" id="upNivel" accept="image/*" style="display:none" onchange="addNivel(this)">
             </div>
             <div class="box">
                 <div class="box-title">
-                    <i class="fas fa-th"></i> Cards Atuais
-                    <span class="lbl" id="lbl-niveis">0 imagens</span>
+                    <i class="fas fa-th"></i> 5 Níveis
+                    <span class="lbl" id="lbl-niveis">0/5 com imagem</span>
                 </div>
                 <div class="nivel-grid" id="niveisGrid"></div>
-                <div class="drop-zone" onclick="document.getElementById('upNivel').click()" style="margin-top:0.5rem;">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <p>Clique ou arraste para adicionar um novo nível</p>
-                    <small>Formato retrato — proporção 3:4</small>
-                </div>
             </div>
         </div>
 
@@ -524,18 +524,23 @@ function carregarSlides(){
         })
         .catch(function(){ renderSlider(); });
 }
-var NIVEIS = [];
+var SLOTS_NIVEIS = [
+    { id: '1', label: 'Educação Infantil', sub: 'Infantil I ao Infantil 5' },
+    { id: '2', label: 'Anos Iniciais',     sub: '1º ao 5º Ano'             },
+    { id: '3', label: 'Anos Finais',       sub: '6º ao 8º Ano'             },
+    { id: '4', label: 'Ensino Médio',      sub: '9º ao 2º Ano'             },
+    { id: '5', label: 'Pré-Universitário', sub: '3º Ano'                   }
+];
+var NIVEIS_IMG = {}; // '1'..'5' → { nome, url, fname }
+
 function carregarNiveis(){
     fetch('/listar?pasta=segmentos')
         .then(function(r){ return r.json(); })
         .then(function(lista){
-            NIVEIS = lista.map(function(item, i){
-                return {
-                    id: i+1,
-                    nome: item.nome.replace(/\.[^.]+$/, '').replace(/[_-]/g,' '),
-                    url: item.url,
-                    fname: item.nome
-                };
+            NIVEIS_IMG = {};
+            lista.forEach(function(item){
+                var p = item.nome.charAt(0);
+                if (/[1-5]/.test(p) && !NIVEIS_IMG[p]) NIVEIS_IMG[p] = item;
             });
             renderNiveis();
         })
@@ -670,46 +675,74 @@ function addSlides(inp){
 
 // ── RENDER NÍVEIS ──
 function renderNiveis(){
-    var n=NIVEIS.length;
-    document.getElementById('cnt-niveis').textContent=n;
-    document.getElementById('lbl-niveis').textContent=n+(n===1?' imagem':' imagens');
-    var g=document.getElementById('niveisGrid');
-    if(!n){g.innerHTML='<div class="empty"><i class="fas fa-graduation-cap"></i><p>Nenhum nível cadastrado.</p></div>';return;}
-    g.innerHTML=NIVEIS.map(function(it){
+    var com = Object.keys(NIVEIS_IMG).length;
+    document.getElementById('cnt-niveis').textContent = com;
+    document.getElementById('lbl-niveis').textContent = com + '/5 com imagem';
+    var g = document.getElementById('niveisGrid');
+    g.innerHTML = SLOTS_NIVEIS.map(function(slot){
+        var img = NIVEIS_IMG[slot.id];
+        var imgHtml = img
+            ? '<img class="nivel-img" src="'+esc(img.url)+'" alt="'+esc(slot.label)+'" onerror="_errN(this,\''+escJ(slot.label)+'\')">'
+            : '<div class="nivel-empty-img"><i class="fas fa-image"></i><span>Sem imagem</span></div>';
         return '<div class="nivel-card">'+
-            '<img class="nivel-img" src="'+esc(it.url)+'" alt="'+esc(it.nome)+'" onerror="_errN(this,\''+escJ(it.nome)+'\')">'+
-            '<div class="nivel-info"><div class="nivel-name">'+esc(it.nome)+'</div>'+
-            '<div class="nivel-actions" style="justify-content:center;">'+
-            '<button class="btn-del" onclick="excluirNivel('+it.id+')" style="width:100%;"><i class="fas fa-trash"></i> Excluir</button>'+
-            '</div></div></div>';
+            imgHtml+
+            '<div class="nivel-info">'+
+                '<div class="nivel-name">'+esc(slot.label)+'</div>'+
+                '<div class="nivel-sub">'+esc(slot.sub)+'</div>'+
+                '<div class="nivel-actions">'+
+                    '<button class="btn-swap" onclick="trocarNivel(\''+slot.id+'\')" title="'+(img?'Trocar imagem':'Adicionar imagem')+'">'+
+                        '<i class="fas fa-'+(img?'camera':'plus')+'"></i> '+(img?'Trocar':'Adicionar')+
+                    '</button>'+
+                    (img?'<button class="btn-del" onclick="excluirNivel(\''+slot.id+'\')" title="Excluir"><i class="fas fa-trash"></i></button>':'')+
+                '</div>'+
+            '</div>'+
+            '<input type="file" id="inpNivel'+slot.id+'" accept="image/*" style="display:none" onchange="uploadNivel(\''+slot.id+'\',this)">'+
+        '</div>';
     }).join('');
 }
-function excluirNivel(id){
-    var it=NIVEIS.find(function(n){return n.id===id;});
-    if(!it) return;
-    confirmar('Excluir permanentemente?', it.nome, function(){
+function trocarNivel(prefixo){
+    document.getElementById('inpNivel'+prefixo).click();
+}
+function uploadNivel(prefixo, inp){
+    if(!inp.files||!inp.files[0]) return;
+    var f = inp.files[0];
+    lerArq(f, function(src){
+        var novoNome = prefixo+'_'+f.name;
+        var doUpload = function(){
+            fetch('/upload', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({nome: novoNome, pasta: 'segmentos', base64: src})
+            })
+            .then(function(r){ return r.json(); })
+            .then(function(){ try{inp.value='';}catch(e){} carregarNiveis(); toast('Nível atualizado!'); })
+            .catch(function(){ toast('Erro ao enviar', true); });
+        };
+        var atual = NIVEIS_IMG[prefixo];
+        if(atual){
+            fetch('/deletar', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({nome: atual.nome, pasta: 'segmentos'})
+            }).then(doUpload).catch(doUpload);
+        } else {
+            doUpload();
+        }
+    });
+}
+function excluirNivel(prefixo){
+    var img = NIVEIS_IMG[prefixo];
+    if(!img) return;
+    var slot = SLOTS_NIVEIS.find(function(s){ return s.id === prefixo; });
+    confirmar('Excluir imagem do nível?', slot?slot.label:'', function(){
         fetch('/deletar', {
             method: 'POST',
             headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({nome: it.fname, pasta: 'segmentos'})
+            body: JSON.stringify({nome: img.nome, pasta: 'segmentos'})
         })
         .then(function(r){ return r.json(); })
         .then(function(){ carregarNiveis(); toast('Imagem excluída!'); })
         .catch(function(){ toast('Erro ao excluir', true); });
-    });
-}
-function addNivel(inp){
-    if(!inp.files||!inp.files[0])return;
-    var f=inp.files[0];
-    lerArq(f,function(src){
-        fetch('/upload', {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({nome: f.name, pasta: 'segmentos', base64: src})
-        })
-        .then(function(r){ return r.json(); })
-        .then(function(){ try{inp.value='';}catch(e){} carregarNiveis(); toast('Nível adicionado!'); })
-        .catch(function(){ toast('Erro ao enviar', true); });
     });
 }
 

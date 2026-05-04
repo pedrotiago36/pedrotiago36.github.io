@@ -68,13 +68,13 @@ begin
   end;
 end;
 
-{ Lista PNGs de uma pasta e retorna JSON array }
+{ Lista imagens de uma pasta e retorna JSON array }
 function ListarPNGs(const pasta: string): string;
 var
   dir: string;
   files: TStringDynArray;
   sb: TStringBuilder;
-  f, nome, urlBase: string;
+  f, nome, urlBase, ext: string;
 begin
   dir := PastaFisica(pasta);
   sb := TStringBuilder.Create;
@@ -82,10 +82,13 @@ begin
     sb.Append('[');
     if TDirectory.Exists(dir) then
     begin
-      files := TDirectory.GetFiles(dir, '*.png');
+      files := TDirectory.GetFiles(dir);
       for f in files do
       begin
         nome := TPath.GetFileName(f);
+        ext  := LowerCase(TPath.GetExtension(nome));
+        if (ext <> '.png') and (ext <> '.jpg') and (ext <> '.jpeg') and (ext <> '.webp') then
+          Continue;
         urlBase := '/files/portal/' + pasta + '/';
         if sb.Length > 1 then sb.Append(',');
         sb.Append('{"nome":"').Append(nome)
