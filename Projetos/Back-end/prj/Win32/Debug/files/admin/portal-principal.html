@@ -525,23 +525,16 @@ function carregarSlides(){
         .catch(function(){ renderSlider(); });
 }
 var NIVEIS = [];
-function _getNiveisHidden(){ try{ return JSON.parse(getCookie('geb_pp_niveis_hidden')||'[]'); }catch(e){return[];} }
-function salvarNiveisCookie(){
-    var hidden = NIVEIS.filter(function(n){return n.hidden;}).map(function(n){return n.fname;});
-    setCookie('geb_pp_niveis_hidden', JSON.stringify(hidden));
-}
 function carregarNiveis(){
     fetch('/listar?pasta=segmentos')
         .then(function(r){ return r.json(); })
         .then(function(lista){
-            var hidden = _getNiveisHidden();
             NIVEIS = lista.map(function(item, i){
                 return {
                     id: i+1,
                     nome: item.nome.replace(/\.[^.]+$/, '').replace(/[_-]/g,' '),
                     url: item.url,
-                    fname: item.nome,
-                    hidden: hidden.indexOf(item.nome) !== -1
+                    fname: item.nome
                 };
             });
             renderNiveis();
@@ -677,38 +670,19 @@ function addSlides(inp){
 
 // ── RENDER NÍVEIS ──
 function renderNiveis(){
-    var visiveis=NIVEIS.filter(function(n){return !n.hidden;}).length;
-    document.getElementById('cnt-niveis').textContent=visiveis;
-    document.getElementById('lbl-niveis').textContent=visiveis+(visiveis===1?' imagem':' imagens');
+    var n=NIVEIS.length;
+    document.getElementById('cnt-niveis').textContent=n;
+    document.getElementById('lbl-niveis').textContent=n+(n===1?' imagem':' imagens');
     var g=document.getElementById('niveisGrid');
-    if(!NIVEIS.length){g.innerHTML='<div class="empty"><i class="fas fa-graduation-cap"></i><p>Nenhum nível cadastrado.</p></div>';return;}
+    if(!n){g.innerHTML='<div class="empty"><i class="fas fa-graduation-cap"></i><p>Nenhum nível cadastrado.</p></div>';return;}
     g.innerHTML=NIVEIS.map(function(it){
-        if(it.hidden){
-            return '<div class="nivel-card" style="opacity:.45;filter:grayscale(1);">'+
-                '<img class="nivel-img" src="'+esc(it.url)+'" alt="'+esc(it.nome)+'" onerror="_errN(this,\''+escJ(it.nome)+'\')">'+
-                '<div class="nivel-info"><div class="nivel-name">'+esc(it.nome)+'<br><small style="color:#c0392b;font-size:.7rem;">⊘ oculto no portal</small></div>'+
-                '<div class="nivel-actions">'+
-                '<button class="btn-swap" onclick="restoreNivel('+it.id+')" style="width:100%;background:linear-gradient(135deg,#27ae60,#1e8449);"><i class="fas fa-eye"></i> Restaurar</button>'+
-                '</div></div></div>';
-        }
         return '<div class="nivel-card">'+
             '<img class="nivel-img" src="'+esc(it.url)+'" alt="'+esc(it.nome)+'" onerror="_errN(this,\''+escJ(it.nome)+'\')">'+
             '<div class="nivel-info"><div class="nivel-name">'+esc(it.nome)+'</div>'+
-            '<div class="nivel-actions">'+
-            '<button class="btn-del" onclick="ocultarNivel('+it.id+')" style="flex:1"><i class="fas fa-eye-slash"></i> Ocultar</button>'+
-            '<button class="btn-del" onclick="excluirNivel('+it.id+')" title="Excluir permanentemente" style="background:rgba(120,0,0,0.1);border-color:rgba(120,0,0,0.3);"><i class="fas fa-trash"></i></button>'+
+            '<div class="nivel-actions" style="justify-content:center;">'+
+            '<button class="btn-del" onclick="excluirNivel('+it.id+')" style="width:100%;"><i class="fas fa-trash"></i> Excluir</button>'+
             '</div></div></div>';
     }).join('');
-}
-function ocultarNivel(id){
-    var it=NIVEIS.find(function(n){return n.id===id;});
-    confirmar('Ocultar no portal?', it?it.nome:'', function(){
-        it.hidden=true; salvarNiveisCookie(); renderNiveis(); toast('Nível ocultado no portal!');
-    }, 'Ocultar');
-}
-function restoreNivel(id){
-    var it=NIVEIS.find(function(n){return n.id===id;});
-    if(it){it.hidden=false; salvarNiveisCookie(); renderNiveis(); toast('Nível restaurado no portal!');}
 }
 function excluirNivel(id){
     var it=NIVEIS.find(function(n){return n.id===id;});

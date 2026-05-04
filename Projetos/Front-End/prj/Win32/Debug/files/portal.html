@@ -1089,16 +1089,11 @@ function listarPastaPortal(pasta, callback) {
         var wrapper = document.getElementById('segmentosWrapper');
         if (!wrapper) return;
 
-        // filtra segmentos ocultos pelo cookie do admin
-        var hiddenNiveis = [];
-        try { hiddenNiveis = JSON.parse(getCookie('geb_pp_niveis_hidden') || '[]'); } catch(e){}
-
-        // monta mapa prefixo → src (ignorando arquivos ocultos)
+        // monta mapa prefixo → src
         var mapaImg = {};
         if (imagens && imagens.length) {
             imagens.forEach(function(item) {
                 var nome = item.imagem.split('/').pop();
-                if (hiddenNiveis.indexOf(nome) !== -1) return;
                 var prefixo = nome.charAt(0);
                 if (!mapaImg[prefixo]) mapaImg[prefixo] = '/files/' + item.imagem;
             });
@@ -2347,7 +2342,6 @@ var _srLastConfig      = getCookie('geb_pp_config')         || '';
 var _srLastHistoria    = getCookie('geb_pp_historia')       || '';
 var _srLastFileList    = '';
 var _srLastSegFileList = '';
-var _srLastNivelHidden = getCookie('geb_pp_niveis_hidden')  || '';
 
 setInterval(function() {
     var hidden   = getCookie('geb_pp_sliders_hidden') || '';
@@ -2376,15 +2370,13 @@ setInterval(function() {
             }
         });
 
-    // Níveis de Ensino: mesma técnica do slider
-    var nivelHidden = getCookie('geb_pp_niveis_hidden') || '';
+    // Níveis de Ensino: atualiza se lista de arquivos mudou
     fetch('http://' + location.hostname + ':8071/listar?pasta=segmentos')
         .then(function(r){ return r.json(); })
         .then(function(lista){
             var fileList = JSON.stringify(lista.map(function(i){ return i.nome; }));
-            if (fileList !== _srLastSegFileList || nivelHidden !== _srLastNivelHidden) {
+            if (fileList !== _srLastSegFileList) {
                 _srLastSegFileList = fileList;
-                _srLastNivelHidden = nivelHidden;
                 var dados = lista.map(function(item){
                     return { imagem: 'portal/segmentos/' + item.nome };
                 });
