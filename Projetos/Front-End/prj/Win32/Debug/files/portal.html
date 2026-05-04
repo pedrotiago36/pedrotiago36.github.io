@@ -1089,17 +1089,28 @@ function listarPastaPortal(pasta, callback) {
         var wrapper = document.getElementById('segmentosWrapper');
         if (!wrapper) return;
 
-        // monta mapa prefixo → src
+        // filtra segmentos ocultos pelo cookie do admin
+        var hiddenNiveis = [];
+        try { hiddenNiveis = JSON.parse(getCookie('geb_pp_niveis_hidden') || '[]'); } catch(e){}
+
+        // monta mapa prefixo → src (ignorando arquivos ocultos)
         var mapaImg = {};
         if (imagens && imagens.length) {
             imagens.forEach(function(item) {
                 var nome = item.imagem.split('/').pop();
+                if (hiddenNiveis.indexOf(nome) !== -1) return;
                 var prefixo = nome.charAt(0);
                 if (!mapaImg[prefixo]) mapaImg[prefixo] = '/files/' + item.imagem;
             });
         }
 
-        wrapper.innerHTML = _SEGS.map(function(seg) {
+        // segmentos visíveis = os que têm imagem não oculta
+        var segsVisiveis = _SEGS.filter(function(seg) {
+            return !!mapaImg[seg.prefixo];
+        });
+        var segsRender = segsVisiveis.length ? segsVisiveis : _SEGS;
+
+        wrapper.innerHTML = segsRender.map(function(seg) {
             var imgSrc = mapaImg[seg.prefixo] || '';
             var interior = imgSrc
                 ? '<img src="' + imgSrc + '" alt="' + seg.nome + '" loading="lazy">'
@@ -1117,6 +1128,7 @@ function listarPastaPortal(pasta, callback) {
         }).join('');
     }
 
+    window._renderSegmentos = renderSegmentos;
     renderSegmentos([]);
     listarPastaPortal('portal/segmentos', renderSegmentos);
 })();
@@ -2336,10 +2348,12 @@ setTimeout(function() {
 }, 800);
 
 // ── SOFT REFRESH (invisível, sem recarregar a página) ──
-var _srLastHidden   = getCookie('geb_pp_sliders_hidden') || '';
-var _srLastConfig   = getCookie('geb_pp_config')         || '';
-var _srLastHistoria = getCookie('geb_pp_historia')       || '';
-var _srLastFileList = '';
+var _srLastHidden      = getCookie('geb_pp_sliders_hidden') || '';
+var _srLastConfig      = getCookie('geb_pp_config')         || '';
+var _srLastHistoria    = getCookie('geb_pp_historia')       || '';
+var _srLastFileList    = '';
+var _srLastSegFileList = '';
+var _srLastNivelHidden = getCookie('geb_pp_niveis_hidden')  || '';
 
 setInterval(function() {
     var hidden   = getCookie('geb_pp_sliders_hidden') || '';
@@ -2367,6 +2381,23 @@ setInterval(function() {
                 renderSlider(_sliderData.slice());
             }
         });
+
+    // Níveis de Ensino: mesma técnica do slider
+    var nivelHidden = getCookie('geb_pp_niveis_hidden') || '';
+    fetch('http://' + location.hostname + ':8071/listar?pasta=segmentos')
+        .then(function(r){ return r.json(); })
+        .then(function(lista){
+            var fileList = JSON.stringify(lista.map(function(i){ return i.nome; }));
+            if (fileList !== _srLastSegFileList || nivelHidden !== _srLastNivelHidden) {
+                _srLastSegFileList = fileList;
+                _srLastNivelHidden = nivelHidden;
+                var dados = lista.map(function(item){
+                    return { imagem: 'portal/segmentos/' + item.nome };
+                });
+                if (window._renderSegmentos) window._renderSegmentos(dados);
+            }
+        })
+        .catch(function(){});
 
     // Textos: re-aplica só se cookie mudou
     if (config !== _srLastConfig) {
