@@ -267,6 +267,7 @@
     </div>
     <div class="topbar-right">
         <div class="topbar-badge"><i class="fas fa-user-circle"></i> Marketing</div>
+        <a href="#" onclick="window.open('http://'+location.hostname+':8070/files/portal.html');return false;" class="btn-sair" style="color:#fdcd62;border-color:rgba(253,205,98,0.4);"><i class="fas fa-eye"></i> Ver Portal</a>
         <a href="index.html" class="btn-sair"><i class="fas fa-sign-out-alt"></i> Sair</a>
     </div>
 </div>
@@ -498,11 +499,31 @@ window._errS = function(el, n) { el.outerHTML = '<div class="slide-ph"><i class=
 window._errN = function(el, n) { el.outerHTML = '<div class="nivel-ph"><i class="fas fa-image"></i><span>' + n + '</span></div>'; };
 
 // ── DADOS ──
-var SLIDES = [
-    { id: 1, nome: 'aprovados.png',  url: '/files/slider/aprovados.png'  },
-    { id: 2, nome: 'Batista 2.png',  url: '/files/slider/Batista 2.png'  },
-    { id: 3, nome: 'ed. Cristã.png', url: '/files/slider/ed. Cristã.png' }
-];
+var SLIDES = [];
+function _getHidden(){ try{ return JSON.parse(getCookie('geb_pp_sliders_hidden')||'[]'); }catch(e){return[];} }
+function salvarSliderCookie(){
+    var hidden = SLIDES.filter(function(s){return s.hidden;}).map(function(s){return s.fname;});
+    setCookie('geb_pp_sliders_hidden', JSON.stringify(hidden));
+    document.cookie = 'geb_pp_sliders=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+}
+function carregarSlides(){
+    fetch('/listar?pasta=slider')
+        .then(function(r){ return r.json(); })
+        .then(function(lista){
+            var hidden = _getHidden();
+            SLIDES = lista.map(function(item, i){
+                return {
+                    id: i+1,
+                    nome: item.nome.replace(/\.[^.]+$/, '').replace(/[_-]/g,' '),
+                    url: item.url,
+                    fname: item.nome,
+                    hidden: hidden.indexOf(item.nome) !== -1
+                };
+            });
+            renderSlider();
+        })
+        .catch(function(){ renderSlider(); });
+}
 var NIVEIS = [
     { id: 1, nome: 'Ed. Infantil',      url: '/files/portal/segmentos/1_infantil teste novo.png' },
     { id: 2, nome: 'Anos Iniciais',     url: '/files/portal/segmentos/2_fund1 teste novo.png'    },
@@ -523,6 +544,25 @@ function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').re
 function escJ(s) { return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 function lerArq(file, cb) { var r = new FileReader(); r.onload = function(e){ cb(e.target.result); }; r.readAsDataURL(file); }
 function uid() { return Date.now() + Math.floor(Math.random()*9999); }
+function confirmar(titulo, nome, cb, btnLabel) {
+    var ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    ov.innerHTML =
+        '<div style="background:#fff;border-radius:1.2rem;padding:2rem 2rem 1.5rem;max-width:340px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);">'+
+        '<div style="width:52px;height:52px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">'+
+        '<i class="fas fa-trash" style="color:#c0392b;font-size:1.3rem;"></i></div>'+
+        '<h3 style="font-family:Poppins,sans-serif;font-size:1.1rem;margin:0 0 .4rem;color:#2d2d2d;">'+titulo+'</h3>'+
+        (nome?'<p style="color:#888;font-size:.85rem;margin:0 0 1.4rem;">'+nome+'</p>':'<div style="margin-bottom:1.4rem;"></div>')+
+        '<div style="display:flex;gap:.8rem;justify-content:center;">'+
+        '<button id="_cnNo"  style="flex:1;padding:.65rem;border-radius:.8rem;border:1px solid #ddd;background:#f5f5f5;color:#555;font-weight:600;cursor:pointer;font-size:.88rem;">Cancelar</button>'+
+        '<button id="_cnYes" style="flex:1;padding:.65rem;border-radius:.8rem;border:none;background:linear-gradient(135deg,#c0392b,#7d2728);color:#fff;font-weight:700;cursor:pointer;font-size:.88rem;">'+(btnLabel||'Excluir')+'</button>'+
+        '</div></div>';
+    document.body.appendChild(ov);
+    function fechar(ok){ document.body.removeChild(ov); if(ok) cb(); }
+    ov.querySelector('#_cnYes').onclick = function(){ fechar(true);  };
+    ov.querySelector('#_cnNo').onclick  = function(){ fechar(false); };
+    ov.onclick = function(e){ if(e.target===ov) fechar(false); };
+}
 
 // ── NAVEGAÇÃO ──
 function ir(sec) {
@@ -534,34 +574,82 @@ function ir(sec) {
 
 // ── RENDER SLIDER ──
 function renderSlider() {
-    var n = SLIDES.length;
-    document.getElementById('cnt-slider').textContent = n;
-    document.getElementById('lbl-slider').textContent = n + (n===1?' imagem':' imagens');
+    var visiveis = SLIDES.filter(function(s){return !s.hidden;}).length;
+    document.getElementById('cnt-slider').textContent = visiveis;
+    document.getElementById('lbl-slider').textContent = visiveis + (visiveis===1?' ativa':' ativas');
     var g = document.getElementById('sliderGrid');
-    if (!n) { g.innerHTML = '<div class="empty"><i class="fas fa-image"></i><p>Nenhum banner. Use o botão acima.</p></div>'; return; }
+    if (!SLIDES.length) { g.innerHTML = '<div class="empty"><i class="fas fa-image"></i><p>Nenhum banner cadastrado.</p></div>'; return; }
     g.innerHTML = SLIDES.map(function(s,i){
+        if(s.hidden){
+            return '<div class="slide-card" style="opacity:.45;filter:grayscale(1);">'+
+                '<div class="slide-num" style="background:#999;">'+(i+1)+'</div>'+
+                '<img class="slide-img" src="'+esc(s.url)+'" alt="'+esc(s.nome)+'" onerror="_errS(this,\''+escJ(s.nome)+'\')">'+
+                '<div class="slide-info">'+
+                '<div class="slide-name">'+esc(s.nome)+'<br><small style="color:#c0392b;font-size:.7rem;">⊘ oculto no portal</small></div>'+
+                '<div class="slide-actions">'+
+                '<button class="btn-swap" onclick="restoreSlide('+s.id+')" style="background:linear-gradient(135deg,#27ae60,#1e8449);"><i class="fas fa-eye"></i> Restaurar</button>'+
+                '</div></div></div>';
+        }
         return '<div class="slide-card">'+
             '<div class="slide-num">'+(i+1)+'</div>'+
             '<img class="slide-img" src="'+esc(s.url)+'" alt="'+esc(s.nome)+'" onerror="_errS(this,\''+escJ(s.nome)+'\')">'+
             '<div class="slide-info">'+
             '<div class="slide-name">'+esc(s.nome)+'</div>'+
             '<div class="slide-actions">'+
-            '<button class="btn-swap" onclick="trocarSlide('+s.id+')"><i class="fas fa-camera"></i> Trocar</button>'+
-            '<button class="btn-del"  onclick="delSlide('+s.id+')"><i class="fas fa-trash"></i></button>'+
+            '<button class="btn-del" onclick="delSlide('+s.id+')" style="flex:1"><i class="fas fa-eye-slash"></i> Ocultar</button>'+
+            '<button class="btn-del" onclick="excluirSlide('+s.id+')" title="Excluir permanentemente" style="background:rgba(120,0,0,0.1);border-color:rgba(120,0,0,0.3);"><i class="fas fa-trash"></i></button>'+
             '</div></div></div>';
     }).join('');
 }
 function delSlide(id){
     var it=SLIDES.find(function(s){return s.id===id;});
-    Swal.fire({title:'Excluir banner?',text:it?it.nome:'',icon:'warning',showCancelButton:true,confirmButtonColor:'#d33327',cancelButtonColor:'#aaa',confirmButtonText:'Excluir',cancelButtonText:'Cancelar'})
-    .then(function(r){ if(r.isConfirmed){SLIDES=SLIDES.filter(function(s){return s.id!==id;});renderSlider();toast('Banner excluído!');} });
+    confirmar('Ocultar no portal?', it?it.nome:'', function(){
+        it.hidden=true; salvarSliderCookie(); renderSlider(); toast('Banner ocultado no portal!');
+    }, 'Ocultar');
+}
+function restoreSlide(id){
+    var it=SLIDES.find(function(s){return s.id===id;});
+    if(it){it.hidden=false; salvarSliderCookie(); renderSlider(); toast('Banner restaurado no portal!');}
+}
+function excluirSlide(id){
+    var it=SLIDES.find(function(s){return s.id===id;});
+    if(!it) return;
+    confirmar('Excluir permanentemente?', it.nome, function(){
+        fetch('/deletar', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({nome: it.fname, pasta: 'slider'})
+        })
+        .then(function(r){ return r.json(); })
+        .then(function(res){
+            carregarSlides();
+            toast('Imagem excluída da pasta!');
+        })
+        .catch(function(){ toast('Erro ao excluir', true); });
+    });
 }
 function trocarSlide(id){ pick(function(src,n){ var it=SLIDES.find(function(s){return s.id===id;}); if(it){it.url=src;it.nome=n;renderSlider();toast('Imagem trocada!');} }); }
 function addSlides(inp){
-    if(!inp.files) return;
-    var files=Array.prototype.slice.call(inp.files), count=0;
-    files.forEach(function(f){ lerArq(f,function(src){ SLIDES.push({id:uid(),nome:f.name,url:src}); if(++count===files.length){renderSlider();toast(count+' banner(s) adicionado(s)!');} }); });
-    inp.value='';
+    if(!inp.files||!inp.files.length) return;
+    var files=Array.prototype.slice.call(inp.files), count=0, total=files.length;
+    files.forEach(function(f){
+        lerArq(f, function(src){
+            fetch('/upload', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({nome: f.name, pasta: 'slider', base64: src})
+            })
+            .then(function(r){ return r.json(); })
+            .then(function(res){
+                if(++count === total){
+                    try{ inp.value=''; }catch(e){}
+                    carregarSlides();
+                    toast(total+' banner(s) adicionado(s)!');
+                }
+            })
+            .catch(function(){ toast('Erro ao enviar imagem', true); });
+        });
+    });
 }
 (function(){
     var dz=document.getElementById('dropSlider');
@@ -587,9 +675,9 @@ function renderNiveis(){
             '</div></div></div>';
     }).join('');
 }
-function delNivel(id){ var it=NIVEIS.find(function(n){return n.id===id;}); Swal.fire({title:'Excluir?',text:it?it.nome:'',icon:'warning',showCancelButton:true,confirmButtonColor:'#d33327',cancelButtonColor:'#aaa',confirmButtonText:'Excluir',cancelButtonText:'Cancelar'}).then(function(r){if(r.isConfirmed){NIVEIS=NIVEIS.filter(function(n){return n.id!==id;});renderNiveis();toast('Nível excluído!');}}); }
+function delNivel(id){ var it=NIVEIS.find(function(n){return n.id===id;}); confirmar('Excluir nível?',it?it.nome:'',function(){ NIVEIS=NIVEIS.filter(function(n){return n.id!==id;}); renderNiveis(); toast('Nível excluído!'); }); }
 function trocarNivel(id){ pick(function(src,n){ var it=NIVEIS.find(function(x){return x.id===id;}); if(it){it.url=src;it.nome=n;renderNiveis();toast('Imagem trocada!');} }); }
-function addNivel(inp){ if(!inp.files||!inp.files[0])return; lerArq(inp.files[0],function(src){ var n=inp.files[0].name.replace(/\.[^.]+$/,'').replace(/[_-]/g,' '); NIVEIS.push({id:uid(),nome:n,url:src}); renderNiveis();toast('Nível adicionado!'); }); inp.value=''; }
+function addNivel(inp){ if(!inp.files||!inp.files[0])return; lerArq(inp.files[0],function(src){ var n=inp.files[0].name.replace(/\.[^.]+$/,'').replace(/[_-]/g,' '); NIVEIS.push({id:uid(),nome:n,url:src}); renderNiveis(); toast('Nível adicionado!'); try{inp.value='';}catch(e){} }); }
 
 // ── RENDER DIFERENCIAIS ──
 function renderDifs(){
@@ -608,9 +696,9 @@ function renderDifs(){
             '</div></div></div>';
     }).join('');
 }
-function delDif(id){ var it=DIFS.find(function(d){return d.id===id;}); Swal.fire({title:'Excluir?',text:it?it.nome:'',icon:'warning',showCancelButton:true,confirmButtonColor:'#d33327',cancelButtonColor:'#aaa',confirmButtonText:'Excluir',cancelButtonText:'Cancelar'}).then(function(r){if(r.isConfirmed){DIFS=DIFS.filter(function(d){return d.id!==id;});renderDifs();toast('Diferencial excluído!');}}); }
+function delDif(id){ var it=DIFS.find(function(d){return d.id===id;}); confirmar('Excluir diferencial?',it?it.nome:'',function(){ DIFS=DIFS.filter(function(d){return d.id!==id;}); renderDifs(); toast('Diferencial excluído!'); }); }
 function trocarDif(id){ pick(function(src,n){ var it=DIFS.find(function(d){return d.id===id;}); if(it){it.url=src;it.nome=n;renderDifs();toast('Imagem trocada!');} }); }
-function addDif(inp){ if(!inp.files||!inp.files[0])return; lerArq(inp.files[0],function(src){ var n=inp.files[0].name.replace(/\.[^.]+$/,'').replace(/[_-]/g,' '); DIFS.push({id:uid(),nome:n,url:src}); renderDifs();toast('Diferencial adicionado!'); }); inp.value=''; }
+function addDif(inp){ if(!inp.files||!inp.files[0])return; lerArq(inp.files[0],function(src){ var n=inp.files[0].name.replace(/\.[^.]+$/,'').replace(/[_-]/g,' '); DIFS.push({id:uid(),nome:n,url:src}); renderDifs(); toast('Diferencial adicionado!'); try{inp.value='';}catch(e){} }); }
 
 // ── TEXTOS — preview versículo ──
 function atualizarPrevVersiculo(){
@@ -629,9 +717,34 @@ function atualizarPrevStats(){
         '<div class="stat-pill"><div class="val">'+alunos+'</div><div class="lbl">alunos</div></div>'+
         '<div class="stat-pill"><div class="val">'+enem+'</div><div class="lbl">aprovação ENEM</div></div>';
 }
+function getCookie(name) {
+    var match = document.cookie.split(';').reduce(function(acc,c){ var p=c.trim().split('='); acc[p[0]]=p.slice(1).join('='); return acc; }, {})[name];
+    return match ? decodeURIComponent(match) : null;
+}
+function setCookie(name, value) {
+    var exp = 'expires=Fri, 31 Dec 2099 23:59:59 GMT';
+    document.cookie = name + '=' + encodeURIComponent(value) + '; path=/; ' + exp;
+}
 function salvarTextos(){
-    // Em produção: POST para o servidor salvando nos JSON files
-    toast('Textos salvos com sucesso!');
+    var config = {
+        versiculo:    document.getElementById('txtVersiculo').value.trim(),
+        versiculoRef: document.getElementById('txtVersiculoRef').value.trim(),
+        email:        document.getElementById('txtEmail').value.trim(),
+        telefone:     document.getElementById('txtTelefone').value.trim(),
+        endereco:     document.getElementById('txtEndereco').value.trim(),
+        instagram:    document.getElementById('txtInsta').value.trim(),
+        facebook:     document.getElementById('txtFace').value.trim(),
+        whatsapp:     document.getElementById('txtWhats').value.trim()
+    };
+    var historia = {
+        fundacao:    document.getElementById('txtFundacao').value.trim(),
+        totalAlunos: document.getElementById('txtAlunos').value.trim(),
+        enem:        document.getElementById('txtEnem').value.trim(),
+        historia:    document.getElementById('txtHistoria').value.trim()
+    };
+    setCookie('geb_pp_config',   JSON.stringify(config));
+    setCookie('geb_pp_historia', JSON.stringify(historia));
+    toast('Textos salvos! Abra o portal para confirmar.');
 }
 
 // ── CARREGA DADOS REAIS DOS JSONS ──
@@ -682,7 +795,7 @@ function toast(msg, err){
 }
 
 // ── INIT ──
-renderSlider(); renderNiveis(); renderDifs();
+carregarSlides(); renderNiveis(); renderDifs();
 atualizarPrevVersiculo(); atualizarPrevStats();
 </script>
 </body>

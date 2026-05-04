@@ -1,7 +1,7 @@
 object UniServerModule: TUniServerModule
   TempFolder = 'temp\'
   Port = 8071
-  Title = 'New Application'
+  Title = 'Adm'
   SuppressErrors = []
   Bindings = <>
   MainFormDisplayMode = mfPage

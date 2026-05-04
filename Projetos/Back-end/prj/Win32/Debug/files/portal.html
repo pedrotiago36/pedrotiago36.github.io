@@ -63,7 +63,7 @@
         @keyframes pulse-novato { 0%,100% { box-shadow: 0 6px 18px rgba(230,168,0,0.55); } 50% { box-shadow: 0 8px 32px rgba(230,168,0,0.9); } }
 
         /* ── HERO SLIDER ── */
-        .hero-slider { position: relative; width: 100%; margin: 1.5rem 0 0; overflow: hidden; min-height: 380px; background: linear-gradient(135deg, #7d2728 0%, #5a2a2b 50%, #3d1a1b 100%); }
+        .hero-slider { position: relative; width: 100%; margin: 1.5rem 0 0; overflow: hidden; }
         .slide { display: none; position: relative; width: 100%; }
         .slide.ativo { display: block; animation: fadeSlide 0.7s ease; }
         @keyframes fadeSlide { from { opacity: 0; } to { opacity: 1; } }
@@ -644,10 +644,24 @@
 
     <!-- SLIDER HERO — LARGURA TOTAL -->
     <div class="hero-slider" id="heroSlider">
-        <div id="sliderTrack"></div>
+        <div id="sliderTrack">
+            <!-- Slide fallback (sobrescrito pelo JSON) -->
+            <div class="slide ativo">
+                <div class="slide-placeholder">
+                    <div style="text-align:center;color:rgba(255,255,255,0.3);font-size:3rem;"><i class="fas fa-cross"></i></div>
+                </div>
+                <div class="slide-overlay">
+                    <span class="badge-slide">Bem-vindo</span>
+                    <h2>Colégio Batista Santos Dumont</h2>
+                    <p>Formando coração e mente para a vida com excelência e valores cristãos.</p>
+                </div>
+            </div>
+        </div>
         <button class="slider-btn prev" id="sliderPrev"><i class="fas fa-chevron-left"></i></button>
         <button class="slider-btn next" id="sliderNext"><i class="fas fa-chevron-right"></i></button>
-        <div class="slider-dots" id="sliderDots"></div>
+        <div class="slider-dots" id="sliderDots">
+            <div class="slider-dot active"></div>
+        </div>
     </div>
 
     <!-- CONTEÚDO PRINCIPAL -->
@@ -899,16 +913,10 @@ for (var i = 0; i < 55; i++) {
 // ============================================================
 // CARREGAMENTO DINÂMICO — lê arquivos em dados/
 // ============================================================
-function getCookie(name) {
-    var match = document.cookie.split(';').reduce(function(acc, c) {
-        var p = c.trim().split('='); acc[p[0]] = p.slice(1).join('='); return acc;
-    }, {})[name];
-    return match ? decodeURIComponent(match) : null;
-}
 function carregarJSON(url, cb) {
     var key = 'geb_pp_' + url.split('/').pop().replace('.json', '');
-    var cookie = getCookie(key);
-    if (cookie) { try { cb(JSON.parse(cookie)); return; } catch(e) {} }
+    var stored = localStorage.getItem(key);
+    if (stored) { try { cb(JSON.parse(stored)); return; } catch(e) {} }
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url + '?_=' + Date.now(), true);
     xhr.onreadystatechange = function() {
@@ -928,24 +936,6 @@ var _sliderTimer = null;
 
 function renderSlider(dados) {
     if (!dados || !dados.length) return;
-    var hiddenCookie = getCookie('geb_pp_sliders_hidden');
-    if (hiddenCookie) {
-        try {
-            var hidden = JSON.parse(hiddenCookie);
-            if (hidden.length) {
-                dados = dados.filter(function(s){
-                    var fname = (s.imagem||'').split('/').pop();
-                    return hidden.indexOf(fname) === -1;
-                });
-            }
-        } catch(e) {}
-    }
-    if (!dados || !dados.length) {
-        clearInterval(_sliderTimer);
-        document.getElementById('sliderTrack').innerHTML = '';
-        document.getElementById('sliderDots').innerHTML  = '';
-        return;
-    }
     _sliderData = dados;
     var track = document.getElementById('sliderTrack');
     var dots  = document.getElementById('sliderDots');
@@ -2334,50 +2324,6 @@ setTimeout(function() {
         cards[ci2].classList.add('animate__fadeInUp');
     }
 }, 800);
-
-// ── SOFT REFRESH (invisível, sem recarregar a página) ──
-var _srLastHidden   = getCookie('geb_pp_sliders_hidden') || '';
-var _srLastConfig   = getCookie('geb_pp_config')         || '';
-var _srLastHistoria = getCookie('geb_pp_historia')       || '';
-var _srLastFileList = '';
-
-setInterval(function() {
-    var hidden   = getCookie('geb_pp_sliders_hidden') || '';
-    var config   = getCookie('geb_pp_config')         || '';
-    var historia = getCookie('geb_pp_historia')       || '';
-
-    // Slider: fetch direto ao Back-End (sem depender da ponte UniGUI)
-    fetch('http://' + location.hostname + ':8071/listar?pasta=slider')
-        .then(function(r) { return r.json(); })
-        .then(function(lista) {
-            var fileList = JSON.stringify(lista.map(function(i) { return i.nome; }));
-            if (fileList !== _srLastFileList || hidden !== _srLastHidden) {
-                _srLastFileList = fileList;
-                _srLastHidden   = hidden;
-                var dados = lista.map(function(item) {
-                    return { imagem: 'portal/slider/' + item.nome };
-                });
-                renderSlider(dados);
-            }
-        })
-        .catch(function() {
-            // fallback: re-renderiza com dados em memória se cookie mudou
-            if (hidden !== _srLastHidden && _sliderData.length) {
-                _srLastHidden = hidden;
-                renderSlider(_sliderData.slice());
-            }
-        });
-
-    // Textos: re-aplica só se cookie mudou
-    if (config !== _srLastConfig) {
-        _srLastConfig = config;
-        carregarJSON('/files/config.json', renderConfig);
-    }
-    if (historia !== _srLastHistoria) {
-        _srLastHistoria = historia;
-        carregarJSON('/files/historia.json', renderHistoria);
-    }
-}, 30000);
 
 </script>
 
