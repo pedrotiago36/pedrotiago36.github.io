@@ -1104,13 +1104,7 @@ function listarPastaPortal(pasta, callback) {
             });
         }
 
-        // segmentos visíveis = os que têm imagem não oculta
-        var segsVisiveis = _SEGS.filter(function(seg) {
-            return !!mapaImg[seg.prefixo];
-        });
-        var segsRender = segsVisiveis.length ? segsVisiveis : _SEGS;
-
-        wrapper.innerHTML = segsRender.map(function(seg) {
+        wrapper.innerHTML = _SEGS.map(function(seg) {
             var imgSrc = mapaImg[seg.prefixo] || '';
             var interior = imgSrc
                 ? '<img src="' + imgSrc + '" alt="' + seg.nome + '" loading="lazy">'
