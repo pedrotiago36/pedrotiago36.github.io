@@ -355,24 +355,15 @@
             <div class="ph">
                 <div>
                     <h2><i class="fas fa-star" style="color:#fdcd62;margin-right:8px;"></i>Nossos Diferenciais</h2>
-                    <p>Imagens dos cards de diferenciais do portal</p>
+                    <p>Clique em "Adicionar" ou "Trocar" em cada diferencial para definir a imagem</p>
                 </div>
-                <button class="btn-add" onclick="document.getElementById('upDif').click()">
-                    <i class="fas fa-plus"></i> Adicionar Diferencial
-                </button>
-                <input type="file" id="upDif" accept="image/*" style="display:none" onchange="addDif(this)">
             </div>
             <div class="box">
                 <div class="box-title">
-                    <i class="fas fa-th"></i> Cards Atuais
-                    <span class="lbl" id="lbl-dif">0 imagens</span>
+                    <i class="fas fa-th"></i> 5 Diferenciais
+                    <span class="lbl" id="lbl-dif">0/5 com imagem</span>
                 </div>
                 <div class="nivel-grid" id="difGrid"></div>
-                <div class="drop-zone" onclick="document.getElementById('upDif').click()" style="margin-top:0.5rem;">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <p>Clique ou arraste para adicionar um novo diferencial</p>
-                    <small>Mesmo tamanho dos cards existentes</small>
-                </div>
             </div>
         </div>
 
@@ -546,13 +537,28 @@ function carregarNiveis(){
         })
         .catch(function(){ renderNiveis(); });
 }
-var DIFS = [
-    { id: 1, nome: 'CBA',               url: '/files/portal/diferenciais/1_cba.png'              },
-    { id: 2, nome: 'Educação Cristã',   url: '/files/portal/diferenciais/2_ed crista.png'        },
-    { id: 3, nome: 'Empreendedorismo',  url: '/files/portal/diferenciais/3_empreendedorismo.png' },
-    { id: 4, nome: 'NAF',               url: '/files/portal/diferenciais/4_naf.png'              },
-    { id: 5, nome: 'Olimpíadas',        url: '/files/portal/diferenciais/5_olimpiadas.png'       }
+var SLOTS_DIFS = [
+    { id: '1', label: 'CBA',              sub: 'Música, teatro e expressão criativa'  },
+    { id: '2', label: 'Educação Cristã',  sub: 'Fé e valores integrados ao currículo' },
+    { id: '3', label: 'Empreendedorismo', sub: 'Liderança e visão de negócios'        },
+    { id: '4', label: 'NAF',              sub: 'Núcleo de Atividades Físicas'          },
+    { id: '5', label: 'Olimpíadas',       sub: 'Competições e medalhas'               }
 ];
+var DIFS_IMG = {}; // '1'..'5' → { nome, url }
+
+function carregarDifs(){
+    fetch('/listar?pasta=diferenciais')
+        .then(function(r){ return r.json(); })
+        .then(function(lista){
+            DIFS_IMG = {};
+            lista.forEach(function(item){
+                var p = item.nome.charAt(0);
+                if (/[1-5]/.test(p) && !DIFS_IMG[p]) DIFS_IMG[p] = item;
+            });
+            renderDifs();
+        })
+        .catch(function(){ renderDifs(); });
+}
 
 // ── HELPERS ──
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
@@ -748,24 +754,76 @@ function excluirNivel(prefixo){
 
 // ── RENDER DIFERENCIAIS ──
 function renderDifs(){
-    var n=DIFS.length;
-    document.getElementById('cnt-diferenciais').textContent=n;
-    document.getElementById('lbl-dif').textContent=n+(n===1?' imagem':' imagens');
-    var g=document.getElementById('difGrid');
-    if(!n){g.innerHTML='<div class="empty"><i class="fas fa-star"></i><p>Nenhum diferencial cadastrado.</p></div>';return;}
-    g.innerHTML=DIFS.map(function(it){
+    var com = Object.keys(DIFS_IMG).length;
+    document.getElementById('cnt-diferenciais').textContent = com;
+    document.getElementById('lbl-dif').textContent = com + '/5 com imagem';
+    var g = document.getElementById('difGrid');
+    g.innerHTML = SLOTS_DIFS.map(function(slot){
+        var img = DIFS_IMG[slot.id];
+        var imgHtml = img
+            ? '<img class="nivel-img" src="'+esc(img.url)+'" alt="'+esc(slot.label)+'" onerror="_errN(this,\''+escJ(slot.label)+'\')">'
+            : '<div class="nivel-empty-img"><i class="fas fa-image"></i><span>Sem imagem</span></div>';
         return '<div class="nivel-card">'+
-            '<img class="nivel-img" src="'+esc(it.url)+'" alt="'+esc(it.nome)+'" onerror="_errN(this,\''+escJ(it.nome)+'\')">'+
-            '<div class="nivel-info"><div class="nivel-name">'+esc(it.nome)+'</div>'+
-            '<div class="nivel-actions">'+
-            '<button class="btn-swap" onclick="trocarDif('+it.id+')" title="Trocar"><i class="fas fa-camera"></i></button>'+
-            '<button class="btn-del"  onclick="delDif('+it.id+')" title="Excluir"><i class="fas fa-trash"></i></button>'+
-            '</div></div></div>';
+            imgHtml+
+            '<div class="nivel-info">'+
+                '<div class="nivel-name">'+esc(slot.label)+'</div>'+
+                '<div class="nivel-sub">'+esc(slot.sub)+'</div>'+
+                '<div class="nivel-actions">'+
+                    '<button class="btn-swap" onclick="trocarDif(\''+slot.id+'\')" title="'+(img?'Trocar imagem':'Adicionar imagem')+'">'+
+                        '<i class="fas fa-'+(img?'camera':'plus')+'"></i> '+(img?'Trocar':'Adicionar')+
+                    '</button>'+
+                    (img?'<button class="btn-del" onclick="excluirDif(\''+slot.id+'\')" title="Excluir"><i class="fas fa-trash"></i></button>':'')+
+                '</div>'+
+            '</div>'+
+            '<input type="file" id="inpDif'+slot.id+'" accept="image/*" style="display:none" onchange="uploadDif(\''+slot.id+'\',this)">'+
+        '</div>';
     }).join('');
 }
-function delDif(id){ var it=DIFS.find(function(d){return d.id===id;}); confirmar('Excluir diferencial?',it?it.nome:'',function(){ DIFS=DIFS.filter(function(d){return d.id!==id;}); renderDifs(); toast('Diferencial excluído!'); }); }
-function trocarDif(id){ pick(function(src,n){ var it=DIFS.find(function(d){return d.id===id;}); if(it){it.url=src;it.nome=n;renderDifs();toast('Imagem trocada!');} }); }
-function addDif(inp){ if(!inp.files||!inp.files[0])return; lerArq(inp.files[0],function(src){ var n=inp.files[0].name.replace(/\.[^.]+$/,'').replace(/[_-]/g,' '); DIFS.push({id:uid(),nome:n,url:src}); renderDifs(); toast('Diferencial adicionado!'); try{inp.value='';}catch(e){} }); }
+function trocarDif(prefixo){
+    document.getElementById('inpDif'+prefixo).click();
+}
+function uploadDif(prefixo, inp){
+    if(!inp.files||!inp.files[0]) return;
+    var f = inp.files[0];
+    lerArq(f, function(src){
+        var novoNome = prefixo+'_'+f.name;
+        var doUpload = function(){
+            fetch('/upload', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({nome: novoNome, pasta: 'diferenciais', base64: src})
+            })
+            .then(function(r){ return r.json(); })
+            .then(function(){ try{inp.value='';}catch(e){} carregarDifs(); toast('Diferencial atualizado!'); })
+            .catch(function(){ toast('Erro ao enviar', true); });
+        };
+        var atual = DIFS_IMG[prefixo];
+        if(atual){
+            fetch('/deletar', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({nome: atual.nome, pasta: 'diferenciais'})
+            }).then(doUpload).catch(doUpload);
+        } else {
+            doUpload();
+        }
+    });
+}
+function excluirDif(prefixo){
+    var img = DIFS_IMG[prefixo];
+    if(!img) return;
+    var slot = SLOTS_DIFS.find(function(s){ return s.id === prefixo; });
+    confirmar('Excluir imagem do diferencial?', slot?slot.label:'', function(){
+        fetch('/deletar', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({nome: img.nome, pasta: 'diferenciais'})
+        })
+        .then(function(r){ return r.json(); })
+        .then(function(){ carregarDifs(); toast('Imagem excluída!'); })
+        .catch(function(){ toast('Erro ao excluir', true); });
+    });
+}
 
 // ── TEXTOS — preview versículo ──
 function atualizarPrevVersiculo(){
@@ -862,7 +920,7 @@ function toast(msg, err){
 }
 
 // ── INIT ──
-carregarSlides(); carregarNiveis(); renderDifs();
+carregarSlides(); carregarNiveis(); carregarDifs();
 atualizarPrevVersiculo(); atualizarPrevStats();
 </script>
 </body>

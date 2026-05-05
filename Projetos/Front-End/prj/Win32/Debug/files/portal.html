@@ -1071,6 +1071,7 @@ function listarPastaPortal(pasta, callback) {
         }).join('');
     }
 
+    window._renderDiferenciais = renderDiferenciais;
     renderDiferenciais([]);
     listarPastaPortal('portal/diferenciais', renderDiferenciais);
 })();
@@ -2342,6 +2343,7 @@ var _srLastConfig      = getCookie('geb_pp_config')         || '';
 var _srLastHistoria    = getCookie('geb_pp_historia')       || '';
 var _srLastFileList    = '';
 var _srLastSegFileList = '';
+var _srLastDifFileList = '';
 
 setInterval(function() {
     var hidden   = getCookie('geb_pp_sliders_hidden') || '';
@@ -2381,6 +2383,21 @@ setInterval(function() {
                     return { imagem: 'portal/segmentos/' + item.nome };
                 });
                 if (window._renderSegmentos) window._renderSegmentos(dados);
+            }
+        })
+        .catch(function(){});
+
+    // Diferenciais: atualiza se lista de arquivos mudou
+    fetch('http://' + location.hostname + ':8071/listar?pasta=diferenciais')
+        .then(function(r){ return r.json(); })
+        .then(function(lista){
+            var fileList = JSON.stringify(lista.map(function(i){ return i.nome; }));
+            if (fileList !== _srLastDifFileList) {
+                _srLastDifFileList = fileList;
+                var dados = lista.map(function(item){
+                    return { imagem: 'portal/diferenciais/' + item.nome };
+                });
+                if (window._renderDiferenciais) window._renderDiferenciais(dados);
             }
         })
         .catch(function(){});
