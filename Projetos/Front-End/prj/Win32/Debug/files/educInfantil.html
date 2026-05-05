@@ -854,7 +854,7 @@ document.getElementById('lazerNext').addEventListener('click', function() { _laz
 // ── CARREGAR FOTOS (XHR → bridge) ──
 function carregarGaleria() {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', '/files/educInfantil/educInfantil.json?t=' + Date.now(), true);
+    xhr.open('GET', '/files/educInfantil/galeria.json?t=' + Date.now(), true);
     xhr.onreadystatechange = function() {
         if (xhr.readyState !== 4) return;
         if (xhr.status === 200 && xhr.responseText) {
@@ -889,14 +889,37 @@ function carregarGaleriaBridge() {
     }, 200);
 }
 carregarGaleria();
-setInterval(carregarGaleria, 30000);
+
+// ── MOMENTOS ESPECIAIS (pasta própria) ──
+function carregarMomentos() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/files/educInfantil/momentos.json?t=' + Date.now(), true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState !== 4) return;
+        if (xhr.status === 200 && xhr.responseText) {
+            try {
+                var d = JSON.parse(xhr.responseText);
+                if (d && d.length) { renderMomentos(d); return; }
+            } catch(e) {}
+        }
+        // fallback: galeria popula momentos via renderGaleria
+    };
+    xhr.send();
+}
+carregarMomentos();
+
+setInterval(function(){ carregarGaleria(); carregarMomentos(); }, 30000);
+
 (function(){
     function pollConteudo(){
         var x=new XMLHttpRequest();
         x.open('GET','/files/educInfantil/conteudo.json?t='+Date.now(),true);
         x.onreadystatechange=function(){
             if(x.readyState!==4||x.status!==200) return;
-            try{ var d=JSON.parse(x.responseText); if(d.descricao){var el=document.getElementById('cj-descricao');if(el)el.innerHTML=d.descricao;} }catch(e){}
+            try{
+                var d=JSON.parse(x.responseText);
+                // descricao gerenciada pelo proposta.json; conteudo.json não sobrescreve
+            }catch(e){}
         };
         x.send();
     }

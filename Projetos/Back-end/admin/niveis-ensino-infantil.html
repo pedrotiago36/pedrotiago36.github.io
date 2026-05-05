@@ -261,6 +261,10 @@ if (sessionStorage.getItem('adm_ok') !== 'niveis-ensino') {
             <i class="fas fa-images"></i> Galeria de Fotos
             <span class="cnt" id="cnt-galeria">0</span>
         </a>
+        <a class="sb-item" id="nav-momentos" onclick="ir('momentos')">
+            <i class="fas fa-camera"></i> Momentos Especiais
+            <span class="cnt" id="cnt-momentos">0</span>
+        </a>
         <a class="sb-item" id="nav-lazer" onclick="ir('lazer')">
             <i class="fas fa-running"></i> Área de Lazer
             <span class="cnt" id="cnt-lazer">0</span>
@@ -332,6 +336,33 @@ if (sessionStorage.getItem('adm_ok') !== 'niveis-ensino') {
                     <i class="fas fa-cloud-upload-alt"></i>
                     <p>Arraste as fotos aqui ou clique para selecionar</p>
                     <small>JPG, PNG, WEBP — Múltiplas imagens aceitas</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════ MOMENTOS ═══════ -->
+        <div class="panel" id="painel-momentos">
+            <div class="ph">
+                <div>
+                    <h2><i class="fas fa-camera" style="color:#fdcd62;margin-right:8px;"></i>Momentos Especiais</h2>
+                    <p>Fotos exibidas na seção "Momentos Especiais" da página de Educação Infantil</p>
+                </div>
+                <button class="btn-add" onclick="document.getElementById('upMomentos').click()">
+                    <i class="fas fa-plus"></i> Adicionar Fotos
+                </button>
+                <input type="file" id="upMomentos" accept="image/*" multiple style="display:none" onchange="addMomentos(this)">
+            </div>
+            <div class="box">
+                <div class="box-title">
+                    <i class="fas fa-th"></i> Fotos Cadastradas
+                    <span class="lbl" id="lbl-momentos">0 imagens</span>
+                </div>
+                <p style="color:#888;font-size:.85rem;margin:0 0 1rem;">São exibidas até 5 fotos em mosaico. Se não houver fotos aqui, a seção usa as fotos da Galeria.</p>
+                <div class="gal-grid" id="momentosGrid"></div>
+                <div class="drop-zone" id="dropMomentos" onclick="document.getElementById('upMomentos').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Arraste as fotos aqui ou clique para selecionar</p>
+                    <small>JPG, PNG, WEBP — Exibidas em mosaico (recomendado: fotos quadradas)</small>
                 </div>
             </div>
         </div>
@@ -505,8 +536,9 @@ if (sessionStorage.getItem('adm_ok') !== 'niveis-ensino') {
 var PASTA_BANNER   = 'educInfantil';
 var PASTA_GAL      = 'educInfantil';
 var GAL_PREFIX     = 'educInfantil/';
-var GAL_JSON_PASTA = '';
-var GAL_JSON_NOME  = 'educInfantil.json';
+var GAL_JSON_PASTA = 'educInfantil';
+var GAL_JSON_NOME  = 'galeria.json';
+var PASTA_MOV      = 'educInfantil/momentos';
 var PASTA_CONTEUDO = 'educInfantil';
 var PASTA_LAZER       = 'educInfantil/estrutura';
 var LAZER_JSON_PASTA  = 'educInfantil';
@@ -690,10 +722,89 @@ function excluirGaleria(nome){
     }
     dzSetup('dropBanner',   uploadBanner);
     dzSetup('dropGal',      addGaleria);
+    dzSetup('dropMomentos', addMomentos);
     dzSetup('dropLazer',    addLazer);
     dzSetup('dropProposta', uploadProposta);
     dzSetup('dropFormacao', uploadFormacao);
 })();
+
+// ── MOMENTOS ESPECIAIS ──
+function carregarMomentos(){
+    fetch('/listar?pasta='+encodeURIComponent(PASTA_MOV)+'&raw=1')
+        .then(function(r){ return r.json(); })
+        .then(function(lista){
+            document.getElementById('cnt-momentos').textContent = lista.length;
+            renderMomentosAdmin(lista);
+        })
+        .catch(function(){ renderMomentosAdmin([]); });
+}
+
+function renderMomentosAdmin(lista){
+    var cnt = lista.length;
+    document.getElementById('lbl-momentos').textContent = cnt + (cnt===1?' imagem':' imagens');
+    var g = document.getElementById('momentosGrid');
+    if(!cnt){
+        g.innerHTML = '<div class="empty" style="grid-column:1/-1"><i class="fas fa-camera"></i><p>Nenhuma foto cadastrada.<br>Se vazio, a seção usa as fotos da Galeria automaticamente.</p></div>';
+        return;
+    }
+    g.innerHTML = lista.map(function(img){
+        var url = '/files/'+PASTA_MOV+'/'+img.nome;
+        return '<div class="gal-card">'+
+            '<img class="gal-img" src="'+esc(url)+'?v='+Date.now()+'" alt="'+esc(img.nome)+'" '+
+                'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'+
+            '<div class="gal-ph" style="display:none"><i class="fas fa-image"></i></div>'+
+            '<div class="gal-info">'+
+            '<div class="gal-name">'+esc(img.nome)+'</div>'+
+            '<button class="btn-del" onclick="excluirMomentos(\''+escJ(img.nome)+'\')" style="width:100%"><i class="fas fa-trash"></i> Excluir</button>'+
+            '</div></div>';
+    }).join('');
+}
+
+function atualizarMomentosJSON(){
+    fetch('/listar?pasta='+encodeURIComponent(PASTA_MOV)+'&raw=1')
+        .then(function(r){ return r.json(); })
+        .then(function(lista){
+            var entries = lista.map(function(img){ return {imagem: PASTA_MOV+'/'+img.nome}; });
+            var b64;
+            try { b64 = btoa(unescape(encodeURIComponent(JSON.stringify(entries)))); } catch(e){ return; }
+            fetch('/salvar-texto',{method:'POST',headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({pasta:'educInfantil', nome:'momentos.json', rawmode:'1', base64:b64})
+            }).catch(function(){});
+        }).catch(function(){});
+}
+
+function addMomentos(inp){
+    if(!inp.files||!inp.files.length) return;
+    var files=Array.prototype.slice.call(inp.files), cnt=0, tot=files.length;
+    files.forEach(function(f){
+        lerArq(f,function(src){
+            fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({nome:f.name, pasta:PASTA_MOV, rawmode:'1', base64:src})
+            }).then(function(r){return r.json();})
+              .then(function(){
+                  if(++cnt===tot){
+                      try{inp.value='';}catch(e){}
+                      carregarMomentos();
+                      atualizarMomentosJSON();
+                      toast(tot+' foto(s) adicionada(s)!');
+                  }
+              })
+              .catch(function(){ toast('Erro ao enviar foto',true); });
+        });
+    });
+}
+
+function excluirMomentos(nome){
+    confirmar('Excluir esta foto dos Momentos?', nome, function(){
+        fetch('/deletar',{method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({nome:nome, pasta:PASTA_MOV, rawmode:'1'})
+        }).then(function(){
+            carregarMomentos();
+            atualizarMomentosJSON();
+            toast('Foto excluída!');
+        }).catch(function(){ toast('Erro ao excluir',true); });
+    });
+}
 
 // ── PROPOSTA E FORMAÇÃO ──
 function carregarPropostaImg(){
@@ -755,7 +866,9 @@ function carregarProposta(){
         })
         .catch(function(){
             document.getElementById('fTituloPropostaTexto').value = 'Nossa Proposta Pedagógica';
+            document.getElementById('fDescricaoProposta').value   = 'Acreditamos que os primeiros anos de vida são fundamentais para o desenvolvimento integral da criança. Nossa proposta une afeto, brincar e aprendizado estruturado, formando bases sólidas para toda a vida escolar.\n\nMetodologia ativa, projetos temáticos e atividades lúdicas que respeitam o ritmo de cada criança, sempre alicerçados nos valores cristãos que norteiam nossa instituição.';
             document.getElementById('fTituloFormacaoTexto').value = 'Formação Integral e Valores';
+            document.getElementById('fDescricaoFormacao').value   = 'Mais do que ensinar conteúdos, formamos caráter. Os princípios bíblicos estão integrados ao cotidiano escolar de forma natural e afetiva, cultivando empatia, honestidade e responsabilidade desde a infância.\n\nParceria constante com as famílias, pois entendemos que a educação é uma missão compartilhada entre escola e lar.';
         });
     carregarPropostaImg();
     carregarFormacaoImg();
@@ -896,10 +1009,11 @@ function carregarConteudo(){
             if(d.diferenciais) setDiferenciais(d.diferenciais);
         })
         .catch(function(){
-            document.getElementById('fTitulo').value    = DEF_TITULO;
-            document.getElementById('fSubtitulo').value = DEF_SUBTITULO;
-            document.getElementById('fFaixa').value     = DEF_FAIXA;
-            document.getElementById('fTurno').value     = DEF_TURNO;
+            document.getElementById('fTitulo').value       = DEF_TITULO;
+            document.getElementById('fSubtitulo').value    = DEF_SUBTITULO;
+            document.getElementById('fFaixa').value        = DEF_FAIXA;
+            document.getElementById('fTurno').value        = DEF_TURNO;
+            document.getElementById('fComponentes').value  = 'Língua Portuguesa, Matemática, Ciências da Natureza, Ciências Humanas, Artes, Educação Física, Língua Inglesa, Ensino Religioso';
         });
 }
 
