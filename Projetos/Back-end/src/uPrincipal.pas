@@ -35,7 +35,7 @@ end;
 procedure TMainForm.UniFormCreate(Sender: TObject);
 begin
   UniHTMLFrame1.HTML.Text :=
-    '<iframe src="/files/admin/index.html?v=' + FormatDateTime('yyyymmddhhnnss', Now) + '" ' +
+    '<iframe src="/files/admin/portal-principal.html?v=' + FormatDateTime('yyyymmddhhnnss', Now) + '" ' +
     'style="width:100%;height:100%;border:none;display:block;" ' +
     'allowtransparency="true"></iframe>';
 end;
