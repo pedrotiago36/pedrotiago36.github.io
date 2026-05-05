@@ -565,7 +565,7 @@ function carregarViaBridge(pasta, cb) {
 
 carregarDados('Medio/galeria',   renderGaleria);
 carregarDados('Medio/momentos',  renderMomentos);
-setInterval(function(){ carregarDados('Medio/galeria', renderGaleria); carregarDados('Medio/momentos', renderMomentos); }, 30000);
+setInterval(function(){ carregarDados('Medio/galeria', renderGaleria); carregarDados('Medio/momentos', renderMomentos); carregarDados('Medio/estrutura', renderEstrutura); }, 30000);
 (function(){
     function pollConteudo(){
         var x=new XMLHttpRequest();

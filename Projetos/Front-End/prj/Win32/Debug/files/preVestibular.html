@@ -765,7 +765,7 @@ carregarDados('preVestibular/documentos', renderDocumentacao);
 
 carregarDados('preVestibular/galeria',   renderGaleria);
 carregarDados('preVestibular/momentos',  renderMomentos);
-setInterval(function(){ carregarDados('preVestibular/galeria', renderGaleria); carregarDados('preVestibular/momentos', renderMomentos); }, 30000);
+setInterval(function(){ carregarDados('preVestibular/galeria', renderGaleria); carregarDados('preVestibular/momentos', renderMomentos); carregarDados('preVestibular/estrutura', renderEstrutura); }, 30000);
 (function(){
     function pollConteudo(){
         var x=new XMLHttpRequest();

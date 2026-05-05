@@ -261,6 +261,10 @@ if (sessionStorage.getItem('adm_ok') !== 'niveis-ensino') {
             <i class="fas fa-images"></i> Galeria de Fotos
             <span class="cnt" id="cnt-galeria">0</span>
         </a>
+        <a class="sb-item" id="nav-lazer" onclick="ir('lazer')">
+            <i class="fas fa-running"></i> Área de Lazer
+            <span class="cnt" id="cnt-lazer">0</span>
+        </a>
 
         <div class="sb-divider"></div>
         <div class="sb-group">Conteúdo</div>
@@ -322,6 +326,32 @@ if (sessionStorage.getItem('adm_ok') !== 'niveis-ensino') {
                 </div>
                 <div class="gal-grid" id="galeriaGrid"></div>
                 <div class="drop-zone" id="dropGal" onclick="document.getElementById('upGal').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Arraste as fotos aqui ou clique para selecionar</p>
+                    <small>JPG, PNG, WEBP — Múltiplas imagens aceitas</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════ LAZER ═══════ -->
+        <div class="panel" id="painel-lazer">
+            <div class="ph">
+                <div>
+                    <h2><i class="fas fa-running" style="color:#fdcd62;margin-right:8px;"></i>Área de Lazer</h2>
+                    <p>Fotos do slideshow exibido na seção de Área de Lazer do portal</p>
+                </div>
+                <button class="btn-add" onclick="document.getElementById('upLazer').click()">
+                    <i class="fas fa-plus"></i> Adicionar Fotos
+                </button>
+                <input type="file" id="upLazer" accept="image/*" multiple style="display:none" onchange="addLazer(this)">
+            </div>
+            <div class="box">
+                <div class="box-title">
+                    <i class="fas fa-images"></i> Fotos do Slideshow
+                    <span class="lbl" id="lbl-lazer">0 imagens</span>
+                </div>
+                <div class="gal-grid" id="lazerGrid"></div>
+                <div class="drop-zone" id="dropLazer" onclick="document.getElementById('upLazer').click()">
                     <i class="fas fa-cloud-upload-alt"></i>
                     <p>Arraste as fotos aqui ou clique para selecionar</p>
                     <small>JPG, PNG, WEBP — Múltiplas imagens aceitas</small>
@@ -416,6 +446,10 @@ var GAL_PREFIX     = 'fundII/galeria/';
 var GAL_JSON_PASTA = 'fundII';
 var GAL_JSON_NOME  = 'galeria.json';
 var PASTA_CONTEUDO = 'fundII';
+var PASTA_LAZER       = 'fundII/estrutura';
+var LAZER_JSON_PASTA  = 'fundII';
+var LAZER_JSON_NOME   = 'estrutura.json';
+var LAZER_PREFIX      = 'fundII/estrutura/';
 var DEF_TITULO     = 'Anos Finais';
 var DEF_SUBTITULO  = '6º ao 9º Ano';
 var DEF_FAIXA      = '11 a 14 anos';
@@ -593,7 +627,86 @@ function excluirGaleria(nome){
     }
     dzSetup('dropBanner', uploadBanner);
     dzSetup('dropGal',    addGaleria);
+    dzSetup('dropLazer',  addLazer);
 })();
+
+// ── LAZER ──
+function carregarLazer(){
+    fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER)+'&raw=1')
+        .then(function(r){ return r.json(); })
+        .then(function(lista){
+            document.getElementById('cnt-lazer').textContent = lista.length;
+            renderLazerAdmin(lista);
+        })
+        .catch(function(){ renderLazerAdmin([]); });
+}
+
+function renderLazerAdmin(lista){
+    var cnt = lista.length;
+    document.getElementById('lbl-lazer').textContent = cnt + (cnt===1?' imagem':' imagens');
+    var g = document.getElementById('lazerGrid');
+    if(!cnt){
+        g.innerHTML = '<div class="empty" style="grid-column:1/-1"><i class="fas fa-images"></i><p>Nenhuma foto cadastrada.</p></div>';
+        return;
+    }
+    g.innerHTML = lista.map(function(img){
+        var url = '/files/'+PASTA_LAZER+'/'+img.nome;
+        return '<div class="gal-card">'+
+            '<img class="gal-img" src="'+esc(url)+'?v='+Date.now()+'" alt="'+esc(img.nome)+'" '+
+                'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'+
+            '<div class="gal-ph" style="display:none"><i class="fas fa-image"></i></div>'+
+            '<div class="gal-info">'+
+            '<div class="gal-name">'+esc(img.nome)+'</div>'+
+            '<button class="btn-del" onclick="excluirLazer(\''+escJ(img.nome)+'\')" style="width:100%"><i class="fas fa-trash"></i> Excluir</button>'+
+            '</div></div>';
+    }).join('');
+}
+
+function atualizarLazerJSON(){
+    fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER)+'&raw=1')
+        .then(function(r){ return r.json(); })
+        .then(function(lista){
+            var entries = lista.map(function(img){ return {imagem: LAZER_PREFIX + img.nome}; });
+            var b64;
+            try { b64 = btoa(unescape(encodeURIComponent(JSON.stringify(entries)))); } catch(e){ return; }
+            fetch('/salvar-texto',{method:'POST',headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({pasta:LAZER_JSON_PASTA, nome:LAZER_JSON_NOME, rawmode:'1', base64:b64})
+            }).catch(function(){});
+        }).catch(function(){});
+}
+
+function addLazer(inp){
+    if(!inp.files||!inp.files.length) return;
+    var files=Array.prototype.slice.call(inp.files), cnt=0, tot=files.length;
+    files.forEach(function(f){
+        lerArq(f,function(src){
+            fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({nome:f.name, pasta:PASTA_LAZER, rawmode:'1', base64:src})
+            }).then(function(r){return r.json();})
+              .then(function(){
+                  if(++cnt===tot){
+                      try{inp.value='';}catch(e){}
+                      carregarLazer();
+                      atualizarLazerJSON();
+                      toast(tot+' foto(s) adicionada(s)!');
+                  }
+              })
+              .catch(function(){ toast('Erro ao enviar foto',true); });
+        });
+    });
+}
+
+function excluirLazer(nome){
+    confirmar('Excluir esta foto da Área de Lazer?', nome, function(){
+        fetch('/deletar',{method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({nome:nome, pasta:PASTA_LAZER, rawmode:'1'})
+        }).then(function(){
+            carregarLazer();
+            atualizarLazerJSON();
+            toast('Foto excluída!');
+        }).catch(function(){ toast('Erro ao excluir',true); });
+    });
+}
 
 // ── DIFERENCIAIS ──
 var _difs = [];
@@ -666,6 +779,7 @@ function salvarConteudo(){
 // ── INIT ──
 carregarBanner();
 carregarGaleria();
+carregarLazer();
 carregarConteudo();
 renderDiferenciais();</script>
 </body>
