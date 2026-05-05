@@ -268,6 +268,9 @@ if (sessionStorage.getItem('adm_ok') !== 'niveis-ensino') {
 
         <div class="sb-divider"></div>
         <div class="sb-group">Conteúdo</div>
+        <a class="sb-item" id="nav-proposta" onclick="ir('proposta')">
+            <i class="fas fa-graduation-cap"></i> Proposta e Formação
+        </a>
         <a class="sb-item" id="nav-textos" onclick="ir('textos')">
             <i class="fas fa-pen-nib"></i> Textos e Informações
         </a>
@@ -356,6 +359,65 @@ if (sessionStorage.getItem('adm_ok') !== 'niveis-ensino') {
                     <p>Arraste as fotos aqui ou clique para selecionar</p>
                     <small>JPG, PNG, WEBP — Múltiplas imagens aceitas</small>
                 </div>
+            </div>
+        </div>
+
+        <!-- ═══════ PROPOSTA E FORMAÇÃO ═══════ -->
+        <div class="panel" id="painel-proposta">
+            <div class="ph">
+                <div>
+                    <h2><i class="fas fa-graduation-cap" style="color:#fdcd62;margin-right:8px;"></i>Proposta e Formação</h2>
+                    <p>Textos e imagens das duas seções de apresentação da Educação Infantil</p>
+                </div>
+                <button class="btn-save" onclick="salvarProposta()">
+                    <i class="fas fa-save"></i> Salvar Textos
+                </button>
+            </div>
+
+            <!-- Nossa Proposta Pedagógica -->
+            <div class="box">
+                <div class="box-title"><i class="fas fa-graduation-cap"></i> Nossa Proposta Pedagógica</div>
+                <div class="fields-2" style="margin-bottom:1rem;">
+                    <div class="field-group" style="grid-column:1/-1">
+                        <div class="field-label"><i class="fas fa-heading"></i> Título</div>
+                        <input type="text" class="field-input" id="fTituloPropostaTexto" placeholder="Ex: Nossa Proposta Pedagógica">
+                    </div>
+                    <div class="field-group" style="grid-column:1/-1">
+                        <div class="field-label"><i class="fas fa-align-left"></i> Texto</div>
+                        <textarea class="field-ta" id="fDescricaoProposta" style="min-height:130px" placeholder="Descreva a proposta pedagógica..."></textarea>
+                    </div>
+                </div>
+                <div class="box-title" style="margin-top:.5rem;"><i class="fas fa-image"></i> Imagem da Proposta</div>
+                <div id="propostaImgPreview"><div class="banner-empty"><i class="fas fa-panorama"></i><p>Carregando...</p></div></div>
+                <div class="drop-zone" id="dropProposta" onclick="document.getElementById('upProposta').click()" style="margin-top:1rem;">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Arraste a imagem aqui ou clique para selecionar</p>
+                    <small>JPG, PNG, WEBP — Recomendado 600 × 500 px</small>
+                </div>
+                <input type="file" id="upProposta" accept="image/*" style="display:none" onchange="uploadProposta(this)">
+            </div>
+
+            <!-- Formação Integral e Valores -->
+            <div class="box">
+                <div class="box-title"><i class="fas fa-pray"></i> Formação Integral e Valores</div>
+                <div class="fields-2" style="margin-bottom:1rem;">
+                    <div class="field-group" style="grid-column:1/-1">
+                        <div class="field-label"><i class="fas fa-heading"></i> Título</div>
+                        <input type="text" class="field-input" id="fTituloFormacaoTexto" placeholder="Ex: Formação Integral e Valores">
+                    </div>
+                    <div class="field-group" style="grid-column:1/-1">
+                        <div class="field-label"><i class="fas fa-align-left"></i> Texto</div>
+                        <textarea class="field-ta" id="fDescricaoFormacao" style="min-height:130px" placeholder="Descreva os valores e formação integral..."></textarea>
+                    </div>
+                </div>
+                <div class="box-title" style="margin-top:.5rem;"><i class="fas fa-image"></i> Imagem da Formação</div>
+                <div id="formacaoImgPreview"><div class="banner-empty"><i class="fas fa-panorama"></i><p>Carregando...</p></div></div>
+                <div class="drop-zone" id="dropFormacao" onclick="document.getElementById('upFormacao').click()" style="margin-top:1rem;">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Arraste a imagem aqui ou clique para selecionar</p>
+                    <small>JPG, PNG, WEBP — Recomendado 600 × 500 px</small>
+                </div>
+                <input type="file" id="upFormacao" accept="image/*" style="display:none" onchange="uploadFormacao(this)">
             </div>
         </div>
 
@@ -626,10 +688,97 @@ function excluirGaleria(nome){
         dz.addEventListener('dragleave',function(){dz.classList.remove('drag-over');});
         dz.addEventListener('drop',function(e){e.preventDefault();dz.classList.remove('drag-over');fn({files:e.dataTransfer.files});});
     }
-    dzSetup('dropBanner', uploadBanner);
-    dzSetup('dropGal',    addGaleria);
-    dzSetup('dropLazer',  addLazer);
+    dzSetup('dropBanner',   uploadBanner);
+    dzSetup('dropGal',      addGaleria);
+    dzSetup('dropLazer',    addLazer);
+    dzSetup('dropProposta', uploadProposta);
+    dzSetup('dropFormacao', uploadFormacao);
 })();
+
+// ── PROPOSTA E FORMAÇÃO ──
+function carregarPropostaImg(){
+    var exts=['png','jpg','jpeg','webp'], idx=0;
+    function tentar(){
+        if(idx>=exts.length){ document.getElementById('propostaImgPreview').innerHTML='<div class="banner-empty"><i class="fas fa-panorama"></i><p>Nenhuma imagem — clique abaixo para adicionar</p></div>'; return; }
+        var nome='proposta.'+exts[idx++], url='/files/'+PASTA_BANNER+'/'+nome;
+        var img=new Image();
+        img.onload=function(){ document.getElementById('propostaImgPreview').innerHTML='<div class="banner-wrap"><img src="'+esc(url)+'?v='+Date.now()+'" alt="Proposta"><div class="banner-actions"><button class="btn-swap" onclick="document.getElementById(\'upProposta\').click()"><i class="fas fa-camera"></i> Trocar</button></div></div>'; };
+        img.onerror=tentar;
+        img.src=url+'?v='+Date.now();
+    }
+    tentar();
+}
+
+function carregarFormacaoImg(){
+    var exts=['png','jpg','jpeg','webp'], idx=0;
+    function tentar(){
+        if(idx>=exts.length){ document.getElementById('formacaoImgPreview').innerHTML='<div class="banner-empty"><i class="fas fa-panorama"></i><p>Nenhuma imagem — clique abaixo para adicionar</p></div>'; return; }
+        var nome='formacao.'+exts[idx++], url='/files/'+PASTA_BANNER+'/'+nome;
+        var img=new Image();
+        img.onload=function(){ document.getElementById('formacaoImgPreview').innerHTML='<div class="banner-wrap"><img src="'+esc(url)+'?v='+Date.now()+'" alt="Formação"><div class="banner-actions"><button class="btn-swap" onclick="document.getElementById(\'upFormacao\').click()"><i class="fas fa-camera"></i> Trocar</button></div></div>'; };
+        img.onerror=tentar;
+        img.src=url+'?v='+Date.now();
+    }
+    tentar();
+}
+
+function uploadProposta(inp){
+    if(!inp.files||!inp.files[0]) return;
+    lerArq(inp.files[0],function(src){
+        fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({nome:'proposta.png', pasta:PASTA_BANNER, rawmode:'1', base64:src})
+        }).then(function(r){return r.json();})
+          .then(function(){ try{inp.value='';}catch(e){} carregarPropostaImg(); toast('Imagem da proposta atualizada!'); })
+          .catch(function(){ toast('Erro ao enviar imagem',true); });
+    });
+}
+
+function uploadFormacao(inp){
+    if(!inp.files||!inp.files[0]) return;
+    lerArq(inp.files[0],function(src){
+        fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({nome:'formacao.png', pasta:PASTA_BANNER, rawmode:'1', base64:src})
+        }).then(function(r){return r.json();})
+          .then(function(){ try{inp.value='';}catch(e){} carregarFormacaoImg(); toast('Imagem da formação atualizada!'); })
+          .catch(function(){ toast('Erro ao enviar imagem',true); });
+    });
+}
+
+function carregarProposta(){
+    fetch('/files/'+PASTA_CONTEUDO+'/proposta.json?v='+Date.now())
+        .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+        .then(function(d){
+            if(d.tituloPropostaTexto) document.getElementById('fTituloPropostaTexto').value = d.tituloPropostaTexto;
+            if(d.descricaoProposta)   document.getElementById('fDescricaoProposta').value   = d.descricaoProposta;
+            if(d.tituloFormacaoTexto) document.getElementById('fTituloFormacaoTexto').value = d.tituloFormacaoTexto;
+            if(d.descricaoFormacao)   document.getElementById('fDescricaoFormacao').value   = d.descricaoFormacao;
+        })
+        .catch(function(){
+            document.getElementById('fTituloPropostaTexto').value = 'Nossa Proposta Pedagógica';
+            document.getElementById('fTituloFormacaoTexto').value = 'Formação Integral e Valores';
+        });
+    carregarPropostaImg();
+    carregarFormacaoImg();
+}
+
+function salvarProposta(){
+    var data = {
+        tituloPropostaTexto: document.getElementById('fTituloPropostaTexto').value.trim(),
+        descricaoProposta:   document.getElementById('fDescricaoProposta').value.trim(),
+        tituloFormacaoTexto: document.getElementById('fTituloFormacaoTexto').value.trim(),
+        descricaoFormacao:   document.getElementById('fDescricaoFormacao').value.trim()
+    };
+    var b64;
+    try { b64 = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))); } catch(e){ toast('Erro ao codificar',true); return; }
+    fetch('/salvar-texto',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({pasta:PASTA_CONTEUDO, nome:'proposta.json', rawmode:'1', base64:b64})
+    }).then(function(r){return r.json();})
+      .then(function(res){
+          if(res.ok) toast('Salvo! O portal atualiza em até 30 segundos.');
+          else toast('Erro: '+(res.erro||'?'), true);
+      })
+      .catch(function(){ toast('Erro ao salvar',true); });
+}
 
 // ── LAZER ──
 function carregarLazer(){
@@ -782,6 +931,7 @@ function salvarConteudo(){
 carregarBanner();
 carregarGaleria();
 carregarLazer();
+carregarProposta();
 carregarConteudo();
 renderDiferenciais();
 </script>

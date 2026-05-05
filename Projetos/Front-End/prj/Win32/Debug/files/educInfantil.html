@@ -340,11 +340,11 @@
 
             <div class="proposta-bloco">
                 <div class="proposta-img">
-                    <img src="/files/educInfantil/proposta.png" alt="Proposta pedagógica" onerror="this.src='/files/educInfantil/capa.png';">
+                    <img id="cj-proposta-img" src="/files/educInfantil/proposta.png" alt="Proposta pedagógica" onerror="this.src='/files/educInfantil/capa.png';">
                 </div>
                 <div class="proposta-texto">
                     <span class="proposta-icone">🎓</span>
-                    <div class="sec-title">Nossa <span>Proposta</span><br>Pedagógica</div>
+                    <div class="sec-title" id="cj-proposta-titulo">Nossa <span>Proposta</span><br>Pedagógica</div>
                     <div class="sec-line"></div>
                     <p class="sec-sub" id="cj-descricao">Acreditamos que os primeiros anos de vida são fundamentais para o desenvolvimento integral da criança. Nossa proposta une afeto, brincar e aprendizado estruturado, formando bases sólidas para toda a vida escolar.<br><br>
                     Metodologia ativa, projetos temáticos e atividades lúdicas que respeitam o ritmo de cada criança, sempre alicerçados nos valores cristãos que norteiam nossa instituição.</p>
@@ -353,13 +353,13 @@
 
             <div class="proposta-bloco reverse">
                 <div class="proposta-img">
-                    <img src="/files/educInfantil/formacao.png" alt="Formação integral" onerror="this.src='/files/educInfantil/capa.png';">
+                    <img id="cj-formacao-img" src="/files/educInfantil/formacao.png" alt="Formação integral" onerror="this.src='/files/educInfantil/capa.png';">
                 </div>
                 <div class="proposta-texto">
                     <span class="proposta-icone">🙏</span>
-                    <div class="sec-title">Formação <span>Integral</span><br>e Valores</div>
+                    <div class="sec-title" id="cj-formacao-titulo">Formação <span>Integral</span><br>e Valores</div>
                     <div class="sec-line"></div>
-                    <p class="sec-sub">Mais do que ensinar conteúdos, formamos caráter. Os princípios bíblicos estão integrados ao cotidiano escolar de forma natural e afetiva, cultivando empatia, honestidade e responsabilidade desde a infância.<br><br>
+                    <p class="sec-sub" id="cj-formacao">Mais do que ensinar conteúdos, formamos caráter. Os princípios bíblicos estão integrados ao cotidiano escolar de forma natural e afetiva, cultivando empatia, honestidade e responsabilidade desde a infância.<br><br>
                     Parceria constante com as famílias, pois entendemos que a educação é uma missão compartilhada entre escola e lar.</p>
                 </div>
             </div>
@@ -910,6 +910,35 @@ setInterval(carregarGaleria, 30000);
     function atualizarBanner() { if (el) el.src = '/files/educInfantil/capa.png?v=' + Date.now(); }
     atualizarBanner();
     setInterval(atualizarBanner, 30000);
+})();
+
+// Atualiza proposta e formação (textos + imagens) a cada 30 segundos
+(function(){
+    function pollProposta(){
+        var x=new XMLHttpRequest();
+        x.open('GET','/files/educInfantil/proposta.json?t='+Date.now(),true);
+        x.onreadystatechange=function(){
+            if(x.readyState!==4||x.status!==200) return;
+            try{
+                var d=JSON.parse(x.responseText);
+                var e;
+                if(d.tituloPropostaTexto){e=document.getElementById('cj-proposta-titulo');if(e)e.textContent=d.tituloPropostaTexto;}
+                if(d.descricaoProposta){e=document.getElementById('cj-descricao');if(e)e.innerHTML=d.descricaoProposta;}
+                if(d.tituloFormacaoTexto){e=document.getElementById('cj-formacao-titulo');if(e)e.textContent=d.tituloFormacaoTexto;}
+                if(d.descricaoFormacao){e=document.getElementById('cj-formacao');if(e)e.innerHTML=d.descricaoFormacao;}
+            }catch(e){}
+        };
+        x.send();
+    }
+    function atualizarImgsProposta(){
+        var p=document.getElementById('cj-proposta-img');
+        var f=document.getElementById('cj-formacao-img');
+        if(p) p.src='/files/educInfantil/proposta.png?v='+Date.now();
+        if(f) f.src='/files/educInfantil/formacao.png?v='+Date.now();
+    }
+    pollProposta();
+    atualizarImgsProposta();
+    setInterval(function(){ pollProposta(); atualizarImgsProposta(); }, 30000);
 })();
 
 // carrega pasta educInfantil/estrutura/
