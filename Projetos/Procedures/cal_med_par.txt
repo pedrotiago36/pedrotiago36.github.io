@@ -1,0 +1,1206 @@
+if exists (select * from sysobjects where id = object_id('dbo.CAL_MED_PAR') and sysstat & 0xf = 4)
+	drop procedure dbo.CAL_MED_PAR
+GO
+
+CREATE PROCEDURE CAL_MED_PAR
+          @V_Is_Mat_Ini      int,
+	        @V_Is_Mat_Fin      int,
+	        @V_Is_Tur     SmallInt,
+	        @V_Nr_Bim     SmallInt,
+	        @V_Is_Usu     SmallInt
+	As
+
+  --	exec cal_med_par 65322, 65322, 4378, 4 , 34
+  -- Select * From T_Meb Where Is_Mat = 304
+  /*
+  	Declare	@V_Is_Mat_Ini      int,
+  		@V_Is_Mat_Fin      int,
+  		@V_Is_Tur     SmallInt,
+  		@V_Nr_Bim     SmallInt,
+  		@V_Is_Usu     SmallInt
+  
+  
+  Select @V_Is_Mat_Ini = Is_Mat, 
+         @V_Is_Tur = Is_Tur 
+    From Alu_Tur_Cur Atc
+   Where Cd_Alu = '0301681'
+     and Is_Anl = 24
+  
+  
+  	Select 	@V_Is_Mat_Fin = @V_Is_Mat_Ini,
+  		@V_Nr_Bim     = 4,
+  		@V_Is_Usu     = 34
+  */
+
+  delete t_meb1 WHERE IS_MAT BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin AND NR_MEB_BIM = @V_Nr_Bim
+  delete t_mep1 WHERE IS_MAT BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin AND NR_MEP_BIM = @V_Nr_Bim
+
+  /* ---[ Cria Arquivo Temporario ]----------------------------------- */
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ---[ Grava Recuperação Semestral <RS=RB> ]----------------------- */
+  EXEC Sp_Grv_Rec_Sem @v_Is_Mat_Ini
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ---[ Grava Recuperação Semestral <RS=RB> ]----------------------- */
+  EXEC Sp_Grv_SemanaCultural @v_Is_Mat_Ini, @V_Nr_Bim
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ---[ Apaga Tabela de Faltas - Digital ]-------------------------- */
+  /*	if ( Select Cd_Ser From Alu_Tur_Ger Atg Where Atg.Is_Mat = @v_Is_Mat_Ini) = 23
+  		Delete Tb_Flt_Bim Where Is_Mat = @v_Is_Mat_Ini  */
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+	-- Delete from T_MEB com JOIN
+	DELETE MEB
+	FROM T_Meb MEB
+	INNER JOIN T_Mat M ON M.Is_Mat = MEB.Is_Mat
+	WHERE M.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+	  AND MEB.Nr_Meb_Bim = @V_Nr_Bim
+	  AND M.Is_Tur = @V_Is_Tur;
+	
+	-- Delete from T_MEP com JOIN
+	DELETE MEP
+	FROM T_Mep MEP
+	INNER JOIN T_Mat M ON M.Is_Mat = MEP.Is_Mat
+	WHERE M.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+	  AND MEP.Nr_Mep_Bim = @V_Nr_Bim
+	  AND M.Is_Tur = @V_Is_Tur;
+
+
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+  DECLARE @Is_Anl SMALLINT
+
+	SET @Is_Anl = ( 
+									SELECT Ser.Is_Anl
+									  FROM T_Tur Tur INNER JOIN T_Ser Ser ON Tur.Is_Ser = Ser.Is_Ser
+									 WHERE Tur.Is_Tur = @V_Is_Tur )
+
+
+  -- Pesquisa Ano Letivo / Serie Inicio 
+  DECLARE @SerIni SMALLINT
+
+	SET @SerIni = CASE 
+	                WHEN @Is_Anl < 20 THEN 15 
+	                ELSE 16 
+	              END;
+
+  /* ---[ 0 - Grava Tarefa 1 - 2º Grau ]------------------------------ */
+/*
+  IF (SELECT
+        Cd_Ser
+      FROM T_Ser Ser
+          ,T_Tur Tur
+      WHERE Ser.Is_Ser = Tur.Is_Ser
+      AND Tur.Is_Tur = @v_Is_Tur)
+    IN (25)
+  BEGIN
+
+    DECLARE @Is_Mat INT
+           ,@Is_Dis INT
+           ,@Nr_Not SMALLINT
+
+    ---[ Apaga Notas Anteriores ]------------------------------ 
+    DELETE T_Not
+      FROM T_Not Nta, Alu_Tur_Ger Atg
+    WHERE Nta.Is_Mat = Atg.Is_Mat
+      AND Atg.Cd_Ser BETWEEN 18 AND 22
+      AND Atg.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+      AND Atg.Is_Tur = @v_Is_Tur
+      AND Nta.Is_Tnt = 1
+      AND Nr_Not_Bim = @v_Nr_Bim
+    -- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+
+    ---[ Atualiza Tarefa ]------------------------------------- 
+    DECLARE C_Cursos CURSOR FOR 
+		SELECT       Atc.Is_Mat, Dis.Is_Dis, SUM(Nr_Not) / COUNT(*)
+    FROM Alu_Tur_Ger Atc
+        ,T_Not Nta
+        ,T_Tnt Tnt
+        ,T_Dis Dis
+    WHERE Atc.is_Mat = Nta.Is_Mat
+    AND Nta.Is_Dis = Dis.Is_Dis
+    AND Nta.Is_Tnt = Tnt.Is_Tnt
+    AND SUBSTRING(Tnt.Cd_Tnt, 1, 1) = 'C'
+    AND Nr_Not_Bim = @v_Nr_Bim
+    AND Atc.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+    AND Atc.Is_Tur = @v_Is_Tur
+    AND Atc.Cd_Ser BETWEEN 18 AND 22
+    GROUP BY Atc.Is_Mat
+            ,Dis.Is_Dis
+
+    OPEN C_Cursos
+    FETCH NEXT FROM C_Cursos INTO @Is_Mat, @Is_Dis, @Nr_Not
+
+    WHILE @@Fetch_Status >= 0
+    BEGIN
+    INSERT T_Not (Is_Mat, Is_Dis, Is_Tnt, Nr_Not_Bim, Nr_Not, Tp_Not, Is_Usu, Dt_Sop)
+      SELECT
+        @Is_Mat
+       ,@Is_Dis
+       ,1
+       ,@v_Nr_Bim
+       ,@Nr_Not
+       ,2
+       ,@V_Is_Usu
+       ,GETDATE()
+
+    FETCH NEXT FROM C_Cursos INTO @Is_Mat, @Is_Dis, @Nr_Not
+    END
+    --  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+
+    ---[ Finalizacao ]-------------------------------------------- 
+    CLOSE C_Cursos
+    DEALLOCATE C_Cursos
+
+  -- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+
+  END
+  -- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+*/
+
+  /* ---[ 0 - Grv.Linha Media por Disciplina/ Aluno ]----------------- */
+  INSERT T_Mep1 (Is_Mat, Is_Dis, Is_Tmp, NR_MEP_PSO, Is_Dis_Dom, NR_MEP_BIM, TP_MEP_PRO, NR_MEP_QRT, Is_Usu, Dt_Sop)
+  SELECT DISTINCT M.Is_Mat, Dse.Is_Dis, Mpg.Is_Tmp,Pmp.Nr_Pmp_Pso,Dse.Is_Dis_Dom,@V_Nr_Bim,0,
+									Qdt_Rea = ( SELECT Nr_Trt_Qtd
+												        FROM T_Trt
+												        WHERE Is_Tur = T.Is_Tur
+												        AND Is_Dis = Dse.Is_Dis
+												        AND Is_Tmp = Tmp.Is_Tmp
+												        AND Nr_Trt_Bim = @V_Nr_Bim) ,@V_Is_Usu  ,GETDATE()
+    FROM T_Mat M, T_Tur T ,T_Dse Dse, T_Ags Ags, T_Tgs Tgs, T_Mag Mag, T_Mbg Mbg, T_Mpg Mpg, T_Pmp Pmp, T_Tmp Tmp, T_Ser Ser, T_Tmb Tmb
+   WHERE M.Is_Tur = T.Is_Tur
+		AND T.Is_Ser = Dse.Is_Ser
+		AND T.Tp_Tur_Esp = Dse.Tp_Dse_Tes
+		AND T.Is_Ser = Ags.Is_Ser
+		AND Ags.Is_Tgs = Tgs.Is_Tgs
+		AND Tgs.Is_Tgs = Mag.Is_Tgs
+		AND Mag.Is_Mag = Mbg.Is_Mag
+		AND Mbg.Is_Mbg = Mpg.Is_Mbg
+		AND Mpg.Is_Mpg = Pmp.Is_Mpg
+		AND Mpg.Is_Tmp = Tmp.Is_Tmp
+		AND T.Is_Ser = Ser.Is_Ser
+		AND Mbg.Is_Tmb = Tmb.Is_Tmb
+		AND Tmb.Is_Anl = Ser.Is_Anl
+		AND M.Is_Tur = @V_Is_Tur
+		AND Pmp.Nr_Pmp_Bim = @V_Nr_Bim
+		AND M.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+		AND Ser.Cd_Ser BETWEEN @SerIni AND 23
+
+
+  /* Inicio */
+
+  INSERT T_Mep1 (Is_Mat, Is_Dis, Is_Tmp, NR_MEP_PSO, Is_Dis_Dom,
+  NR_MEP_BIM, TP_MEP_PRO,
+  NR_MEP_QRT,
+  Is_Usu, Dt_Sop)
+    SELECT DISTINCT
+      M.Is_Mat
+     ,Dse.Is_Dis
+     ,Mpg.Is_Tmp
+     ,Pmp.Nr_Pmp_Pso
+     ,Dse.Is_Dis_Dom
+     ,@V_Nr_Bim
+     ,0
+     ,Trt.Nr_Trt_Qtd
+     ,@V_Is_Usu
+     ,GETDATE()
+    FROM T_Mat M
+        ,T_Tur T
+        ,T_Dse Dse
+        ,T_Ags Ags
+        ,T_Tgs Tgs
+        ,T_Mag Mag
+        ,T_Mbg Mbg
+        ,T_Mpg Mpg
+        ,T_Pmp Pmp
+        ,T_Tmp Tmp
+        ,T_Trt Trt
+        ,T_Ser Ser
+    WHERE M.Is_Tur = T.Is_Tur
+    AND T.Is_Ser = Dse.Is_Ser
+    AND T.Tp_Tur_Esp = Dse.Tp_Dse_Tes
+    AND T.Is_Ser = Ags.Is_Ser
+    AND Ags.Is_Tgs = Tgs.Is_Tgs
+    AND Tgs.Is_Tgs = Mag.Is_Tgs
+    AND Mag.Is_Mag = Mbg.Is_Mag
+    AND Mbg.Is_Mbg = Mpg.Is_Mbg
+    AND Mpg.Is_Mpg = Pmp.Is_Mpg
+    AND Mpg.Is_Tmp = Tmp.Is_Tmp
+    AND T.Is_Ser = Ser.Is_Ser
+    AND M.Is_Tur = @V_Is_Tur
+    AND Pmp.Nr_Pmp_Bim = @V_Nr_Bim
+    AND Trt.Is_Tur = T.Is_Tur
+    AND Trt.Is_Dis = Dse.Is_Dis
+    AND Trt.Is_Tmp = Tmp.Is_Tmp
+    AND Trt.Nr_Trt_Bim = @V_Nr_Bim
+    AND M.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+    AND Ser.Cd_Ser BETWEEN 0 AND 15
+
+  UPDATE T_Mep1
+  SET IS_NOT_OBR = N.Is_Not
+  FROM T_Mep1 Mep, T_Mat M, T_Tmp Tmp, T_Mpg Mpg, T_Ntg Ntg, T_Not N
+  WHERE Mep.Is_Mat = M.Is_Mat
+
+  AND Tmp.Is_Tmp = Mep.Is_Tmp
+  AND Tmp.Is_Tmp = Mpg.Is_Tmp
+  /*  and Mpg.Is_Mpg     = Ntg.Is_Ntg            */
+  AND Mpg.Is_Mpg = Ntg.Is_Mpg
+  AND Mep.Is_Mat = N.Is_Mat
+  AND N.Nr_Not_Bim = Mep.Nr_Mep_Bim
+  /*  	   and Mep.Is_Dis     = N.Is_Dis
+  	   and   N.Is_Tnt     = Ntg.Is_Tnt     */
+  AND Mep.Is_Dis = N.Is_Dis
+  AND N.Is_Tnt = Ntg.Is_Tnt
+  AND M.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND M.Is_Tur = @V_Is_Tur
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+  /* ---[ 1 - Grava Variaveis para Calculo Media ]-------------------- */
+  /*	UpDate T_Mep1
+  	   Set  TP_MEP_PRO = 1,
+  		Nr_Mep_Qra =  (  Select Distinct Count(*)
+  				 From T_Not N, T_Tnt Tnt, T_Ntg Ntg, T_Mpg Mpg
+  				Where   N.Is_Mat     = M.Is_Mat
+  				  and   N.Nr_Not_Bim = @V_Nr_Bim
+  				  and   N.Is_Dis     = Mep.Is_Dis
+  				  and   N.Is_Tnt     = Tnt.Is_Tnt
+  				  and Tnt.Is_Tnt     = Ntg.Is_Tnt
+  				  and Ntg.Is_Mpg     = Mpg.Is_Mpg
+  				  and Mpg.Is_Tmp     = Mep.Is_Tmp
+  				Group By N.Is_Mat, N.Is_Dis, Ntg.Is_Mpg	    ),
+  		Nr_Mep_Sma= (  Select Distinct Sum(N.Nr_Not) 
+  				 From T_Not N, T_Tnt Tnt, T_Ntg Ntg, T_Mpg Mpg
+  				Where   N.Is_Mat     = M.Is_Mat
+  				  and   N.Nr_Not_Bim = @V_Nr_Bim
+  				  and   N.Is_Dis     = Mep.Is_Dis
+  				  and   N.Is_Tnt     = Tnt.Is_Tnt
+  				  and Tnt.Is_Tnt     = Ntg.Is_Tnt
+  				  and Ntg.Is_Mpg     = Mpg.Is_Mpg
+  				  and Mpg.Is_Tmp     = Mep.Is_Tmp
+  				Group By N.Is_Mat, N.Is_Dis, Ntg.Is_Mpg	    )
+  	  From  T_Mep1 Mep, T_Mat M
+  	 Where   M.Is_Mat       = Mep.Is_Mat
+  	   and   M.Is_Mat BetWeen @V_Is_Mat_Ini and @V_Is_Mat_Fin
+  	   and   M.Is_Tur       = @V_Is_Tur
+  	   and Mep.Nr_Mep_Bim   = @V_Nr_Bim
+  */
+  UPDATE T_Mep1
+  SET TP_MEP_PRO = 1
+     ,Nr_Mep_QRA = (SELECT DISTINCT
+          COUNT(*)
+        FROM T_Not N
+            ,T_Tnt Tnt
+            ,T_Ntg Ntg
+            ,T_Mpg Mpg
+            ,T_Mbg Mbg
+            ,T_Mag Mag
+        WHERE N.Is_Mat = M.Is_Mat
+        AND N.Nr_Not_Bim = @V_Nr_Bim
+        AND N.Is_Dis = Mep.Is_Dis
+        AND N.Is_Tnt = Tnt.Is_Tnt
+        AND Tnt.Is_Tnt = Ntg.Is_Tnt
+        AND Ntg.Is_Mpg = Mpg.Is_Mpg
+        AND Mpg.Is_Tmp = Mep.Is_Tmp
+        AND Mpg.Is_Mbg = Mbg.Is_Mbg
+        AND Mbg.Is_Mag = Mag.Is_Mag
+        AND Mag.Is_Tgs = Ags.Is_Tgs
+        AND SUBSTRING(Cd_Tnt, 1, 1) <> 'P'  /* Retira Pontos */
+        GROUP BY N.Is_Mat
+                ,N.Is_Dis
+                ,Ntg.Is_Mpg)
+  FROM T_Mep1 Mep, T_Mat M, T_Tur Tur, T_Ags Ags
+  WHERE M.Is_Mat = Mep.Is_Mat
+  AND M.Is_Tur = Tur.Is_Tur
+  AND Tur.Is_Ser = Ags.Is_Ser
+  AND M.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND M.Is_Tur = @V_Is_Tur
+  AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+
+  UPDATE T_Mep1
+  SET TP_MEP_PRO = 1
+     ,Nr_Mep_Sma = (SELECT DISTINCT
+          SUM(N.Nr_Not)
+        FROM T_Not N
+            ,T_Tnt Tnt
+            ,T_Ntg Ntg
+            ,T_Mpg Mpg
+            ,T_Mbg Mbg
+            ,T_Mag Mag
+        WHERE N.Is_Mat = M.Is_Mat
+        AND N.Nr_Not_Bim = @V_Nr_Bim
+        AND N.Is_Dis = Mep.Is_Dis
+        AND N.Is_Tnt = Tnt.Is_Tnt
+        AND Tnt.Is_Tnt = Ntg.Is_Tnt
+        AND Ntg.Is_Mpg = Mpg.Is_Mpg
+        AND Mpg.Is_Tmp = Mep.Is_Tmp
+        AND Mpg.Is_Mbg = Mbg.Is_Mbg
+        AND Mbg.Is_Mag = Mag.Is_Mag
+        AND Mag.Is_Tgs = Ags.Is_Tgs)
+  --				Group By N.Is_Mat, N.Is_Dis, Ntg.Is_Mpg	    )
+  FROM T_Mep1 Mep, T_Mat M, T_Tur Tur, T_Ags Ags
+  WHERE M.Is_Mat = Mep.Is_Mat
+  AND M.Is_Tur = Tur.Is_Tur
+  AND Tur.Is_Ser = Ags.Is_Ser
+  AND M.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND M.Is_Tur = @V_Is_Tur
+  AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+  /* ---[ 2 - Grava Media Digitada ]---------------------------------- */
+  UPDATE T_Mep1
+  SET TP_MEP_PRO = 2
+     ,NR_MEP_DIG = N.Nr_Not
+  FROM T_Mep1 Mep, T_Tmp Tmp, T_Not N, T_Mat M
+  WHERE M.Is_Mat = Mep.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Mep.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+  AND Mep.Is_Tmp = Tmp.Is_Tmp
+  AND Tmp.Is_Tnt_Dig = N.Is_Tnt
+  AND N.Is_Dis = Mep.Is_Dis
+  AND N.Is_Mat = Mep.Is_Mat
+  AND N.Nr_Not_Bim = @V_Nr_Bim
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+  /* ---[ 3 - Grava Media Nota de Recuperacao ]----------------------- */
+  UPDATE T_Mep1
+  SET TP_MEP_PRO = 3
+     ,NR_MEP_REC = N.Nr_Not
+  FROM T_Mep1 Mep, T_Tmp Tmp, T_Not N, T_Mat M
+  WHERE M.Is_Mat = Mep.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Mep.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+  AND Mep.Is_Tmp = Tmp.Is_Tmp
+  AND Tmp.Is_Tnt_Rec = N.Is_Tnt
+  AND N.Is_Dis = Mep.Is_Dis
+  AND N.Is_Mat = Mep.Is_Mat
+  AND N.Nr_Not_Bim = @V_Nr_Bim
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ---[ 4 - Grava Ponto na Media ]---------------------------------- */
+  UPDATE T_Mep1
+  SET TP_MEP_PRO = 4
+     ,NR_MEP_PTO = N.Nr_Not
+  FROM T_Mep1 Mep, T_Tmp Tmp, T_Not N, T_Mat M
+  WHERE M.Is_Mat = Mep.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Mep.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+  AND Mep.Is_Tmp = Tmp.Is_Tmp
+  AND Tmp.Is_Tnt_Pto = N.Is_Tnt
+  AND N.Is_Dis = Mep.Is_Dis
+  AND N.Is_Mat = Mep.Is_Mat
+  AND Nr_Not_Bim = Nr_Mep_Bim
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  UPDATE T_Mep1
+  SET Nr_Mep_Pto = 0
+  WHERE Nr_Mep_Pto IS NULL
+
+
+  IF (SELECT
+        Cd_Ser
+      FROM T_Ser Ser
+          ,T_Tur Tur
+      WHERE Ser.Is_Ser = Tur.Is_Ser
+      AND Tur.Is_Tur = @v_Is_Tur)
+    <= 18
+  BEGIN
+    /* ---[4.1 - Grava Ponto Simulado (Alunos que tiraram 50) ]--------------------------------- */
+    UPDATE T_Mep1
+    SET Tp_Mep_Pro = 41
+       ,Nr_Mep_Pto = Nr_Mep_Pto + 10
+    FROM T_Mep1 Mep
+    JOIN T_Not Nta
+      ON Nta.Is_Mat = Mep.Is_Mat
+      AND Mep.Is_Dis = Nta.Is_Dis
+      AND Nr_Not_Bim = Nr_Mep_Bim
+      AND Nta.Nr_Not >= 50
+      AND Mep.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+      AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+      AND Mep.NR_MEP_PTO <= 90
+    JOIN T_Tnt Tnt
+      ON Tnt.Is_Tnt = Nta.Is_Tnt
+      AND Tnt.Cd_Tnt = 'S1'
+    JOIN T_Tmp Tmp
+      ON Tmp.Is_Tmp = Mep.Is_Tmp
+      AND SUBSTRING(Cd_Tmp, 1, 1) = 'B'
+
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+  END
+
+  IF (SELECT
+        Cd_Ser
+      FROM T_Ser Ser
+          ,T_Tur Tur
+      WHERE Ser.Is_Ser = Tur.Is_Ser
+      AND Tur.Is_Tur = @v_Is_Tur)
+    > 18
+  BEGIN
+    /* ---[4.1 - Grava Ponto Simulado (Alunos que tiraram 50) ]--------------------------------- */
+    UPDATE T_Mep1
+    SET Tp_Mep_Pro = 41
+       ,Nr_Mep_Pto = Nr_Mep_Pto + 10
+    FROM T_Mep1 Mep
+    JOIN T_Not Nta
+      ON Nta.Is_Mat = Mep.Is_Mat
+      AND Mep.Is_Dis = Nta.Is_Dis
+      AND Nr_Not_Bim = Nr_Mep_Bim
+      AND Nta.Nr_Not = 50
+      AND Mep.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+      AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+      AND Mep.NR_MEP_PTO <= 90
+    JOIN T_Tnt Tnt
+      ON Tnt.Is_Tnt = Nta.Is_Tnt
+      AND Tnt.Cd_Tnt = 'S1'
+    JOIN T_Tmp Tmp
+      ON Tmp.Is_Tmp = Mep.Is_Tmp
+      AND SUBSTRING(Cd_Tmp, 1, 1) = 'B'
+
+    /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+    /* ---[4.2 - Grava Ponto Simulado (Alunos que tiraram acina de 50) / Apenas Ensino Médio ]- */
+    UPDATE T_Mep1
+    SET Tp_Mep_Pro = 42
+       ,Nr_Mep_Pto = Nr_Mep_Pto + 20
+    FROM T_Mep1 Mep
+    JOIN T_Not Nta
+      ON Nta.Is_Mat = Mep.Is_Mat
+      AND Mep.Is_Dis = Nta.Is_Dis
+      AND Nr_Not_Bim = Nr_Mep_Bim
+      AND Nta.Nr_Not > 50
+      AND Mep.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+      AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+      AND Mep.NR_MEP_PTO <= 80
+    JOIN T_Tnt Tnt
+      ON Tnt.Is_Tnt = Nta.Is_Tnt
+      AND Tnt.Cd_Tnt = 'S1'
+    JOIN T_Tmp Tmp
+      ON Tmp.Is_Tmp = Mep.Is_Tmp
+      AND SUBSTRING(Cd_Tmp, 1, 1) = 'B'
+
+  END
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ---[ 5 - Calculo da Media Parcial ]------------------------------ */
+  UPDATE T_Mep1
+  SET TP_MEP_PRO = 5
+     ,Nr_Mep_Cal = (Mep.Nr_Mep_Sma / Mep.Nr_Mep_Qra)
+     ,Nr_Mep_Fin = (Mep.Nr_Mep_Sma / Mep.Nr_Mep_Qra)
+  FROM T_Mep1 Mep, T_Mat M
+  WHERE M.Is_Mat = Mep.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Mep.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+  AND Mep.Nr_Mep_Pso > 0               /* Peso Maior que ZERO   */
+  AND Mep.Nr_Mep_Qra >= Mep.Nr_Mep_Qrt  /* Qtd.Tar.Turma > Realiz*/
+
+  UPDATE T_Mep1
+  SET TP_MEP_PRO = 5
+     ,Nr_Mep_Cal = (Mep.Nr_Mep_Sma / Mep.Nr_Mep_Qra) + Mep.Nr_Mep_Pto
+     ,Nr_Mep_Fin = (Mep.Nr_Mep_Sma / Mep.Nr_Mep_Qra) + Mep.Nr_Mep_Pto
+  FROM T_Mep1 Mep, T_Mat M
+  WHERE M.Is_Mat = Mep.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Mep.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+  AND Mep.Nr_Mep_Pso > 0               /* Peso Maior que ZERO   */
+  AND Mep.Nr_Mep_Qra >= Mep.Nr_Mep_Qrt  /* Qtd.Tar.Turma > Realiz*/
+  AND Mep.Nr_Mep_Pto IS NOT NULL
+  AND (Mep.Nr_Mep_Sma / Mep.Nr_Mep_Qra) + Mep.Nr_Mep_Pto <= 100
+
+  UPDATE T_Mep1
+  SET TP_MEP_PRO = 5
+     ,Nr_Mep_Cal = 100
+     ,NR_MEP_FIN = 100
+  FROM T_Mep1 Mep, T_Mat M
+  WHERE M.Is_Mat = Mep.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Mep.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+  AND Mep.Nr_Mep_Pso > 0               /* Peso Maior que ZERO   */
+  AND Mep.Nr_Mep_Qra >= Mep.Nr_Mep_Qrt  /* Qtd.Tar.Turma > Realiz*/
+  AND Mep.Nr_Mep_Pto IS NOT NULL
+  AND (Mep.Nr_Mep_Sma / Mep.Nr_Mep_Qra) + Mep.Nr_Mep_Pto > 100
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+  /* ---[ 6 - Grava Media Digitada ]---------------------------------- */
+  UPDATE T_Mep1
+  SET TP_MEP_PRO = 6
+     ,NR_MEP_FIN = Mep.Nr_Mep_Dig
+  FROM T_Mep1 Mep, T_Mat M
+  WHERE M.Is_Mat = Mep.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Mep.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+  AND Mep.Nr_Mep_Dig IS NOT NULL
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ---[ 7 - Grava Media com Recuperacao ]--------------------------- */
+  UPDATE T_Mep1
+  SET TP_MEP_PRO = 7
+     ,NR_MEP_Fin = Mep.Nr_Mep_Rec
+  FROM T_Mep1 Mep, T_Mat M, T_Tmp Tmp
+  WHERE M.Is_Mat = Mep.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Mep.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+  AND Mep.Nr_Mep_Rec IS NOT NULL
+  AND Mep.Is_Tmp = Tmp.Is_Tmp
+  AND Tmp.TP_TMP_REC = '1'
+  AND Mep.Nr_Mep_Rec > Mep.NR_MEP_Fin
+  UPDATE T_Mep1
+  SET TP_MEP_PRO = 7
+     ,NR_MEP_Fin = Tmb.NR_TMB_APR
+  FROM T_Mep1 Mep, T_Mat M, T_Tmp Tmp, T_Tsi Tsi, T_Tmb Tmb
+  WHERE M.Is_Mat = Mep.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Mep.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+
+  AND Mep.Nr_Mep_Rec IS NOT NULL
+  AND Mep.Is_Tmp = Tmp.Is_Tmp
+  AND Tmp.Is_Tsi = Tsi.Is_Tsi
+  AND Tsi.Is_Tsi = Tmb.Is_Tsi
+  AND Tmp.TP_TMP_REC = '2'
+  AND Mep.Nr_Mep_Rec > Mep.NR_MEP_Fin
+  UPDATE T_Mep1
+  SET TP_MEP_PRO = 7
+     ,TP_MEP_REC = 'R '
+  FROM T_Mep1 Mep, T_Mat M, T_Tmp Tmp, T_Tsi Tsi, T_Tmb Tmb
+  WHERE M.Is_Mat = Mep.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Mep.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+  AND Mep.Nr_Mep_Rec IS NOT NULL
+  AND Mep.Is_Tmp = Tmp.Is_Tmp
+  AND Tmp.Is_Tsi = Tsi.Is_Tsi
+  AND Tsi.Is_Tsi = Tmb.Is_Tsi
+  AND Mep.Nr_Mep_Rec >= Mep.NR_MEP_Fin
+  AND Mep.Nr_Mep_Rec >= Tmb.NR_TMB_APR
+  UPDATE T_Mep1
+  SET TP_MEP_PRO = 7
+     ,TP_MEP_REC = 'NR'
+  FROM T_Mep1 Mep, T_Mat M, T_Tmp Tmp, T_Tsi Tsi, T_Tmb Tmb
+  WHERE M.Is_Mat = Mep.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Mep.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+  AND Mep.Nr_Mep_Rec IS NOT NULL
+  AND Mep.Is_Tmp = Tmp.Is_Tmp
+  AND Tmp.Is_Tsi = Tsi.Is_Tsi
+  AND Tsi.Is_Tsi = Tmb.Is_Tsi
+  AND ((Mep.Nr_Mep_Rec < Mep.NR_MEP_Fin
+  AND Mep.Nr_Mep_Fin < Tmb.NR_TMB_APR)
+  OR (Mep.Nr_Mep_Rec >= Mep.NR_MEP_Fin
+  AND Mep.Nr_Mep_Rec < Tmb.Nr_Tmb_Apr))
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+  /* ---[ 8 - Grava Media com Simbologia ]---------------------------- */
+  UPDATE T_Mep1
+  SET TP_MEP_PRO = 8
+     ,Is_Sim = Sim.Is_Sim
+  FROM T_Mep1 Mep, T_Mat M, T_Sim Sim,
+  T_Ser Ser, T_Tur Tur
+  WHERE M.Is_Mat = Mep.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Mep.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+  AND Mep.NR_Mep_Fin IS NOT NULL
+  AND M.Is_Tur = Tur.Is_Tur
+  AND Tur.Is_Ser = Ser.Is_Ser
+  AND Ser.Cd_Ser BETWEEN 0 AND 15
+  AND Sim.Is_Sim = (SELECT
+      MAX(S.Is_Sim)
+    FROM T_Tmp Tmp
+        ,T_Tsi Tsi
+        ,T_Sim S
+    WHERE Mep.Is_Tmp = Tmp.Is_Tmp
+    AND Tmp.Is_Tsi = Tsi.Is_Tsi
+    AND Tsi.Is_Tsi = S.Is_Tsi
+    AND S.NR_SIM_NOT <= Mep.Nr_Mep_Cal
+    AND Tsi.Tp_Tsi = 'S')
+  UPDATE T_Mep1
+  SET TP_MEP_PRO = 8
+     ,Is_Sim = Sim.Is_Sim
+  FROM T_Mep1 Mep, T_Mat M, T_Sim Sim,
+  T_Ser Ser, T_Tur Tur
+  WHERE M.Is_Mat = Mep.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Mep.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+  AND Mep.NR_Mep_Fin IS NOT NULL
+  AND M.Is_Tur = Tur.Is_Tur
+  AND Tur.Is_Ser = Ser.Is_Ser
+  AND Ser.Cd_Ser BETWEEN @SerIni AND 23
+  AND Sim.Is_Sim = (SELECT
+      MAX(S.Is_Sim)
+    FROM T_Tmp Tmp
+        ,T_Tsi Tsi
+        ,T_Sim S
+    WHERE Mep.Is_Tmp = Tmp.Is_Tmp
+    AND Tmp.Is_Tsi = Tsi.Is_Tsi
+    AND Tsi.Is_Tsi = S.Is_Tsi
+    AND S.NR_SIM_NOT <= Mep.Nr_Mep_Fin
+    AND Tsi.Tp_Tsi = 'S')
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+  /* ---[ 09 - Grava Media Parcial   Disciplina Dominante ]----------- */
+  UPDATE T_Mep1
+  SET TP_MEP_PRO = 09
+     ,Nr_Mep_Sma = (SELECT
+          SUM(Nr_Mep_Fin)
+        FROM T_Mep1 Mep2
+        WHERE Mep2.Is_Dis_Dom = Mep.Is_Dis
+        AND Mep2.Is_Dis <> Mep2.Is_Dis_Dom
+        AND Mep2.Is_Mat = Mep.Is_Mat
+        AND Mep2.Is_Tmp = Mep.Is_Tmp)
+     ,Nr_Mep_Qrt = (SELECT
+          COUNT(*)
+        FROM T_Mep1 Mep2
+        WHERE Mep2.Is_Dis_Dom = Mep.Is_Dis
+        AND Mep2.Is_Mat = Mep.Is_Mat
+        AND Mep2.Is_Dis <> Mep2.Is_Dis_Dom
+        AND Mep2.Is_Tmp = Mep.Is_Tmp)
+     ,Nr_Mep_Qra = (SELECT
+          COUNT(*)
+        FROM T_Mep1 Mep2
+        WHERE Mep2.Is_Dis_Dom = Mep.Is_Dis
+        AND Mep2.Is_Mat = Mep.Is_Mat
+        AND Mep2.Is_Dis <> Mep2.Is_Dis_Dom
+        AND Nr_Mep_Fin IS NOT NULL
+        AND Mep2.Is_Tmp = Mep.Is_Tmp)
+  /*	  From  T_Mep1 Mep, T_Mat M, T_Sim Sim   */
+  FROM T_Mep1 Mep, T_Mat M
+  WHERE M.Is_Mat = Mep.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Mep.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+  AND Mep.NR_Mep_Fin IS NULL
+  AND Mep.Is_Sim IS NULL
+  AND Mep.Is_Dis = Mep.Is_Dis_Dom
+  AND EXISTS (SELECT
+      Is_Dis_Dom
+    FROM T_Mep1 Mep3
+    WHERE Mep3.Is_Dis_Dom = Mep.Is_Dis_Dom
+    AND Mep.Is_Dis <> Mep3.Is_Dis)
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+  /* ---[ 10 - Calcula Media Displina Dominante ]--------------------- */
+  UPDATE T_Mep1
+  SET TP_MEP_PRO = 32
+     ,Nr_Mep_Fin = Nr_Mep_Sma / Nr_Mep_Qrt
+     ,Nr_Mep_Cal = Nr_Mep_Sma / Nr_Mep_Qra
+  FROM T_Mep1 Mep, T_Mat M
+  WHERE M.Is_Mat = Mep.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Mep.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+  AND Mep.NR_Mep_Fin IS NULL
+  AND Mep.Is_Sim IS NULL
+  AND Mep.Is_Dis = Mep.Is_Dis_Dom
+  AND Mep.Nr_Mep_Qrt <= Mep.Nr_Mep_Qra
+
+  UPDATE T_Mep1
+  SET TP_MEP_PRO = 33
+     ,Nr_Mep_Cal = 100
+     ,NR_MEP_FIN = 100
+  FROM T_Mep1 Mep, T_Mat M
+  WHERE M.Is_Mat = Mep.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Mep.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+  AND Mep.Nr_Mep_Pso > 0               /* Peso Maior que ZERO   */
+  AND Mep.Nr_Mep_Qra >= Mep.Nr_Mep_Qrt  /* Qtd.Tar.Turma > Realiz*/
+  AND Mep.Nr_Mep_Pto IS NOT NULL
+  AND (Mep.Nr_Mep_Sma / Mep.Nr_Mep_Qra) + Mep.Nr_Mep_Pto > 100
+
+  UPDATE T_Mep1
+  SET Nr_Mep_Cal = 100
+  WHERE Nr_Mep_Cal > 100
+
+  UPDATE T_Mep1
+  SET Nr_Mep_Fin = 100
+  WHERE Nr_Mep_Fin > 100
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ---[ Grava Tabela T_MEP ]---------------------------------------- */
+  INSERT T_Mep
+    SELECT
+      *
+    FROM T_Mep1
+
+  /* ---[ Copia Arquivo Temp. p/ T_MEP ]------------------------------ */
+  DELETE T_Mep1 
+		FROM T_Mep1 Mep JOIN T_Mat Mat ON Mep.IS_MAT = Mat.IS_MAT
+										JOIN T_TUR ON Mat.IS_TUR = T_TUR.IS_TUR
+   WHERE Mat.IS_TUR     = @V_Is_Tur
+     AND MEP.NR_MEP_BIM = @V_Nr_Bim
+
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ---[ Cria Arquivo Temporario ]----------------------------------- */
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ---[20 - Grv.Linha MEB por Disciplina/ Aluno ]------------------- */
+  INSERT T_Meb1 (Is_Dis, Is_Mat, Is_Tmb, Is_Mag,
+  Nr_Meb_Pso, Tp_Meb_Pro, Nr_Meb_Bim,
+  Is_Usu, Dt_Sop)
+    SELECT DISTINCT
+      Mep.Is_Dis
+     ,M.Is_Mat
+     ,Tmb.Is_Tmb
+     ,Mag.Is_Mag
+     ,Nr_Meb_Pso = (SELECT
+          Nr_Pmb_Pso
+        FROM T_Pmb Pmb
+        WHERE Pmb.Is_Mbg = Mbg.Is_Mbg
+        AND Pmb.Nr_Pmb_Bim = @V_Nr_Bim)
+     ,20
+     ,@V_Nr_Bim
+     ,@V_Is_Usu
+     ,GETDATE()
+    FROM T_Mep Mep
+        ,T_Mat M
+        ,T_Tur T
+        ,T_Ags Ags
+        ,T_Tgs Tgs
+        ,T_Mag Mag
+        ,T_Mbg Mbg
+        ,T_Tmb Tmb
+        ,T_Pmb Pmb
+    WHERE Mep.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+    AND Mep.Is_Mat = M.Is_Mat
+    AND M.Is_Tur = @V_Is_Tur
+    AND M.Is_Tur = T.Is_Tur
+    AND T.Is_Ser = Ags.Is_Ser
+    AND Ags.Is_Tgs = Tgs.Is_Tgs
+    AND Tgs.Is_Tgs = Mag.Is_Tgs
+    AND Mag.Is_Mag = Mbg.Is_Mag
+    AND Mbg.Is_Tmb = Tmb.Is_Tmb
+    AND Pmb.IS_MBG = Mbg.IS_MBG
+    AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+    AND Tmb.Is_Anl = @Is_Anl
+    GROUP BY M.Is_Mat
+            ,Mep.Is_Dis
+            ,Mep.Nr_Mep_Bim
+            ,Tmb.Is_Tmb
+            ,Mbg.Is_Mbg
+            ,Mag.Is_Mag
+
+  UPDATE T_Meb1
+  SET Is_Dis_Dom = Mep.Is_Dis_Dom
+  FROM T_Meb1 Meb, T_Mep Mep
+  WHERE Meb.Is_Dis = Mep.Is_Dis
+  AND Meb.Is_Mat = Mep.Is_Mat
+  AND Mep.Nr_Mep_Bim = @V_Nr_Bim
+  AND Meb.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ---[21 - Grv.Linha Qtd. Medias Necess / Realizadas ]-------------- */
+  UPDATE T_Meb1
+  SET TP_MEB_PRO = 21
+     ,Nr_Meb_QPR = (SELECT
+          COUNT(*)
+        FROM T_Mep Mep
+        WHERE Mep.Is_Mat = Meb.Is_Mat
+        AND Mep.Is_Dis = Meb.Is_Dis
+        AND Mep.Nr_Mep_Bim = Meb.Nr_Meb_Bim
+        AND Mep.Nr_Mep_Fin IS NOT NULL)
+     ,Nr_Meb_QPN = (SELECT
+          COUNT(*)
+        FROM T_Mep Mep
+        WHERE M.Is_Mat = Mep.Is_Mat
+        AND Mep.NR_MEP_QRT > 0
+        AND Meb.Nr_Meb_Bim = Mep.Nr_Mep_Bim
+        AND Meb.Is_Dis = Mep.Is_Dis)
+
+  FROM T_Meb1 Meb, T_MAT M
+  WHERE M.IS_MAT = Meb.IS_MAT
+  AND Meb.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND M.Is_Tur = @V_Is_Tur
+  AND Meb.Nr_Meb_Bim = @V_Nr_Bim
+  AND NOT EXISTS (SELECT
+      Is_Dis_Dom
+    FROM T_MEB Mb2
+    WHERE Mb2.IS_DIS <> Mb2.IS_DIS_DOM
+    AND Mb2.IS_MAT = Meb.IS_MAT
+    AND Mb2.NR_MEB_BIM = Meb.NR_MEB_BIM)
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ---[23 - Grv.Linha Soma Medias Parcias Realizadas ]-------------- */
+  UPDATE T_Meb1
+  SET TP_MEB_PRO = 23
+     ,Nr_Meb_SMA = (SELECT
+          SUM(Nr_Mep_Fin * NR_MEP_PSO)
+        FROM T_Mep Mep
+            ,T_Tmp Tmp
+        WHERE Mep.Is_Mat = Meb.Is_Mat
+        AND Mep.Is_Tmp = Tmp.Is_Tmp
+        AND Tmp.Tp_Tmp_Med = 0
+        AND Mep.Is_Dis = Meb.Is_Dis
+        AND Mep.Nr_Mep_Bim = Meb.Nr_Meb_Bim
+        AND Mep.Nr_Mep_Fin IS NOT NULL
+        AND Meb.Nr_Meb_Qpr >= Meb.Nr_Meb_Qpn)
+     ,NR_MEB_SPP = (SELECT
+          SUM(NR_MEP_PSO)
+        FROM T_Mep Mep
+            ,T_Tmp Tmp
+        WHERE Mep.Is_Mat = Meb.Is_Mat
+        AND Mep.Is_Tmp = Tmp.Is_Tmp
+        AND Tmp.Tp_Tmp_Med = 0
+        AND Mep.Is_Dis = Meb.Is_Dis
+        AND Mep.Nr_Mep_Bim = Meb.Nr_Meb_Bim
+        AND Mep.Nr_Mep_Fin IS NOT NULL
+        AND Meb.Nr_Meb_Qpr >= Meb.Nr_Meb_Qpn)
+  FROM T_Meb1 Meb, T_Mat M
+  WHERE Meb.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Meb.Is_Mat = M.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Meb.Nr_Meb_Bim = @V_Nr_Bim
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ---[ 24 - Grava Media Digitada ]--------------------------------- */
+  UPDATE T_Meb1
+  SET TP_MEB_PRO = 24
+     ,NR_MEB_DIG = N.Nr_Not
+     ,NR_MEB_CAL = N.Nr_Not
+     ,NR_MEB_FIN = N.Nr_Not
+  FROM T_Meb1 Meb, T_Tmb Tmb, T_Not N, T_Mat M
+  WHERE M.Is_Mat = Meb.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Meb.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Meb.Nr_Meb_Bim = @V_Nr_Bim
+  AND Meb.Is_Tmb = Tmb.Is_Tmb
+  AND Tmb.Is_Tnt_Dig = N.Is_Tnt
+  AND N.Is_Dis = Meb.Is_Dis
+  AND N.Is_Mat = Meb.Is_Mat
+  AND N.Nr_Not_Bim = @V_Nr_Bim
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ---[ 25 - Grava Ponto na Media Bimestral ]----------------------- */
+  UPDATE T_Meb1
+  SET TP_MEB_PRO = 25
+     ,NR_MEB_PTO = N.Nr_Not
+  FROM T_Meb1 Meb, T_Tmb Tmb, T_Not N, T_Mat M
+  WHERE M.Is_Mat = Meb.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Meb.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Meb.Nr_Meb_Bim = @V_Nr_Bim
+  AND Meb.Is_Tmb = Tmb.Is_Tmb
+  AND Tmb.Is_Tnt_Pto = N.Is_Tnt
+  AND N.Is_Dis = Meb.Is_Dis
+  AND N.Is_Mat = Meb.Is_Mat
+  AND N.Nr_Not_Bim = @V_Nr_Bim
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ---[ 26 - Grava Media de Recuperacao / Bimestral ]--------------- */
+  UPDATE T_Meb1
+  SET TP_MEB_PRO = 26
+     ,NR_MEB_REC = N.Nr_Not
+  FROM T_Meb1 Meb, T_Tmb Tmb, T_Not N, T_Mat M
+  WHERE M.Is_Mat = Meb.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Meb.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Meb.Nr_Meb_Bim = @V_Nr_Bim
+  AND Meb.Is_Tmb = Tmb.Is_Tmb
+  AND Tmb.Is_Tnt_Rec = N.Is_Tnt
+  AND N.Is_Dis = Meb.Is_Dis
+  AND N.Is_Mat = Meb.Is_Mat
+  AND N.Nr_Not_Bim = @V_Nr_Bim
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ---[ 27 - Calculo da Media Bimestral ]--------------------------- */
+  UPDATE T_Meb1
+  SET TP_MEB_PRO = 27
+     ,Nr_Meb_Cal = (Meb.Nr_Meb_Sma / Meb.Nr_Meb_Spp)
+     ,Nr_Meb_Fin = (Meb.Nr_Meb_Sma / Meb.Nr_Meb_Spp)
+  FROM T_Meb1 Meb, T_Mat M
+  WHERE M.Is_Mat = Meb.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Meb.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Meb.Nr_Meb_Bim = @V_Nr_Bim
+  AND NR_MEB_FIN IS NULL
+  AND NR_MEB_CAL IS NULL
+  AND Meb.Nr_Meb_Spp > 0               /* Peso Maior que ZERO   */
+  AND Meb.NR_MEB_QPR >= Meb.NR_MEB_QPN  /* Qtd.Tar.Turma > Realiz*/
+  AND (NOT EXISTS (SELECT
+      Is_Dis_Dom
+    FROM T_Meb1 Meb2
+    WHERE Meb2.Is_Dis <> Meb2.Is_Dis_Dom
+    AND Meb2.Is_Mat = M.Is_Mat)
+  OR EXISTS (SELECT
+      Is_Dis
+    FROM T_Meb1 Meb3
+    WHERE Meb3.Is_Dis <> Meb.Is_Dis_Dom
+    AND Meb3.Is_Dis <> Meb3.Is_Dis_Dom
+    AND Meb3.Is_Mat = M.Is_Mat)
+  )
+
+
+  IF (SELECT
+        Cd_Ser
+      FROM T_Ser Ser
+          ,T_Tur Tur
+      WHERE Ser.Is_Ser = Tur.Is_Ser
+      AND Tur.Is_Tur = @v_Is_Tur)
+    = 23
+  BEGIN
+    IF @v_Nr_Bim <> 2
+
+    BEGIN
+
+      UPDATE T_Meb1
+      SET TP_MEB_PRO = 5
+         ,Nr_Meb_Cal = (Meb.Nr_Meb_Sma / Meb.Nr_Meb_Spp) + Meb.Nr_Meb_Pto
+         ,Nr_Meb_Fin = (Meb.Nr_Meb_Sma / Meb.Nr_Meb_Spp) + Meb.Nr_Meb_Pto
+      FROM T_Meb1 Meb, T_Mat M
+      WHERE M.Is_Mat = Meb.Is_Mat
+      AND M.Is_Tur = @V_Is_Tur
+      AND Meb.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+      AND Meb.Nr_Meb_Bim = @V_Nr_Bim
+      AND Meb.Nr_Meb_Spp > 0               /* Peso Maior que ZERO   */
+      AND Meb.NR_MEB_QPR >= Meb.NR_MEB_QPN  /* Qtd.Tar.Turma > Realiz*/
+      AND Meb.Nr_Meb_Pto IS NOT NULL
+      AND (Meb.Nr_Meb_Sma / Meb.Nr_Meb_Spp) + Meb.Nr_Meb_Pto <= 100
+      AND (NOT EXISTS (SELECT
+          Is_Dis_Dom
+        FROM T_Meb1 Meb2
+        WHERE Meb2.Is_Dis <> Meb2.Is_Dis_Dom
+        AND Meb2.Is_Mat = M.Is_Mat)
+      OR EXISTS (SELECT
+          Is_Dis
+        FROM T_Meb1 Meb3
+        WHERE Meb3.Is_Dis <> Meb.Is_Dis_Dom
+        AND Meb3.Is_Dis <> Meb3.Is_Dis_Dom
+        AND Meb3.Is_Mat = M.Is_Mat)
+      )
+      UPDATE T_Meb1
+      SET TP_MEB_PRO = 5
+         ,Nr_Meb_Cal = 100
+         ,NR_MEB_FIN = 100
+      FROM T_Meb1 Meb, T_Mat M
+      WHERE M.Is_Mat = Meb.Is_Mat
+      AND M.Is_Tur = @V_Is_Tur
+      AND Meb.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+      AND Meb.Nr_Meb_Bim = @V_Nr_Bim
+      AND Meb.Nr_Meb_Spp > 0               /* Peso Maior que ZERO   */
+      AND Meb.NR_MEB_QPR >= Meb.NR_MEB_QPN  /* Qtd.Tar.Turma > Realiz*/
+      AND Meb.Nr_Meb_Pto IS NOT NULL
+      AND (Meb.Nr_Meb_Sma / Meb.Nr_Meb_Spp) + Meb.Nr_Meb_Pto > 100
+      AND (NOT EXISTS (SELECT
+          Is_Dis_Dom
+        FROM T_Meb1 Meb2
+        WHERE Meb2.Is_Dis <> Meb2.Is_Dis_Dom
+        AND Meb2.Is_Mat = M.Is_Mat)
+      OR EXISTS (SELECT
+          Is_Dis
+        FROM T_Meb1 Meb3
+        WHERE Meb3.Is_Dis <> Meb.Is_Dis_Dom
+        AND Meb3.Is_Dis <> Meb3.Is_Dis_Dom
+        AND Meb3.Is_Mat = M.Is_Mat)
+      )
+    END
+  END
+  ELSE
+  BEGIN
+    UPDATE T_Meb1
+    SET TP_MEB_PRO = 5
+       ,Nr_Meb_Cal = (Meb.Nr_Meb_Sma / Meb.Nr_Meb_Spp) + Meb.Nr_Meb_Pto
+       ,Nr_Meb_Fin = (Meb.Nr_Meb_Sma / Meb.Nr_Meb_Spp) + Meb.Nr_Meb_Pto
+    FROM T_Meb1 Meb, T_Mat M
+    WHERE M.Is_Mat = Meb.Is_Mat
+    AND M.Is_Tur = @V_Is_Tur
+    AND Meb.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+    AND Meb.Nr_Meb_Bim = @V_Nr_Bim
+    AND Meb.Nr_Meb_Spp > 0               /* Peso Maior que ZERO   */
+    AND Meb.NR_MEB_QPR >= Meb.NR_MEB_QPN  /* Qtd.Tar.Turma > Realiz*/
+    AND Meb.Nr_Meb_Pto IS NOT NULL
+    AND (Meb.Nr_Meb_Sma / Meb.Nr_Meb_Spp) + Meb.Nr_Meb_Pto <= 100
+    AND (NOT EXISTS (SELECT
+        Is_Dis_Dom
+      FROM T_Meb1 Meb2
+      WHERE Meb2.Is_Dis <> Meb2.Is_Dis_Dom
+      AND Meb2.Is_Mat = M.Is_Mat)
+    OR EXISTS (SELECT
+        Is_Dis
+      FROM T_Meb1 Meb3
+      WHERE Meb3.Is_Dis <> Meb.Is_Dis_Dom
+      AND Meb3.Is_Dis <> Meb3.Is_Dis_Dom
+      AND Meb3.Is_Mat = M.Is_Mat)
+    )
+
+    UPDATE T_Meb1
+    SET TP_MEB_PRO = 5
+       ,Nr_Meb_Cal = 100
+       ,NR_MEB_FIN = 100
+    FROM T_Meb1 Meb, T_Mat M
+    WHERE M.Is_Mat = Meb.Is_Mat
+    AND M.Is_Tur = @V_Is_Tur
+    AND Meb.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+    AND Meb.Nr_Meb_Bim = @V_Nr_Bim
+    AND Meb.Nr_Meb_Spp > 0               /* Peso Maior que ZERO   */
+    AND Meb.NR_MEB_QPR >= Meb.NR_MEB_QPN  /* Qtd.Tar.Turma > Realiz*/
+    AND Meb.Nr_Meb_Pto IS NOT NULL
+    AND (Meb.Nr_Meb_Sma / Meb.Nr_Meb_Spp) + Meb.Nr_Meb_Pto > 100
+    AND (NOT EXISTS (SELECT
+        Is_Dis_Dom
+      FROM T_Meb1 Meb2
+      WHERE Meb2.Is_Dis <> Meb2.Is_Dis_Dom
+      AND Meb2.Is_Mat = M.Is_Mat)
+    OR EXISTS (SELECT
+        Is_Dis
+      FROM T_Meb1 Meb3
+      WHERE Meb3.Is_Dis <> Meb.Is_Dis_Dom
+      AND Meb3.Is_Dis <> Meb3.Is_Dis_Dom
+      AND Meb3.Is_Mat = M.Is_Mat)
+    )
+
+  END
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ---[ 29 - Grava Faltas Digitadas ]------------------------------- */
+  UPDATE T_Meb1 SET Nr_Meb_Flt = Nr_Faltas
+    FROM Tb_Flt_Bim Flt JOIN T_Mat Mat  ON Mat.Is_Alu = Flt.Is_Alu AND Mat.Is_Tur = Flt.Is_Tur
+                        JOIN T_Meb1 Meb ON Meb.Is_Mat = Mat.Is_Mat AND Nr_Meb_Bim = Nr_Bim
+                        JOIN T_Dse Dse  ON Dse.Is_Dse = Flt.Is_Dse AND Meb.Is_Dis = Dse.Is_Dis
+                        JOIN T_Dis Dis ON Dis.Is_Dis = Dse.Is_Dis 
+  WHERE Nr_Bim = @V_Nr_Bim
+
+  UPDATE T_Meb1
+  SET TP_MEB_PRO = 29
+     ,NR_MEB_FLT = Fdd.Nr_Fdd
+  FROM T_Meb1 Meb, T_Mat M, T_Fdd Fdd
+  WHERE M.Is_Mat = Meb.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Meb.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Meb.Nr_Meb_Bim = @V_Nr_Bim
+  AND Meb.Is_Mat = Fdd.Is_Mat
+  AND Meb.Is_Dis = Fdd.Is_Dis
+  AND Meb.Nr_Meb_Bim = Fdd.Nr_Fdd_Bim
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ---[ 30 - Grava Media com Simbologia ]--------------------------- */
+  UPDATE T_Meb1
+  SET TP_MEb_PRO = 30
+     ,Is_Sim = Sim.Is_Sim
+  FROM T_Meb1 Meb, T_Mat M, T_Sim Sim
+  WHERE M.Is_Mat = Meb.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Meb.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Meb.Nr_Meb_Bim = @V_Nr_Bim
+  AND Meb.NR_Meb_Fin IS NOT NULL
+  AND Sim.Is_Sim = (SELECT
+      MAX(S.Is_Sim)
+    FROM T_Tmb Tmb
+        ,T_Tsi Tsi
+        ,T_Sim S
+    WHERE Meb.Is_Tmb = Tmb.Is_Tmb
+    AND Tmb.Is_Tsi = Tsi.Is_Tsi
+    AND Tsi.Is_Tsi = S.Is_Tsi
+    AND S.NR_SIM_NOT <= Meb.Nr_Meb_Fin
+    AND Tsi.Tp_Tsi = 'S')
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ---[ 31 - Grava Media Bimestral Disciplina Dominante ]----------- */
+  UPDATE T_Meb1
+  SET TP_MEb_PRO = 31
+     ,Nr_Meb_Sma = (SELECT
+          SUM(Nr_Meb_Fin)
+        FROM T_Meb1 Meb2
+        WHERE Meb2.Is_Dis_Dom = Meb.Is_Dis
+        AND Meb2.Is_Mat = Meb.Is_Mat
+        AND Meb2.Is_Dis <> Meb2.Is_Dis_Dom)
+     ,Nr_Meb_Flt = (SELECT
+          SUM(Nr_Meb_Flt)
+        FROM T_Meb1 Meb2
+        WHERE Meb2.Is_Dis_Dom = Meb.Is_Dis
+        AND Meb2.Is_Mat = Meb.Is_Mat
+
+        AND Meb2.Is_Dis <> Meb2.Is_Dis_Dom
+        AND Nr_Meb_Flt IS NOT NULL)
+  FROM T_Meb1 Meb, T_Mat M
+  WHERE M.Is_Mat = Meb.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Meb.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Meb.Nr_Meb_Bim = @V_Nr_Bim
+  AND Meb.Is_Sim IS NULL
+  AND Meb.Is_Dis = Meb.Is_Dis_Dom
+  AND Meb.Nr_Meb_Fin IS NULL
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ---[ 32 - Grv Qtd.Med.Bim. Disciplina Dominante ]---------------- */
+  UPDATE T_Meb1
+  SET TP_MEb_PRO = 32
+     ,Nr_Meb_Qpn = (SELECT
+          COUNT(*)
+        FROM T_Meb1 Meb2
+        WHERE Meb2.Is_Dis_Dom = Meb.Is_Dis
+        AND Meb2.Is_Mat = Meb.Is_Mat
+        AND Meb2.Is_Dis <> Meb2.Is_Dis_Dom)
+  FROM T_Meb1 Meb, T_Mat M
+  WHERE M.Is_Mat = Meb.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Meb.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Meb.Nr_Meb_Bim = @V_Nr_Bim
+  AND Meb.Is_Sim IS NULL
+  AND EXISTS (SELECT
+      Is_Dis_Dom
+    FROM T_MEB1 Mb2
+    WHERE Mb2.IS_DIS <> Mb2.IS_DIS_DOM
+    AND Mb2.IS_MAT = Meb.IS_MAT
+    AND Mb2.NR_MEB_BIM = Meb.NR_MEB_BIM)
+  AND Meb.Is_Dis = Meb.Is_Dis_Dom
+  AND Meb.Nr_Meb_Fin IS NULL
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ---[ 33 - Grava Media Bimestral Disciplina Dominante ]----------- */
+  UPDATE T_Meb1
+     SET TP_MEb_PRO = 33,
+         Nr_Meb_Qpr = (SELECT COUNT(*)
+                         FROM T_Meb1 Meb2
+                        WHERE Meb2.Is_Dis_Dom = Meb.Is_Dis
+                          AND Meb2.Is_Mat = Meb.Is_Mat
+                          AND Meb2.Is_Dis <> Meb2.Is_Dis_Dom 
+                          AND Nr_Meb_Fin IS NOT NULL)
+    FROM T_Meb1 Meb, T_Mat M
+   WHERE M.Is_Mat = Meb.Is_Mat
+     AND M.Is_Tur = @V_Is_Tur
+     AND Meb.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+     AND Meb.Nr_Meb_Bim = @V_Nr_Bim
+     AND Meb.Is_Sim IS NULL
+     AND EXISTS (SELECT Is_Dis_Dom
+                   FROM T_Meb1
+                  WHERE Is_Dis <> Is_Dis_Dom
+                    AND Is_Dis_Dom = Meb.Is_Dis)
+      AND Meb.Is_Dis = Meb.Is_Dis_Dom
+      AND Meb.Nr_Meb_Fin IS NULL
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  -- retirar 35
+  /* ---[ 35 - Calcula Media Displina Dominante ]--------------------- */
+  UPDATE T_Meb1
+  SET TP_MEb_PRO = 35
+     ,Nr_Meb_Fin = Nr_Meb_Sma / Nr_Meb_Qpr
+     ,Nr_Meb_Cal = Nr_Meb_Sma / Nr_Meb_Qpr
+  FROM T_Meb1 Meb, T_Mat M
+  WHERE M.Is_Mat = Meb.Is_Mat
+  AND M.Is_Tur = @V_Is_Tur
+  AND Meb.Is_Mat BETWEEN @V_Is_Mat_Ini AND @V_Is_Mat_Fin
+  AND Meb.Nr_Meb_Bim = @V_Nr_Bim
+  AND Meb.NR_Meb_Fin IS NULL
+  AND Meb.Is_Sim IS NULL
+  AND Meb.Is_Dis = Meb.Is_Dis_Dom
+  AND Meb.Nr_Meb_Qpn = Meb.Nr_Meb_Qpr
+
+  /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+  /* ---[ Copia Arquivo Temp. p/ T_MEP ]------------------------------ */
+	INSERT T_Meb
+  SELECT * FROM T_Meb1
+
+  DELETE T_Meb1 
+		FROM T_Meb1 Meb JOIN T_Mat Mat ON Meb.IS_MAT = Mat.IS_MAT
+										JOIN T_TUR ON Mat.IS_TUR = T_TUR.IS_TUR
+   WHERE Mat.IS_TUR     = @V_Is_Tur
+     AND MEB.NR_MEB_BIM = @V_Nr_Bim
+
+GO

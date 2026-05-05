@@ -1,0 +1,269 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Níveis de Ensino — Gerenciar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { font-family: 'Inter', sans-serif; background: #f5f0eb; color: #2d2d2d; }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            background: linear-gradient(135deg, #7d2728, #3d1a1b);
+            padding: 0 2rem; height: 64px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 1rem; }
+        .btn-voltar {
+            width: 38px; height: 38px; border-radius: 0.7rem;
+            background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+            color: #fff; font-size: 0.9rem; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; text-decoration: none; transition: all 0.25s;
+        }
+        .btn-voltar:hover { background: rgba(255,255,255,0.22); }
+        .topbar-title h1 { font-family: 'Poppins', sans-serif; font-size: 1.1rem; font-weight: 700; color: #fff; }
+        .topbar-title span { font-size: 0.72rem; color: rgba(255,255,255,0.55); }
+        .topbar-right { display: flex; align-items: center; gap: 0.8rem; }
+        .topbar-badge {
+            background: rgba(253,205,98,0.2); border: 1px solid rgba(253,205,98,0.4);
+            color: #fdcd62; font-size: 0.75rem; font-weight: 600;
+            padding: 0.3rem 0.9rem; border-radius: 2rem; display: flex; align-items: center; gap: 5px;
+        }
+        .btn-sair {
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.7); font-size: 0.8rem; font-weight: 600;
+            padding: 0.4rem 1rem; border-radius: 0.7rem; cursor: pointer;
+            text-decoration: none; transition: all 0.25s; display: flex; align-items: center; gap: 6px;
+        }
+        .btn-sair:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+        /* ── HERO ── */
+        .hero {
+            padding: 2.5rem 2rem 1.5rem;
+            max-width: 1060px; margin: 0 auto;
+        }
+        .hero-inner { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+        .hero h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.9rem; font-weight: 800; color: #7d2728; margin-bottom: 0.3rem;
+        }
+        .hero p { color: #a08080; font-size: 0.93rem; }
+        .hero-divider {
+            width: 60px; height: 4px;
+            background: linear-gradient(90deg, #fdcd62, #d33327);
+            border-radius: 4px; margin: 0.9rem 0 0;
+        }
+        .hero-badge {
+            background: rgba(211,51,39,0.08); border: 1px solid rgba(211,51,39,0.18);
+            color: #7d2728; font-size: 0.78rem; font-weight: 700;
+            padding: 0.45rem 1rem; border-radius: 2rem; display: flex; align-items: center; gap: 6px;
+        }
+
+        /* ── GRID 5 NIVEIS ── */
+        .niveis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 1.4rem;
+            max-width: 1060px;
+            margin: 0 auto;
+            padding: 0.5rem 2rem 3rem;
+        }
+
+        /* ── CARD ── */
+        .nc {
+            background: #fff;
+            border-radius: 1.8rem;
+            padding: 2rem;
+            box-shadow: 0 4px 24px rgba(125,39,40,0.07);
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.32s cubic-bezier(0.22,1,0.36,1);
+            position: relative; overflow: hidden;
+            text-decoration: none; display: block;
+        }
+        .nc::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: var(--nc-gradient); opacity: 0; transition: opacity 0.3s;
+        }
+        .nc:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 20px 48px rgba(0,0,0,0.13);
+            border-color: rgba(0,0,0,0.06);
+        }
+        .nc:hover::before { opacity: 1; }
+
+        .nc-icon {
+            width: 68px; height: 68px; border-radius: 1.3rem;
+            background: var(--nc-gradient);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; color: #fff; margin-bottom: 1.3rem;
+            box-shadow: 0 8px 22px var(--nc-shadow);
+            transition: transform 0.3s;
+        }
+        .nc:hover .nc-icon { transform: scale(1.08) rotate(-3deg); }
+
+        .nc-pill {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 0.67rem; font-weight: 800; letter-spacing: 0.9px;
+            text-transform: uppercase; color: #fff;
+            background: var(--nc-gradient);
+            padding: 0.22rem 0.7rem; border-radius: 2rem;
+            margin-bottom: 0.65rem;
+        }
+
+        .nc h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.22rem; font-weight: 800; color: #3d1a1b;
+            margin-bottom: 0.4rem;
+        }
+        .nc p {
+            font-size: 0.84rem; color: #a08080; line-height: 1.55;
+            margin-bottom: 1.4rem;
+        }
+        .nc-btn {
+            display: inline-flex; align-items: center; gap: 7px;
+            background: var(--nc-gradient);
+            color: #fff; border: none; border-radius: 0.9rem;
+            padding: 0.65rem 1.2rem; font-size: 0.83rem; font-weight: 700;
+            cursor: pointer; font-family: 'Inter', sans-serif;
+            transition: box-shadow 0.25s;
+        }
+        .nc:hover .nc-btn { box-shadow: 0 8px 20px var(--nc-shadow); }
+
+        /* status dot */
+        .nc-status {
+            position: absolute; top: 1.4rem; right: 1.4rem;
+            width: 10px; height: 10px; border-radius: 50%;
+            background: #e0d8d0;
+            transition: background 0.3s;
+        }
+        .nc-status.ok { background: #2ecc71; box-shadow: 0 0 0 3px rgba(46,204,113,0.2); }
+
+        /* ── FOOTER ── */
+        .footer-adm {
+            text-align: center; padding: 1rem;
+            color: #c0aba8; font-size: 0.78rem;
+        }
+    </style>
+</head>
+<body>
+<script>
+// Verificação de acesso — redireciona se não autenticado
+if (sessionStorage.getItem('adm_ok') !== 'niveis-ensino') {
+    window.location.replace('index.html');
+}
+</script>
+
+<div class="topbar">
+    <div class="topbar-left">
+        <a href="index.html" class="btn-voltar" title="Voltar ao painel"><i class="fas fa-arrow-left"></i></a>
+        <div class="topbar-title">
+            <h1><i class="fas fa-graduation-cap" style="color:#fdcd62;margin-right:6px;"></i>Níveis de Ensino</h1>
+            <span>Gerenciamento de Conteúdo</span>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <div class="topbar-badge"><i class="fas fa-user-circle"></i> Marketing</div>
+        <a href="#" onclick="window.top.location.replace('/');return false;" class="btn-sair">
+            <i class="fas fa-sign-out-alt"></i> Sair
+        </a>
+    </div>
+</div>
+
+<div class="hero">
+    <div class="hero-inner">
+        <div>
+            <h2><i class="fas fa-layer-group" style="color:#fdcd62;margin-right:10px;"></i>Selecione o Nível</h2>
+            <p>Gerencie imagens, textos e informações de cada nível de ensino</p>
+            <div class="hero-divider"></div>
+        </div>
+        <div class="hero-badge"><i class="fas fa-info-circle"></i> 5 níveis disponíveis</div>
+    </div>
+</div>
+
+<div class="niveis-grid">
+
+    <!-- EDUCAÇÃO INFANTIL -->
+    <a class="nc" href="niveis-ensino-infantil.html"
+       style="--nc-gradient:linear-gradient(135deg,#FF8C42,#E5570A);--nc-shadow:rgba(255,140,66,0.38);">
+        <div class="nc-status" id="st-infantil"></div>
+        <div class="nc-icon"><i class="fas fa-child"></i></div>
+        <span class="nc-pill"><i class="fas fa-circle" style="font-size:0.5rem;"></i> 0 — 5 anos</span>
+        <h3>Educação Infantil</h3>
+        <p>Berçário, Maternal I, II e III, Jardim e Pré-Escolar. Estimulação e desenvolvimento integral nos primeiros anos de vida.</p>
+        <div class="nc-btn"><i class="fas fa-pen"></i> Gerenciar Conteúdo</div>
+    </a>
+
+    <!-- ANOS INICIAIS -->
+    <a class="nc" href="niveis-ensino-iniciais.html"
+       style="--nc-gradient:linear-gradient(135deg,#3FA9F5,#1A78CF);--nc-shadow:rgba(63,169,245,0.38);">
+        <div class="nc-status" id="st-iniciais"></div>
+        <div class="nc-icon"><i class="fas fa-book-open"></i></div>
+        <span class="nc-pill"><i class="fas fa-circle" style="font-size:0.5rem;"></i> 6 — 10 anos</span>
+        <h3>Anos Iniciais</h3>
+        <p>1º ao 5º Ano do Ensino Fundamental. Base sólida em leitura, escrita, raciocínio lógico e ciências.</p>
+        <div class="nc-btn"><i class="fas fa-pen"></i> Gerenciar Conteúdo</div>
+    </a>
+
+    <!-- ANOS FINAIS -->
+    <a class="nc" href="niveis-ensino-finais.html"
+       style="--nc-gradient:linear-gradient(135deg,#2ECC71,#1E9E56);--nc-shadow:rgba(46,204,113,0.38);">
+        <div class="nc-status" id="st-finais"></div>
+        <div class="nc-icon"><i class="fas fa-book"></i></div>
+        <span class="nc-pill"><i class="fas fa-circle" style="font-size:0.5rem;"></i> 11 — 14 anos</span>
+        <h3>Anos Finais</h3>
+        <p>6º ao 9º Ano do Ensino Fundamental. Aprofundamento disciplinar e construção da identidade do estudante.</p>
+        <div class="nc-btn"><i class="fas fa-pen"></i> Gerenciar Conteúdo</div>
+    </a>
+
+    <!-- ENSINO MÉDIO -->
+    <a class="nc" href="niveis-ensino-medio.html"
+       style="--nc-gradient:linear-gradient(135deg,#D33327,#7D2728);--nc-shadow:rgba(211,51,39,0.38);">
+        <div class="nc-status" id="st-medio"></div>
+        <div class="nc-icon"><i class="fas fa-graduation-cap"></i></div>
+        <span class="nc-pill"><i class="fas fa-circle" style="font-size:0.5rem;"></i> 15 — 17 anos</span>
+        <h3>Ensino Médio</h3>
+        <p>1º ao 3º Ano. Formação completa com foco em ENEM, vestibulares e desenvolvimento humano integral.</p>
+        <div class="nc-btn"><i class="fas fa-pen"></i> Gerenciar Conteúdo</div>
+    </a>
+
+    <!-- PRÉ-UNIVERSITÁRIO -->
+    <a class="nc" href="niveis-ensino-pre.html"
+       style="--nc-gradient:linear-gradient(135deg,#9B59B6,#6C3483);--nc-shadow:rgba(155,89,182,0.38);">
+        <div class="nc-status" id="st-pre"></div>
+        <div class="nc-icon"><i class="fas fa-university"></i></div>
+        <span class="nc-pill"><i class="fas fa-circle" style="font-size:0.5rem;"></i> 17 — 18 anos</span>
+        <h3>Pré-Universitário</h3>
+        <p>Preparação intensiva para os principais vestibulares e ENEM. Metodologia focada em aprovação.</p>
+        <div class="nc-btn"><i class="fas fa-pen"></i> Gerenciar Conteúdo</div>
+    </a>
+
+</div>
+
+<div class="footer-adm">&copy; 2026 Colégio Batista Santos Dumont — Sistema Administrativo</div>
+
+<script>
+// Verifica se cada nível já tem conteúdo configurado (dot verde)
+var niveis = [
+    { id: 'infantil', pasta: 'niveis/infantil' },
+    { id: 'iniciais', pasta: 'niveis/iniciais' },
+    { id: 'finais',   pasta: 'niveis/finais'   },
+    { id: 'medio',    pasta: 'niveis/medio'    },
+    { id: 'pre',      pasta: 'niveis/pre'      }
+];
+niveis.forEach(function(n){
+    fetch('/files/portal/'+n.pasta+'/conteudo.json?v='+Date.now())
+        .then(function(r){ if(r.ok) document.getElementById('st-'+n.id).classList.add('ok'); })
+        .catch(function(){});
+});
+</script>
+</body>
+</html>
+

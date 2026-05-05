@@ -283,7 +283,7 @@
 
     <!-- HERO -->
     <div class="hero" id="heroSection">
-        <img src="/files/preVestibular/capa.png" class="hero-bg" alt="" onerror="this.src='/files/preVestibular/capa.jpg';">
+        <img id="heroBg" class="hero-bg" alt="">
         <div class="hero-overlay"></div>
     </div>
 
@@ -307,7 +307,7 @@
                     <span class="proposta-icone">🎓</span>
                     <div class="sec-title">Nossa <span>Proposta</span><br>Pedagógica</div>
                     <div class="sec-line"></div>
-                    <p class="sec-sub">O Ensino Médio no Colégio Batista Santos Dumont prepara o aluno para os maiores desafios da vida acadêmica e profissional. Com foco no ENEM e nos principais vestibulares do país, nosso currículo alia profundidade de conteúdo, raciocínio crítico e formação de caráter.<br><br>
+                    <p class="sec-sub" id="cj-descricao">O Ensino Médio no Colégio Batista Santos Dumont prepara o aluno para os maiores desafios da vida acadêmica e profissional. Com foco no ENEM e nos principais vestibulares do país, nosso currículo alia profundidade de conteúdo, raciocínio crítico e formação de caráter.<br><br>
                     Professores experientes, simulados periódicos, aulas preparatórias e suporte individualizado fazem do nosso Ensino Médio referência em aprovações nas melhores universidades.</p>
                 </div>
             </div>
@@ -760,8 +760,25 @@ function renderDocumentacao(dados) {
 }
 carregarDados('preVestibular/documentos', renderDocumentacao);
 
+// Carrega banner e atualiza automaticamente a cada 30 segundos
+(function(){ var el=document.getElementById('heroBg'); function f(){ if(el) el.src='/files/preVestibular/capa.png?v='+Date.now(); } f(); setInterval(f,30000); })();
+
 carregarDados('preVestibular/galeria',   renderGaleria);
 carregarDados('preVestibular/momentos',  renderMomentos);
+setInterval(function(){ carregarDados('preVestibular/galeria', renderGaleria); carregarDados('preVestibular/momentos', renderMomentos); }, 30000);
+(function(){
+    function pollConteudo(){
+        var x=new XMLHttpRequest();
+        x.open('GET','/files/preVestibular/conteudo.json?t='+Date.now(),true);
+        x.onreadystatechange=function(){
+            if(x.readyState!==4||x.status!==200) return;
+            try{ var d=JSON.parse(x.responseText); if(d.descricao){var el=document.getElementById('cj-descricao');if(el)el.innerHTML=d.descricao;} }catch(e){}
+        };
+        x.send();
+    }
+    pollConteudo();
+    setInterval(pollConteudo,30000);
+})();
 carregarDados('preVestibular/estrutura', renderEstrutura);
 </script>
 <button class="btn-indicar-float-sub" onclick="try{window.parent.abrirModalIndicar();}catch(e){}"><i class="fas fa-user-friends"></i> Indique um Amigo</button>

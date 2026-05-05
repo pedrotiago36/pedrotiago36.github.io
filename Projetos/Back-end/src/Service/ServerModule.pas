@@ -69,14 +69,23 @@ begin
 end;
 
 { Lista imagens de uma pasta e retorna JSON array }
-function ListarPNGs(const pasta: string): string;
+function ListarPNGs(const pasta: string; raw: Boolean): string;
 var
-  dir: string;
+  dir, urlBase: string;
   files: TStringDynArray;
   sb: TStringBuilder;
-  f, nome, urlBase, ext: string;
+  f, nome, ext: string;
 begin
-  dir := PastaFisica(pasta);
+  if raw then
+  begin
+    dir     := BASE_FRONTEND + StringReplace(pasta, '/', '\', [rfReplaceAll]) + '\';
+    urlBase := '/files/' + pasta + '/';
+  end
+  else
+  begin
+    dir     := PastaFisica(pasta);
+    urlBase := '/files/portal/' + pasta + '/';
+  end;
   sb := TStringBuilder.Create;
   try
     sb.Append('[');
@@ -87,9 +96,8 @@ begin
       begin
         nome := TPath.GetFileName(f);
         ext  := LowerCase(TPath.GetExtension(nome));
-        if (ext <> '.png') and (ext <> '.jpg') and (ext <> '.jpeg') and (ext <> '.webp') then
+        if (ext <> '.png') and (ext <> '.jpg') and (ext <> '.jpeg') and (ext <> '.webp') and (ext <> '.gif') then
           Continue;
-        urlBase := '/files/portal/' + pasta + '/';
         if sb.Length > 1 then sb.Append(',');
         sb.Append('{"nome":"').Append(nome)
           .Append('","url":"').Append(urlBase).Append(nome).Append('"}');
@@ -109,6 +117,7 @@ var
   bytes: TBytes;
   fs: TFileStream;
   jsonFile: TStringList;
+  rawmode: Boolean;
 begin
   doc := ARequestInfo.Document;
   AResponseInfo.ContentType := 'application/json; charset=utf-8';
@@ -124,8 +133,8 @@ begin
     Exit;
   end;
 
-  // ── GET /files/portal/... → serve da pasta do Front-End ─────────
-  if (ARequestInfo.Command = 'GET') and StartsStr('/files/portal/', doc) then
+  // ── GET /files/... → serve da pasta do Front-End ─────────────────
+  if (ARequestInfo.Command = 'GET') and StartsStr('/files/', doc) then
   begin
     filePath := BASE_FRONTEND + StringReplace(
       Copy(doc, Length('/files/') + 1, MaxInt), '/', '\', [rfReplaceAll]);
@@ -138,6 +147,8 @@ begin
       else if ext = '.webp' then AResponseInfo.ContentType := 'image/webp'
       else if ext = '.gif'  then AResponseInfo.ContentType := 'image/gif'
       else if ext = '.json' then AResponseInfo.ContentType := 'application/json; charset=utf-8'
+      else if ext = '.html' then AResponseInfo.ContentType := 'text/html; charset=utf-8'
+      else if ext = '.pdf'  then AResponseInfo.ContentType := 'application/pdf'
       else                       AResponseInfo.ContentType := 'application/octet-stream';
       AResponseInfo.ResponseNo := 200;
       AResponseInfo.ContentStream := TFileStream.Create(filePath, fmOpenRead or fmShareDenyNone);
@@ -147,24 +158,25 @@ begin
     Exit;
   end;
 
-  // ── GET /listar?pasta=slider ────────────────────────────────────
+  // ── GET /listar?pasta=slider[&raw=1] ────────────────────────────
   if (ARequestInfo.Command = 'GET') and StartsStr('/listar', doc) then
   begin
     pasta := ARequestInfo.Params.Values['pasta'];
     if pasta = '' then pasta := 'slider';
     AResponseInfo.ResponseNo := 200;
-    AResponseInfo.ContentText := ListarPNGs(pasta);
+    AResponseInfo.ContentText := ListarPNGs(pasta, ARequestInfo.Params.Values['raw'] = '1');
     Handled := True;
     Exit;
   end;
 
-  // ── POST /deletar  { "nome":"x.png", "pasta":"slider" } ─────────────
+  // ── POST /deletar  { "nome":"x.png", "pasta":"slider"[, "rawmode":"1"] }
   if (ARequestInfo.Command = 'POST') and (doc = '/deletar') then
   begin
     try
-      body  := LerBody(ARequestInfo.PostStream);
-      nome  := JsonGet(body, 'nome');
-      pasta := JsonGet(body, 'pasta');
+      body    := LerBody(ARequestInfo.PostStream);
+      nome    := JsonGet(body, 'nome');
+      pasta   := JsonGet(body, 'pasta');
+      rawmode := JsonGet(body, 'rawmode') = '1';
 
       if (nome = '') or (pasta = '') then
       begin
@@ -174,7 +186,10 @@ begin
         Exit;
       end;
 
-      filePath := PastaFisica(pasta) + nome;
+      if rawmode then
+        filePath := BASE_FRONTEND + StringReplace(pasta, '/', '\', [rfReplaceAll]) + '\' + nome
+      else
+        filePath := PastaFisica(pasta) + nome;
 
       if TFile.Exists(filePath) then
         TFile.Delete(filePath);
@@ -196,14 +211,15 @@ begin
     Exit;
   end;
 
-  // ── POST /upload  { "nome":"x.png", "pasta":"slider", "base64":"..." } ──
+  // ── POST /upload  { "nome":"x.png", "pasta":"slider", "base64":"..."[, "rawmode":"1"] }
   if (ARequestInfo.Command = 'POST') and (doc = '/upload') then
   begin
     try
-      body  := LerBody(ARequestInfo.PostStream);
-      nome  := JsonGet(body, 'nome');
-      pasta := JsonGet(body, 'pasta');
-      b64   := JsonGet(body, 'base64');
+      body    := LerBody(ARequestInfo.PostStream);
+      nome    := JsonGet(body, 'nome');
+      pasta   := JsonGet(body, 'pasta');
+      b64     := JsonGet(body, 'base64');
+      rawmode := JsonGet(body, 'rawmode') = '1';
 
       // Remove prefixo data:image/...;base64,
       if Pos(',', b64) > 0 then
@@ -217,10 +233,18 @@ begin
         Exit;
       end;
 
-      filePath := PastaFisica(pasta) + nome;
-
-      if not TDirectory.Exists(PastaFisica(pasta)) then
-        TDirectory.CreateDirectory(PastaFisica(pasta));
+      if rawmode then
+      begin
+        filePath := BASE_FRONTEND + StringReplace(pasta, '/', '\', [rfReplaceAll]) + '\' + nome;
+        if not TDirectory.Exists(ExtractFilePath(filePath)) then
+          TDirectory.CreateDirectory(ExtractFilePath(filePath));
+      end
+      else
+      begin
+        filePath := PastaFisica(pasta) + nome;
+        if not TDirectory.Exists(PastaFisica(pasta)) then
+          TDirectory.CreateDirectory(PastaFisica(pasta));
+      end;
 
       bytes := TNetEncoding.Base64.DecodeStringToBytes(b64);
       fs := TFileStream.Create(filePath, fmCreate);
@@ -230,17 +254,83 @@ begin
         fs.Free;
       end;
 
-      // Cria JSON de metadados vazio ao lado da imagem
+      if not rawmode then
+      begin
+        // Cria JSON de metadados vazio ao lado da imagem
+        jsonFile := TStringList.Create;
+        try
+          jsonFile.Text := '{}';
+          jsonFile.SaveToFile(ChangeFileExt(filePath, '.json'), TEncoding.UTF8);
+        finally
+          jsonFile.Free;
+        end;
+      end;
+
+      AResponseInfo.ResponseNo := 200;
+      AResponseInfo.ContentText := '{"ok":true,"arquivo":"' + nome + '"}';
+    except
+      on E: Exception do
+      begin
+        AResponseInfo.ResponseNo := 500;
+        AResponseInfo.ContentText := '{"erro":"' + E.Message + '"}';
+      end;
+    end;
+    Handled := True;
+    Exit;
+  end;
+
+  // ── POST /salvar-texto  { "pasta":"...", "nome":"conteudo.json", "base64":"..."[, "rawmode":"1"] }
+  if (ARequestInfo.Command = 'POST') and (doc = '/salvar-texto') then
+  begin
+    try
+      body    := LerBody(ARequestInfo.PostStream);
+      nome    := JsonGet(body, 'nome');
+      pasta   := JsonGet(body, 'pasta');
+      b64     := JsonGet(body, 'base64');
+      rawmode := JsonGet(body, 'rawmode') = '1';
+
+      if (nome = '') or (b64 = '') then
+      begin
+        AResponseInfo.ResponseNo := 400;
+        AResponseInfo.ContentText := '{"erro":"campos obrigatorios: nome, base64"}';
+        Handled := True;
+        Exit;
+      end;
+
+      if rawmode then
+      begin
+        if pasta = '' then
+          filePath := BASE_FRONTEND + nome
+        else
+          filePath := BASE_FRONTEND + StringReplace(pasta, '/', '\', [rfReplaceAll]) + '\' + nome;
+      end
+      else
+      begin
+        if pasta = '' then
+        begin
+          AResponseInfo.ResponseNo := 400;
+          AResponseInfo.ContentText := '{"erro":"campo pasta obrigatorio no modo portal"}';
+          Handled := True;
+          Exit;
+        end;
+        filePath := BASE_FRONTEND + 'portal\' +
+                    StringReplace(pasta, '/', '\', [rfReplaceAll]) + '\' + nome;
+      end;
+
+      if not TDirectory.Exists(ExtractFilePath(filePath)) then
+        TDirectory.CreateDirectory(ExtractFilePath(filePath));
+
+      bytes := TNetEncoding.Base64.DecodeStringToBytes(b64);
       jsonFile := TStringList.Create;
       try
-        jsonFile.Text := '{}';
-        jsonFile.SaveToFile(ChangeFileExt(filePath, '.json'), TEncoding.UTF8);
+        jsonFile.Text := TEncoding.UTF8.GetString(bytes);
+        jsonFile.SaveToFile(filePath, TEncoding.UTF8);
       finally
         jsonFile.Free;
       end;
 
       AResponseInfo.ResponseNo := 200;
-      AResponseInfo.ContentText := '{"ok":true,"arquivo":"' + nome + '"}';
+      AResponseInfo.ContentText := '{"ok":true}';
     except
       on E: Exception do
       begin

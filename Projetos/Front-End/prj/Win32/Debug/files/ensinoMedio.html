@@ -230,7 +230,7 @@
 
     <!-- HERO -->
     <div class="hero" id="heroSection">
-        <img src="/files/Medio/capa.png" class="hero-bg" alt="" onerror="this.src='/files/Medio/capa.jpg';">
+        <img id="heroBg" class="hero-bg" alt="">
         <div class="hero-overlay"></div>
     </div>
 
@@ -254,7 +254,7 @@
                     <span class="proposta-icone">📖</span>
                     <div class="sec-title">Nossa <span>Proposta</span><br>Pedagógica</div>
                     <div class="sec-line"></div>
-                    <p class="sec-sub">O Ensino Médio no Colégio Batista Santos Dumont combina rigor acadêmico, valores cristãos e preparação completa para os maiores desafios da vida universitária e profissional.<br><br>
+                    <p class="sec-sub" id="cj-descricao">O Ensino Médio no Colégio Batista Santos Dumont combina rigor acadêmico, valores cristãos e preparação completa para os maiores desafios da vida universitária e profissional.<br><br>
                     Com professores experientes, metodologias ativas e acompanhamento individualizado, formamos jovens preparados para os melhores vestibulares e para a vida.</p>
                 </div>
             </div>
@@ -560,8 +560,25 @@ function carregarViaBridge(pasta, cb) {
     }, 200);
 }
 
+// Carrega banner e atualiza automaticamente a cada 30 segundos
+(function(){ var el=document.getElementById('heroBg'); function f(){ if(el) el.src='/files/Medio/capa.png?v='+Date.now(); } f(); setInterval(f,30000); })();
+
 carregarDados('Medio/galeria',   renderGaleria);
 carregarDados('Medio/momentos',  renderMomentos);
+setInterval(function(){ carregarDados('Medio/galeria', renderGaleria); carregarDados('Medio/momentos', renderMomentos); }, 30000);
+(function(){
+    function pollConteudo(){
+        var x=new XMLHttpRequest();
+        x.open('GET','/files/Medio/conteudo.json?t='+Date.now(),true);
+        x.onreadystatechange=function(){
+            if(x.readyState!==4||x.status!==200) return;
+            try{ var d=JSON.parse(x.responseText); if(d.descricao){var el=document.getElementById('cj-descricao');if(el)el.innerHTML=d.descricao;} }catch(e){}
+        };
+        x.send();
+    }
+    pollConteudo();
+    setInterval(pollConteudo,30000);
+})();
 carregarDados('Medio/estrutura', renderEstrutura);
 </script>
 <button class="btn-indicar-float-sub" onclick="try{window.parent.abrirModalIndicar();}catch(e){}"><i class="fas fa-user-friends"></i> Indique um Amigo</button>

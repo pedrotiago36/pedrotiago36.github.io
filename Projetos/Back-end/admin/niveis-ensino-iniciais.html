@@ -1,0 +1,674 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anos Iniciais — Gerenciar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { font-family: 'Inter', sans-serif; background: #f5f0eb; color: #2d2d2d; }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            background: linear-gradient(135deg, #7d2728, #3d1a1b);
+            padding: 0 2rem; height: 64px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 1rem; }
+        .btn-voltar {
+            width: 38px; height: 38px; border-radius: 0.7rem;
+            background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+            color: #fff; font-size: 0.9rem; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; text-decoration: none; transition: all 0.25s;
+        }
+        .btn-voltar:hover { background: rgba(255,255,255,0.22); }
+        .topbar-title h1 { font-family: 'Poppins', sans-serif; font-size: 1.1rem; font-weight: 700; color: #fff; }
+        .topbar-title span { font-size: 0.72rem; color: rgba(255,255,255,0.55); }
+        .topbar-right { display: flex; align-items: center; gap: 0.8rem; }
+        .topbar-badge {
+            background: rgba(253,205,98,0.2); border: 1px solid rgba(253,205,98,0.4);
+            color: #fdcd62; font-size: 0.75rem; font-weight: 600;
+            padding: 0.3rem 0.9rem; border-radius: 2rem; display: flex; align-items: center; gap: 5px;
+        }
+        .btn-sair {
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.7); font-size: 0.8rem; font-weight: 600;
+            padding: 0.4rem 1rem; border-radius: 0.7rem; cursor: pointer;
+            text-decoration: none; transition: all 0.25s; display: flex; align-items: center; gap: 6px;
+        }
+        .btn-sair:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+        /* ── LAYOUT ── */
+        .layout { display: flex; min-height: calc(100vh - 64px); }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: 224px; flex-shrink: 0; background: #fff;
+            border-right: 1px solid rgba(125,39,40,0.1);
+            padding: 1.5rem 0;
+            position: sticky; top: 64px; height: calc(100vh - 64px); overflow-y: auto;
+        }
+        .sb-nivel-tag {
+            margin: 0 0.9rem 1.2rem;
+            background: linear-gradient(135deg,#3FA9F5,#1A78CF);
+            border-radius: 0.9rem; padding: 0.75rem 1rem;
+            display: flex; align-items: center; gap: 10px; color: #fff;
+        }
+        .sb-nivel-tag i { font-size: 1.3rem; }
+        .sb-nivel-tag span { font-family:'Poppins',sans-serif; font-size:0.85rem; font-weight:700; line-height:1.2; }
+        .sb-nivel-tag small { font-size:0.65rem; opacity:0.8; display:block; }
+        .sb-group { font-size: 0.63rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; padding: 1rem 1.2rem 0.4rem; }
+        .sb-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 0.78rem 1.2rem; margin: 0.08rem 0.6rem;
+            border-radius: 0.8rem; cursor: pointer; font-size: 0.88rem; font-weight: 500; color: #5a3a2e;
+            transition: all 0.2s; text-decoration: none; user-select: none;
+        }
+        .sb-item i { width: 18px; text-align: center; color: #d33327; font-size: 0.95rem; }
+        .sb-item:hover { background: rgba(211,51,39,0.07); color: #d33327; }
+        .sb-item.ativo {
+            background: linear-gradient(135deg, rgba(211,51,39,0.12), rgba(125,39,40,0.06));
+            color: #7d2728; font-weight: 700;
+            border-left: 3px solid #d33327; padding-left: calc(1.2rem - 3px);
+        }
+        .sb-item .cnt {
+            margin-left: auto; background: rgba(211,51,39,0.1); color: #d33327;
+            font-size: 0.68rem; font-weight: 800; padding: 0.15rem 0.55rem; border-radius: 2rem;
+        }
+        .sb-divider { height: 1px; background: rgba(125,39,40,0.08); margin: 0.8rem 1rem; }
+
+        /* ── MAIN ── */
+        .main { flex: 1; padding: 2rem; overflow-x: hidden; max-width: calc(100vw - 224px); }
+
+        /* ── PANELS ── */
+        .panel { display: none; }
+        .panel.ativo { display: block; animation: fadein 0.28s ease; }
+        @keyframes fadein { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+        /* ── PAGE HEADER ── */
+        .ph { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.8rem; flex-wrap: wrap; gap: 1rem; }
+        .ph h2 { font-family: 'Poppins', sans-serif; font-size: 1.55rem; font-weight: 800; color: #7d2728; margin-bottom: 0.2rem; }
+        .ph p { color: #999; font-size: 0.87rem; }
+
+        /* ── BUTTONS ── */
+        .btn-add {
+            display: inline-flex; align-items: center; gap: 7px;
+            background: linear-gradient(135deg, #d33327, #7d2728);
+            color: #fff; border: none; border-radius: 0.9rem;
+            padding: 0.7rem 1.4rem; font-size: 0.88rem; font-weight: 700;
+            cursor: pointer; transition: all 0.25s; white-space: nowrap; font-family: 'Inter', sans-serif;
+            text-decoration: none;
+        }
+        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(211,51,39,0.35); }
+        .btn-save {
+            display: inline-flex; align-items: center; gap: 7px;
+            background: linear-gradient(135deg, #27ae60, #1e8449);
+            color: #fff; border: none; border-radius: 0.9rem;
+            padding: 0.7rem 1.4rem; font-size: 0.88rem; font-weight: 700;
+            cursor: pointer; transition: all 0.25s; white-space: nowrap; font-family: 'Inter', sans-serif;
+        }
+        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(39,174,96,0.35); }
+        .btn-del {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: rgba(211,51,39,0.08); color: #c0392b;
+            border: 1px solid rgba(211,51,39,0.2); border-radius: 0.6rem;
+            padding: 0.42rem 0.8rem; font-size: 0.78rem; font-weight: 700;
+            cursor: pointer; transition: all 0.22s; font-family: 'Inter', sans-serif;
+        }
+        .btn-del:hover { background: #d33327; color: #fff; border-color: #d33327; }
+        .btn-swap {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: rgba(125,39,40,0.07); color: #7d2728;
+            border: 1px solid rgba(125,39,40,0.18); border-radius: 0.6rem;
+            padding: 0.42rem 0.8rem; font-size: 0.78rem; font-weight: 700;
+            cursor: pointer; transition: all 0.22s; font-family: 'Inter', sans-serif;
+        }
+        .btn-swap:hover { background: #7d2728; color: #fff; }
+
+        /* ── BOX ── */
+        .box {
+            background: #fff; border-radius: 1.4rem;
+            padding: 1.5rem; box-shadow: 0 2px 16px rgba(125,39,40,0.07);
+            margin-bottom: 1.5rem;
+        }
+        .box-title {
+            font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 700; color: #7d2728;
+            margin-bottom: 1.2rem; display: flex; align-items: center; gap: 8px;
+            padding-bottom: 0.9rem; border-bottom: 2px solid rgba(253,205,98,0.3);
+        }
+        .box-title i { color: #fdcd62; }
+        .box-title .lbl { margin-left: auto; font-size: 0.75rem; font-weight: 600; color: #bbb; background: #f5f0eb; padding: 0.2rem 0.65rem; border-radius: 2rem; }
+
+        /* ── BANNER ── */
+        .banner-wrap { border-radius: 1rem; overflow: hidden; position: relative; margin-bottom: 1rem; border: 2px solid rgba(125,39,40,0.1); }
+        .banner-wrap img { width: 100%; aspect-ratio: 16/6; object-fit: cover; display: block; }
+        .banner-empty {
+            width: 100%; aspect-ratio: 16/6;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #f0e8e8, #fdf5f5); gap: 0.6rem;
+        }
+        .banner-empty i { font-size: 3rem; color: #d33327; opacity: 0.12; }
+        .banner-empty p { color: #ccc; font-size: 0.88rem; }
+        .banner-actions { position: absolute; top: 0.7rem; right: 0.7rem; display: flex; gap: 0.4rem; }
+
+        /* ── GALERIA ── */
+        .gal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+        .gal-card { border-radius: 0.9rem; overflow: hidden; border: 2px solid rgba(125,39,40,0.1); background: #fdfafa; transition: all 0.25s; }
+        .gal-card:hover { border-color: rgba(211,51,39,0.35); box-shadow: 0 6px 18px rgba(211,51,39,0.1); }
+        .gal-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
+        .gal-ph { width: 100%; aspect-ratio: 4/3; display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg,#f0e8e8,#fdf5f5); }
+        .gal-ph i { font-size:1.8rem; color:#d33327; opacity:0.15; }
+        .gal-info { padding: 0.55rem; }
+        .gal-name { font-size: 0.72rem; font-weight: 600; color: #5a3a2e; margin-bottom: 0.35rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* ── DROP ZONE ── */
+        .drop-zone {
+            border: 2px dashed rgba(211,51,39,0.22); border-radius: 1rem;
+            padding: 1.6rem; text-align: center; cursor: pointer;
+            transition: all 0.3s; background: rgba(211,51,39,0.015);
+        }
+        .drop-zone:hover, .drop-zone.drag-over { border-color: #d33327; background: rgba(211,51,39,0.06); }
+        .drop-zone i { font-size: 1.9rem; color: rgba(211,51,39,0.22); display: block; margin-bottom: 0.5rem; }
+        .drop-zone p { font-size: 0.87rem; color: #bbb; margin-bottom: 0.18rem; }
+        .drop-zone small { font-size: 0.73rem; color: #ccc; }
+
+        /* ── CAMPOS ── */
+        .field-group { margin-bottom: 1.2rem; }
+        .field-label {
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
+            color: #7d2728; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 6px;
+        }
+        .field-label i { color: #fdcd62; }
+        .field-input, .field-ta {
+            width: 100%; padding: 0.75rem 1rem;
+            border: 2px solid rgba(125,39,40,0.13); border-radius: 0.8rem;
+            font-size: 0.9rem; font-family: 'Inter', sans-serif; color: #2d2d2d;
+            background: #fdfafa; transition: border-color 0.25s; outline: none;
+        }
+        .field-input:focus, .field-ta:focus { border-color: #d33327; background: #fff; }
+        .field-ta { min-height: 110px; resize: vertical; line-height: 1.6; }
+        .field-hint { font-size: 0.72rem; color: #bbb; margin-top: 0.3rem; }
+        .fields-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 700px) { .fields-2 { grid-template-columns: 1fr; } }
+
+        /* ── DIFERENCIAIS ── */
+        .dif-item { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.65rem; }
+        .dif-icon { color: #fdcd62; flex-shrink: 0; font-size: 0.9rem; }
+
+        /* ── EMPTY ── */
+        .empty { text-align: center; padding: 2.5rem 1rem; color: #ccc; }
+        .empty i { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; }
+        .empty p { font-size: 0.88rem; }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999;
+            background: #fff; border-radius: 1rem; padding: 0.85rem 1.3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.13); border-left: 4px solid #2ecc71;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 0.87rem; font-weight: 600; color: #2d2d2d;
+            transform: translateX(200%); transition: transform 0.35s ease;
+        }
+        .toast.ativo { transform: translateX(0); }
+        .toast i { color: #2ecc71; }
+        .toast.erro { border-left-color: #e74c3c; }
+        .toast.erro i { color: #e74c3c; }
+    </style>
+</head>
+<body>
+<script>
+// Verificação de acesso — redireciona se não autenticado
+if (sessionStorage.getItem('adm_ok') !== 'niveis-ensino') {
+    window.location.replace('index.html');
+}
+</script>
+
+<div class="topbar">
+    <div class="topbar-left">
+        <a href="niveis-ensino.html" class="btn-voltar" title="Voltar"><i class="fas fa-arrow-left"></i></a>
+        <div class="topbar-title">
+            <h1><i class="fas fa-book-open" style="color:#fdcd62;margin-right:6px;"></i>Anos Iniciais</h1>
+            <span>Níveis de Ensino — Gerenciar Conteúdo</span>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <div class="topbar-badge"><i class="fas fa-user-circle"></i> Marketing</div>
+        <a href="#" onclick="window.top.location.replace('/');return false;" class="btn-sair">
+            <i class="fas fa-sign-out-alt"></i> Sair
+        </a>
+    </div>
+</div>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sb-nivel-tag">
+            <i class="fas fa-book-open"></i>
+            <div><span>Anos Iniciais</span><small>6 — 10 anos</small></div>
+        </div>
+
+        <div class="sb-group">Imagens</div>
+        <a class="sb-item ativo" id="nav-banner" onclick="ir('banner')">
+            <i class="fas fa-image"></i> Banner Principal
+        </a>
+        <a class="sb-item" id="nav-galeria" onclick="ir('galeria')">
+            <i class="fas fa-images"></i> Galeria de Fotos
+            <span class="cnt" id="cnt-galeria">0</span>
+        </a>
+
+        <div class="sb-divider"></div>
+        <div class="sb-group">Conteúdo</div>
+        <a class="sb-item" id="nav-textos" onclick="ir('textos')">
+            <i class="fas fa-pen-nib"></i> Textos e Informações
+        </a>
+        <a class="sb-item" id="nav-difs" onclick="ir('difs')">
+            <i class="fas fa-star"></i> Diferenciais
+            <span class="cnt" id="cnt-difs">0</span>
+        </a>
+    </aside>
+
+    <main class="main">
+
+        <!-- ═══════ BANNER ═══════ -->
+        <div class="panel ativo" id="painel-banner">
+            <div class="ph">
+                <div>
+                    <h2><i class="fas fa-image" style="color:#fdcd62;margin-right:8px;"></i>Banner Principal</h2>
+                    <p>Imagem de destaque exibida no topo da página de Anos Iniciais</p>
+                </div>
+                <button class="btn-add" onclick="document.getElementById('upBanner').click()">
+                    <i class="fas fa-camera"></i> Trocar Banner
+                </button>
+                <input type="file" id="upBanner" accept="image/*" style="display:none" onchange="uploadBanner(this)">
+            </div>
+            <div class="box">
+                <div class="box-title"><i class="fas fa-image"></i> Banner Atual</div>
+                <div id="bannerPreview">
+                    <div class="banner-empty">
+                        <i class="fas fa-panorama"></i>
+                        <p>Nenhum banner cadastrado — clique em "Trocar Banner" para adicionar</p>
+                    </div>
+                </div>
+                <div class="drop-zone" id="dropBanner" onclick="document.getElementById('upBanner').click()" style="margin-top:1rem;">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Arraste a imagem aqui ou clique para selecionar</p>
+                    <small>JPG, PNG, WEBP — Recomendado 1920 × 600 px</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════ GALERIA ═══════ -->
+        <div class="panel" id="painel-galeria">
+            <div class="ph">
+                <div>
+                    <h2><i class="fas fa-images" style="color:#fdcd62;margin-right:8px;"></i>Galeria de Fotos</h2>
+                    <p>Fotos que aparecem na seção de galeria da página de Anos Iniciais</p>
+                </div>
+                <button class="btn-add" onclick="document.getElementById('upGal').click()">
+                    <i class="fas fa-plus"></i> Adicionar Fotos
+                </button>
+                <input type="file" id="upGal" accept="image/*" multiple style="display:none" onchange="addGaleria(this)">
+            </div>
+            <div class="box">
+                <div class="box-title">
+                    <i class="fas fa-th"></i> Fotos Cadastradas
+                    <span class="lbl" id="lbl-galeria">0 imagens</span>
+                </div>
+                <div class="gal-grid" id="galeriaGrid"></div>
+                <div class="drop-zone" id="dropGal" onclick="document.getElementById('upGal').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Arraste as fotos aqui ou clique para selecionar</p>
+                    <small>JPG, PNG, WEBP — Múltiplas imagens aceitas</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════ TEXTOS ═══════ -->
+        <div class="panel" id="painel-textos">
+            <div class="ph">
+                <div>
+                    <h2><i class="fas fa-pen-nib" style="color:#fdcd62;margin-right:8px;"></i>Textos e Informações</h2>
+                    <p>Conteúdo exibido na página de Anos Iniciais do portal</p>
+                </div>
+                <button class="btn-save" onclick="salvarConteudo()">
+                    <i class="fas fa-save"></i> Salvar
+                </button>
+            </div>
+            <div class="box">
+                <div class="box-title"><i class="fas fa-heading"></i> Identificação</div>
+                <div class="fields-2">
+                    <div class="field-group" style="grid-column:1/-1">
+                        <div class="field-label"><i class="fas fa-tag"></i> Título Principal</div>
+                        <input type="text" class="field-input" id="fTitulo" placeholder="Ex: Educação Infantil">
+                    </div>
+                    <div class="field-group" style="grid-column:1/-1">
+                        <div class="field-label"><i class="fas fa-pen"></i> Subtítulo</div>
+                        <input type="text" class="field-input" id="fSubtitulo" placeholder="Ex: 1º ao 5º Ano">
+                    </div>
+                    <div class="field-group">
+                        <div class="field-label"><i class="fas fa-birthday-cake"></i> Faixa Etária</div>
+                        <input type="text" class="field-input" id="fFaixa" placeholder="Ex: 0 a 5 anos">
+                    </div>
+                    <div class="field-group">
+                        <div class="field-label"><i class="fas fa-clock"></i> Turno</div>
+                        <input type="text" class="field-input" id="fTurno" placeholder="Ex: Manhã, Tarde e Integral">
+                    </div>
+                </div>
+            </div>
+            <div class="box">
+                <div class="box-title"><i class="fas fa-align-left"></i> Descrição</div>
+                <div class="field-group">
+                    <div class="field-label"><i class="fas fa-quote-left"></i> Texto de Apresentação</div>
+                    <textarea class="field-ta" id="fDescricao" style="min-height:140px"
+                        placeholder="Descreva a proposta pedagógica e os diferenciais deste nível de ensino..."></textarea>
+                    <div class="field-hint">Exibido como parágrafo principal na página do portal.</div>
+                </div>
+            </div>
+            <div class="box">
+                <div class="box-title"><i class="fas fa-list-ul"></i> Grade Curricular</div>
+                <div class="field-group">
+                    <div class="field-label"><i class="fas fa-book"></i> Componentes Curriculares</div>
+                    <textarea class="field-ta" id="fComponentes" style="min-height:120px"
+                        placeholder="Ex:&#10;Linguagem e Comunicação&#10;Pensamento Matemático&#10;Ciências da Natureza&#10;Arte e Cultura&#10;Movimento e Expressão Corporal"></textarea>
+                    <div class="field-hint">Um componente por linha — aparecem como lista no portal.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════ DIFERENCIAIS ═══════ -->
+        <div class="panel" id="painel-difs">
+            <div class="ph">
+                <div>
+                    <h2><i class="fas fa-star" style="color:#fdcd62;margin-right:8px;"></i>Diferenciais</h2>
+                    <p>Pontos de destaque de Anos Iniciais exibidos no portal</p>
+                </div>
+                <div style="display:flex;gap:0.7rem;">
+                    <button class="btn-add" onclick="addDiferencial()"><i class="fas fa-plus"></i> Adicionar</button>
+                    <button class="btn-save" onclick="salvarConteudo()"><i class="fas fa-save"></i> Salvar</button>
+                </div>
+            </div>
+            <div class="box">
+                <div class="box-title"><i class="fas fa-star"></i> Itens de Destaque</div>
+                <div id="difContainer"></div>
+                <div id="difEmpty" class="empty">
+                    <i class="fas fa-star"></i>
+                    <p>Nenhum diferencial cadastrado.<br>Clique em "Adicionar" para criar.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
+
+<script>
+// ── CONFIGURAÇÕES ──
+var PASTA_BANNER   = 'fundI';
+var PASTA_GAL      = 'fundI/galeria';
+var GAL_PREFIX     = 'fundI/galeria/';
+var GAL_JSON_PASTA = 'fundI';
+var GAL_JSON_NOME  = 'galeria.json';
+var PASTA_CONTEUDO = 'fundI';
+var DEF_TITULO     = 'Anos Iniciais';
+var DEF_SUBTITULO  = '1º ao 5º Ano';
+var DEF_FAIXA      = '6 a 10 anos';
+var DEF_TURNO      = 'Manhã e Tarde';
+// ── HELPERS ──
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escJ(s){ return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+function lerArq(file, cb){ var r=new FileReader(); r.onload=function(e){cb(e.target.result);}; r.readAsDataURL(file); }
+
+var _tt;
+function toast(msg, err){
+    document.getElementById('toastMsg').textContent = msg;
+    var t = document.getElementById('toast');
+    t.classList.toggle('erro', !!err);
+    t.querySelector('i').className = err ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+    t.classList.add('ativo');
+    clearTimeout(_tt);
+    _tt = setTimeout(function(){ t.classList.remove('ativo'); }, 3500);
+}
+
+function confirmar(titulo, nome, cb){
+    var ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    ov.innerHTML =
+        '<div style="background:#fff;border-radius:1.3rem;padding:2rem;max-width:340px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);">'+
+        '<div style="width:52px;height:52px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">'+
+        '<i class="fas fa-trash" style="color:#c0392b;font-size:1.3rem;"></i></div>'+
+        '<h3 style="font-family:Poppins,sans-serif;font-size:1.1rem;margin:0 0 .4rem;color:#2d2d2d;">'+titulo+'</h3>'+
+        (nome?'<p style="color:#888;font-size:.85rem;margin:0 0 1.4rem;">'+nome+'</p>':'<div style="margin-bottom:1.4rem;"></div>')+
+        '<div style="display:flex;gap:.8rem;">'+
+        '<button id="_no" style="flex:1;padding:.65rem;border-radius:.8rem;border:1px solid #ddd;background:#f5f5f5;color:#555;font-weight:600;cursor:pointer;">Cancelar</button>'+
+        '<button id="_yes" style="flex:1;padding:.65rem;border-radius:.8rem;border:none;background:linear-gradient(135deg,#c0392b,#7d2728);color:#fff;font-weight:700;cursor:pointer;">Excluir</button>'+
+        '</div></div>';
+    document.body.appendChild(ov);
+    function fechar(ok){ document.body.removeChild(ov); if(ok) cb(); }
+    ov.querySelector('#_yes').onclick = function(){ fechar(true); };
+    ov.querySelector('#_no').onclick  = function(){ fechar(false); };
+    ov.onclick = function(e){ if(e.target===ov) fechar(false); };
+}
+
+// ─ NAVEGAÇÃO ──
+function ir(sec){
+    document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('ativo'); });
+    document.querySelectorAll('.sb-item').forEach(function(i){ i.classList.remove('ativo'); });
+    document.getElementById('painel-'+sec).classList.add('ativo');
+    document.getElementById('nav-'+sec).classList.add('ativo');
+}
+
+// ── BANNER ──
+function carregarBanner(){
+    var exts = ['png','jpg','jpeg','webp'], idx = 0;
+    function tentar(){
+        if(idx >= exts.length){ renderBanner(null); return; }
+        var nome = 'capa.' + exts[idx++];
+        var url  = '/files/' + PASTA_BANNER + '/' + nome;
+        var img  = new Image();
+        img.onload  = function(){ renderBanner({nome:nome, url:url}); };
+        img.onerror = tentar;
+        img.src = url + '?v=' + Date.now();
+    }
+    tentar();
+}
+
+function renderBanner(banner){
+    var el = document.getElementById('bannerPreview');
+    if(!banner){
+        el.innerHTML = '<div class="banner-empty"><i class="fas fa-panorama"></i><p>Nenhum banner encontrado — clique em "Trocar Banner" para adicionar</p></div>';
+        return;
+    }
+    el.innerHTML =
+        '<div class="banner-wrap">'+
+        '<img src="'+esc(banner.url)+'?v='+Date.now()+'" alt="Banner">'+
+        '<div class="banner-actions">'+
+        '<button class="btn-swap" onclick="document.getElementById(\'upBanner\').click()"><i class="fas fa-camera"></i> Trocar</button>'+
+        '</div></div>';
+}
+
+function uploadBanner(inp){
+    if(!inp.files||!inp.files[0]) return;
+    lerArq(inp.files[0], function(src){
+        fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({nome:'capa.png', pasta:PASTA_BANNER, rawmode:'1', base64:src})
+        }).then(function(r){return r.json();})
+          .then(function(){ try{inp.value='';}catch(e){} carregarBanner(); toast('Banner atualizado!'); })
+          .catch(function(){ toast('Erro ao enviar banner',true); });
+    });
+}
+
+// ── GALERIA ──
+function carregarGaleria(){
+    fetch('/listar?pasta='+encodeURIComponent(PASTA_GAL)+'&raw=1')
+        .then(function(r){ return r.json(); })
+        .then(function(lista){
+            var fotos = lista.filter(function(img){ return !/^capa\./i.test(img.nome); });
+            document.getElementById('cnt-galeria').textContent = fotos.length;
+            renderGaleria(fotos);
+        })
+        .catch(function(){ renderGaleria([]); });
+}
+
+function renderGaleria(lista){
+    var cnt = lista.length;
+    document.getElementById('lbl-galeria').textContent = cnt + (cnt===1?' imagem':' imagens');
+    var g = document.getElementById('galeriaGrid');
+    if(!cnt){
+        g.innerHTML = '<div class="empty" style="grid-column:1/-1"><i class="fas fa-images"></i><p>Nenhuma foto cadastrada.</p></div>';
+        return;
+    }
+    g.innerHTML = lista.map(function(img){
+        var url = '/files/'+PASTA_GAL+'/'+img.nome;
+        return '<div class="gal-card">'+
+            '<img class="gal-img" src="'+esc(url)+'?v='+Date.now()+'" alt="'+esc(img.nome)+'" '+
+                'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'+
+            '<div class="gal-ph" style="display:none"><i class="fas fa-image"></i></div>'+
+            '<div class="gal-info">'+
+            '<div class="gal-name">'+esc(img.nome)+'</div>'+
+            '<button class="btn-del" onclick="excluirGaleria(\''+escJ(img.nome)+'\')" style="width:100%"><i class="fas fa-trash"></i> Excluir</button>'+
+            '</div></div>';
+    }).join('');
+}
+
+function atualizarGaleriaJSON(){
+    fetch('/listar?pasta='+encodeURIComponent(PASTA_GAL)+'&raw=1')
+        .then(function(r){ return r.json(); })
+        .then(function(lista){
+            var entries = lista.map(function(img){ return {imagem: GAL_PREFIX + img.nome}; });
+            var b64;
+            try { b64 = btoa(unescape(encodeURIComponent(JSON.stringify(entries)))); } catch(e){ return; }
+            fetch('/salvar-texto',{method:'POST',headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({pasta:GAL_JSON_PASTA, nome:GAL_JSON_NOME, rawmode:'1', base64:b64})
+            }).catch(function(){});
+        }).catch(function(){});
+}
+
+function addGaleria(inp){
+    if(!inp.files||!inp.files.length) return;
+    var files=Array.prototype.slice.call(inp.files), cnt=0, tot=files.length;
+    files.forEach(function(f){
+        lerArq(f,function(src){
+            fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({nome:f.name, pasta:PASTA_GAL, rawmode:'1', base64:src})
+            }).then(function(r){return r.json();})
+              .then(function(){
+                  if(++cnt===tot){
+                      try{inp.value='';}catch(e){}
+                      carregarGaleria();
+                      atualizarGaleriaJSON();
+                      toast(tot+' foto(s) adicionada(s)!');
+                  }
+              })
+              .catch(function(){ toast('Erro ao enviar foto',true); });
+        });
+    });
+}
+
+function excluirGaleria(nome){
+    confirmar('Excluir esta foto?', nome, function(){
+        fetch('/deletar',{method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({nome:nome, pasta:PASTA_GAL, rawmode:'1'})
+        }).then(function(){
+            carregarGaleria();
+            atualizarGaleriaJSON();
+            toast('Foto excluída!');
+        }).catch(function(){ toast('Erro ao excluir',true); });
+    });
+}
+
+(function(){
+    function dzSetup(id, fn){
+        var dz=document.getElementById(id);
+        if(!dz) return;
+        dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('drag-over');});
+        dz.addEventListener('dragleave',function(){dz.classList.remove('drag-over');});
+        dz.addEventListener('drop',function(e){e.preventDefault();dz.classList.remove('drag-over');fn({files:e.dataTransfer.files});});
+    }
+    dzSetup('dropBanner', uploadBanner);
+    dzSetup('dropGal',    addGaleria);
+})();
+
+// ── DIFERENCIAIS ──
+var _difs = [];
+function getDiferenciais(){ return _difs.filter(function(d){return d.trim()!==''; }); }
+function setDiferenciais(arr){ _difs=arr||[]; renderDiferenciais(); }
+function addDiferencial(){ _difs.push(''); renderDiferenciais(); setTimeout(function(){ var ins=document.querySelectorAll('.dif-item input'); if(ins.length) ins[ins.length-1].focus(); },50); }
+function removeDiferencial(i){ _difs.splice(i,1); renderDiferenciais(); }
+function updateDif(i,v){ _difs[i]=v; }
+function renderDiferenciais(){
+    var cnt=getDiferenciais().length;
+    document.getElementById('cnt-difs').textContent=cnt;
+    var c=document.getElementById('difContainer');
+    var emp=document.getElementById('difEmpty');
+    if(!_difs.length){ c.innerHTML=''; emp.style.display=''; return; }
+    emp.style.display='none';
+    c.innerHTML=_difs.map(function(d,i){
+        return '<div class="dif-item">'+
+            '<i class="fas fa-star dif-icon"></i>'+
+            '<input type="text" class="field-input" value="'+esc(d)+'" '+
+                'oninput="updateDif('+i+',this.value)" placeholder="Ex: Sala ambiente e lúdica">'+
+            '<button class="btn-del" onclick="removeDiferencial('+i+')" title="Remover"><i class="fas fa-times"></i></button>'+
+        '</div>';
+    }).join('');
+}
+
+// ── CONTEÚDO JSON ──
+function carregarConteudo(){
+    fetch('/files/'+PASTA_CONTEUDO+'/conteudo.json?v='+Date.now())
+        .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+        .then(function(d){
+            if(d.titulo)       document.getElementById('fTitulo').value      = d.titulo;
+            if(d.subtitulo)    document.getElementById('fSubtitulo').value   = d.subtitulo;
+            if(d.faixaEtaria)  document.getElementById('fFaixa').value       = d.faixaEtaria;
+            if(d.turno)        document.getElementById('fTurno').value       = d.turno;
+            if(d.descricao)    document.getElementById('fDescricao').value   = d.descricao;
+            if(d.componentes)  document.getElementById('fComponentes').value = d.componentes;
+            if(d.diferenciais) setDiferenciais(d.diferenciais);
+        })
+        .catch(function(){
+            document.getElementById('fTitulo').value    = DEF_TITULO;
+            document.getElementById('fSubtitulo').value = DEF_SUBTITULO;
+            document.getElementById('fFaixa').value     = DEF_FAIXA;
+            document.getElementById('fTurno').value     = DEF_TURNO;
+        });
+}
+
+function salvarConteudo(){
+    var data = {
+        titulo:       document.getElementById('fTitulo').value.trim(),
+        subtitulo:    document.getElementById('fSubtitulo').value.trim(),
+        faixaEtaria:  document.getElementById('fFaixa').value.trim(),
+        turno:        document.getElementById('fTurno').value.trim(),
+        descricao:    document.getElementById('fDescricao').value.trim(),
+        componentes:  document.getElementById('fComponentes').value.trim(),
+        diferenciais: getDiferenciais()
+    };
+    var b64;
+    try { b64 = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))); }
+    catch(e){ toast('Erro ao codificar conteúdo', true); return; }
+    fetch('/salvar-texto',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({pasta:PASTA_CONTEUDO, nome:'conteudo.json', rawmode:'1', base64:b64})
+    }).then(function(r){return r.json();})
+      .then(function(res){
+          if(res.ok) toast('Salvo! O portal atualiza em até 30 segundos.');
+          else toast('Erro: '+(res.erro||'?'), true);
+      })
+      .catch(function(){ toast('Erro ao salvar', true); });
+}
+
+// ── INIT ──
+carregarBanner();
+carregarGaleria();
+carregarConteudo();
+renderDiferenciais();</script>
+</body>
+</html>
+
+

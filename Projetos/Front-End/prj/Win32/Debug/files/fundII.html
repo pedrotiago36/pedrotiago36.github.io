@@ -231,7 +231,7 @@
 
     <!-- HERO -->
     <div class="hero" id="heroSection">
-        <img src="/files/fundII/capa.png" class="hero-bg" alt="" onerror="this.src='/files/fundII/capa.jpg';">
+        <img id="heroBg" class="hero-bg" alt="">
         <div class="hero-overlay"></div>
     </div>
 
@@ -255,7 +255,7 @@
                     <span class="proposta-icone">📖</span>
                     <div class="sec-title">Nossa <span>Proposta</span><br>Pedagógica</div>
                     <div class="sec-line"></div>
-                    <p class="sec-sub">Os Anos Finais do Ensino Fundamental — do 6º ao 9º ano — são um período de grande transformação. O aluno aprofunda conhecimentos, desenvolve pensamento crítico e se prepara para os desafios do Ensino Médio.<br><br>
+                    <p class="sec-sub" id="cj-descricao">Os Anos Finais do Ensino Fundamental — do 6º ao 9º ano — são um período de grande transformação. O aluno aprofunda conhecimentos, desenvolve pensamento crítico e se prepara para os desafios do Ensino Médio.<br><br>
                     Oferecemos metodologias ativas, projetos interdisciplinares e acompanhamento pedagógico individualizado, sempre com base nos valores cristãos que norteiam nossa instituição.</p>
                 </div>
             </div>
@@ -589,8 +589,25 @@ function carregarViaBridge(pasta, cb) {
     }, 200);
 }
 
+// Carrega banner e atualiza automaticamente a cada 30 segundos
+(function(){ var el=document.getElementById('heroBg'); function f(){ if(el) el.src='/files/fundII/capa.png?v='+Date.now(); } f(); setInterval(f,30000); })();
+
 carregarDados('fundII/galeria',   renderGaleria);
 carregarDados('fundII/momentos',  renderMomentos);
+setInterval(function(){ carregarDados('fundII/galeria', renderGaleria); carregarDados('fundII/momentos', renderMomentos); }, 30000);
+(function(){
+    function pollConteudo(){
+        var x=new XMLHttpRequest();
+        x.open('GET','/files/fundII/conteudo.json?t='+Date.now(),true);
+        x.onreadystatechange=function(){
+            if(x.readyState!==4||x.status!==200) return;
+            try{ var d=JSON.parse(x.responseText); if(d.descricao){var el=document.getElementById('cj-descricao');if(el)el.innerHTML=d.descricao;} }catch(e){}
+        };
+        x.send();
+    }
+    pollConteudo();
+    setInterval(pollConteudo,30000);
+})();
 carregarDados('fundII/estrutura', renderEstrutura);
 </script>
 <button class="btn-indicar-float-sub" onclick="try{window.parent.abrirModalIndicar();}catch(e){}"><i class="fas fa-user-friends"></i> Indique um Amigo</button>

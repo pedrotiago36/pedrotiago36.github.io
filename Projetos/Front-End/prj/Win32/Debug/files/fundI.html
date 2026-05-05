@@ -233,7 +233,7 @@
 
     <!-- HERO -->
     <div class="hero" id="heroSection">
-        <img src="/files/fundI/capa.png" class="hero-bg" alt="" onerror="this.src='/files/fundI/capa.jpg';">
+        <img id="heroBg" class="hero-bg" alt="">
         <div class="hero-overlay"></div>
     </div>
 
@@ -257,7 +257,7 @@
                     <span class="proposta-icone">📖</span>
                     <div class="sec-title">Nossa <span>Proposta</span><br>Pedagógica</div>
                     <div class="sec-line"></div>
-                    <p class="sec-sub">O Ensino Fundamental I é o alicerce da jornada acadêmica. Do 2º ao 5º ano, trabalhamos a alfabetização completa, o raciocínio lógico-matemático e o desenvolvimento das competências socioemocionais, sempre com base nos valores cristãos.<br><br>
+                    <p class="sec-sub" id="cj-descricao">O Ensino Fundamental I é o alicerce da jornada acadêmica. Do 2º ao 5º ano, trabalhamos a alfabetização completa, o raciocínio lógico-matemático e o desenvolvimento das competências socioemocionais, sempre com base nos valores cristãos.<br><br>
                     Metodologias ativas, projetos interdisciplinares e acompanhamento individualizado garantem que cada aluno avance no seu ritmo, com confiança e motivação.</p>
                 </div>
             </div>
@@ -602,8 +602,25 @@ function carregarViaBridge(pasta, cb) {
     }, 200);
 }
 
+// Carrega banner e atualiza automaticamente a cada 30 segundos
+(function(){ var el=document.getElementById('heroBg'); function f(){ if(el) el.src='/files/fundI/capa.png?v='+Date.now(); } f(); setInterval(f,30000); })();
+
 carregarDados('fundI/galeria', renderGaleria);
 carregarDados('fundI/momentos', renderMomentos);
+setInterval(function(){ carregarDados('fundI/galeria', renderGaleria); carregarDados('fundI/momentos', renderMomentos); }, 30000);
+(function(){
+    function pollConteudo(){
+        var x=new XMLHttpRequest();
+        x.open('GET','/files/fundI/conteudo.json?t='+Date.now(),true);
+        x.onreadystatechange=function(){
+            if(x.readyState!==4||x.status!==200) return;
+            try{ var d=JSON.parse(x.responseText); if(d.descricao){var el=document.getElementById('cj-descricao');if(el)el.innerHTML=d.descricao;} }catch(e){}
+        };
+        x.send();
+    }
+    pollConteudo();
+    setInterval(pollConteudo,30000);
+})();
 
 // carrega estrutura da pasta fundI/estrutura/
 carregarDados('fundI/estrutura', renderEstrutura);

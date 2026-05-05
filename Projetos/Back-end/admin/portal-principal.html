@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
@@ -265,6 +265,12 @@
     </style>
 </head>
 <body>
+<script>
+// Verificação de acesso — redireciona se não autenticado
+if (sessionStorage.getItem('adm_ok') !== 'portal-principal') {
+    window.location.replace('index.html');
+}
+</script>
 
 <div class="topbar">
     <div class="topbar-left">
@@ -924,3 +930,4 @@ atualizarPrevVersiculo(); atualizarPrevStats();
 </script>
 </body>
 </html>
+
