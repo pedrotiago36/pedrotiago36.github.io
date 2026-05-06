@@ -158,6 +158,7 @@
 
         /* ── GALERIA ── */
         .gal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+        #lazerGrid { grid-template-columns: repeat(auto-fill, minmax(195px, 1fr)); }
         .gal-card { border-radius: 0.9rem; overflow: hidden; border: 2px solid rgba(125,39,40,0.1); background: #fdfafa; transition: all 0.25s; }
         .gal-card:hover { border-color: rgba(211,51,39,0.35); box-shadow: 0 6px 18px rgba(211,51,39,0.1); }
         .gal-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
@@ -341,24 +342,19 @@ if (sessionStorage.getItem('adm_ok') !== 'niveis-ensino') {
             <div class="ph">
                 <div>
                     <h2><i class="fas fa-running" style="color:#fdcd62;margin-right:8px;"></i>Área de Lazer</h2>
-                    <p>Fotos do slideshow exibido na seção de Área de Lazer do portal</p>
+                    <p>Cada card tem imagem, nome e descrição — aparecem no slide do portal após 30 segundos</p>
                 </div>
-                <button class="btn-add" onclick="document.getElementById('upLazer').click()">
-                    <i class="fas fa-plus"></i> Adicionar Fotos
+                <button class="btn-add" onclick="abrirModalLazer()">
+                    <i class="fas fa-plus"></i> Adicionar Espaço
                 </button>
-                <input type="file" id="upLazer" accept="image/*" multiple style="display:none" onchange="addLazer(this)">
             </div>
             <div class="box">
                 <div class="box-title">
-                    <i class="fas fa-images"></i> Fotos do Slideshow
-                    <span class="lbl" id="lbl-lazer">0 imagens</span>
+                    <i class="fas fa-images"></i> Espaços Cadastrados
+                    <span class="lbl" id="lbl-lazer">0 itens</span>
                 </div>
                 <div class="gal-grid" id="lazerGrid"></div>
-                <div class="drop-zone" id="dropLazer" onclick="document.getElementById('upLazer').click()">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <p>Arraste as fotos aqui ou clique para selecionar</p>
-                    <small>JPG, PNG, WEBP — Múltiplas imagens aceitas</small>
-                </div>
+                <p id="lazerDica" style="display:none;color:#bbb;font-size:0.82rem;text-align:center;padding:1rem 0;">Nenhum espaço cadastrado ainda. Clique em "Adicionar Espaço" para começar.</p>
             </div>
         </div>
 
@@ -478,20 +474,13 @@ if (sessionStorage.getItem('adm_ok') !== 'niveis-ensino') {
             <div class="ph">
                 <div>
                     <h2><i class="fas fa-star" style="color:#fdcd62;margin-right:8px;"></i>Diferenciais</h2>
-                    <p>Pontos de destaque da Educação Infantil exibidos no portal</p>
+                    <p>Cards exibidos na seção "Nossos Diferenciais" do portal</p>
                 </div>
-                <div style="display:flex;gap:0.7rem;">
-                    <button class="btn-add" onclick="addDiferencial()"><i class="fas fa-plus"></i> Adicionar</button>
-                    <button class="btn-save" onclick="salvarConteudo()"><i class="fas fa-save"></i> Salvar</button>
-                </div>
+                <button class="btn-add" onclick="abrirModalDifAdmin(-1)"><i class="fas fa-plus"></i> Adicionar</button>
             </div>
             <div class="box">
-                <div class="box-title"><i class="fas fa-star"></i> Itens de Destaque</div>
-                <div id="difContainer"></div>
-                <div id="difEmpty" class="empty">
-                    <i class="fas fa-star"></i>
-                    <p>Nenhum diferencial cadastrado.<br>Clique em "Adicionar" para criar.</p>
-                </div>
+                <div class="box-title"><i class="fas fa-star"></i> Cards Cadastrados <span class="lbl" id="lbl-difs">0</span></div>
+                <div class="gal-grid" id="difGrid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));"></div>
             </div>
         </div>
 
@@ -505,8 +494,8 @@ if (sessionStorage.getItem('adm_ok') !== 'niveis-ensino') {
 var PASTA_BANNER   = 'educInfantil';
 var PASTA_GAL      = 'educInfantil';
 var GAL_PREFIX     = 'educInfantil/';
-var GAL_JSON_PASTA = '';
-var GAL_JSON_NOME  = 'educInfantil.json';
+var GAL_JSON_PASTA = 'educInfantil';
+var GAL_JSON_NOME  = 'galeria.json';
 var PASTA_CONTEUDO = 'educInfantil';
 var PASTA_LAZER       = 'educInfantil/estrutura';
 var LAZER_JSON_PASTA  = 'educInfantil';
@@ -690,7 +679,7 @@ function excluirGaleria(nome){
     }
     dzSetup('dropBanner',   uploadBanner);
     dzSetup('dropGal',      addGaleria);
-    dzSetup('dropLazer',    addLazer);
+    // dropLazer removido — lazer usa modal de criação
     dzSetup('dropProposta', uploadProposta);
     dzSetup('dropFormacao', uploadFormacao);
 })();
@@ -755,7 +744,9 @@ function carregarProposta(){
         })
         .catch(function(){
             document.getElementById('fTituloPropostaTexto').value = 'Nossa Proposta Pedagógica';
+            document.getElementById('fDescricaoProposta').value   = 'Acreditamos que os primeiros anos de vida são fundamentais para o desenvolvimento integral da criança. Nossa proposta une afeto, brincar e aprendizado estruturado, formando bases sólidas para toda a vida escolar.\n\nMetodologia ativa, projetos temáticos e atividades lúdicas que respeitam o ritmo de cada criança, sempre alicerçados nos valores cristãos que norteiam nossa instituição.';
             document.getElementById('fTituloFormacaoTexto').value = 'Formação Integral e Valores';
+            document.getElementById('fDescricaoFormacao').value   = 'Mais do que ensinar conteúdos, formamos caráter. Os princípios bíblicos estão integrados ao cotidiano escolar de forma natural e afetiva, cultivando empatia, honestidade e responsabilidade desde a infância.\n\nParceria constante com as famílias, pois entendemos que a educação é uma missão compartilhada entre escola e lar.';
         });
     carregarPropostaImg();
     carregarFormacaoImg();
@@ -781,105 +772,351 @@ function salvarProposta(){
 }
 
 // ── LAZER ──
+var _lazerItens = [];
+var _lazerSaveTimer = null;
+
 function carregarLazer(){
-    fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER)+'&raw=1')
-        .then(function(r){ return r.json(); })
-        .then(function(lista){
-            document.getElementById('cnt-lazer').textContent = lista.length;
-            renderLazerAdmin(lista);
+    fetch('/files/'+LAZER_JSON_PASTA+'/'+LAZER_JSON_NOME+'?v='+Date.now())
+        .then(function(r){ return r.ok ? r.json() : []; })
+        .catch(function(){ return []; })
+        .then(function(jsonEntries){
+            var tituloMap = {}, descMap = {};
+            if(Array.isArray(jsonEntries)){
+                jsonEntries.forEach(function(e){
+                    var nome = (e.imagem||'').split('/').pop();
+                    tituloMap[nome] = e.titulo || '';
+                    descMap[nome]   = e.descricao || '';
+                });
+            }
+            return fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER)+'&raw=1')
+                .then(function(r){ return r.json(); })
+                .then(function(lista){
+                    _lazerItens = lista.map(function(img){
+                        var defaultTitulo = img.nome.replace(/\.[^.]+$/, '').replace(/_/g, ' ');
+                        return {nome: img.nome, titulo: tituloMap[img.nome] || defaultTitulo, descricao: descMap[img.nome] || ''};
+                    });
+                    document.getElementById('cnt-lazer').textContent = _lazerItens.length;
+                    renderLazerAdmin();
+                    atualizarLazerJSON();
+                });
         })
-        .catch(function(){ renderLazerAdmin([]); });
+        .catch(function(){ _lazerItens=[]; renderLazerAdmin(); });
 }
 
-function renderLazerAdmin(lista){
-    var cnt = lista.length;
-    document.getElementById('lbl-lazer').textContent = cnt + (cnt===1?' imagem':' imagens');
+function renderLazerAdmin(){
+    var cnt = _lazerItens.length;
+    document.getElementById('cnt-lazer').textContent = cnt;
+    document.getElementById('lbl-lazer').textContent = cnt + (cnt===1?' item':' itens');
     var g = document.getElementById('lazerGrid');
-    if(!cnt){
-        g.innerHTML = '<div class="empty" style="grid-column:1/-1"><i class="fas fa-images"></i><p>Nenhuma foto cadastrada.</p></div>';
-        return;
-    }
-    g.innerHTML = lista.map(function(img){
-        var url = '/files/'+PASTA_LAZER+'/'+img.nome;
+    var dica = document.getElementById('lazerDica');
+    if(dica) dica.style.display = cnt ? 'none' : 'block';
+    g.innerHTML = _lazerItens.map(function(item, i){
+        var url = '/files/'+PASTA_LAZER+'/'+item.nome;
         return '<div class="gal-card">'+
-            '<img class="gal-img" src="'+esc(url)+'?v='+Date.now()+'" alt="'+esc(img.nome)+'" '+
+            '<img src="'+esc(url)+'?v='+Date.now()+'" alt="'+esc(item.titulo)+'" '+
+                'style="width:100%;height:160px;object-fit:contain;background:#f5f0eb;display:block;" '+
                 'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'+
             '<div class="gal-ph" style="display:none"><i class="fas fa-image"></i></div>'+
             '<div class="gal-info">'+
-            '<div class="gal-name">'+esc(img.nome)+'</div>'+
-            '<button class="btn-del" onclick="excluirLazer(\''+escJ(img.nome)+'\')" style="width:100%"><i class="fas fa-trash"></i> Excluir</button>'+
-            '</div></div>';
+            '<div style="font-weight:700;font-size:0.85rem;color:#3d1a1b;margin-bottom:3px;">'+esc(item.titulo||'(sem título)')+'</div>'+
+            (item.descricao ? '<div style="font-size:0.78rem;color:#7d5a3a;margin-bottom:8px;line-height:1.4;">'+esc(item.descricao)+'</div>' : '<div style="font-size:0.75rem;color:#bbb;margin-bottom:8px;font-style:italic;">sem descrição</div>')+
+            '<div style="display:flex;gap:5px;">'+
+            '<button class="btn-swap" onclick="editarLazer('+i+')" style="flex:1"><i class="fas fa-edit"></i> Editar</button>'+
+            '<button class="btn-del"  onclick="excluirLazer(\''+escJ(item.nome)+'\')" style="flex:1"><i class="fas fa-trash"></i> Excluir</button>'+
+            '</div></div></div>';
     }).join('');
 }
 
 function atualizarLazerJSON(){
-    fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER)+'&raw=1')
-        .then(function(r){ return r.json(); })
-        .then(function(lista){
-            var entries = lista.map(function(img){ return {imagem: LAZER_PREFIX + img.nome}; });
-            var b64;
-            try { b64 = btoa(unescape(encodeURIComponent(JSON.stringify(entries)))); } catch(e){ return; }
-            fetch('/salvar-texto',{method:'POST',headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({pasta:LAZER_JSON_PASTA, nome:LAZER_JSON_NOME, rawmode:'1', base64:b64})
-            }).catch(function(){});
-        }).catch(function(){});
+    var entries = _lazerItens.map(function(item){
+        return {imagem: LAZER_PREFIX + item.nome, titulo: item.titulo, descricao: item.descricao || ''};
+    });
+    var b64;
+    try { b64 = btoa(unescape(encodeURIComponent(JSON.stringify(entries)))); } catch(e){ return; }
+    fetch('/salvar-texto',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({pasta:LAZER_JSON_PASTA, nome:LAZER_JSON_NOME, rawmode:'1', base64:b64})
+    }).catch(function(){});
 }
 
-function addLazer(inp){
-    if(!inp.files||!inp.files.length) return;
-    var files=Array.prototype.slice.call(inp.files), cnt=0, tot=files.length;
-    files.forEach(function(f){
+// ── MODAL LAZER ──
+var _lazerEditIdx = -1;
+
+function abrirModalLazer(){
+    _lazerEditIdx = -1;
+    document.getElementById('mLazerTitle').textContent = 'Novo Espaço de Lazer';
+    document.getElementById('mLazerNome').value = '';
+    document.getElementById('mLazerDesc').value = '';
+    document.getElementById('mLazerFile').value = '';
+    document.getElementById('mLazerPreviewBox').style.display = 'none';
+    document.getElementById('mLazerFileLabel').textContent = 'Selecionar Imagem';
+    document.getElementById('mLazerImgLabel').textContent = 'Imagem *';
+    document.getElementById('mLazerBtn').innerHTML = '<i class="fas fa-plus"></i> Criar Espaço';
+    document.getElementById('modalLazerOv').style.display = 'flex';
+    setTimeout(function(){ document.getElementById('mLazerNome').focus(); }, 80);
+}
+function editarLazer(idx){
+    _lazerEditIdx = idx;
+    var item = _lazerItens[idx];
+    document.getElementById('mLazerTitle').textContent = 'Editar Espaço de Lazer';
+    document.getElementById('mLazerNome').value = item.titulo || '';
+    document.getElementById('mLazerDesc').value = item.descricao || '';
+    document.getElementById('mLazerFile').value = '';
+    document.getElementById('mLazerPreview').src = '/files/'+PASTA_LAZER+'/'+item.nome+'?v='+Date.now();
+    document.getElementById('mLazerPreviewBox').style.display = 'block';
+    document.getElementById('mLazerFileLabel').textContent = 'Trocar Imagem (opcional)';
+    document.getElementById('mLazerImgLabel').textContent = 'Imagem';
+    document.getElementById('mLazerBtn').innerHTML = '<i class="fas fa-save"></i> Salvar Alterações';
+    document.getElementById('modalLazerOv').style.display = 'flex';
+    setTimeout(function(){ document.getElementById('mLazerNome').focus(); }, 80);
+}
+function fecharModalLazer(){
+    document.getElementById('modalLazerOv').style.display = 'none';
+}
+function _lazerPreview(inp){
+    if(!inp.files||!inp.files[0]) return;
+    var f = inp.files[0];
+    document.getElementById('mLazerFileLabel').textContent = f.name;
+    var r = new FileReader();
+    r.onload = function(e){
+        document.getElementById('mLazerPreview').src = e.target.result;
+        document.getElementById('mLazerPreviewBox').style.display = 'block';
+    };
+    r.readAsDataURL(f);
+}
+function confirmarModalLazer(){
+    var titulo = document.getElementById('mLazerNome').value.trim();
+    var desc   = document.getElementById('mLazerDesc').value.trim();
+    var inp    = document.getElementById('mLazerFile');
+    if(!titulo){ document.getElementById('mLazerNome').focus(); toast('Informe o nome do espaço',true); return; }
+
+    if(_lazerEditIdx === -1){
+        // ── ADICIONAR ──
+        if(!inp.files||!inp.files[0]){ toast('Selecione uma imagem',true); return; }
+        var f = inp.files[0];
         lerArq(f,function(src){
             fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},
                 body:JSON.stringify({nome:f.name, pasta:PASTA_LAZER, rawmode:'1', base64:src})
             }).then(function(r){return r.json();})
               .then(function(){
-                  if(++cnt===tot){
-                      try{inp.value='';}catch(e){}
-                      carregarLazer();
-                      atualizarLazerJSON();
-                      toast(tot+' foto(s) adicionada(s)!');
-                  }
+                  fecharModalLazer();
+                  _lazerItens.push({nome:f.name, titulo:titulo, descricao:desc});
+                  atualizarLazerJSON();
+                  renderLazerAdmin();
+                  toast('"'+titulo+'" adicionado! O portal atualiza em até 30 segundos.');
               })
-              .catch(function(){ toast('Erro ao enviar foto',true); });
+              .catch(function(){ toast('Erro ao enviar imagem',true); });
         });
-    });
+    } else {
+        // ── EDITAR ──
+        var idx  = _lazerEditIdx;
+        var item = _lazerItens[idx];
+        item.titulo   = titulo;
+        item.descricao = desc;
+        if(inp.files && inp.files[0]){
+            var f = inp.files[0], oldNome = item.nome;
+            lerArq(f,function(src){
+                fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({nome:f.name, pasta:PASTA_LAZER, rawmode:'1', base64:src})
+                }).then(function(r){return r.json();})
+                  .then(function(){
+                      if(oldNome !== f.name){
+                          fetch('/deletar',{method:'POST',headers:{'Content-Type':'application/json'},
+                              body:JSON.stringify({nome:oldNome, pasta:PASTA_LAZER, rawmode:'1'})
+                          }).catch(function(){});
+                          item.nome = f.name;
+                      }
+                      fecharModalLazer();
+                      atualizarLazerJSON();
+                      renderLazerAdmin();
+                      toast('Alterações salvas! O portal atualiza em até 30 segundos.');
+                  })
+                  .catch(function(){ toast('Erro ao trocar imagem',true); });
+            });
+        } else {
+            fecharModalLazer();
+            atualizarLazerJSON();
+            renderLazerAdmin();
+            toast('Alterações salvas! O portal atualiza em até 30 segundos.');
+        }
+    }
 }
 
 function excluirLazer(nome){
-    confirmar('Excluir esta foto da Área de Lazer?', nome, function(){
+    confirmar('Excluir este item da Área de Lazer?', nome, function(){
         fetch('/deletar',{method:'POST',headers:{'Content-Type':'application/json'},
             body:JSON.stringify({nome:nome, pasta:PASTA_LAZER, rawmode:'1'})
         }).then(function(){
-            carregarLazer();
+            _lazerItens = _lazerItens.filter(function(i){ return i.nome !== nome; });
             atualizarLazerJSON();
-            toast('Foto excluída!');
+            document.getElementById('cnt-lazer').textContent = _lazerItens.length;
+            renderLazerAdmin();
+            toast('Item excluído!');
         }).catch(function(){ toast('Erro ao excluir',true); });
     });
 }
 
 // ── DIFERENCIAIS ──
-var _difs = [];
-function getDiferenciais(){ return _difs.filter(function(d){return d.trim()!==''; }); }
-function setDiferenciais(arr){ _difs=arr||[]; renderDiferenciais(); }
-function addDiferencial(){ _difs.push(''); renderDiferenciais(); setTimeout(function(){ var ins=document.querySelectorAll('.dif-item input'); if(ins.length) ins[ins.length-1].focus(); },50); }
-function removeDiferencial(i){ _difs.splice(i,1); renderDiferenciais(); }
-function updateDif(i,v){ _difs[i]=v; }
+var _difsData = [];
+var _difEditIdx = -1;
+var _difFotoAtual = '';
+var _difIconeImgAtual = '';
+
+function carregarDiferenciais(){
+    fetch('/files/'+PASTA_CONTEUDO+'/diferenciais.json?v='+Date.now())
+        .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+        .then(function(d){ _difsData = Array.isArray(d) ? d : []; renderDiferenciais(); })
+        .catch(function(){ _difsData = []; renderDiferenciais(); });
+}
+
 function renderDiferenciais(){
-    var cnt=getDiferenciais().length;
-    document.getElementById('cnt-difs').textContent=cnt;
-    var c=document.getElementById('difContainer');
-    var emp=document.getElementById('difEmpty');
-    if(!_difs.length){ c.innerHTML=''; emp.style.display=''; return; }
-    emp.style.display='none';
-    c.innerHTML=_difs.map(function(d,i){
-        return '<div class="dif-item">'+
-            '<i class="fas fa-star dif-icon"></i>'+
-            '<input type="text" class="field-input" value="'+esc(d)+'" '+
-                'oninput="updateDif('+i+',this.value)" placeholder="Ex: Sala ambiente e lúdica">'+
-            '<button class="btn-del" onclick="removeDiferencial('+i+')" title="Remover"><i class="fas fa-times"></i></button>'+
-        '</div>';
+    document.getElementById('lbl-difs').textContent = _difsData.length;
+    var cnt = document.getElementById('cnt-difs');
+    if(cnt) cnt.textContent = _difsData.length;
+    var g = document.getElementById('difGrid');
+    if(!_difsData.length){
+        g.innerHTML = '<div class="empty" style="grid-column:1/-1"><i class="fas fa-star"></i><p>Nenhum diferencial cadastrado.</p></div>';
+        return;
+    }
+    g.innerHTML = _difsData.map(function(d, i){
+        return '<div class="gal-card" style="text-align:center;">'+
+            '<div style="font-size:2.4rem;padding:1rem 0 0.3rem;">'+(d.icone||'⭐')+'</div>'+
+            '<div style="font-weight:800;color:#7d2728;font-size:0.85rem;padding:0 0.7rem 0.3rem;">'+esc(d.titulo||'')+'</div>'+
+            '<div style="font-size:0.75rem;color:#999;padding:0 0.7rem 0.8rem;line-height:1.4;">'+esc((d.descricao||'').substring(0,70))+((d.descricao||'').length>70?'...':'')+'</div>'+
+            '<div class="gal-info" style="display:flex;gap:0.4rem;">'+
+            '<button class="btn-swap" style="flex:1" onclick="abrirModalDifAdmin('+i+')"><i class="fas fa-edit"></i> Editar</button>'+
+            '<button class="btn-del" style="flex:1" onclick="excluirDif('+i+')"><i class="fas fa-trash"></i> Excluir</button>'+
+            '</div></div>';
     }).join('');
+}
+
+function abrirModalDifAdmin(idx){
+    _difEditIdx = idx;
+    var d = idx >= 0 ? _difsData[idx] : {};
+    _difFotoAtual = d.foto || '';
+    _difIconeImgAtual = d.iconeImg || '';
+    document.getElementById('mDifTitle').textContent = idx >= 0 ? 'Editar Diferencial' : 'Novo Diferencial';
+    document.getElementById('mDifIcone').value = d.icone || '';
+    document.getElementById('mDifTitulo').value = d.titulo || '';
+    document.getElementById('mDifDesc').value = d.descricao || '';
+    document.getElementById('mDifTexto').value = d.textoModal || '';
+    // foto
+    document.getElementById('mDifFile').value = '';
+    document.getElementById('mDifFileLabel').textContent = _difFotoAtual ? 'Trocar Foto (opcional)' : 'Selecionar Foto';
+    var pb = document.getElementById('mDifPreviewBox');
+    var pi = document.getElementById('mDifPreview');
+    if(_difFotoAtual){ pi.src = '/files/' + _difFotoAtual + '?v=' + Date.now(); pb.style.display = 'block'; }
+    else { pb.style.display = 'none'; pi.src = ''; }
+    // ícone imagem
+    document.getElementById('mDifIconeFile').value = '';
+    document.getElementById('mDifIconeFileLabel').textContent = _difIconeImgAtual ? 'Trocar Ícone (opcional)' : 'Selecionar Imagem';
+    var ipb = document.getElementById('mDifIconePreviewBox');
+    var ipi = document.getElementById('mDifIconePreview');
+    if(_difIconeImgAtual){ ipi.src = '/files/' + _difIconeImgAtual + '?v=' + Date.now(); ipb.style.display = 'flex'; }
+    else { ipb.style.display = 'none'; ipi.src = ''; }
+    document.getElementById('modalDifAdmOv').style.display = 'flex';
+}
+
+function _difPreviewFoto(inp){
+    if(!inp.files||!inp.files[0]) return;
+    document.getElementById('mDifFileLabel').textContent = inp.files[0].name;
+    var r = new FileReader();
+    r.onload = function(e){
+        document.getElementById('mDifPreview').src = e.target.result;
+        document.getElementById('mDifPreviewBox').style.display = 'block';
+    };
+    r.readAsDataURL(inp.files[0]);
+}
+
+function _difPreviewIcone(inp){
+    if(!inp.files||!inp.files[0]) return;
+    document.getElementById('mDifIconeFileLabel').textContent = inp.files[0].name;
+    var r = new FileReader();
+    r.onload = function(e){
+        document.getElementById('mDifIconePreview').src = e.target.result;
+        document.getElementById('mDifIconePreviewBox').style.display = 'flex';
+    };
+    r.readAsDataURL(inp.files[0]);
+}
+
+function removerIconeImg(){
+    _difIconeImgAtual = '';
+    document.getElementById('mDifIconeFile').value = '';
+    document.getElementById('mDifIconeFileLabel').textContent = 'Selecionar Imagem';
+    document.getElementById('mDifIconePreviewBox').style.display = 'none';
+    document.getElementById('mDifIconePreview').src = '';
+}
+
+function fecharModalDifAdmin(){
+    document.getElementById('modalDifAdmOv').style.display = 'none';
+}
+
+function confirmarModalDifAdmin(){
+    var icone = document.getElementById('mDifIcone').value.trim();
+    var titulo = document.getElementById('mDifTitulo').value.trim();
+    var desc = document.getElementById('mDifDesc').value.trim();
+    var texto = document.getElementById('mDifTexto').value.trim();
+    var inpFoto = document.getElementById('mDifFile');
+    var inpIcone = document.getElementById('mDifIconeFile');
+    if(!titulo){ toast('Informe o título do diferencial', true); return; }
+
+    var fotoPath = _difFotoAtual;
+    var iconeImgPath = _difIconeImgAtual;
+    var pendentes = 0;
+
+    function salvar(){
+        var obj = {icone: icone||'⭐', titulo: titulo, descricao: desc, textoModal: texto};
+        if(fotoPath) obj.foto = fotoPath;
+        if(iconeImgPath) obj.iconeImg = iconeImgPath;
+        if(_difEditIdx >= 0){ _difsData[_difEditIdx] = obj; }
+        else { _difsData.push(obj); }
+        fecharModalDifAdmin();
+        renderDiferenciais();
+        salvarDiferenciaisJSON();
+    }
+
+    if(inpIcone.files && inpIcone.files[0]){
+        pendentes++;
+        var fi = inpIcone.files[0];
+        lerArq(fi, function(src){
+            fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({nome:fi.name, pasta:'educInfantil/diferenciais/icones', rawmode:'1', base64:src})
+            }).then(function(r){ return r.json(); })
+              .then(function(){ iconeImgPath = 'educInfantil/diferenciais/icones/' + fi.name; if(--pendentes===0) salvar(); })
+              .catch(function(){ toast('Erro ao enviar ícone', true); });
+        });
+    }
+
+    if(inpFoto.files && inpFoto.files[0]){
+        pendentes++;
+        var ff = inpFoto.files[0];
+        lerArq(ff, function(src){
+            fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({nome:ff.name, pasta:'educInfantil/diferenciais', rawmode:'1', base64:src})
+            }).then(function(r){ return r.json(); })
+              .then(function(){ fotoPath = 'educInfantil/diferenciais/' + ff.name; if(--pendentes===0) salvar(); })
+              .catch(function(){ toast('Erro ao enviar foto', true); });
+        });
+    }
+
+    if(pendentes === 0) salvar();
+}
+
+function excluirDif(i){
+    confirmar('Excluir este diferencial?', _difsData[i].titulo, function(){
+        _difsData.splice(i, 1);
+        renderDiferenciais();
+        salvarDiferenciaisJSON();
+        toast('Diferencial excluído!');
+    });
+}
+
+function salvarDiferenciaisJSON(){
+    var b64;
+    try { b64 = btoa(unescape(encodeURIComponent(JSON.stringify(_difsData, null, 2)))); } catch(e){ toast('Erro ao codificar', true); return; }
+    fetch('/salvar-texto',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({pasta:PASTA_CONTEUDO, nome:'diferenciais.json', rawmode:'1', base64:b64})
+    }).then(function(r){ if(!r.ok) throw 0; toast('Diferenciais salvos!'); })
+      .catch(function(){ toast('Erro ao salvar diferenciais', true); });
 }
 
 // ── CONTEÚDO JSON ──
@@ -893,13 +1130,13 @@ function carregarConteudo(){
             if(d.turno)        document.getElementById('fTurno').value       = d.turno;
             if(d.descricao)    document.getElementById('fDescricao').value   = d.descricao;
             if(d.componentes)  document.getElementById('fComponentes').value = d.componentes;
-            if(d.diferenciais) setDiferenciais(d.diferenciais);
         })
         .catch(function(){
-            document.getElementById('fTitulo').value    = DEF_TITULO;
-            document.getElementById('fSubtitulo').value = DEF_SUBTITULO;
-            document.getElementById('fFaixa').value     = DEF_FAIXA;
-            document.getElementById('fTurno').value     = DEF_TURNO;
+            document.getElementById('fTitulo').value       = DEF_TITULO;
+            document.getElementById('fSubtitulo').value    = DEF_SUBTITULO;
+            document.getElementById('fFaixa').value        = DEF_FAIXA;
+            document.getElementById('fTurno').value        = DEF_TURNO;
+            document.getElementById('fComponentes').value  = 'Língua Portuguesa, Matemática, Ciências da Natureza, Ciências Humanas, Artes, Educação Física, Língua Inglesa, Ensino Religioso';
         });
 }
 
@@ -911,7 +1148,6 @@ function salvarConteudo(){
         turno:        document.getElementById('fTurno').value.trim(),
         descricao:    document.getElementById('fDescricao').value.trim(),
         componentes:  document.getElementById('fComponentes').value.trim(),
-        diferenciais: getDiferenciais()
     };
     var b64;
     try { b64 = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))); }
@@ -928,13 +1164,140 @@ function salvarConteudo(){
 }
 
 // ── INIT ──
+(function(){
+    var emojis = ['🎨','📖','🕐','🏃','🙏','🎵','🔬','🏆','🌱','💡','🎯','🤝','📚','✏️','🎭','🏅','🌟','💪','🎲','🖼️','🎓','🌍','🤸','🧩'];
+    var grid = document.getElementById('mDifEmojisGrid');
+    if(grid){
+        emojis.forEach(function(e){
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.title = e;
+            btn.textContent = e;
+            btn.style.cssText = 'width:34px;height:34px;border-radius:.5rem;border:1.5px solid rgba(125,39,40,.15);background:#fdf8f5;font-size:1.2rem;cursor:pointer;transition:.15s;line-height:1;';
+            btn.onmouseover = function(){ this.style.background='rgba(211,51,39,.1)'; this.style.borderColor='#d33327'; };
+            btn.onmouseout  = function(){ this.style.background='#fdf8f5'; this.style.borderColor='rgba(125,39,40,.15)'; };
+            btn.onclick = function(){ document.getElementById('mDifIcone').value = e; };
+            grid.appendChild(btn);
+        });
+    }
+})();
 carregarBanner();
-carregarGaleria();
-carregarLazer();
-carregarProposta();
-carregarConteudo();
-renderDiferenciais();
+setTimeout(carregarGaleria,    600);
+setTimeout(carregarLazer,     1200);
+setTimeout(carregarProposta,  1800);
+setTimeout(carregarConteudo,  2400);
+setTimeout(carregarDiferenciais, 3000);
 </script>
+
+<!-- ═══════ MODAL DIFERENCIAL ═══════ -->
+<div id="modalDifAdmOv" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:1.4rem;padding:2rem;max-width:460px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:90vh;overflow-y:auto;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+            <h3 id="mDifTitle" style="font-family:'Poppins',sans-serif;font-size:1.1rem;font-weight:800;color:#7d2728;"><i class="fas fa-star" style="color:#fdcd62;margin-right:8px;"></i>Novo Diferencial</h3>
+            <button onclick="fecharModalDifAdmin()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#aaa;line-height:1;">✕</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:1rem;">
+            <div>
+                <label style="font-size:.82rem;font-weight:700;color:#5a3a2e;display:block;margin-bottom:.3rem;">Ícone (emoji)</label>
+                <div style="display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;">
+                    <input id="mDifIcone" type="text" class="field-input" placeholder="🎨" style="width:70px;font-size:1.6rem;text-align:center;padding:.4rem;">
+                    <div id="mDifEmojisGrid" style="display:flex;flex-wrap:wrap;gap:.3rem;"></div>
+                </div>
+                <div style="font-size:.7rem;color:#bbb;margin-top:.3rem;">Clique num emoji ou cole/digite outro no campo</div>
+                <div style="display:flex;align-items:center;gap:.6rem;margin-top:.8rem;">
+                    <div style="flex:1;height:1px;background:rgba(125,39,40,.12);"></div>
+                    <span style="font-size:.72rem;color:#bbb;font-weight:600;white-space:nowrap;">OU use uma imagem como ícone</span>
+                    <div style="flex:1;height:1px;background:rgba(125,39,40,.12);"></div>
+                </div>
+                <div style="font-size:.7rem;color:#888;margin:.4rem 0 .5rem;">Dimensões recomendadas: <strong>80 × 80 px</strong> — PNG com fundo transparente</div>
+                <div id="mDifIconePreviewBox" style="display:none;align-items:center;gap:.6rem;margin-bottom:.5rem;">
+                    <div style="width:72px;height:72px;border-radius:.7rem;border:1.5px solid #e0d4cb;background:#fdf8f5;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+                        <img id="mDifIconePreview" src="" style="width:100%;height:100%;object-fit:contain;">
+                    </div>
+                    <button type="button" onclick="removerIconeImg()" style="font-size:.75rem;color:#c0392b;background:none;border:none;cursor:pointer;font-weight:700;"><i class="fas fa-times"></i> Remover</button>
+                </div>
+                <button type="button" onclick="document.getElementById('mDifIconeFile').click()"
+                    style="width:100%;padding:8px;border:2px dashed rgba(211,51,39,.3);border-radius:0.8rem;background:rgba(211,51,39,.04);color:#d33327;font-weight:700;cursor:pointer;font-size:0.85rem;font-family:'Inter',sans-serif;transition:.2s;"
+                    onmouseover="this.style.background='rgba(211,51,39,.09)'" onmouseout="this.style.background='rgba(211,51,39,.04)'">
+                    <i class="fas fa-upload"></i> <span id="mDifIconeFileLabel">Selecionar Imagem</span>
+                </button>
+                <input type="file" id="mDifIconeFile" accept="image/*" style="display:none" onchange="_difPreviewIcone(this)">
+            </div>
+            <div>
+                <label style="font-size:.82rem;font-weight:700;color:#5a3a2e;display:block;margin-bottom:.3rem;">Título *</label>
+                <input id="mDifTitulo" type="text" class="field-input" placeholder="Ex: Arte e Criatividade">
+            </div>
+            <div>
+                <label style="font-size:.82rem;font-weight:700;color:#5a3a2e;display:block;margin-bottom:.3rem;">Descrição curta (exibida no card)</label>
+                <textarea id="mDifDesc" class="field-input" rows="2" placeholder="Breve descrição para o card do portal" style="resize:vertical;"></textarea>
+            </div>
+            <div>
+                <label style="font-size:.82rem;font-weight:700;color:#5a3a2e;display:block;margin-bottom:.3rem;">Texto completo (modal "Saiba mais")</label>
+                <textarea id="mDifTexto" class="field-input" rows="4" placeholder="Texto detalhado exibido ao clicar em Saiba mais" style="resize:vertical;"></textarea>
+            </div>
+            <div>
+                <label style="font-size:.82rem;font-weight:700;color:#5a3a2e;display:block;margin-bottom:.3rem;">Foto do modal (opcional)</label>
+                <div id="mDifPreviewBox" style="display:none;margin-bottom:8px;border-radius:0.8rem;overflow:hidden;border:1.5px solid #e0d4cb;">
+                    <img id="mDifPreview" src="" style="width:100%;max-height:180px;object-fit:cover;display:block;">
+                </div>
+                <button type="button" onclick="document.getElementById('mDifFile').click()"
+                    style="width:100%;padding:10px;border:2px dashed rgba(211,51,39,.3);border-radius:0.8rem;background:rgba(211,51,39,.04);color:#d33327;font-weight:700;cursor:pointer;font-size:0.88rem;font-family:'Inter',sans-serif;transition:.2s;"
+                    onmouseover="this.style.background='rgba(211,51,39,.09)'" onmouseout="this.style.background='rgba(211,51,39,.04)'">
+                    <i class="fas fa-image"></i> <span id="mDifFileLabel">Selecionar Foto</span>
+                </button>
+                <input type="file" id="mDifFile" accept="image/*" style="display:none" onchange="_difPreviewFoto(this)">
+            </div>
+            <div style="display:flex;gap:.7rem;margin-top:.5rem;">
+                <button onclick="fecharModalDifAdmin()" style="flex:1;padding:.75rem;border-radius:.8rem;border:2px solid #ddd;background:#f9f9f9;cursor:pointer;font-weight:700;color:#888;">Cancelar</button>
+                <button onclick="confirmarModalDifAdmin()" style="flex:2;padding:.75rem;border-radius:.8rem;border:none;background:linear-gradient(135deg,#d33327,#7d2728);color:#fff;cursor:pointer;font-weight:800;font-size:1rem;"><i class="fas fa-save"></i> Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════ MODAL ESPAÇO DE LAZER ═══════ -->
+<div id="modalLazerOv" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:1.4rem;padding:2rem;max-width:460px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:90vh;overflow-y:auto;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+            <h3 id="mLazerTitle" style="font-family:'Poppins',sans-serif;font-size:1.1rem;font-weight:800;color:#7d2728;"><i class="fas fa-running" style="color:#fdcd62;margin-right:8px;"></i>Novo Espaço de Lazer</h3>
+            <button onclick="fecharModalLazer()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#aaa;line-height:1;">✕</button>
+        </div>
+        <div style="margin-bottom:1rem;">
+            <label style="display:block;font-size:0.82rem;font-weight:700;color:#7d2728;margin-bottom:5px;">Título do card <span style="color:#d33327;">*</span></label>
+            <input id="mLazerNome" type="text" placeholder="Ex: Quadra Esportiva, Parquinho..."
+                style="width:100%;padding:10px 12px;border:1.5px solid #e0d4cb;border-radius:0.8rem;font-size:0.92rem;font-family:'Inter',sans-serif;color:#2d2d2d;outline:none;transition:.2s;"
+                onfocus="this.style.borderColor='#d33327'" onblur="this.style.borderColor='#e0d4cb'">
+        </div>
+        <div style="margin-bottom:1rem;">
+            <label style="display:block;font-size:0.82rem;font-weight:700;color:#7d2728;margin-bottom:5px;">Descrição do card</label>
+            <textarea id="mLazerDesc" rows="3" placeholder="Ex: Espaço amplo para recreação e esportes coletivos..."
+                style="width:100%;padding:10px 12px;border:1.5px solid #e0d4cb;border-radius:0.8rem;font-size:0.88rem;font-family:'Inter',sans-serif;color:#2d2d2d;resize:vertical;outline:none;transition:.2s;"
+                onfocus="this.style.borderColor='#d33327'" onblur="this.style.borderColor='#e0d4cb'"></textarea>
+        </div>
+        <div style="margin-bottom:1.5rem;">
+            <label id="mLazerImgLabel" style="display:block;font-size:0.82rem;font-weight:700;color:#7d2728;margin-bottom:5px;">Imagem *</label>
+            <div id="mLazerPreviewBox" style="display:none;margin-bottom:8px;border-radius:0.8rem;overflow:hidden;border:1.5px solid #e0d4cb;">
+                <img id="mLazerPreview" src="" style="width:100%;max-height:180px;object-fit:cover;display:block;">
+            </div>
+            <button onclick="document.getElementById('mLazerFile').click()"
+                style="width:100%;padding:10px;border:2px dashed rgba(211,51,39,.3);border-radius:0.8rem;background:rgba(211,51,39,.04);color:#d33327;font-weight:700;cursor:pointer;font-size:0.88rem;font-family:'Inter',sans-serif;transition:.2s;"
+                onmouseover="this.style.background='rgba(211,51,39,.09)'" onmouseout="this.style.background='rgba(211,51,39,.04)'">
+                <i class="fas fa-image"></i> <span id="mLazerFileLabel">Selecionar Imagem</span>
+            </button>
+            <input type="file" id="mLazerFile" accept="image/*" style="display:none" onchange="_lazerPreview(this)">
+        </div>
+        <div style="display:flex;gap:0.8rem;justify-content:flex-end;">
+            <button onclick="fecharModalLazer()"
+                style="padding:0.65rem 1.4rem;border-radius:0.8rem;border:1.5px solid #ddd;background:#fff;color:#666;font-weight:700;cursor:pointer;font-size:0.88rem;font-family:'Inter',sans-serif;">
+                Cancelar
+            </button>
+            <button id="mLazerBtn" onclick="confirmarModalLazer()"
+                style="padding:0.65rem 1.4rem;border-radius:0.8rem;border:none;background:linear-gradient(135deg,#d33327,#7d2728);color:#fff;font-weight:700;cursor:pointer;font-size:0.88rem;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:7px;">
+                <i class="fas fa-plus"></i> Criar Espaço
+            </button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
 

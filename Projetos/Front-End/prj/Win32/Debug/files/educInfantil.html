@@ -166,17 +166,7 @@
         }
         .lazer-slide-mobile { display: none; }
 
-        /* ── MOMENTOS (grade de fotos) ── */
-        .momentos { padding: 5rem 0; background: white; }
-        .momentos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2rem; }
-        .momento-card { border-radius: 1.2rem; overflow: hidden; position: relative; cursor: pointer; background: linear-gradient(135deg,#fff2e3,#ffe6cc); aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; font-size: 3rem; transition: 0.3s; }
-        .momento-card:hover { transform: scale(1.02); box-shadow: 0 16px 32px rgba(0,0,0,0.12); }
-        .momento-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-        .momento-card .placeholder-txt { position: relative; z-index: 1; text-align: center; color: rgba(125,39,40,0.3); }
-        .momento-card .placeholder-txt i { font-size: 2rem; display: block; margin-bottom: 0.3rem; }
-        .momento-card .placeholder-txt span { font-size: 0.75rem; font-weight: 600; }
-        .momento-destaque { grid-column: span 2; grid-row: span 1; aspect-ratio: auto; }
-        @media (max-width: 600px) { .momentos-grid { grid-template-columns: 1fr 1fr; } .momento-destaque { grid-column: span 2; } }
+
 
         /* ── DIFERENCIAIS ── */
         .diferenciais { padding: 5rem 0; background: linear-gradient(135deg, #7d2728 0%, #3d1a1b 100%); }
@@ -321,10 +311,6 @@
             <div class="qcard-icon"><img src="/files/educInfantil/icones/lazer.png" alt="Área de Lazer" style=""></div>
             <span>Área de Lazer</span>
         </a>
-        <a href="#sec-momentos" class="qcard qcard-4">
-            <div class="qcard-icon"><img src="/files/educInfantil/icones/momentos.png" alt="Momentos Especiais" style=""></div>
-            <span>Momentos Especiais</span>
-        </a>
         <a href="#sec-diferenciais" class="qcard qcard-5">
             <div class="qcard-icon"><img src="/files/educInfantil/icones/diferenciais.png" alt="Diferenciais" style=""></div>
             <span>Diferenciais</span>
@@ -460,67 +446,13 @@
         </div>
     </div>
 
-    <!-- MOMENTOS ESPECIAIS -->
-    <div class="momentos" id="sec-momentos">
-        <div class="container">
-            <div class="sec-title">Momentos <span>Especiais</span></div>
-            <div class="sec-line"></div>
-            <p class="sec-sub">Momentos especiais do dia a dia da Educação Infantil</p>
-            <div class="momentos-grid" id="momentosGrid">
-                <!-- preenchido dinamicamente ou placeholder -->
-                <div class="momento-card momento-destaque"><div class="placeholder-txt"><i class="fas fa-camera"></i><span>Foto em destaque</span></div></div>
-                <div class="momento-card"><div class="placeholder-txt"><i class="fas fa-camera"></i><span>Foto</span></div></div>
-                <div class="momento-card"><div class="placeholder-txt"><i class="fas fa-camera"></i><span>Foto</span></div></div>
-                <div class="momento-card"><div class="placeholder-txt"><i class="fas fa-camera"></i><span>Foto</span></div></div>
-                <div class="momento-card"><div class="placeholder-txt"><i class="fas fa-camera"></i><span>Foto</span></div></div>
-            </div>
-        </div>
-    </div>
-
     <!-- DIFERENCIAIS -->
     <div class="diferenciais" id="sec-diferenciais">
         <div class="container">
             <div class="sec-title">Nossos <span style="color:#fdcd62;">Diferenciais</span></div>
             <div class="sec-line"></div>
             <p class="sec-sub" style="color:rgba(255,255,255,0.7);">Uma proposta pedagógica que une cuidado, afeto e excelência educacional</p>
-            <div class="dif-grid">
-                <div class="dif-card" onclick="abrirModalDif('arte')">
-                    <span class="dif-icone">🎨</span>
-                    <h3>Arte e Criatividade</h3>
-                    <p>Atividades lúdicas que estimulam a imaginação e o desenvolvimento criativo de cada criança.</p>
-                    <div class="dif-card-hint"><i class="fas fa-expand-alt"></i> Saiba mais</div>
-                </div>
-                <div class="dif-card" onclick="abrirModalDif('alfabetizacao')">
-                    <span class="dif-icone">📖</span>
-                    <h3>Alfabetização Fônica</h3>
-                    <p>Metodologia fônica e lúdica que prepara a criança para a leitura e escrita com prazer.</p>
-                    <div class="dif-card-hint"><i class="fas fa-expand-alt"></i> Saiba mais</div>
-                </div>
-                <div class="dif-card" onclick="abrirModalDif('jornada')">
-                    <span class="dif-icone">🕐</span>
-                    <h3>Jornada Ampliada</h3>
-                    <p>Período estendido com atividades complementares que enriquecem o desenvolvimento integral.</p>
-                    <div class="dif-card-hint"><i class="fas fa-expand-alt"></i> Saiba mais</div>
-                </div>
-                <div class="dif-card" onclick="abrirModalDif('psicomotricidade')">
-                    <span class="dif-icone">🏃</span>
-                    <h3>Psicomotricidade</h3>
-                    <p>Desenvolvimento motor coordenado com atividades físicas, jogos e brincadeiras orientadas.</p>
-                    <div class="dif-card-hint"><i class="fas fa-expand-alt"></i> Saiba mais</div>
-                </div>
-                <div class="dif-card" onclick="abrirModalDif('socializacao')">
-                    <span class="dif-icone">🤝</span>
-                    <h3>Socialização</h3>
-                    <p>Projetos coletivos que ensinam cooperação, respeito e convivência desde a primeira infância.</p>
-                    <div class="dif-card-hint"><i class="fas fa-expand-alt"></i> Saiba mais</div>
-                </div>
-                <div class="dif-card" onclick="abrirModalDif('valores')">
-                    <span class="dif-icone">🙏</span>
-                    <h3>Valores Cristãos</h3>
-                    <p>Princípios bíblicos integrados ao cotidiano escolar, formando caráter e propósito desde cedo.</p>
-                    <div class="dif-card-hint"><i class="fas fa-expand-alt"></i> Saiba mais</div>
-                </div>
-            </div>
+            <div class="dif-grid" id="difGrid"></div>
         </div>
     </div>
 
@@ -664,25 +596,10 @@ function renderGaleria(dados) {
                '<div class="gal-card-ov"><i class="fas fa-search-plus"></i></div>' +
                '</div>';
     }).join('');
-    // preenche momentos grid também
-    renderMomentos(fotos);
 }
 document.getElementById('galPrev').addEventListener('click', function() { _galIr(_galOffset - 1); });
 document.getElementById('galNext').addEventListener('click', function() { _galIr(_galOffset + 1); });
 
-// ── MOMENTOS GRID ──
-function renderMomentos(fotos) {
-    var grid = document.getElementById('momentosGrid');
-    if (!grid || !fotos.length) return;
-    var html = '';
-    fotos.slice(0, 5).forEach(function(item, i) {
-        var cls = i === 0 ? 'momento-card momento-destaque' : 'momento-card';
-        html += '<div class="' + cls + '" onclick="_abrirLb(' + i + ')">' +
-                '<img src="/files/' + item.imagem + '" alt="Momento ' + (i+1) + '" loading="lazy">' +
-                '</div>';
-    });
-    grid.innerHTML = html;
-}
 
 // ── LIGHTBOX ──
 window._abrirLb = function(idx) {
@@ -759,15 +676,15 @@ var _lazerTimer = null;
 
 function _lazerHtml(dados) {
     return dados.map(function(item) {
-        var nome = item.imagem.split('/').pop().replace(/\.[^.]+$/, '').replace(/_/g, ' ');
-        var titulo = item.titulo || nome;
+        var titulo = item.titulo || '';
         var desc   = item.descricao || '';
+        var capa   = (titulo || desc) ? '<div class="lazer-slide-capa">' +
+               (titulo ? '<div class="lazer-slide-titulo">' + titulo + '</div>' : '') +
+               (desc   ? '<div class="lazer-slide-desc">'   + desc   + '</div>' : '') +
+               '</div>' : '';
         return '<div class="lazer-slide-item">' +
-               '<img src="/files/' + item.imagem + '" alt="' + titulo + '" loading="lazy">' +
-               '<div class="lazer-slide-capa">' +
-               '<div class="lazer-slide-titulo">' + titulo + '</div>' +
-               (desc ? '<div class="lazer-slide-desc">' + desc + '</div>' : '') +
-               '</div></div>';
+               '<img src="/files/' + item.imagem + '" alt="" loading="lazy">' +
+               capa + '</div>';
     }).join('');
 }
 function renderLazer(dados) {
@@ -784,7 +701,7 @@ function renderLazer(dados) {
     // Cards laterais gerados dinamicamente a partir do JSON
     var icons = ['🛝','⚽','📚','🍽️','🏫','😴','🎨','🌿','🎭','🎵'];
     var cardsHtml = dados.map(function(item, i) {
-        var titulo = item.titulo || item.imagem.split('/').pop().replace(/\.[^.]+$/, '').replace(/_/g, ' ');
+        var titulo = item.titulo || '';
         var desc = item.descricao || '';
         return '<div class="lazer-item' + (i === 0 ? ' ativo' : '') + '" data-idx="' + i + '" onclick="_lazerIrIdx(this)">' +
                '<div class="lazer-item-icon">' + icons[i % icons.length] + '</div>' +
@@ -816,6 +733,7 @@ document.getElementById('lazerPrev').addEventListener('click', function() { _laz
 document.getElementById('lazerNext').addEventListener('click', function() { _lazerIr(_lazerIdx + 1); _lazerIniciarAuto(); });
 
 // ── CARREGAR FOTOS (XHR → bridge) ──
+var _galeriaCache = '';
 function carregarGaleria() {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', '/files/educInfantil/galeria.json?t=' + Date.now(), true);
@@ -823,11 +741,15 @@ function carregarGaleria() {
         if (xhr.readyState !== 4) return;
         if (xhr.status === 200 && xhr.responseText) {
             try {
-                var d = JSON.parse(xhr.responseText);
-                if (d && d.length) { renderGaleria(d); return; }
+                var raw = xhr.responseText.replace(/^﻿/,'');
+                var d = JSON.parse(raw);
+                if (d && d.length) {
+                    if (raw !== _galeriaCache) { _galeriaCache = raw; renderGaleria(d); }
+                    return;
+                }
             } catch(e) {}
         }
-        carregarGaleriaBridge();
+        if (!_galeriaCache) carregarGaleriaBridge();
     };
     xhr.send();
 }
@@ -854,52 +776,13 @@ function carregarGaleriaBridge() {
 }
 carregarGaleria();
 
-// ── MOMENTOS ESPECIAIS (pasta própria) ──
-function carregarMomentos() {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', '/files/educInfantil/momentos.json?t=' + Date.now(), true);
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState !== 4) return;
-        if (xhr.status === 200 && xhr.responseText) {
-            try {
-                var d = JSON.parse(xhr.responseText);
-                if (d && d.length) { renderMomentos(d); return; }
-            } catch(e) {}
-        }
-        // fallback: galeria popula momentos via renderGaleria
-    };
-    xhr.send();
-}
-carregarMomentos();
-
-setInterval(function(){ carregarGaleria(); carregarMomentos(); carregarLazer(); }, 30000);
-
-(function(){
-    function pollConteudo(){
-        var x=new XMLHttpRequest();
-        x.open('GET','/files/educInfantil/conteudo.json?t='+Date.now(),true);
-        x.onreadystatechange=function(){
-            if(x.readyState!==4||x.status!==200) return;
-            try{
-                var d=JSON.parse(x.responseText);
-                // descricao gerenciada pelo proposta.json; conteudo.json não sobrescreve
-            }catch(e){}
-        };
-        x.send();
-    }
-    pollConteudo();
-    setInterval(pollConteudo,30000);
-})();
-
-// Carrega banner e atualiza automaticamente a cada 30 segundos
+// Carrega banner uma vez — só muda quando o admin faz upload
 (function() {
     var el = document.getElementById('heroBg');
-    function atualizarBanner() { if (el) el.src = '/files/educInfantil/capa.png?v=' + Date.now(); }
-    atualizarBanner();
-    setInterval(atualizarBanner, 30000);
+    if (el) el.src = '/files/educInfantil/capa.png?v=' + Date.now();
 })();
 
-// Atualiza proposta e formação (textos + imagens) a cada 30 segundos
+// Atualiza textos de proposta e formação a cada 30 segundos (imagens só no carregamento inicial)
 (function(){
     function pollProposta(){
         var x=new XMLHttpRequest();
@@ -907,7 +790,7 @@ setInterval(function(){ carregarGaleria(); carregarMomentos(); carregarLazer(); 
         x.onreadystatechange=function(){
             if(x.readyState!==4||x.status!==200) return;
             try{
-                var d=JSON.parse(x.responseText);
+                var d=JSON.parse(x.responseText.replace(/^﻿/,''));
                 var e;
                 if(d.tituloPropostaTexto){e=document.getElementById('cj-proposta-titulo');if(e)e.textContent=d.tituloPropostaTexto;}
                 if(d.descricaoProposta){e=document.getElementById('cj-descricao');if(e)e.innerHTML=d.descricaoProposta;}
@@ -917,96 +800,101 @@ setInterval(function(){ carregarGaleria(); carregarMomentos(); carregarLazer(); 
         };
         x.send();
     }
-    function atualizarImgsProposta(){
-        var p=document.getElementById('cj-proposta-img');
-        var f=document.getElementById('cj-formacao-img');
-        if(p) p.src='/files/educInfantil/proposta.png?v='+Date.now();
-        if(f) f.src='/files/educInfantil/formacao.png?v='+Date.now();
-    }
+    var p=document.getElementById('cj-proposta-img');
+    var f=document.getElementById('cj-formacao-img');
+    if(p) p.src='/files/educInfantil/proposta.png?v='+Date.now();
+    if(f) f.src='/files/educInfantil/formacao.png?v='+Date.now();
     pollProposta();
-    atualizarImgsProposta();
-    setInterval(function(){ pollProposta(); atualizarImgsProposta(); }, 30000);
+    setInterval(pollProposta, 30000);
 })();
 
 // Carrega Área de Lazer do JSON e atualiza a cada 30s
+var _lazerCache = '';
 function carregarLazer() {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', '/files/educInfantil/estrutura.json?t=' + Date.now(), true);
     xhr.onreadystatechange = function() {
         if (xhr.readyState !== 4) return;
         if (xhr.status === 200 && xhr.responseText) {
-            try { var d = JSON.parse(xhr.responseText); if (d && d.length) renderLazer(d); } catch(e) {}
+            try {
+                var raw = xhr.responseText.replace(/^﻿/,'');
+                var d = JSON.parse(raw);
+                if (d && d.length && raw !== _lazerCache) { _lazerCache = raw; renderLazer(d); }
+            } catch(e) {}
         }
     };
     xhr.send();
 }
-carregarLazer();
+setTimeout(carregarLazer, 1500);
 
-// ---- Modal Diferenciais ----
-var _dadosDif = {
-    arte: {
-        icone: '🎨',
-        titulo: 'Arte e Criatividade',
-        texto: 'Desde cedo, nossas crianças exploram o mundo através da arte. Com atividades de pintura, modelagem, música e teatro, desenvolvemos a expressão criativa, a imaginação e a autoconfiança de forma lúdica e prazerosa.',
-        foto: 'educInfantil/diferenciais/arte.jpg'
-    },
-    alfabetizacao: {
-        icone: '📚',
-        titulo: 'Alfabetização Bilíngue',
-        texto: 'Nossa metodologia de alfabetização alia o português ao inglês de forma natural e integrada, estimulando a aquisição da leitura e escrita com estratégias lúdicas, garantindo uma base sólida para toda a vida escolar.',
-        foto: 'educInfantil/diferenciais/alfabetizacao.jpg'
-    },
-    jornada: {
-        icone: '🕐',
-        titulo: 'Jornada Ampliada',
-        texto: 'Oferecemos uma jornada escolar ampliada com atividades diversificadas no contraturno, garantindo que as crianças tenham mais tempo de aprendizado, socialização e desenvolvimento integral em um ambiente seguro e estimulante.',
-        foto: 'educInfantil/diferenciais/jornada.jpg'
-    },
-    psicomotricidade: {
-        icone: '🤸',
-        titulo: 'Psicomotricidade',
-        texto: 'As aulas de psicomotricidade desenvolvem a coordenação motora, o equilíbrio e a consciência corporal das crianças por meio de jogos e brincadeiras estruturadas, preparando-as para desafios acadêmicos e físicos futuros.',
-        foto: 'educInfantil/diferenciais/psicomotricidade.jpg'
-    },
-    socializacao: {
-        icone: '🤝',
-        titulo: 'Socialização',
-        texto: 'Acreditamos que aprender a conviver é tão importante quanto aprender conteúdos. Nosso ambiente favorece a construção de amizades, o respeito às diferenças e o desenvolvimento de habilidades socioemocionais essenciais.',
-        foto: 'educInfantil/diferenciais/socializacao.jpg'
-    },
-    valores: {
-        icone: '✨',
-        titulo: 'Valores Cristãos',
-        texto: 'Integrados ao cotidiano escolar, os valores cristãos permeiam todas as atividades, cultivando o amor ao próximo, a honestidade, a gratidão e o senso de responsabilidade desde a mais tenra idade.',
-        foto: 'educInfantil/diferenciais/valores.jpg'
-    }
-};
+// ---- Diferenciais dinâmicos ----
+var _difsPortal = [];
+var _difsCache = '';
 
-function abrirModalDif(chave) {
-    var d = _dadosDif[chave];
+function carregarDiferenciais() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/files/educInfantil/diferenciais.json?t=' + Date.now(), true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState !== 4) return;
+        if (xhr.status === 200 && xhr.responseText) {
+            try {
+                var raw = xhr.responseText.replace(/^﻿/,'');
+                var d = JSON.parse(raw);
+                if (d && d.length && raw !== _difsCache) { _difsCache = raw; _difsPortal = d; renderDiferenciaisPortal(); }
+            } catch(e) {}
+        }
+    };
+    xhr.send();
+}
+
+function renderDiferenciaisPortal() {
+    var g = document.getElementById('difGrid');
+    if (!g) return;
+    g.innerHTML = _difsPortal.map(function(d, i) {
+        var iconeHtml = d.iconeImg
+            ? '<span class="dif-icone"><img src="/files/' + d.iconeImg + '" alt="" style="width:2.4rem;height:2.4rem;object-fit:contain;"></span>'
+            : '<span class="dif-icone">' + d.icone + '</span>';
+        return '<div class="dif-card" onclick="abrirModalDif(' + i + ')">' +
+            iconeHtml +
+            '<h3>' + d.titulo + '</h3>' +
+            '<p>' + d.descricao + '</p>' +
+            '<div class="dif-card-hint"><i class="fas fa-expand-alt"></i> Saiba mais</div>' +
+            '</div>';
+    }).join('');
+}
+
+function abrirModalDif(idx) {
+    var d = _difsPortal[idx];
     if (!d) return;
-    // Ícone: tenta imagem da pasta icones, fallback para emoji
     var iconeEl = document.getElementById('modalDifIcone');
-    var iconeImg = new Image();
-    iconeImg.onload = function() {
-        iconeEl.innerHTML = '';
-        iconeEl.appendChild(iconeImg);
-    };
-    iconeImg.onerror = function() {
+    if (d.iconeImg) {
+        iconeEl.innerHTML = '<img src="/files/' + d.iconeImg + '" alt="" style="width:52px;height:52px;object-fit:contain;">';
+    } else {
         iconeEl.textContent = d.icone;
-    };
-    iconeImg.src = '/files/educInfantil/diferenciais/icones/' + chave + '.png';
-    iconeEl.textContent = d.icone; // mostra emoji enquanto carrega
+    }
     document.getElementById('modalDifTitulo').textContent = d.titulo;
-    document.getElementById('modalDifTexto').textContent = d.texto;
+    document.getElementById('modalDifTexto').textContent = d.textoModal || d.descricao;
     var img = document.getElementById('modalDifImg');
     var ph = document.getElementById('modalDifFotoPh');
-    img.style.display = 'none';
-    ph.style.display = 'block';
-    img.src = '/files/' + d.foto;
-    var overlay = document.getElementById('modalDif');
-    overlay.classList.add('ativo');
+    if (d.foto) {
+        img.style.display = 'none';
+        ph.style.display = 'block';
+        img.src = '/files/' + d.foto;
+    } else {
+        img.style.display = 'none';
+        ph.style.display = 'block';
+    }
+    document.getElementById('modalDif').classList.add('ativo');
 }
+
+setTimeout(carregarDiferenciais, 3000);
+
+// Auto-refresh a cada 30s — requisições escalonadas para não sobrecarregar o servidor
+setInterval(function(){
+    carregarGaleria();
+    setTimeout(carregarLazer, 2000);
+    setTimeout(carregarDiferenciais, 4000);
+}, 30000);
 
 (function() {
     function fecharDif() {

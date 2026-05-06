@@ -261,10 +261,6 @@ if (sessionStorage.getItem('adm_ok') !== 'niveis-ensino') {
             <i class="fas fa-images"></i> Galeria de Fotos
             <span class="cnt" id="cnt-galeria">0</span>
         </a>
-        <a class="sb-item" id="nav-lazer" onclick="ir('lazer')">
-            <i class="fas fa-running"></i> Área de Lazer
-            <span class="cnt" id="cnt-lazer">0</span>
-        </a>
 
         <div class="sb-divider"></div>
         <div class="sb-group">Conteúdo</div>
@@ -326,32 +322,6 @@ if (sessionStorage.getItem('adm_ok') !== 'niveis-ensino') {
                 </div>
                 <div class="gal-grid" id="galeriaGrid"></div>
                 <div class="drop-zone" id="dropGal" onclick="document.getElementById('upGal').click()">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <p>Arraste as fotos aqui ou clique para selecionar</p>
-                    <small>JPG, PNG, WEBP — Múltiplas imagens aceitas</small>
-                </div>
-            </div>
-        </div>
-
-        <!-- ═══════ LAZER ═══════ -->
-        <div class="panel" id="painel-lazer">
-            <div class="ph">
-                <div>
-                    <h2><i class="fas fa-running" style="color:#fdcd62;margin-right:8px;"></i>Área de Lazer</h2>
-                    <p>Fotos do slideshow exibido na seção de Área de Lazer do portal</p>
-                </div>
-                <button class="btn-add" onclick="document.getElementById('upLazer').click()">
-                    <i class="fas fa-plus"></i> Adicionar Fotos
-                </button>
-                <input type="file" id="upLazer" accept="image/*" multiple style="display:none" onchange="addLazer(this)">
-            </div>
-            <div class="box">
-                <div class="box-title">
-                    <i class="fas fa-images"></i> Fotos do Slideshow
-                    <span class="lbl" id="lbl-lazer">0 imagens</span>
-                </div>
-                <div class="gal-grid" id="lazerGrid"></div>
-                <div class="drop-zone" id="dropLazer" onclick="document.getElementById('upLazer').click()">
                     <i class="fas fa-cloud-upload-alt"></i>
                     <p>Arraste as fotos aqui ou clique para selecionar</p>
                     <small>JPG, PNG, WEBP — Múltiplas imagens aceitas</small>
@@ -446,10 +416,6 @@ var GAL_PREFIX     = 'preVestibular/galeria/';
 var GAL_JSON_PASTA = 'preVestibular';
 var GAL_JSON_NOME  = 'galeria.json';
 var PASTA_CONTEUDO = 'preVestibular';
-var PASTA_LAZER       = 'preVestibular/estrutura';
-var LAZER_JSON_PASTA  = 'preVestibular';
-var LAZER_JSON_NOME   = 'estrutura.json';
-var LAZER_PREFIX      = 'preVestibular/estrutura/';
 var DEF_TITULO     = 'Pré-Universitário';
 var DEF_SUBTITULO  = 'Preparatório para Vestibulares';
 var DEF_FAIXA      = '17 a 18 anos';
@@ -627,114 +593,7 @@ function excluirGaleria(nome){
     }
     dzSetup('dropBanner', uploadBanner);
     dzSetup('dropGal',    addGaleria);
-    dzSetup('dropLazer',  addLazer);
 })();
-
-// ── LAZER ──
-var _lazerItens = [];
-var _lazerSaveTimer = null;
-
-function carregarLazer(){
-    fetch('/files/'+LAZER_JSON_PASTA+'/'+LAZER_JSON_NOME+'?v='+Date.now())
-        .then(function(r){ return r.ok ? r.json() : []; })
-        .catch(function(){ return []; })
-        .then(function(jsonEntries){
-            var tituloMap = {};
-            if(Array.isArray(jsonEntries)){
-                jsonEntries.forEach(function(e){
-                    var nome = (e.imagem||'').split('/').pop();
-                    tituloMap[nome] = e.titulo || '';
-                });
-            }
-            return fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER)+'&raw=1')
-                .then(function(r){ return r.json(); })
-                .then(function(lista){
-                    _lazerItens = lista.map(function(img){
-                        return {nome: img.nome, titulo: tituloMap[img.nome] || ''};
-                    });
-                    document.getElementById('cnt-lazer').textContent = _lazerItens.length;
-                    renderLazerAdmin();
-                    atualizarLazerJSON();
-                });
-        })
-        .catch(function(){ _lazerItens=[]; renderLazerAdmin(); });
-}
-
-function renderLazerAdmin(){
-    var cnt = _lazerItens.length;
-    document.getElementById('cnt-lazer').textContent = cnt;
-    document.getElementById('lbl-lazer').textContent = cnt + (cnt===1?' item':' itens');
-    var g = document.getElementById('lazerGrid');
-    if(!cnt){
-        g.innerHTML = '<div class="empty" style="grid-column:1/-1"><i class="fas fa-images"></i><p>Nenhum item cadastrado. Adicione uma foto para criar um novo espaço.</p></div>';
-        return;
-    }
-    g.innerHTML = _lazerItens.map(function(item, i){
-        var url = '/files/'+PASTA_LAZER+'/'+item.nome;
-        return '<div class="gal-card">'+
-            '<img class="gal-img" src="'+esc(url)+'?v='+Date.now()+'" alt="'+esc(item.nome)+'" '+
-                'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'+
-            '<div class="gal-ph" style="display:none"><i class="fas fa-image"></i></div>'+
-            '<div class="gal-info">'+
-            '<input type="text" placeholder="Nome do espaço (ex: Quadra Esportiva)" '+
-                'value="'+esc(item.titulo)+'" data-idx="'+i+'" oninput="_lazerTitulo(this)" '+
-                'style="width:100%;margin-bottom:6px;font-size:0.82rem;padding:5px 8px;border:1px solid #e0d4cb;border-radius:6px;font-family:inherit;color:#3d1a1b;">'+
-            '<button class="btn-del" onclick="excluirLazer(\''+escJ(item.nome)+'\')" style="width:100%"><i class="fas fa-trash"></i> Excluir</button>'+
-            '</div></div>';
-    }).join('');
-}
-
-function _lazerTitulo(inp){
-    var idx = parseInt(inp.getAttribute('data-idx'), 10);
-    if(_lazerItens[idx] !== undefined) _lazerItens[idx].titulo = inp.value;
-    clearTimeout(_lazerSaveTimer);
-    _lazerSaveTimer = setTimeout(atualizarLazerJSON, 800);
-}
-
-function atualizarLazerJSON(){
-    var entries = _lazerItens.map(function(item){
-        return {imagem: LAZER_PREFIX + item.nome, titulo: item.titulo};
-    });
-    var b64;
-    try { b64 = btoa(unescape(encodeURIComponent(JSON.stringify(entries)))); } catch(e){ return; }
-    fetch('/salvar-texto',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({pasta:LAZER_JSON_PASTA, nome:LAZER_JSON_NOME, rawmode:'1', base64:b64})
-    }).catch(function(){});
-}
-
-function addLazer(inp){
-    if(!inp.files||!inp.files.length) return;
-    var files=Array.prototype.slice.call(inp.files), cnt=0, tot=files.length;
-    files.forEach(function(f){
-        lerArq(f,function(src){
-            fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({nome:f.name, pasta:PASTA_LAZER, rawmode:'1', base64:src})
-            }).then(function(r){return r.json();})
-              .then(function(){
-                  if(++cnt===tot){
-                      try{inp.value='';}catch(e){}
-                      carregarLazer();
-                      toast(tot+' item(ns) adicionado(s)! Edite o nome do espaço acima da foto.');
-                  }
-              })
-              .catch(function(){ toast('Erro ao enviar foto',true); });
-        });
-    });
-}
-
-function excluirLazer(nome){
-    confirmar('Excluir este item da Área de Lazer?', nome, function(){
-        fetch('/deletar',{method:'POST',headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({nome:nome, pasta:PASTA_LAZER, rawmode:'1'})
-        }).then(function(){
-            _lazerItens = _lazerItens.filter(function(i){ return i.nome !== nome; });
-            atualizarLazerJSON();
-            document.getElementById('cnt-lazer').textContent = _lazerItens.length;
-            renderLazerAdmin();
-            toast('Item excluído!');
-        }).catch(function(){ toast('Erro ao excluir',true); });
-    });
-}
 
 // ── DIFERENCIAIS ──
 var _difs = [];
@@ -809,7 +668,6 @@ function salvarConteudo(){
 // ── INIT ──
 carregarBanner();
 carregarGaleria();
-carregarLazer();
 carregarConteudo();
 renderDiferenciais();</script>
 </body>
