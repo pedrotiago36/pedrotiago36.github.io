@@ -746,10 +746,12 @@ function carregarConteudo(){
             if(d.diferenciais) setDiferenciais(d.diferenciais);
         })
         .catch(function(){
-            document.getElementById('fTitulo').value    = DEF_TITULO;
-            document.getElementById('fSubtitulo').value = DEF_SUBTITULO;
-            document.getElementById('fFaixa').value     = DEF_FAIXA;
-            document.getElementById('fTurno').value     = DEF_TURNO;
+            document.getElementById('fTitulo').value      = DEF_TITULO;
+            document.getElementById('fSubtitulo').value   = DEF_SUBTITULO;
+            document.getElementById('fFaixa').value       = DEF_FAIXA;
+            document.getElementById('fTurno').value       = DEF_TURNO;
+            document.getElementById('fDescricao').value   = 'O Ensino Fundamental I é o alicerce da jornada acadêmica. Do 2º ao 5º ano, trabalhamos a alfabetização completa, o raciocínio lógico-matemático e o desenvolvimento das competências socioemocionais, sempre com base nos valores cristãos.\n\nMetodologias ativas, projetos interdisciplinares e acompanhamento individualizado garantem que cada aluno avance no seu ritmo, com confiança e motivação.';
+            document.getElementById('fComponentes').value = 'Língua Portuguesa, Matemática, Ciências da Natureza, Ciências Humanas, Artes, Educação Física, Língua Inglesa, Ensino Religioso';
         });
 }
 

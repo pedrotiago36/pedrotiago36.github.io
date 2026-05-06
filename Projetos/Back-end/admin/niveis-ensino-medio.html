@@ -746,10 +746,12 @@ function carregarConteudo(){
             if(d.diferenciais) setDiferenciais(d.diferenciais);
         })
         .catch(function(){
-            document.getElementById('fTitulo').value    = DEF_TITULO;
-            document.getElementById('fSubtitulo').value = DEF_SUBTITULO;
-            document.getElementById('fFaixa').value     = DEF_FAIXA;
-            document.getElementById('fTurno').value     = DEF_TURNO;
+            document.getElementById('fTitulo').value      = DEF_TITULO;
+            document.getElementById('fSubtitulo').value   = DEF_SUBTITULO;
+            document.getElementById('fFaixa').value       = DEF_FAIXA;
+            document.getElementById('fTurno').value       = DEF_TURNO;
+            document.getElementById('fDescricao').value   = 'O Ensino Médio no Colégio Batista Santos Dumont combina rigor acadêmico, valores cristãos e preparação completa para os maiores desafios da vida universitária e profissional.\n\nCom professores experientes, metodologias ativas e acompanhamento individualizado, formamos jovens preparados para os melhores vestibulares e para a vida.';
+            document.getElementById('fComponentes').value = 'Língua Portuguesa, Literatura, Matemática, Física, Química, Biologia, História, Geografia, Filosofia, Sociologia, Artes, Educação Física, Língua Inglesa, Ensino Religioso';
         });
 }
 

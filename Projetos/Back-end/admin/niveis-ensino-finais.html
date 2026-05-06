@@ -746,10 +746,12 @@ function carregarConteudo(){
             if(d.diferenciais) setDiferenciais(d.diferenciais);
         })
         .catch(function(){
-            document.getElementById('fTitulo').value    = DEF_TITULO;
-            document.getElementById('fSubtitulo').value = DEF_SUBTITULO;
-            document.getElementById('fFaixa').value     = DEF_FAIXA;
-            document.getElementById('fTurno').value     = DEF_TURNO;
+            document.getElementById('fTitulo').value      = DEF_TITULO;
+            document.getElementById('fSubtitulo').value   = DEF_SUBTITULO;
+            document.getElementById('fFaixa').value       = DEF_FAIXA;
+            document.getElementById('fTurno').value       = DEF_TURNO;
+            document.getElementById('fDescricao').value   = 'Os Anos Finais do Ensino Fundamental — do 6º ao 9º ano — são um período de grande transformação. O aluno aprofunda conhecimentos, desenvolve pensamento crítico e se prepara para os desafios do Ensino Médio.\n\nOferecemos metodologias ativas, projetos interdisciplinares e acompanhamento pedagógico individualizado, sempre com base nos valores cristãos que norteiam nossa instituição.';
+            document.getElementById('fComponentes').value = 'Língua Portuguesa, Matemática, Ciências da Natureza, Ciências Humanas, Artes, Educação Física, Língua Inglesa, Ensino Religioso';
         });
 }
 
