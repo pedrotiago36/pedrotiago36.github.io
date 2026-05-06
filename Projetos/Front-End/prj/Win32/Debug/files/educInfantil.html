@@ -446,50 +446,7 @@
                         <button class="lazer-btn next" onclick="_lazerIr(_lazerIdx+1);_lazerIniciarAuto();"><i class="fas fa-chevron-right"></i></button>
                         <div class="lazer-dots" id="lazerDotsMobile"></div>
                     </div>
-                    <div class="lazer-items" id="lazerCards">
-                        <div class="lazer-item" data-chave="parquinho" onclick="_lazerIrPorChave(this)">
-                            <div class="lazer-item-icon">🛝</div>
-                            <div>
-                                <h4>Parquinho Pedagógico</h4>
-                                <p>Escorregadores, balanços e estruturas que desenvolvem equilíbrio, força e coragem.</p>
-                            </div>
-                        </div>
-                        <div class="lazer-item" data-chave="quadra" onclick="_lazerIrPorChave(this)">
-                            <div class="lazer-item-icon">⚽</div>
-                            <div>
-                                <h4>Quadra Poliesportiva</h4>
-                                <p>Atividades físicas orientadas, jogos coletivos e psicomotricidade supervisionada.</p>
-                            </div>
-                        </div>
-                        <div class="lazer-item" data-chave="refeitorio" onclick="_lazerIrPorChave(this)">
-                            <div class="lazer-item-icon">🍽️</div>
-                            <div>
-                                <h4>Refeitório</h4>
-                                <p>Espaço aconchegante com alimentação balanceada e saudável, preparada com carinho para as crianças.</p>
-                            </div>
-                        </div>
-                        <div class="lazer-item" data-chave="biblioteca" onclick="_lazerIrPorChave(this)">
-                            <div class="lazer-item-icon">📚</div>
-                            <div>
-                                <h4>Biblioteca Infantil</h4>
-                                <p>Espaço colorido com acervo especial para a primeira infância e contação de histórias.</p>
-                            </div>
-                        </div>
-                        <div class="lazer-item" data-chave="sala" onclick="_lazerIrPorChave(this)">
-                            <div class="lazer-item-icon">🏫</div>
-                            <div>
-                                <h4>Sala Infantil</h4>
-                                <p>Ambiente acolhedor, colorido e estimulante, com cantinhos temáticos que despertam a curiosidade e a criatividade.</p>
-                            </div>
-                        </div>
-                        <div class="lazer-item" data-chave="cantinho" onclick="_lazerIrPorChave(this)">
-                            <div class="lazer-item-icon">😴</div>
-                            <div>
-                                <h4>Cantinho do Sono</h4>
-                                <p>Espaço tranquilo e confortável para o descanso das crianças, com colchonetes e ambiente pensado para um sono de qualidade.</p>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="lazer-items" id="lazerCards"></div>
             </div>
             <div class="lazer-slide" id="lazerSlide">
                 <div class="lazer-slide-track" id="lazerTrack">
@@ -809,7 +766,7 @@ function _lazerHtml(dados) {
     }).join('');
 }
 function renderLazer(dados) {
-    if (!dados.length) return;
+    if (!dados || !dados.length) return;
     _lazerLista = dados;
     var html = _lazerHtml(dados);
     var dotHtml = dados.map(function(_, i) {
@@ -819,6 +776,16 @@ function renderLazer(dados) {
     document.getElementById('lazerDots').innerHTML  = dotHtml;
     document.getElementById('lazerTrackMobile').innerHTML = html;
     document.getElementById('lazerDotsMobile').innerHTML  = dotHtml;
+    // Cards laterais gerados dinamicamente a partir do JSON
+    var icons = ['🛝','⚽','📚','🍽️','🏫','😴','🎨','🌿','🎭','🎵'];
+    var cardsHtml = dados.map(function(item, i) {
+        var titulo = item.titulo || item.imagem.split('/').pop().replace(/\.[^.]+$/, '').replace(/_/g, ' ');
+        var desc = item.descricao || '';
+        return '<div class="lazer-item' + (i === 0 ? ' ativo' : '') + '" data-idx="' + i + '" onclick="_lazerIrIdx(this)">' +
+               '<div class="lazer-item-icon">' + icons[i % icons.length] + '</div>' +
+               '<div><h4>' + titulo + '</h4>' + (desc ? '<p>' + desc + '</p>' : '') + '</div></div>';
+    }).join('');
+    document.getElementById('lazerCards').innerHTML = cardsHtml || '<p style="color:rgba(125,39,40,0.3);font-size:0.85rem;padding:1rem 0;">Nenhum espaço cadastrado.</p>';
     _lazerIniciarAuto();
 }
 function _lazerIr(idx) {
@@ -827,22 +794,14 @@ function _lazerIr(idx) {
     document.getElementById('lazerTrack').style.transform = tx;
     document.getElementById('lazerTrackMobile').style.transform = tx;
     document.querySelectorAll('.lazer-dot').forEach(function(d, i) { d.classList.toggle('ativo', i === _lazerIdx); });
-    // destaca o card correspondente
-    var nome = (_lazerLista[_lazerIdx].imagem || '').toLowerCase();
     document.querySelectorAll('.lazer-item').forEach(function(el) {
-        var chave = el.getAttribute('data-chave') || '';
-        el.classList.toggle('ativo', nome.indexOf(chave) >= 0);
+        el.classList.toggle('ativo', parseInt(el.getAttribute('data-idx'), 10) === _lazerIdx);
     });
 }
-function _lazerIrPorChave(el) {
-    var chave = el.getAttribute('data-chave');
-    for (var i = 0; i < _lazerLista.length; i++) {
-        if ((_lazerLista[i].imagem || '').toLowerCase().indexOf(chave) >= 0) {
-            _lazerIr(i);
-            _lazerIniciarAuto();
-            return;
-        }
-    }
+function _lazerIrIdx(el) {
+    var idx = parseInt(el.getAttribute('data-idx'), 10);
+    _lazerIr(idx);
+    _lazerIniciarAuto();
 }
 function _lazerIniciarAuto() {
     if (_lazerTimer) clearInterval(_lazerTimer);
@@ -908,7 +867,7 @@ function carregarMomentos() {
 }
 carregarMomentos();
 
-setInterval(function(){ carregarGaleria(); carregarMomentos(); }, 30000);
+setInterval(function(){ carregarGaleria(); carregarMomentos(); carregarLazer(); }, 30000);
 
 (function(){
     function pollConteudo(){
@@ -964,36 +923,19 @@ setInterval(function(){ carregarGaleria(); carregarMomentos(); }, 30000);
     setInterval(function(){ pollProposta(); atualizarImgsProposta(); }, 30000);
 })();
 
-// carrega pasta educInfantil/estrutura/
-(function() {
-    var pasta = 'educInfantil/estrutura';
-    var uni = null;
-    try { uni = window.parent.parent; } catch(e) {}
-    if (!uni || typeof uni.listarPasta !== 'function') { try { uni = window.parent; } catch(e) {} }
-    if (uni && typeof uni.listarPasta === 'function') {
-        var vn = '_lista_' + pasta.replace(/\//g, '_');
-        try { uni[vn] = null; } catch(e) {}
-        uni.listarPasta(pasta);
-        var t = 0, timer = setInterval(function() {
-            t++;
-            var lista = null; try { lista = uni[vn]; } catch(e) {}
-            if (lista !== null && lista !== undefined) {
-                clearInterval(timer);
-                try { var d = typeof lista === 'string' ? JSON.parse(lista) : lista; if (d && d.length) renderLazer(d); } catch(e) {}
-            } else if (t >= 25) { clearInterval(timer); }
-        }, 200);
-    } else {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', '/files/' + pasta + '.json?t=' + Date.now(), true);
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState !== 4) return;
-            if (xhr.status === 200 && xhr.responseText) {
-                try { var d = JSON.parse(xhr.responseText); if (d && d.length) renderLazer(d); } catch(e) {}
-            }
-        };
-        xhr.send();
-    }
-})();
+// Carrega Área de Lazer do JSON e atualiza a cada 30s
+function carregarLazer() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/files/educInfantil/estrutura.json?t=' + Date.now(), true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState !== 4) return;
+        if (xhr.status === 200 && xhr.responseText) {
+            try { var d = JSON.parse(xhr.responseText); if (d && d.length) renderLazer(d); } catch(e) {}
+        }
+    };
+    xhr.send();
+}
+carregarLazer();
 
 // ---- Modal Diferenciais ----
 var _dadosDif = {
