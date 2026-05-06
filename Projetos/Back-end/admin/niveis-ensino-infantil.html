@@ -894,48 +894,75 @@ function salvarProposta(){
 }
 
 // ── LAZER ──
+var _lazerItens = [];
+var _lazerSaveTimer = null;
+
 function carregarLazer(){
-    fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER)+'&raw=1')
-        .then(function(r){ return r.json(); })
-        .then(function(lista){
-            document.getElementById('cnt-lazer').textContent = lista.length;
-            renderLazerAdmin(lista);
+    fetch('/files/'+LAZER_JSON_PASTA+'/'+LAZER_JSON_NOME+'?v='+Date.now())
+        .then(function(r){ return r.ok ? r.json() : []; })
+        .catch(function(){ return []; })
+        .then(function(jsonEntries){
+            var tituloMap = {};
+            if(Array.isArray(jsonEntries)){
+                jsonEntries.forEach(function(e){
+                    var nome = (e.imagem||'').split('/').pop();
+                    tituloMap[nome] = e.titulo || '';
+                });
+            }
+            return fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER)+'&raw=1')
+                .then(function(r){ return r.json(); })
+                .then(function(lista){
+                    _lazerItens = lista.map(function(img){
+                        return {nome: img.nome, titulo: tituloMap[img.nome] || ''};
+                    });
+                    document.getElementById('cnt-lazer').textContent = _lazerItens.length;
+                    renderLazerAdmin();
+                    atualizarLazerJSON();
+                });
         })
-        .catch(function(){ renderLazerAdmin([]); });
+        .catch(function(){ _lazerItens=[]; renderLazerAdmin(); });
 }
 
-function renderLazerAdmin(lista){
-    var cnt = lista.length;
-    document.getElementById('lbl-lazer').textContent = cnt + (cnt===1?' imagem':' imagens');
+function renderLazerAdmin(){
+    var cnt = _lazerItens.length;
+    document.getElementById('cnt-lazer').textContent = cnt;
+    document.getElementById('lbl-lazer').textContent = cnt + (cnt===1?' item':' itens');
     var g = document.getElementById('lazerGrid');
     if(!cnt){
-        g.innerHTML = '<div class="empty" style="grid-column:1/-1"><i class="fas fa-images"></i><p>Nenhuma foto cadastrada.</p></div>';
+        g.innerHTML = '<div class="empty" style="grid-column:1/-1"><i class="fas fa-images"></i><p>Nenhum item cadastrado. Adicione uma foto para criar um novo espaço.</p></div>';
         return;
     }
-    g.innerHTML = lista.map(function(img){
-        var url = '/files/'+PASTA_LAZER+'/'+img.nome;
+    g.innerHTML = _lazerItens.map(function(item, i){
+        var url = '/files/'+PASTA_LAZER+'/'+item.nome;
         return '<div class="gal-card">'+
-            '<img class="gal-img" src="'+esc(url)+'?v='+Date.now()+'" alt="'+esc(img.nome)+'" '+
+            '<img class="gal-img" src="'+esc(url)+'?v='+Date.now()+'" alt="'+esc(item.nome)+'" '+
                 'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'+
             '<div class="gal-ph" style="display:none"><i class="fas fa-image"></i></div>'+
             '<div class="gal-info">'+
-            '<div class="gal-name">'+esc(img.nome)+'</div>'+
-            '<button class="btn-del" onclick="excluirLazer(\''+escJ(img.nome)+'\')" style="width:100%"><i class="fas fa-trash"></i> Excluir</button>'+
+            '<input type="text" placeholder="Nome do espaço (ex: Quadra Esportiva)" '+
+                'value="'+esc(item.titulo)+'" data-idx="'+i+'" oninput="_lazerTitulo(this)" '+
+                'style="width:100%;margin-bottom:6px;font-size:0.82rem;padding:5px 8px;border:1px solid #e0d4cb;border-radius:6px;font-family:inherit;color:#3d1a1b;">'+
+            '<button class="btn-del" onclick="excluirLazer(\''+escJ(item.nome)+'\')" style="width:100%"><i class="fas fa-trash"></i> Excluir</button>'+
             '</div></div>';
     }).join('');
 }
 
+function _lazerTitulo(inp){
+    var idx = parseInt(inp.getAttribute('data-idx'), 10);
+    if(_lazerItens[idx] !== undefined) _lazerItens[idx].titulo = inp.value;
+    clearTimeout(_lazerSaveTimer);
+    _lazerSaveTimer = setTimeout(atualizarLazerJSON, 800);
+}
+
 function atualizarLazerJSON(){
-    fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER)+'&raw=1')
-        .then(function(r){ return r.json(); })
-        .then(function(lista){
-            var entries = lista.map(function(img){ return {imagem: LAZER_PREFIX + img.nome}; });
-            var b64;
-            try { b64 = btoa(unescape(encodeURIComponent(JSON.stringify(entries)))); } catch(e){ return; }
-            fetch('/salvar-texto',{method:'POST',headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({pasta:LAZER_JSON_PASTA, nome:LAZER_JSON_NOME, rawmode:'1', base64:b64})
-            }).catch(function(){});
-        }).catch(function(){});
+    var entries = _lazerItens.map(function(item){
+        return {imagem: LAZER_PREFIX + item.nome, titulo: item.titulo};
+    });
+    var b64;
+    try { b64 = btoa(unescape(encodeURIComponent(JSON.stringify(entries)))); } catch(e){ return; }
+    fetch('/salvar-texto',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({pasta:LAZER_JSON_PASTA, nome:LAZER_JSON_NOME, rawmode:'1', base64:b64})
+    }).catch(function(){});
 }
 
 function addLazer(inp){
@@ -950,8 +977,7 @@ function addLazer(inp){
                   if(++cnt===tot){
                       try{inp.value='';}catch(e){}
                       carregarLazer();
-                      atualizarLazerJSON();
-                      toast(tot+' foto(s) adicionada(s)!');
+                      toast(tot+' item(ns) adicionado(s)! Edite o nome do espaço acima da foto.');
                   }
               })
               .catch(function(){ toast('Erro ao enviar foto',true); });
@@ -960,13 +986,15 @@ function addLazer(inp){
 }
 
 function excluirLazer(nome){
-    confirmar('Excluir esta foto da Área de Lazer?', nome, function(){
+    confirmar('Excluir este item da Área de Lazer?', nome, function(){
         fetch('/deletar',{method:'POST',headers:{'Content-Type':'application/json'},
             body:JSON.stringify({nome:nome, pasta:PASTA_LAZER, rawmode:'1'})
         }).then(function(){
-            carregarLazer();
+            _lazerItens = _lazerItens.filter(function(i){ return i.nome !== nome; });
             atualizarLazerJSON();
-            toast('Foto excluída!');
+            document.getElementById('cnt-lazer').textContent = _lazerItens.length;
+            renderLazerAdmin();
+            toast('Item excluído!');
         }).catch(function(){ toast('Erro ao excluir',true); });
     });
 }
