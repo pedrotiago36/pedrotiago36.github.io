@@ -129,7 +129,6 @@ if (sessionStorage.getItem('adm_ok') !== 'niveis-ensino') { window.location.repl
         <div class="sb-group">Imagens</div>
         <div class="sb-item" id="nav-galeria" onclick="ir('galeria')"><i class="fas fa-images"></i> Nossa Galeria<span class="cnt" id="cnt-galeria">0</span></div>
         <div class="sb-item" id="nav-lazer" onclick="ir('lazer')"><i class="fas fa-building"></i> Nossa Estrutura<span class="cnt" id="cnt-lazer">0</span></div>
-        <div class="sb-item" id="nav-momentos" onclick="ir('momentos')"><i class="fas fa-camera"></i> Momentos Especiais<span class="cnt" id="cnt-momentos">0</span></div>
         <div class="sb-item" id="nav-difs" onclick="ir('difs')"><i class="fas fa-star"></i> Nossos Diferenciais<span class="cnt" id="cnt-difs">0</span></div>
     </aside>
 
@@ -162,23 +161,6 @@ if (sessionStorage.getItem('adm_ok') !== 'niveis-ensino') { window.location.repl
                 <div class="box-title"><i class="fas fa-th"></i> Fotos Cadastradas<span class="lbl" id="lbl-galeria">0 imagens</span></div>
                 <div class="gal-grid" id="galeriaGrid"></div>
                 <div class="drop-zone" id="dropGal" onclick="document.getElementById('upGal').click()">
-                    <i class="fas fa-cloud-upload-alt"></i><p>Arraste as fotos aqui ou clique para selecionar</p><small>JPG, PNG, WEBP — Múltiplas imagens aceitas</small>
-                </div>
-            </div>
-        </div>
-
-        <!-- MOMENTOS -->
-        <div class="panel" id="painel-momentos">
-            <div class="ph">
-                <div><h2><i class="fas fa-camera" style="color:#fdcd62;margin-right:8px;"></i>Momentos Especiais</h2><p>O portal exibe as <strong>5 primeiras</strong> fotos — a primeira aparece em destaque (maior)</p></div>
-                <button class="btn-add" onclick="document.getElementById('upMomentos').click()"><i class="fas fa-plus"></i> Adicionar Fotos</button>
-                <input type="file" id="upMomentos" accept="image/*" multiple style="display:none" onchange="addMomentos(this)">
-            </div>
-            <div class="box">
-                <div class="box-title"><i class="fas fa-camera"></i> Fotos Cadastradas<span class="lbl" id="lbl-momentos">0 imagens</span></div>
-                <div class="gal-grid" id="momentosGrid"></div>
-                <p style="font-size:0.8rem;color:#aaa;margin-top:0.5rem;text-align:center;"><i class="fas fa-info-circle"></i> A <strong>1ª foto</strong> aparece em destaque (ocupa 2 colunas). O portal usa as 5 primeiras da lista.</p>
-                <div class="drop-zone" id="dropMomentos" onclick="document.getElementById('upMomentos').click()" style="margin-top:1rem;">
                     <i class="fas fa-cloud-upload-alt"></i><p>Arraste as fotos aqui ou clique para selecionar</p><small>JPG, PNG, WEBP — Múltiplas imagens aceitas</small>
                 </div>
             </div>
@@ -291,10 +273,6 @@ var PASTA_LAZER       = 'fundI/estrutura';
 var LAZER_JSON_PASTA  = 'fundI';
 var LAZER_JSON_NOME   = 'estrutura.json';
 var LAZER_PREFIX      = 'fundI/estrutura/';
-var PASTA_MOMENTOS    = 'fundI/momentos';
-var MOM_JSON_PASTA    = 'fundI';
-var MOM_JSON_NOME     = 'momentos.json';
-var MOM_PREFIX        = 'fundI/momentos/';
 
 // ── HELPERS ──
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -339,7 +317,6 @@ function ir(sec){
     if(sec === 'proposta')    { carregarPropostaImg(); carregarFormacaoImg(); }
     if(sec === 'textos')      carregarConteudo();
     if(sec === 'galeria')     carregarGaleria();
-    if(sec === 'momentos')    carregarMomentos();
     if(sec === 'lazer')       carregarLazer();
     if(sec === 'difs')        carregarDiferenciais();
 }
@@ -421,57 +398,6 @@ function excluirGaleria(nome){
     });
 }
 
-// ── MOMENTOS ──
-function carregarMomentos(){
-    fetch('/listar?pasta='+encodeURIComponent(PASTA_MOMENTOS)+'&raw=1')
-    .then(function(r){return r.json();})
-    .then(function(lista){
-        document.getElementById('cnt-momentos').textContent=lista.length;
-        renderMomentos(lista);
-    }).catch(function(){ renderMomentos([]); });
-}
-function renderMomentos(lista){
-    var cnt=lista.length;
-    document.getElementById('lbl-momentos').textContent=cnt+(cnt===1?' imagem':' imagens');
-    var g=document.getElementById('momentosGrid');
-    if(!cnt){ g.innerHTML='<div class="empty" style="grid-column:1/-1"><i class="fas fa-camera"></i><p>Nenhuma foto cadastrada.</p></div>'; return; }
-    g.innerHTML=lista.map(function(img,i){
-        var url='/files/'+PASTA_MOMENTOS+'/'+img.nome;
-        var destaque=i===0?' style="border-color:#fdcd62;"':'';
-        return '<div class="gal-card"'+destaque+'>'+(i===0?'<div style="background:#fdcd62;color:#7d2728;font-size:0.65rem;font-weight:800;text-align:center;padding:3px;">DESTAQUE</div>':'')+
-            '<img class="gal-img" src="'+esc(url)+'?v='+Date.now()+'" alt="'+esc(img.nome)+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="gal-ph" style="display:none"><i class="fas fa-image"></i></div>'+
-            '<div class="gal-info"><div class="gal-name">'+esc(img.nome)+'</div><button class="btn-del" onclick="excluirMomento(\''+escJ(img.nome)+'\')" style="width:100%"><i class="fas fa-trash"></i> Excluir</button></div></div>';
-    }).join('');
-}
-function atualizarMomentosJSON(){
-    fetch('/listar?pasta='+encodeURIComponent(PASTA_MOMENTOS)+'&raw=1')
-    .then(function(r){return r.json();})
-    .then(function(lista){
-        var entries=lista.map(function(img){return{imagem:MOM_PREFIX+img.nome};});
-        var b64; try{b64=btoa(unescape(encodeURIComponent(JSON.stringify(entries))));}catch(e){return;}
-        fetch('/salvar-texto',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pasta:MOM_JSON_PASTA,nome:MOM_JSON_NOME,rawmode:'1',base64:b64})}).catch(function(){});
-    }).catch(function(){});
-}
-function addMomentos(inp){
-    if(!inp.files||!inp.files.length) return;
-    var files=Array.prototype.slice.call(inp.files), cnt=0, tot=files.length;
-    files.forEach(function(f){
-        lerArq(f,function(src){
-            fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:f.name,pasta:PASTA_MOMENTOS,rawmode:'1',base64:src})})
-            .then(function(r){return r.json();})
-            .then(function(){ if(++cnt===tot){ try{inp.value='';}catch(e){} carregarMomentos(); atualizarMomentosJSON(); toast(tot+' foto(s) adicionada(s)!'); } })
-            .catch(function(){ toast('Erro ao enviar foto',true); });
-        });
-    });
-}
-function excluirMomento(nome){
-    confirmar('Excluir esta foto de Momentos?',nome,function(){
-        fetch('/deletar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:nome,pasta:PASTA_MOMENTOS,rawmode:'1'})})
-        .then(function(){ carregarMomentos(); atualizarMomentosJSON(); toast('Foto excluída!'); })
-        .catch(function(){ toast('Erro ao excluir',true); });
-    });
-}
-
 // ── DRAG & DROP ──
 (function(){
     function dzSetup(id,fn){
@@ -482,7 +408,6 @@ function excluirMomento(nome){
     }
     dzSetup('dropBanner',uploadBanner);
     dzSetup('dropGal',addGaleria);
-    dzSetup('dropMomentos',addMomentos);
     dzSetup('dropProposta',uploadProposta);
     dzSetup('dropFormacao',uploadFormacao);
 })();
@@ -799,8 +724,7 @@ function salvarConteudo(){
 })();
 carregarBanner();
 setTimeout(carregarGaleria,    600);
-setTimeout(carregarMomentos,  1200);
-setTimeout(carregarLazer,     1800);
+setTimeout(carregarLazer,     1200);
 setTimeout(carregarProposta,  2400);
 setTimeout(carregarConteudo,  3000);
 setTimeout(carregarDiferenciais, 3600);

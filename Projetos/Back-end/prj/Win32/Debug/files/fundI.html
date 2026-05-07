@@ -53,14 +53,9 @@
         .quick-nav { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; padding: 2rem 1.5rem 0; }
         .qcard { background: white; border-radius: 1.5rem; padding: 1.4rem 1rem; text-align: center; cursor: pointer; border: 2px solid transparent; box-shadow: 0 4px 16px rgba(0,0,0,0.06); transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1.1); text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
         .qcard:hover { transform: translateY(-6px); border-color: #fdcd62; box-shadow: 0 16px 32px rgba(211,51,39,0.12); }
-        .qcard-icon { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 0.2rem; }
+        .qcard-icon { width: 128px; height: 128px; display: flex; align-items: center; justify-content: center; margin-bottom: 0.2rem; }
+        .qcard-icon img { width: 128px; height: 128px; object-fit: contain; }
         .qcard span { font-family: 'Poppins', sans-serif; font-size: 0.82rem; font-weight: 700; color: #7d2728; line-height: 1.3; }
-        .qcard-1 .qcard-icon { background: linear-gradient(135deg,#fff2e3,#fdcd62); }
-        .qcard-2 .qcard-icon { background: linear-gradient(135deg,#fde8e8,#f87171); }
-        .qcard-3 .qcard-icon { background: linear-gradient(135deg,#e8f5e9,#4ade80); }
-        .qcard-4 .qcard-icon { background: linear-gradient(135deg,#e8f0fe,#60a5fa); }
-        .qcard-5 .qcard-icon { background: linear-gradient(135deg,#fdf4ff,#c084fc); }
-        .qcard-6 .qcard-icon { background: linear-gradient(135deg,#fff7ed,#fb923c); }
 
         /* ── CONTAINER ── */
         .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
@@ -152,17 +147,6 @@
             .estrutura-slide-mobile { display: block !important; height: 160px; min-height: unset; border-radius: 1rem; margin-bottom: 1rem; }
         }
 
-        /* ── MOMENTOS ── */
-        .momentos { padding: 5rem 0; background: white; }
-        .momentos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2rem; }
-        .momento-card { border-radius: 1.2rem; overflow: hidden; position: relative; cursor: pointer; background: linear-gradient(135deg,#fff2e3,#ffe6cc); aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
-        .momento-card:hover { transform: scale(1.02); box-shadow: 0 16px 32px rgba(0,0,0,0.12); }
-        .momento-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-        .momento-card .placeholder-txt { position: relative; z-index: 1; text-align: center; color: rgba(125,39,40,0.3); }
-        .momento-card .placeholder-txt i { font-size: 2rem; display: block; margin-bottom: 0.3rem; }
-        .momento-card .placeholder-txt span { font-size: 0.75rem; font-weight: 600; }
-        .momento-destaque { grid-column: span 2; }
-        @media (max-width: 600px) { .momentos-grid { grid-template-columns: 1fr 1fr; } .momento-destaque { grid-column: span 2; } }
 
         /* ── DIFERENCIAIS ── */
         .diferenciais { padding: 5rem 0; background: linear-gradient(135deg, #7d2728 0%, #3d1a1b 100%); }
@@ -256,11 +240,10 @@
 
     <!-- QUICK NAV -->
     <div class="quick-nav">
-        <a href="#sec-proposta" class="qcard qcard-1"><div class="qcard-icon">🎯</div><span>Nossa Proposta</span></a>
-        <a href="#sec-anos"     class="qcard qcard-2"><div class="qcard-icon">📚</div><span>Anos / Turmas</span></a>
-        <a href="#sec-estrutura" class="qcard qcard-3"><div class="qcard-icon">🏫</div><span>Estrutura</span></a>
-        <a href="#sec-momentos" class="qcard qcard-4"><div class="qcard-icon">📸</div><span>Momentos</span></a>
-        <a href="#sec-diferenciais" class="qcard qcard-5"><div class="qcard-icon">⭐</div><span>Diferenciais</span></a>
+        <a href="#sec-proposta"    class="qcard qcard-1"><div class="qcard-icon"><img src="/files/fundI/icones/proposta.png" alt="Proposta"></div><span>Nossa Proposta</span></a>
+        <a href="#sec-anos"        class="qcard qcard-2"><div class="qcard-icon"><img src="/files/fundI/icones/Anos e Turmas.png" alt="Faixa Etária"></div><span>Faixa Etária</span></a>
+        <a href="#sec-estrutura"   class="qcard qcard-3"><div class="qcard-icon"><img src="/files/fundI/icones/rotina.png" alt="Estrutura"></div><span>Estrutura</span></a>
+        <a href="#sec-diferenciais" class="qcard qcard-4"><div class="qcard-icon"><img src="/files/fundI/icones/diferenciais.png" alt="Diferenciais"></div><span>Diferenciais</span></a>
     </div>
 
     <!-- PROPOSTA -->
@@ -379,22 +362,6 @@
         </div>
     </div>
 
-    <!-- MOMENTOS -->
-    <div class="momentos" id="sec-momentos">
-        <div class="container">
-            <div class="sec-title">Momentos <span>Especiais</span></div>
-            <div class="sec-line"></div>
-            <p class="sec-sub">Momentos especiais do dia a dia do Fundamental I</p>
-            <div class="momentos-grid" id="momentosGrid">
-                <div class="momento-card momento-destaque"><div class="placeholder-txt"><i class="fas fa-camera"></i><span>Foto em destaque</span></div></div>
-                <div class="momento-card"><div class="placeholder-txt"><i class="fas fa-camera"></i><span>Foto</span></div></div>
-                <div class="momento-card"><div class="placeholder-txt"><i class="fas fa-camera"></i><span>Foto</span></div></div>
-                <div class="momento-card"><div class="placeholder-txt"><i class="fas fa-camera"></i><span>Foto</span></div></div>
-                <div class="momento-card"><div class="placeholder-txt"><i class="fas fa-camera"></i><span>Foto</span></div></div>
-            </div>
-        </div>
-    </div>
-
     <!-- DIFERENCIAIS -->
     <div class="diferenciais" id="sec-diferenciais">
         <div class="container">
@@ -414,7 +381,6 @@
         <p>Agende uma visita e veja de perto o ambiente que preparamos para o seu filho.</p>
         <div class="cta-btns">
             <a href="javascript:void(0)" onclick="abrirNoPortal('novato')" class="btn-cta-main"><i class="fas fa-calendar-check"></i> Agendar uma Visita</a>
-            <a href="javascript:void(0)" onclick="abrirNoPortal('pai')" class="btn-cta-sec"><i class="fas fa-users"></i> Portal do Pai</a>
         </div>
     </div>
 
@@ -466,16 +432,6 @@ function renderGaleria(dados) {
 }
 document.getElementById('galPrev').addEventListener('click', function() { _galIr(_galOffset - 1); });
 document.getElementById('galNext').addEventListener('click', function() { _galIr(_galOffset + 1); });
-
-function renderMomentos(fotos) {
-    var grid = document.getElementById('momentosGrid');
-    if (!grid || !fotos.length) return;
-    grid.innerHTML = fotos.slice(0, 5).map(function(item, i) {
-        var cls = i === 0 ? 'momento-card momento-destaque' : 'momento-card';
-        return '<div class="' + cls + '" onclick="_abrirLb(' + i + ')">' +
-               '<img src="/files/' + item.imagem + '" alt="" loading="lazy"></div>';
-    }).join('');
-}
 
 // ── LIGHTBOX ──
 window._abrirLb = function(idx) { _lbIdx = idx; _lbAtualizar(); document.getElementById('lightbox').classList.add('aberto'); };
@@ -752,9 +708,6 @@ setTimeout(function(){
     setInterval(pollConteudo, 30000);
 }, 1200);
 
-// 1600ms — momentos
-setTimeout(function(){ carregarDados('fundI/momentos', renderMomentos); }, 1600);
-
 // 2000ms — estrutura (JSON direto para preservar titulo e descricao)
 setTimeout(function(){ _carregarJSON('fundI/estrutura', renderEstrutura); }, 2000);
 
@@ -764,9 +717,8 @@ setTimeout(carregarDiferenciais, 2400);
 // Intervalo consolidado (30s) com escalonamento interno
 setInterval(function(){
     carregarDados('fundI/galeria', renderGaleria);
-    setTimeout(function(){ carregarDados('fundI/momentos', renderMomentos); }, 2000);
-    setTimeout(function(){ _carregarJSON('fundI/estrutura', renderEstrutura); }, 4000);
-    setTimeout(carregarDiferenciais, 6000);
+    setTimeout(function(){ _carregarJSON('fundI/estrutura', renderEstrutura); }, 2000);
+    setTimeout(carregarDiferenciais, 4000);
 }, 30000);
 </script>
 <button class="btn-indicar-float-sub" onclick="try{window.parent.abrirModalIndicar();}catch(e){}"><i class="fas fa-user-friends"></i> Indique um Amigo</button>
