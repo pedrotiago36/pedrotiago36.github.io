@@ -79,6 +79,7 @@ type
     ImgModeloRuler: TImage;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure FormResize(Sender: TObject);
     procedure RectBtnMenuClick(Sender: TObject);
     procedure RectBtnVoltarClick(Sender: TObject);
     procedure RectMenuOverlayClick(Sender: TObject);
@@ -172,7 +173,9 @@ begin
   
   // Mostra cards
   MostrarCards;
-  
+
+  FormResize(nil);
+
   // Animação de entrada
   RectConteudo.Opacity := 0;
   RectConteudo.Scale.X := 0.95;
@@ -209,18 +212,41 @@ begin
   PosX[5] := 230; PosX[6] := 275; PosX[7] := 320; PosX[8] := 365; PosX[9] := 405;
   PosX[10] := 35; PosX[11] := 120; PosX[12] := 205; PosX[13] := 290; PosX[14] := 375;
   
-  FDecorSpeeds[0] := 1.2; FDecorSpeeds[1] := 1.8; FDecorSpeeds[2] := 1.5;
-  FDecorSpeeds[3] := 2.0; FDecorSpeeds[4] := 1.3; FDecorSpeeds[5] := 1.7;
-  FDecorSpeeds[6] := 1.4; FDecorSpeeds[7] := 2.2; FDecorSpeeds[8] := 1.6;
-  FDecorSpeeds[9] := 1.9; FDecorSpeeds[10] := 1.1; FDecorSpeeds[11] := 2.1;
-  FDecorSpeeds[12] := 1.4; FDecorSpeeds[13] := 1.8; FDecorSpeeds[14] := 1.5;
+  FDecorSpeeds[0] := 0.30; FDecorSpeeds[1] := 0.45; FDecorSpeeds[2] := 0.35;
+  FDecorSpeeds[3] := 0.50; FDecorSpeeds[4] := 0.32; FDecorSpeeds[5] := 0.42;
+  FDecorSpeeds[6] := 0.35; FDecorSpeeds[7] := 0.55; FDecorSpeeds[8] := 0.40;
+  FDecorSpeeds[9] := 0.48; FDecorSpeeds[10] := 0.28; FDecorSpeeds[11] := 0.52;
+  FDecorSpeeds[12] := 0.35; FDecorSpeeds[13] := 0.45; FDecorSpeeds[14] := 0.38;
   
-  FDecorRotations[0] := 1.5; FDecorRotations[1] := -1.2; FDecorRotations[2] := 2.0;
-  FDecorRotations[3] := -1.8; FDecorRotations[4] := 1.3; FDecorRotations[5] := -2.2;
-  FDecorRotations[6] := 1.7; FDecorRotations[7] := -1.4; FDecorRotations[8] := 2.1;
-  FDecorRotations[9] := -1.6; FDecorRotations[10] := 1.9; FDecorRotations[11] := -1.1;
-  FDecorRotations[12] := 2.3; FDecorRotations[13] := -1.5; FDecorRotations[14] := 1.8;
-  
+  FDecorRotations[0] := 0.38; FDecorRotations[1] := -0.30; FDecorRotations[2] := 0.50;
+  FDecorRotations[3] := -0.45; FDecorRotations[4] := 0.32; FDecorRotations[5] := -0.55;
+  FDecorRotations[6] := 0.42; FDecorRotations[7] := -0.35; FDecorRotations[8] := 0.52;
+  FDecorRotations[9] := -0.40; FDecorRotations[10] := 0.48; FDecorRotations[11] := -0.28;
+  FDecorRotations[12] := 0.57; FDecorRotations[13] := -0.38; FDecorRotations[14] := 0.45;
+
+  var sBase: string := TPath.Combine(ExtractFilePath(ParamStr(0)), 'img');
+  {$IFDEF ANDROID}
+  sBase := TPath.GetDocumentsPath;
+  {$ENDIF}
+  var sArq: string := TPath.Combine(sBase, 'books.png');
+  if not FileExists(sArq) then sArq := TPath.Combine(sBase, 'book.png');
+  if FileExists(sArq) then
+  begin
+    ImgModeloBook.Bitmap.LoadFromFile(sArq);
+    ImgModeloPencil.Bitmap.Assign(ImgModeloBook.Bitmap);
+    ImgModeloEraser.Bitmap.Assign(ImgModeloBook.Bitmap);
+    ImgModeloNotebook.Bitmap.Assign(ImgModeloBook.Bitmap);
+    ImgModeloRuler.Bitmap.Assign(ImgModeloBook.Bitmap);
+  end;
+  sArq := TPath.Combine(sBase, 'pencil.png');
+  if FileExists(sArq) then ImgModeloPencil.Bitmap.LoadFromFile(sArq);
+  sArq := TPath.Combine(sBase, 'eraser.png');
+  if FileExists(sArq) then ImgModeloEraser.Bitmap.LoadFromFile(sArq);
+  sArq := TPath.Combine(sBase, 'notebook.png');
+  if FileExists(sArq) then ImgModeloNotebook.Bitmap.LoadFromFile(sArq);
+  sArq := TPath.Combine(sBase, 'ruler.png');
+  if FileExists(sArq) then ImgModeloRuler.Bitmap.LoadFromFile(sArq);
+
   for I := 0 to 14 do
   begin
     FDecorItems[I] := TImage.Create(Self);
@@ -861,6 +887,36 @@ begin
     'Matemática e Português - Vagas limitadas',
     'Publicado em: 01/11/2024 às 08:00 | Terças e Quintas às 14h',
     COR_VERDE);
+end;
+
+procedure TFormResponsavel.FormResize(Sender: TObject);
+begin
+  if RectConteudo.Width < 30 then Exit;
+  RectBtnMenu.Position.X := Width - 60;
+  LblTituloHeader.Width := Width - 145;
+  LblSubtituloHeader.Width := Width - 145;
+  RectConteudoHeader.Width := RectConteudo.Width;
+  LblConteudoTitulo.Width := RectConteudo.Width;
+  LblConteudoSubtitulo.Width := RectConteudo.Width;
+  RectCard1.Width := RectConteudo.Width;
+  LblCard1Titulo.Width := RectConteudo.Width - 110;
+  LblCard1Desc.Width := RectConteudo.Width - 110;
+  RectCard2.Width := RectConteudo.Width;
+  LblCard2Titulo.Width := RectConteudo.Width - 110;
+  LblCard2Desc.Width := RectConteudo.Width - 110;
+  RectCard3.Width := RectConteudo.Width;
+  LblCard3Titulo.Width := RectConteudo.Width - 110;
+  LblCard3Desc.Width := RectConteudo.Width - 110;
+  RectDetalhe.Position.X := RectConteudo.Position.X;
+  RectDetalhe.Position.Y := RectConteudo.Position.Y;
+  RectDetalhe.Width := RectConteudo.Width;
+  RectDetalhe.Height := RectConteudo.Height;
+  RectDetalheHeader.Width := RectDetalhe.Width;
+  RectBtnFecharDetalhe.Position.X := RectDetalhe.Width - 65;
+  LblDetalheTitulo.Width := RectDetalhe.Width - 80;
+  RectDetalheConteudo.Width := RectDetalhe.Width - 20;
+  RectDetalheConteudo.Height := RectDetalhe.Height - 70;
+  RectMenuLateral.Height := Height;
 end;
 
 end.

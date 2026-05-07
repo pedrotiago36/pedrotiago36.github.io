@@ -6,7 +6,7 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects,
   FMX.StdCtrls, FMX.Controls.Presentation, FMX.Ani, FMX.Effects, FMX.Layouts,
-  System.DateUtils;
+  System.IOUtils, System.DateUtils;
 
 type
   TFormEducInfantil = class(TForm)
@@ -70,6 +70,7 @@ type
     ImgModeloRuler: TImage;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure FormResize(Sender: TObject);
     procedure RectBtnMenuClick(Sender: TObject);
     procedure RectBtnVoltarClick(Sender: TObject);
     procedure RectMenuOverlayClick(Sender: TObject);
@@ -157,7 +158,9 @@ begin
     CriarItensDecorativos;
     FDecorCriado := True;
   end;
-  
+
+  FormResize(nil);
+
   // Garante que cards estao visiveis e detalhe escondido
   RectConteudo.Visible := True;
   RectDetalhe.Visible := False;
@@ -192,18 +195,41 @@ begin
   PosX[5] := 230; PosX[6] := 275; PosX[7] := 320; PosX[8] := 365; PosX[9] := 405;
   PosX[10] := 35; PosX[11] := 120; PosX[12] := 205; PosX[13] := 290; PosX[14] := 375;
   
-  FDecorSpeeds[0] := 1.2; FDecorSpeeds[1] := 1.8; FDecorSpeeds[2] := 1.5;
-  FDecorSpeeds[3] := 2.0; FDecorSpeeds[4] := 1.3; FDecorSpeeds[5] := 1.7;
-  FDecorSpeeds[6] := 1.4; FDecorSpeeds[7] := 2.2; FDecorSpeeds[8] := 1.6;
-  FDecorSpeeds[9] := 1.9; FDecorSpeeds[10] := 1.1; FDecorSpeeds[11] := 2.1;
-  FDecorSpeeds[12] := 1.4; FDecorSpeeds[13] := 1.8; FDecorSpeeds[14] := 1.5;
+  FDecorSpeeds[0] := 0.30; FDecorSpeeds[1] := 0.45; FDecorSpeeds[2] := 0.35;
+  FDecorSpeeds[3] := 0.50; FDecorSpeeds[4] := 0.32; FDecorSpeeds[5] := 0.42;
+  FDecorSpeeds[6] := 0.35; FDecorSpeeds[7] := 0.55; FDecorSpeeds[8] := 0.40;
+  FDecorSpeeds[9] := 0.48; FDecorSpeeds[10] := 0.28; FDecorSpeeds[11] := 0.52;
+  FDecorSpeeds[12] := 0.35; FDecorSpeeds[13] := 0.45; FDecorSpeeds[14] := 0.38;
   
-  FDecorRotations[0] := 1.5; FDecorRotations[1] := -1.2; FDecorRotations[2] := 2.0;
-  FDecorRotations[3] := -1.8; FDecorRotations[4] := 1.3; FDecorRotations[5] := -2.2;
-  FDecorRotations[6] := 1.7; FDecorRotations[7] := -1.4; FDecorRotations[8] := 2.1;
-  FDecorRotations[9] := -1.6; FDecorRotations[10] := 1.9; FDecorRotations[11] := -1.1;
-  FDecorRotations[12] := 2.3; FDecorRotations[13] := -1.5; FDecorRotations[14] := 1.8;
-  
+  FDecorRotations[0] := 0.38; FDecorRotations[1] := -0.30; FDecorRotations[2] := 0.50;
+  FDecorRotations[3] := -0.45; FDecorRotations[4] := 0.32; FDecorRotations[5] := -0.55;
+  FDecorRotations[6] := 0.42; FDecorRotations[7] := -0.35; FDecorRotations[8] := 0.52;
+  FDecorRotations[9] := -0.40; FDecorRotations[10] := 0.48; FDecorRotations[11] := -0.28;
+  FDecorRotations[12] := 0.57; FDecorRotations[13] := -0.38; FDecorRotations[14] := 0.45;
+
+  var sBase: string := TPath.Combine(ExtractFilePath(ParamStr(0)), 'img');
+  {$IFDEF ANDROID}
+  sBase := TPath.GetDocumentsPath;
+  {$ENDIF}
+  var sArq: string := TPath.Combine(sBase, 'books.png');
+  if not FileExists(sArq) then sArq := TPath.Combine(sBase, 'book.png');
+  if FileExists(sArq) then
+  begin
+    ImgModeloBook.Bitmap.LoadFromFile(sArq);
+    ImgModeloPencil.Bitmap.Assign(ImgModeloBook.Bitmap);
+    ImgModeloEraser.Bitmap.Assign(ImgModeloBook.Bitmap);
+    ImgModeloNotebook.Bitmap.Assign(ImgModeloBook.Bitmap);
+    ImgModeloRuler.Bitmap.Assign(ImgModeloBook.Bitmap);
+  end;
+  sArq := TPath.Combine(sBase, 'pencil.png');
+  if FileExists(sArq) then ImgModeloPencil.Bitmap.LoadFromFile(sArq);
+  sArq := TPath.Combine(sBase, 'eraser.png');
+  if FileExists(sArq) then ImgModeloEraser.Bitmap.LoadFromFile(sArq);
+  sArq := TPath.Combine(sBase, 'notebook.png');
+  if FileExists(sArq) then ImgModeloNotebook.Bitmap.LoadFromFile(sArq);
+  sArq := TPath.Combine(sBase, 'ruler.png');
+  if FileExists(sArq) then ImgModeloRuler.Bitmap.LoadFromFile(sArq);
+
   for I := 0 to 14 do
   begin
     FDecorItems[I] := TImage.Create(Self);
@@ -427,18 +453,23 @@ begin
     7: DiaSemana := 'Sábado';
   end;
   
+  var ItemW: Single := ScrollBoxDetalhe.Width - 10;
+  if ItemW < 200 then ItemW := 200;
+  var ItemX: Single := (ScrollBoxDetalhe.Width - ItemW) / 2;
+  if ItemX < 0 then ItemX := 0;
+
   RectItem := TRectangle.Create(Self);
   RectItem.Parent := ScrollBoxDetalhe;
-  RectItem.Position.X := 5;
+  RectItem.Position.X := ItemX;
   RectItem.Position.Y := PosY;
-  RectItem.Width := 390;
+  RectItem.Width := ItemW;
   RectItem.Height := 130;
   RectItem.Fill.Color := $15FFFFFF;
   RectItem.Stroke.Color := $4DFDCD62;
   RectItem.Stroke.Thickness := 1;
   RectItem.XRadius := 12;
   RectItem.YRadius := 12;
-  
+
   LblData := TLabel.Create(RectItem);
   LblData.Parent := RectItem;
   LblData.Position.X := 15;
@@ -466,37 +497,37 @@ begin
   LinhaDiv.Parent := RectItem;
   LinhaDiv.Position.X := 15;
   LinhaDiv.Position.Y := 36;
-  LinhaDiv.Width := 360;
+  LinhaDiv.Width := ItemW - 30;
   LinhaDiv.Height := 1;
   LinhaDiv.Stroke.Color := $30FFFFFF;
-  
+
   LblRefeicao := TLabel.Create(RectItem);
   LblRefeicao.Parent := RectItem;
   LblRefeicao.Position.X := 15;
   LblRefeicao.Position.Y := 45;
-  LblRefeicao.Width := 360;
+  LblRefeicao.Width := ItemW - 30;
   LblRefeicao.Height := 22;
   LblRefeicao.StyledSettings := [];
   LblRefeicao.TextSettings.Font.Size := 12;
   LblRefeicao.TextSettings.FontColor := TAlphaColors.White;
   LblRefeicao.Text := 'Refeicao: ' + Refeicao;
-  
+
   LblBebida := TLabel.Create(RectItem);
   LblBebida.Parent := RectItem;
   LblBebida.Position.X := 15;
   LblBebida.Position.Y := 70;
-  LblBebida.Width := 360;
+  LblBebida.Width := ItemW - 30;
   LblBebida.Height := 22;
   LblBebida.StyledSettings := [];
   LblBebida.TextSettings.Font.Size := 12;
   LblBebida.TextSettings.FontColor := $CCFFFFFF;
   LblBebida.Text := 'Bebida: ' + Bebida;
-  
+
   LblLanche := TLabel.Create(RectItem);
   LblLanche.Parent := RectItem;
   LblLanche.Position.X := 15;
   LblLanche.Position.Y := 95;
-  LblLanche.Width := 360;
+  LblLanche.Width := ItemW - 30;
   LblLanche.Height := 22;
   LblLanche.StyledSettings := [];
   LblLanche.TextSettings.Font.Size := 12;
@@ -575,6 +606,8 @@ var
   LblDataHora, LblDescricao, LblTipo: TLabel;
   Cor: TAlphaColor;
   TipoTexto: string;
+  ItemW: Single;
+  ItemX: Single;
 begin
   case Tipo of
     1: begin TipoTexto := 'FEBRE/DOENÇA'; Cor := COR_VERMELHO; end;
@@ -586,47 +619,52 @@ begin
   else
     begin TipoTexto := 'GERAL'; Cor := COR_DOURADO; end;
   end;
-  
+
+  ItemW := ScrollBoxDetalhe.Width - 10;
+  if ItemW < 200 then ItemW := 200;
+  ItemX := (ScrollBoxDetalhe.Width - ItemW) / 2;
+  if ItemX < 0 then ItemX := 0;
+
   RectItem := TRectangle.Create(Self);
   RectItem.Parent := ScrollBoxDetalhe;
-  RectItem.Position.X := 5;
+  RectItem.Position.X := ItemX;
   RectItem.Position.Y := PosY;
-  RectItem.Width := 390;
+  RectItem.Width := ItemW;
   RectItem.Height := 100;
   RectItem.Fill.Color := $15FFFFFF;
   RectItem.Stroke.Color := Cor;
   RectItem.Stroke.Thickness := 1.5;
   RectItem.XRadius := 12;
   RectItem.YRadius := 12;
-  
+
   LblTipo := TLabel.Create(RectItem);
   LblTipo.Parent := RectItem;
   LblTipo.Position.X := 15;
   LblTipo.Position.Y := 10;
-  LblTipo.Width := 200;
+  LblTipo.Width := ItemW - 30;
   LblTipo.Height := 20;
   LblTipo.StyledSettings := [];
   LblTipo.TextSettings.Font.Size := 11;
   LblTipo.TextSettings.Font.Style := [TFontStyle.fsBold];
   LblTipo.TextSettings.FontColor := Cor;
   LblTipo.Text := TipoTexto;
-  
+
   LblDataHora := TLabel.Create(RectItem);
   LblDataHora.Parent := RectItem;
   LblDataHora.Position.X := 15;
   LblDataHora.Position.Y := 32;
-  LblDataHora.Width := 360;
+  LblDataHora.Width := ItemW - 30;
   LblDataHora.Height := 20;
   LblDataHora.StyledSettings := [];
   LblDataHora.TextSettings.Font.Size := 12;
   LblDataHora.TextSettings.FontColor := TAlphaColors.White;
   LblDataHora.Text := FormatDateTime('dd/mm/yyyy', DataHora) + ' as ' + FormatDateTime('hh:nn', DataHora);
-  
+
   LblDescricao := TLabel.Create(RectItem);
   LblDescricao.Parent := RectItem;
   LblDescricao.Position.X := 15;
   LblDescricao.Position.Y := 55;
-  LblDescricao.Width := 360;
+  LblDescricao.Width := ItemW - 30;
   LblDescricao.Height := 40;
   LblDescricao.StyledSettings := [];
   LblDescricao.TextSettings.Font.Size := 11;
@@ -676,6 +714,36 @@ begin
     
   CriarItemOcorrencia(PosY, Hoje - 4 + EncodeTime(9, 30, 0, 0),
     'Participou da aula de música com muito entusiasmo! Cantou todas as músicas.', 5);
+end;
+
+procedure TFormEducInfantil.FormResize(Sender: TObject);
+var CardW: Single;
+begin
+  if RectConteudo.Width < 30 then Exit;
+  RectBtnMenu.Position.X := Width - 60;
+  LblTituloHeader.Width := Width - 145;
+  LblSubtituloHeader.Width := Width - 145;
+  LblConteudoTitulo.Width := RectConteudo.Width;
+  LblConteudoSubtitulo.Width := RectConteudo.Width;
+  LblNomeAluno.Width := RectConteudo.Width;
+  CardW := (RectConteudo.Width - 15) / 2;
+  RectCard1.Width := CardW;
+  LblCard1Titulo.Width := CardW - 20;
+  LblCard1Desc.Width := CardW - 20;
+  RectCard2.Position.X := CardW + 15;
+  RectCard2.Width := CardW;
+  LblCard2Titulo.Width := CardW - 20;
+  LblCard2Desc.Width := CardW - 20;
+  RectDetalhe.Position.X := 0;
+  RectDetalhe.Position.Y := RectHeader.Height;
+  RectDetalhe.Width  := Width;
+  RectDetalhe.Height := Height - RectHeader.Height;
+  RectDetalheHeader.Width := RectDetalhe.Width;
+  RectBtnFecharDetalhe.Position.X := RectDetalhe.Width - 65;
+  LblDetalheTitulo.Width := RectDetalhe.Width - 80;
+  ScrollBoxDetalhe.Width  := RectDetalhe.Width - 20;
+  ScrollBoxDetalhe.Height := RectDetalhe.Height - 70;
+  RectMenuLateral.Height := Height;
 end;
 
 end.

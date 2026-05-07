@@ -10,6 +10,7 @@ object FormPrincipal: TFormPrincipal
   FormFactor.Devices = [Desktop, iPhone, iPad]
   FullScreen = True
   OnCreate = FormCreate
+  OnResize = FormResize
   OnShow = FormShow
   DesignerMasterStyle = 0
   object RectFundo: TRectangle
@@ -36,6 +37,7 @@ object FormPrincipal: TFormPrincipal
       Size.PlatformDefault = False
     end
     object RectHeader: TRectangle
+      Align = Top
       Fill.Color = x30000000
       Size.Width = 450.000000000000000000
       Size.Height = 80.000000000000000000
@@ -108,9 +110,12 @@ object FormPrincipal: TFormPrincipal
       end
     end
     object RectConteudo: TRectangle
+      Align = Client
+      Margins.Left = 10.000000000000000000
+      Margins.Top = 10.000000000000000000
+      Margins.Right = 10.000000000000000000
+      Margins.Bottom = 10.000000000000000000
       Fill.Kind = None
-      Position.X = 15.000000000000000000
-      Position.Y = 95.000000000000000000
       Size.Width = 420.000000000000000000
       Size.Height = 640.000000000000000000
       Size.PlatformDefault = False
@@ -366,6 +371,7 @@ object FormPrincipal: TFormPrincipal
       end
     end
     object RectMenuOverlay: TRectangle
+      Align = Contents
       Fill.Color = x99000000
       Size.Width = 450.000000000000000000
       Size.Height = 750.000000000000000000

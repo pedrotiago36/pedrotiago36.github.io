@@ -81,6 +81,7 @@ type
     ImgModeloRuler: TImage;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure FormResize(Sender: TObject);
     procedure RectBtnMenuClick(Sender: TObject);
     procedure RectMenuOverlayClick(Sender: TObject);
     procedure RectBtnSairClick(Sender: TObject);
@@ -142,8 +143,45 @@ begin
   CriarItensDecorativos;
 end;
 
+procedure TFormPrincipal.FormResize(Sender: TObject);
+var
+  CardW: Single;
+begin
+  // RectConteudo already auto-sized via Align=Client; use its actual width
+  if RectConteudo.Width < 30 then Exit;
+
+  RectBtnMenu.Position.X := Width - 60;
+  RectConteudoHeader.Width := RectConteudo.Width;
+  LblConteudoTitulo.Width  := RectConteudo.Width;
+  LblConteudoSubtitulo.Width := RectConteudo.Width;
+
+  LblTituloHeader.Width    := Width - 145;
+  LblSubtituloHeader.Width := Width - 145;
+
+  CardW := (RectConteudo.Width - 30) / 2;
+
+  RectCard1.Position.X := 10;   RectCard1.Width := CardW;
+  LblCard1Titulo.Width := CardW - 20;
+  LblCard1Valor.Width  := CardW - 20;
+
+  RectCard2.Position.X := CardW + 20;  RectCard2.Width := CardW;
+  LblCard2Titulo.Width := CardW - 20;
+  LblCard2Valor.Width  := CardW - 20;
+
+  RectCard3.Position.X := 10;   RectCard3.Width := CardW;
+  LblCard3Titulo.Width := CardW - 20;
+  LblCard3Valor.Width  := CardW - 20;
+
+  RectCard4.Position.X := CardW + 20;  RectCard4.Width := CardW;
+  LblCard4Titulo.Width := CardW - 20;
+  LblCard4Valor.Width  := CardW - 20;
+
+  RectMenuLateral.Height := Height;
+end;
+
 procedure TFormPrincipal.FormShow(Sender: TObject);
 begin
+  FormResize(nil);
   // Atualiza informações do usuário
   if NomeUsuario <> '' then
     LblNomeUsuario.Text := NomeUsuario
@@ -196,19 +234,42 @@ begin
   PosX[10] := 35; PosX[11] := 120; PosX[12] := 205; PosX[13] := 290; PosX[14] := 375;
   
   // Velocidades diferentes para cada objeto
-  FDecorSpeeds[0] := 1.2; FDecorSpeeds[1] := 1.8; FDecorSpeeds[2] := 1.5;
-  FDecorSpeeds[3] := 2.0; FDecorSpeeds[4] := 1.3; FDecorSpeeds[5] := 1.7;
-  FDecorSpeeds[6] := 1.4; FDecorSpeeds[7] := 2.2; FDecorSpeeds[8] := 1.6;
-  FDecorSpeeds[9] := 1.9; FDecorSpeeds[10] := 1.1; FDecorSpeeds[11] := 2.1;
-  FDecorSpeeds[12] := 1.4; FDecorSpeeds[13] := 1.8; FDecorSpeeds[14] := 1.5;
+  FDecorSpeeds[0] := 0.30; FDecorSpeeds[1] := 0.45; FDecorSpeeds[2] := 0.35;
+  FDecorSpeeds[3] := 0.50; FDecorSpeeds[4] := 0.32; FDecorSpeeds[5] := 0.42;
+  FDecorSpeeds[6] := 0.35; FDecorSpeeds[7] := 0.55; FDecorSpeeds[8] := 0.40;
+  FDecorSpeeds[9] := 0.48; FDecorSpeeds[10] := 0.28; FDecorSpeeds[11] := 0.52;
+  FDecorSpeeds[12] := 0.35; FDecorSpeeds[13] := 0.45; FDecorSpeeds[14] := 0.38;
   
   // Velocidades de rotação
-  FDecorRotations[0] := 1.5; FDecorRotations[1] := -1.2; FDecorRotations[2] := 2.0;
-  FDecorRotations[3] := -1.8; FDecorRotations[4] := 1.3; FDecorRotations[5] := -2.2;
-  FDecorRotations[6] := 1.7; FDecorRotations[7] := -1.4; FDecorRotations[8] := 2.1;
-  FDecorRotations[9] := -1.6; FDecorRotations[10] := 1.9; FDecorRotations[11] := -1.1;
-  FDecorRotations[12] := 2.3; FDecorRotations[13] := -1.5; FDecorRotations[14] := 1.8;
-  
+  FDecorRotations[0] := 0.38; FDecorRotations[1] := -0.30; FDecorRotations[2] := 0.50;
+  FDecorRotations[3] := -0.45; FDecorRotations[4] := 0.32; FDecorRotations[5] := -0.55;
+  FDecorRotations[6] := 0.42; FDecorRotations[7] := -0.35; FDecorRotations[8] := 0.52;
+  FDecorRotations[9] := -0.40; FDecorRotations[10] := 0.48; FDecorRotations[11] := -0.28;
+  FDecorRotations[12] := 0.57; FDecorRotations[13] := -0.38; FDecorRotations[14] := 0.45;
+
+  var sBase: string := TPath.Combine(ExtractFilePath(ParamStr(0)), 'img');
+  {$IFDEF ANDROID}
+  sBase := TPath.GetDocumentsPath;
+  {$ENDIF}
+  var sArq: string := TPath.Combine(sBase, 'books.png');
+  if not FileExists(sArq) then sArq := TPath.Combine(sBase, 'book.png');
+  if FileExists(sArq) then
+  begin
+    ImgModeloBook.Bitmap.LoadFromFile(sArq);
+    ImgModeloPencil.Bitmap.Assign(ImgModeloBook.Bitmap);
+    ImgModeloEraser.Bitmap.Assign(ImgModeloBook.Bitmap);
+    ImgModeloNotebook.Bitmap.Assign(ImgModeloBook.Bitmap);
+    ImgModeloRuler.Bitmap.Assign(ImgModeloBook.Bitmap);
+  end;
+  sArq := TPath.Combine(sBase, 'pencil.png');
+  if FileExists(sArq) then ImgModeloPencil.Bitmap.LoadFromFile(sArq);
+  sArq := TPath.Combine(sBase, 'eraser.png');
+  if FileExists(sArq) then ImgModeloEraser.Bitmap.LoadFromFile(sArq);
+  sArq := TPath.Combine(sBase, 'notebook.png');
+  if FileExists(sArq) then ImgModeloNotebook.Bitmap.LoadFromFile(sArq);
+  sArq := TPath.Combine(sBase, 'ruler.png');
+  if FileExists(sArq) then ImgModeloRuler.Bitmap.LoadFromFile(sArq);
+
   for I := 0 to 14 do
   begin
     FDecorItems[I] := TImage.Create(Self);

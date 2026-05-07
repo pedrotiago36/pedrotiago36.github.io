@@ -10,6 +10,7 @@
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop, iPhone, iPad]
   OnCreate = FormCreate
+  OnResize = FormResize
   OnShow = FormShow
   DesignerMasterStyle = 0
   object RectFundo: TRectangle
@@ -40,9 +41,8 @@
       HitTest = False
     end
     object RectHeader: TRectangle
+      Align = Top
       Fill.Color = x30000000
-      Position.X = 0.000000000000000000
-      Position.Y = 0.000000000000000000
       Size.Width = 450.000000000000000000
       Size.Height = 80.000000000000000000
       Size.PlatformDefault = False
@@ -134,8 +134,11 @@
       end
     end
     object ScrollBoxConteudo: TVertScrollBox
-      Position.X = 5.000000000000000000
-      Position.Y = 95.000000000000000000
+      Align = Client
+      Margins.Left = 5.000000000000000000
+      Margins.Top = 10.000000000000000000
+      Margins.Right = 5.000000000000000000
+      Margins.Bottom = 5.000000000000000000
       Size.Width = 440.000000000000000000
       Size.Height = 640.000000000000000000
       Size.PlatformDefault = False
@@ -658,11 +661,71 @@
           TextSettings.WordWrap = True
         end
       end
+      object RectCard9: TRectangle
+        Cursor = crHandPoint
+        Fill.Color = x20FFFFFF
+        Position.X = 5.000000000000000000
+        Position.Y = 700.000000000000000000
+        Size.Width = 430.000000000000000000
+        Size.Height = 90.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Color = x4DFDCD62
+        Stroke.Thickness = 1.500000000000000000
+        XRadius = 15.000000000000000000
+        YRadius = 15.000000000000000000
+        OnClick = CardClick
+        OnMouseEnter = CardMouseEnter
+        OnMouseLeave = CardMouseLeave
+        object ShadowCard9: TShadowEffect
+          Distance = 6.000000000000000000
+          Direction = 45.000000000000000000
+          Softness = 0.350000000000000000
+          Opacity = 0.300000000000000000
+          ShadowColor = claBlack
+        end
+        object LblCard9Icone: TLabel
+          HitTest = False
+          Position.X = 15.000000000000000000
+          Position.Y = 12.000000000000000000
+          Size.Width = 50.000000000000000000
+          Size.Height = 50.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = #55357#56506
+          TextSettings.Font.Size = 28.000000000000000000
+          TextSettings.HorzAlign = Center
+          TextSettings.VertAlign = Center
+        end
+        object LblCard9Titulo: TLabel
+          HitTest = False
+          Position.X = 75.000000000000000000
+          Position.Y = 14.000000000000000000
+          Size.Width = 330.000000000000000000
+          Size.Height = 26.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Mensagens'
+          TextSettings.Font.Size = 15.000000000000000000
+          TextSettings.Font.Style = [fsBold]
+          TextSettings.FontColor = claWhite
+        end
+        object LblCard9Desc: TLabel
+          HitTest = False
+          Position.X = 75.000000000000000000
+          Position.Y = 44.000000000000000000
+          Size.Width = 330.000000000000000000
+          Size.Height = 30.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Converse com os alunos'
+          TextSettings.Font.Size = 11.000000000000000000
+          TextSettings.FontColor = xFFFDCD62
+        end
+      end
     end
     object RectMenuOverlay: TRectangle
+      Align = Contents
       Fill.Color = x99000000
-      Position.X = 0.000000000000000000
-      Position.Y = 0.000000000000000000
       Size.Width = 450.000000000000000000
       Size.Height = 750.000000000000000000
       Size.PlatformDefault = False

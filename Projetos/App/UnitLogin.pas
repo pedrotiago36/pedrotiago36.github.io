@@ -4,9 +4,11 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  System.Math,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects,
   FMX.Layouts, FMX.StdCtrls, FMX.Controls.Presentation, FMX.Ani, FMX.Effects,
-  FMX.Edit, FMX.Filter.Effects, System.IOUtils;
+  FMX.Edit, FMX.Filter.Effects, System.IOUtils,
+  FMX.Platform, FMX.VirtualKeyboard;
 
 type
   TFormLogin = class(TForm)
@@ -73,12 +75,20 @@ type
     procedure RectAreaUniversidadeClick(Sender: TObject);
     procedure AreaMouseEnter(Sender: TObject);
     procedure AreaMouseLeave(Sender: TObject);
+    procedure EdtSenhaChangeTracking(Sender: TObject);
     procedure EdtSenhaKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
     procedure TimerPulseTimer(Sender: TObject);
     procedure TimerDecorTimer(Sender: TObject);
+    procedure FormResize(Sender: TObject);
+    procedure RectUsuarioClick(Sender: TObject);
+    procedure RectSenhaClick(Sender: TObject);
   private
     FAreaSelecionada: Integer;
     FPulseGrow: Boolean;
+    FSenhaReal: string;
+    FMascarando: Boolean;
+    FNormalY: Single;
+    FTecladoVisivel: Boolean;
     FDecorItems: array[0..14] of TImage;
     FDecorSpeeds: array[0..14] of Single;
     FDecorRotations: array[0..14] of Single;
@@ -88,6 +98,10 @@ type
     procedure AnimarShake;
     procedure AnimarDecorItems;
     procedure CriarItensDecorativos;
+    procedure CriarImagensModelo;
+    procedure MostrarTeclado(AEdit: TEdit);
+    procedure HandleEditEnter(Sender: TObject);
+    procedure HandleEditExit(Sender: TObject);
   public
   end;
 
@@ -105,16 +119,144 @@ implementation
 
 {$R *.fmx}
 
-uses UnitPrincipal, UnitAluno, UnitResponsavel, UnitProfessor, UnitAdministrativo, UnitEducInfantil;
+uses UnitPrincipal, UnitAluno, UnitResponsavel, UnitProfessor, UnitAdministrativo, UnitEducInfantil
+  {$IFDEF ANDROID}, Androidapi.JNI.GraphicsContentViewText, Androidapi.Helpers{$ENDIF};
 
 procedure TFormLogin.FormCreate(Sender: TObject);
 begin
+  {$IFDEF ANDROID}
+  TAndroidHelper.Activity.getWindow.setSoftInputMode(
+    TJWindowManager_LayoutParams.JavaClass.SOFT_INPUT_ADJUST_NOTHING);
+  {$ENDIF}
+
   FAreaSelecionada := 0;
   FPulseGrow := True;
+  FTecladoVisivel := False;
   RectCard.Opacity := 0;
-  
-  // Cria os itens decorativos (livros, lápis, etc.)
+  ImgCapelo.WrapMode := TImageWrapMode.Fit;
+
+  EdtUsuario.OnEnter := HandleEditEnter;
+  EdtSenha.OnEnter   := HandleEditEnter;
+  EdtUsuario.OnExit  := HandleEditExit;
+  EdtSenha.OnExit    := HandleEditExit;
+
   CriarItensDecorativos;
+end;
+
+procedure TFormLogin.CriarImagensModelo;
+var
+  Bmp: TBitmap;
+begin
+  // === Livro - capa vermelha com lombada escura ===
+  Bmp := TBitmap.Create(32, 42);
+  try
+    Bmp.Canvas.BeginScene;
+    Bmp.Canvas.Clear(0);
+    Bmp.Canvas.Fill.Kind := TBrushKind.Solid;
+    Bmp.Canvas.Fill.Color := $FFD33327;
+    Bmp.Canvas.FillRect(RectF(5, 2, 30, 40), 3, 3, AllCorners, 1);
+    Bmp.Canvas.Fill.Color := $FF7D2728;
+    Bmp.Canvas.FillRect(RectF(5, 2, 11, 40), 3, 3, AllCorners, 1);
+    Bmp.Canvas.Stroke.Color := $50FFFFFF;
+    Bmp.Canvas.Stroke.Thickness := 1;
+    Bmp.Canvas.DrawLine(PointF(14, 13), PointF(27, 13), 1);
+    Bmp.Canvas.DrawLine(PointF(14, 19), PointF(27, 19), 1);
+    Bmp.Canvas.DrawLine(PointF(14, 25), PointF(27, 25), 1);
+    Bmp.Canvas.DrawLine(PointF(14, 31), PointF(27, 31), 1);
+    Bmp.Canvas.EndScene;
+    ImgModeloBook.Bitmap.Assign(Bmp);
+  finally
+    Bmp.Free;
+  end;
+
+  // === Lápis - corpo amarelo com ponta e borracha ===
+  Bmp := TBitmap.Create(14, 44);
+  try
+    Bmp.Canvas.BeginScene;
+    Bmp.Canvas.Clear(0);
+    Bmp.Canvas.Fill.Kind := TBrushKind.Solid;
+    Bmp.Canvas.Fill.Color := $FFFF9999;
+    Bmp.Canvas.FillRect(RectF(2, 2, 12, 9), 2, 2, AllCorners, 1);
+    Bmp.Canvas.Fill.Color := $FF888888;
+    Bmp.Canvas.FillRect(RectF(3, 9, 11, 12), 0, 0, AllCorners, 1);
+    Bmp.Canvas.Fill.Color := $FFFDCD62;
+    Bmp.Canvas.FillRect(RectF(2, 12, 12, 36), 0, 0, AllCorners, 1);
+    Bmp.Canvas.Fill.Color := $FFD4A76A;
+    Bmp.Canvas.FillRect(RectF(3, 36, 11, 41), 0, 0, AllCorners, 1);
+    Bmp.Canvas.Fill.Color := $FF444444;
+    Bmp.Canvas.FillRect(RectF(5, 41, 9, 44), 1, 1, AllCorners, 1);
+    Bmp.Canvas.EndScene;
+    ImgModeloPencil.Bitmap.Assign(Bmp);
+  finally
+    Bmp.Free;
+  end;
+
+  // === Borracha - rosa com faixas ===
+  Bmp := TBitmap.Create(40, 22);
+  try
+    Bmp.Canvas.BeginScene;
+    Bmp.Canvas.Clear(0);
+    Bmp.Canvas.Fill.Kind := TBrushKind.Solid;
+    Bmp.Canvas.Fill.Color := $FFFF9999;
+    Bmp.Canvas.FillRect(RectF(2, 2, 38, 20), 4, 4, AllCorners, 1);
+    Bmp.Canvas.Fill.Color := $FFFFFFFF;
+    Bmp.Canvas.FillRect(RectF(2, 8, 38, 13), 0, 0, AllCorners, 1);
+    Bmp.Canvas.Fill.Color := $FF6699CC;
+    Bmp.Canvas.FillRect(RectF(2, 13, 38, 20), 0, 0, AllCorners, 1);
+    Bmp.Canvas.EndScene;
+    ImgModeloEraser.Bitmap.Assign(Bmp);
+  finally
+    Bmp.Free;
+  end;
+
+  // === Caderno - capa azul com espiral e linhas ===
+  Bmp := TBitmap.Create(34, 44);
+  try
+    Bmp.Canvas.BeginScene;
+    Bmp.Canvas.Clear(0);
+    Bmp.Canvas.Fill.Kind := TBrushKind.Solid;
+    Bmp.Canvas.Fill.Color := $FF1565C0;
+    Bmp.Canvas.FillRect(RectF(8, 2, 32, 42), 3, 3, AllCorners, 1);
+    Bmp.Canvas.Fill.Color := $FFB0B0B0;
+    Bmp.Canvas.FillRect(RectF(5, 9, 10, 15), 3, 3, AllCorners, 1);
+    Bmp.Canvas.FillRect(RectF(5, 20, 10, 26), 3, 3, AllCorners, 1);
+    Bmp.Canvas.FillRect(RectF(5, 31, 10, 37), 3, 3, AllCorners, 1);
+    Bmp.Canvas.Stroke.Color := $40FFFFFF;
+    Bmp.Canvas.Stroke.Thickness := 1;
+    Bmp.Canvas.DrawLine(PointF(13, 14), PointF(29, 14), 1);
+    Bmp.Canvas.DrawLine(PointF(13, 20), PointF(29, 20), 1);
+    Bmp.Canvas.DrawLine(PointF(13, 26), PointF(29, 26), 1);
+    Bmp.Canvas.DrawLine(PointF(13, 32), PointF(29, 32), 1);
+    Bmp.Canvas.EndScene;
+    ImgModeloNotebook.Bitmap.Assign(Bmp);
+  finally
+    Bmp.Free;
+  end;
+
+  // === Régua - bege com marcações ===
+  Bmp := TBitmap.Create(12, 44);
+  try
+    Bmp.Canvas.BeginScene;
+    Bmp.Canvas.Clear(0);
+    Bmp.Canvas.Fill.Kind := TBrushKind.Solid;
+    Bmp.Canvas.Fill.Color := $FFFFEABB;
+    Bmp.Canvas.FillRect(RectF(2, 2, 10, 42), 2, 2, AllCorners, 1);
+    Bmp.Canvas.Fill.Color := $FFD4A010;
+    Bmp.Canvas.FillRect(RectF(2, 2, 10, 6), 2, 2, AllCorners, 1);
+    Bmp.Canvas.FillRect(RectF(2, 38, 10, 42), 2, 2, AllCorners, 1);
+    Bmp.Canvas.Stroke.Color := $88000000;
+    Bmp.Canvas.Stroke.Thickness := 1;
+    Bmp.Canvas.DrawLine(PointF(3, 10), PointF(7, 10), 1);
+    Bmp.Canvas.DrawLine(PointF(3, 15), PointF(9, 15), 1);
+    Bmp.Canvas.DrawLine(PointF(3, 20), PointF(7, 20), 1);
+    Bmp.Canvas.DrawLine(PointF(3, 25), PointF(9, 25), 1);
+    Bmp.Canvas.DrawLine(PointF(3, 30), PointF(7, 30), 1);
+    Bmp.Canvas.DrawLine(PointF(3, 35), PointF(9, 35), 1);
+    Bmp.Canvas.EndScene;
+    ImgModeloRuler.Bitmap.Assign(Bmp);
+  finally
+    Bmp.Free;
+  end;
 end;
 
 procedure TFormLogin.CriarItensDecorativos;
@@ -142,19 +284,21 @@ begin
   PosX[10] := 35; PosX[11] := 120; PosX[12] := 205; PosX[13] := 290; PosX[14] := 375;
   
   // Velocidades diferentes para cada objeto
-  FDecorSpeeds[0] := 1.2; FDecorSpeeds[1] := 1.8; FDecorSpeeds[2] := 1.5; 
-  FDecorSpeeds[3] := 2.0; FDecorSpeeds[4] := 1.3; FDecorSpeeds[5] := 1.7;
-  FDecorSpeeds[6] := 1.4; FDecorSpeeds[7] := 2.2; FDecorSpeeds[8] := 1.6;
-  FDecorSpeeds[9] := 1.9; FDecorSpeeds[10] := 1.1; FDecorSpeeds[11] := 2.1;
-  FDecorSpeeds[12] := 1.4; FDecorSpeeds[13] := 1.8; FDecorSpeeds[14] := 1.5;
+  FDecorSpeeds[0] := 0.90; FDecorSpeeds[1] := 1.35; FDecorSpeeds[2] := 1.05;
+  FDecorSpeeds[3] := 1.50; FDecorSpeeds[4] := 0.96; FDecorSpeeds[5] := 1.26;
+  FDecorSpeeds[6] := 1.05; FDecorSpeeds[7] := 1.65; FDecorSpeeds[8] := 1.20;
+  FDecorSpeeds[9] := 1.44; FDecorSpeeds[10] := 0.84; FDecorSpeeds[11] := 1.56;
+  FDecorSpeeds[12] := 1.05; FDecorSpeeds[13] := 1.35; FDecorSpeeds[14] := 1.14;
   
   // Velocidades de rotação
-  FDecorRotations[0] := 1.5; FDecorRotations[1] := -1.2; FDecorRotations[2] := 2.0;
-  FDecorRotations[3] := -1.8; FDecorRotations[4] := 1.3; FDecorRotations[5] := -2.2;
-  FDecorRotations[6] := 1.7; FDecorRotations[7] := -1.4; FDecorRotations[8] := 2.1;
-  FDecorRotations[9] := -1.6; FDecorRotations[10] := 1.9; FDecorRotations[11] := -1.1;
-  FDecorRotations[12] := 2.3; FDecorRotations[13] := -1.5; FDecorRotations[14] := 1.8;
-  
+  FDecorRotations[0] := 0.38; FDecorRotations[1] := -0.30; FDecorRotations[2] := 0.50;
+  FDecorRotations[3] := -0.45; FDecorRotations[4] := 0.32; FDecorRotations[5] := -0.55;
+  FDecorRotations[6] := 0.42; FDecorRotations[7] := -0.35; FDecorRotations[8] := 0.52;
+  FDecorRotations[9] := -0.40; FDecorRotations[10] := 0.48; FDecorRotations[11] := -0.28;
+  FDecorRotations[12] := 0.57; FDecorRotations[13] := -0.38; FDecorRotations[14] := 0.45;
+
+  CriarImagensModelo;
+
   for I := 0 to 14 do
   begin
     FDecorItems[I] := TImage.Create(Self);
@@ -175,14 +319,15 @@ end;
 
 procedure TFormLogin.FormShow(Sender: TObject);
 begin
+  // Ajuste responsivo inicial
+  FormResize(nil);
+
   // Animação de entrada do card
   TAnimator.AnimateFloat(RectCard, 'Opacity', 1, 0.6, TAnimationType.Out, TInterpolationType.Quadratic);
-  
+
   // Inicia timers
   TimerPulse.Enabled := True;
   TimerDecor.Enabled := True;
-  
-  EdtUsuario.SetFocus;
 end;
 
 procedure TFormLogin.TimerPulseTimer(Sender: TObject);
@@ -200,6 +345,7 @@ begin
     TAnimator.AnimateFloat(CircleLogo, 'Scale.Y', 1, 0.5);
   end;
   FPulseGrow := not FPulseGrow;
+
 end;
 
 procedure TFormLogin.TimerDecorTimer(Sender: TObject);
@@ -258,7 +404,7 @@ begin
     procedure
     begin
       Sleep(150);
-      TThread.Synchronize(nil,
+      TThread.Queue(nil,
         procedure
         begin
           TAnimator.AnimateFloat(RectArea, 'Scale.X', 1, 0.1);
@@ -391,6 +537,29 @@ begin
   ShadowBtn.Distance := 6;
 end;
 
+procedure TFormLogin.EdtSenhaChangeTracking(Sender: TObject);
+var
+  NovoTexto: string;
+  NovoLen, VelhoLen: Integer;
+begin
+  if FMascarando then Exit;
+  FMascarando := True;
+  try
+    NovoTexto := EdtSenha.Text;
+    NovoLen   := Length(NovoTexto);
+    VelhoLen  := Length(FSenhaReal);
+
+    if NovoLen > VelhoLen then
+      FSenhaReal := FSenhaReal + Copy(NovoTexto, VelhoLen + 1, NovoLen - VelhoLen)
+    else
+      FSenhaReal := Copy(FSenhaReal, 1, NovoLen);
+
+    EdtSenha.Text := StringOfChar(Char($2022), NovoLen);
+  finally
+    FMascarando := False;
+  end;
+end;
+
 procedure TFormLogin.EdtSenhaKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
 begin
   if Key = vkReturn then
@@ -407,13 +576,13 @@ begin
     procedure
     begin
       Sleep(50);
-      TThread.Synchronize(nil, procedure begin TAnimator.AnimateFloat(RectCard, 'Position.X', PosOriginal - 15, 0.05); end);
+      TThread.Queue(nil, procedure begin TAnimator.AnimateFloat(RectCard, 'Position.X', PosOriginal - 15, 0.05); end);
       Sleep(50);
-      TThread.Synchronize(nil, procedure begin TAnimator.AnimateFloat(RectCard, 'Position.X', PosOriginal + 10, 0.05); end);
+      TThread.Queue(nil, procedure begin TAnimator.AnimateFloat(RectCard, 'Position.X', PosOriginal + 10, 0.05); end);
       Sleep(50);
-      TThread.Synchronize(nil, procedure begin TAnimator.AnimateFloat(RectCard, 'Position.X', PosOriginal - 10, 0.05); end);
+      TThread.Queue(nil, procedure begin TAnimator.AnimateFloat(RectCard, 'Position.X', PosOriginal - 10, 0.05); end);
       Sleep(50);
-      TThread.Synchronize(nil, procedure begin TAnimator.AnimateFloat(RectCard, 'Position.X', PosOriginal, 0.05); end);
+      TThread.Queue(nil, procedure begin TAnimator.AnimateFloat(RectCard, 'Position.X', PosOriginal, 0.05); end);
     end).Start;
 end;
 
@@ -437,7 +606,7 @@ begin
   end;
 
   // Validar campos
-  if (Trim(EdtUsuario.Text) = '') or (Trim(EdtSenha.Text) = '') then
+  if (Trim(EdtUsuario.Text) = '') or (Trim(FSenhaReal) = '') then
   begin
     ShowMessage('Por favor, preencha usuário e senha!');
     AnimarShake;
@@ -445,7 +614,7 @@ begin
   end;
 
   // Validar credenciais (admin/123)
-  if (EdtUsuario.Text = 'admin') and (EdtSenha.Text = '123') then
+  if (EdtUsuario.Text = 'admin') and (FSenhaReal = '123') then
   begin
     // Animação de saída
     TAnimator.AnimateFloat(RectCard, 'Opacity', 0, 0.4);
@@ -462,7 +631,7 @@ begin
         NomeUsr := EdtUsuario.Text;
         
         Sleep(450);
-        TThread.Synchronize(nil,
+        TThread.Queue(nil,
           procedure
           begin
             // Para os timers
@@ -506,6 +675,7 @@ begin
             RectCard.Scale.Y := 1;
             EdtUsuario.Text := '';
             EdtSenha.Text := '';
+            FSenhaReal := '';
             FAreaSelecionada := 0;
             ResetarAreas;
           end);
@@ -516,8 +686,70 @@ begin
     ShowMessage('Usuário ou senha inválidos!');
     AnimarShake;
     EdtSenha.Text := '';
+    FSenhaReal := '';
     EdtSenha.SetFocus;
   end;
+end;
+
+procedure TFormLogin.FormResize(Sender: TObject);
+const
+  DESIGN_W = 380;
+  DESIGN_H = 680;
+var
+  Scale, VisualW, VisualH: Single;
+begin
+  if (Width <= 10) or (Height <= 10) then Exit;
+  Scale := Min((Width - 20) / DESIGN_W, (Height - 20) / DESIGN_H);
+  if Scale > 1.0 then Scale := 1.0;
+  if Scale < 0.4 then Scale := 0.4;
+  LayoutCentral.Scale.X := Scale;
+  LayoutCentral.Scale.Y := Scale;
+  VisualW := DESIGN_W * Scale;
+  VisualH := DESIGN_H * Scale;
+  LayoutCentral.Position.X := (Width - VisualW) / 2;
+  FNormalY := (Height - VisualH) / 2;
+  if not FTecladoVisivel then
+    LayoutCentral.Position.Y := FNormalY;
+end;
+
+procedure TFormLogin.RectUsuarioClick(Sender: TObject);
+begin
+  MostrarTeclado(EdtUsuario);
+end;
+
+procedure TFormLogin.RectSenhaClick(Sender: TObject);
+begin
+  MostrarTeclado(EdtSenha);
+end;
+
+procedure TFormLogin.MostrarTeclado(AEdit: TEdit);
+var
+  VK: IFMXVirtualKeyboardService;
+begin
+  AEdit.SetFocus;
+  if TPlatformServices.Current.SupportsPlatformService(
+    IFMXVirtualKeyboardService, IInterface(VK)) then
+    VK.ShowVirtualKeyboard(AEdit);
+end;
+
+procedure TFormLogin.HandleEditEnter(Sender: TObject);
+begin
+  FTecladoVisivel := True;
+  // Y=-80: ambos os campos e o botão Entrar ficam acima do teclado
+  TAnimator.AnimateFloat(LayoutCentral, 'Position.Y', -80, 0.25,
+    TAnimationType.Out, TInterpolationType.Quadratic);
+end;
+
+procedure TFormLogin.HandleEditExit(Sender: TObject);
+begin
+  // Sinaliza intenção de restaurar; HandleEditEnter do próximo campo cancela se foco mudar
+  FTecladoVisivel := False;
+  TThread.Queue(nil, procedure
+  begin
+    if not FTecladoVisivel then
+      TAnimator.AnimateFloat(LayoutCentral, 'Position.Y', FNormalY, 0.3,
+        TAnimationType.Out, TInterpolationType.Quadratic);
+  end);
 end;
 
 end.

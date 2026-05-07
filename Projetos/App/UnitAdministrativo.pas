@@ -56,6 +56,7 @@ type
     ImgModeloRuler: TImage;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure FormResize(Sender: TObject);
     procedure RectBtnMenuClick(Sender: TObject);
     procedure RectBtnVoltarClick(Sender: TObject);
     procedure RectMenuOverlayClick(Sender: TObject);
@@ -75,8 +76,8 @@ type
     FDecorRotations: array[0..14] of Single;
     FLogoScale: Single;
     FLogoGrow: Boolean;
-    FCards: array[1..12] of TRectangle;
-    FMenuItems: array[1..12] of TRectangle;
+    FCards: array[1..13] of TRectangle;
+    FMenuItems: array[1..13] of TRectangle;
     procedure CriarItensDecorativos;
     procedure CriarCards;
     procedure CriarMenuItems;
@@ -141,7 +142,7 @@ const
     $FF9E9E9E   // Grey
   );
 
-  CARD_TITULOS: array[1..12] of string = (
+  CARD_TITULOS: array[1..13] of string = (
     'Matrículas Anuais',
     'Evasões por Mês',
     'Evasões por Série',
@@ -153,10 +154,11 @@ const
     'Outros Gastos',
     'Perdas com Evasões',
     'Ganhos com Matrículas',
-    'Contas Receber/Pagar'
+    'Contas Receber/Pagar',
+    'Professores'
   );
 
-  CARD_DESCRICOES: array[1..12] of string = (
+  CARD_DESCRICOES: array[1..13] of string = (
     'Comparativo últimos 5 anos',
     'Evasões mês a mês',
     'Evasões por série escolar',
@@ -168,18 +170,19 @@ const
     'Demais despesas',
     'Total perdido com evasões',
     'Total recebido em matrículas',
-    'Balanço últimos 10 anos'
+    'Balanço últimos 10 anos',
+    'Cadastro de professores'
   );
 
-  CARD_ICONES: array[1..12] of string = (
-    '📊', '📉', '🎓', '📈', '👥', '💰', '💸', '💡', '📋', '❌', '✅', '📑'
+  CARD_ICONES: array[1..13] of string = (
+    '📊', '📉', '🎓', '📈', '👥', '💰', '💸', '💡', '📋', '❌', '✅', '📑', '👩‍🏫'
   );
 
 implementation
 
 {$R *.fmx}
 
-uses UnitLogin;
+uses UnitLogin, UnitCadastroProfessores;
 
 procedure TFormAdministrativo.FormCreate(Sender: TObject);
 begin
@@ -215,7 +218,9 @@ begin
     
   LblTipoUsuario.Text := 'Área Administrativa';
   LblSubtituloHeader.Text := 'Olá, ' + LblNomeUsuario.Text + '!';
-  
+
+  FormResize(nil);
+
   ScrollBoxConteudo.Opacity := 0;
   ScrollBoxConteudo.Scale.X := 0.95;
   ScrollBoxConteudo.Scale.Y := 0.95;
@@ -236,12 +241,12 @@ var
   LblIcone, LblTitulo, LblDesc: TLabel;
   CardW, CardH, MarginX, MarginY, PosX, PosY: Single;
 begin
-  CardW := 195;
-  CardH := 110;
+  CardW := 165;
+  CardH := 90;
   MarginX := 20;
   MarginY := 10;
   
-  for I := 1 to 12 do
+  for I := 1 to 13 do
   begin
     Col := (I - 1) mod 2;
     Row := (I - 1) div 2;
@@ -275,35 +280,35 @@ begin
     
     LblIcone := TLabel.Create(Card);
     LblIcone.Parent := Card;
-    LblIcone.Position.X := 12;
-    LblIcone.Position.Y := 12;
-    LblIcone.Width := 35;
-    LblIcone.Height := 35;
+    LblIcone.Position.X := 10;
+    LblIcone.Position.Y := 8;
+    LblIcone.Width := 30;
+    LblIcone.Height := 30;
     LblIcone.StyledSettings := [];
-    LblIcone.TextSettings.Font.Size := 24;
+    LblIcone.TextSettings.Font.Size := 20;
     LblIcone.TextSettings.HorzAlign := TTextAlign.Center;
     LblIcone.Text := CARD_ICONES[I];
     LblIcone.HitTest := False;
-    
+
     LblTitulo := TLabel.Create(Card);
     LblTitulo.Parent := Card;
     LblTitulo.Position.X := 12;
-    LblTitulo.Position.Y := 50;
+    LblTitulo.Position.Y := 42;
     LblTitulo.Width := CardW - 24;
-    LblTitulo.Height := 22;
+    LblTitulo.Height := 20;
     LblTitulo.StyledSettings := [];
-    LblTitulo.TextSettings.Font.Size := 12;
+    LblTitulo.TextSettings.Font.Size := 11;
     LblTitulo.TextSettings.Font.Style := [TFontStyle.fsBold];
     LblTitulo.TextSettings.FontColor := TAlphaColors.White;
     LblTitulo.Text := CARD_TITULOS[I];
     LblTitulo.HitTest := False;
-    
+
     LblDesc := TLabel.Create(Card);
     LblDesc.Parent := Card;
     LblDesc.Position.X := 12;
-    LblDesc.Position.Y := 72;
+    LblDesc.Position.Y := 63;
     LblDesc.Width := CardW - 24;
-    LblDesc.Height := 30;
+    LblDesc.Height := 22;
     LblDesc.StyledSettings := [];
     LblDesc.TextSettings.Font.Size := 10;
     LblDesc.TextSettings.FontColor := COR_DOURADO;
@@ -321,7 +326,7 @@ var
   MenuItem: TRectangle;
   LblIcone, LblTitulo: TLabel;
 begin
-  for I := 1 to 12 do
+  for I := 1 to 13 do
   begin
     MenuItem := TRectangle.Create(Self);
     MenuItem.Parent := ScrollBoxMenu;
@@ -391,18 +396,41 @@ begin
   PosX[5] := 230; PosX[6] := 275; PosX[7] := 320; PosX[8] := 365; PosX[9] := 405;
   PosX[10] := 35; PosX[11] := 120; PosX[12] := 205; PosX[13] := 290; PosX[14] := 375;
   
-  FDecorSpeeds[0] := 1.2; FDecorSpeeds[1] := 1.8; FDecorSpeeds[2] := 1.5;
-  FDecorSpeeds[3] := 2.0; FDecorSpeeds[4] := 1.3; FDecorSpeeds[5] := 1.7;
-  FDecorSpeeds[6] := 1.4; FDecorSpeeds[7] := 2.2; FDecorSpeeds[8] := 1.6;
-  FDecorSpeeds[9] := 1.9; FDecorSpeeds[10] := 1.1; FDecorSpeeds[11] := 2.1;
-  FDecorSpeeds[12] := 1.4; FDecorSpeeds[13] := 1.8; FDecorSpeeds[14] := 1.5;
+  FDecorSpeeds[0] := 0.30; FDecorSpeeds[1] := 0.45; FDecorSpeeds[2] := 0.35;
+  FDecorSpeeds[3] := 0.50; FDecorSpeeds[4] := 0.32; FDecorSpeeds[5] := 0.42;
+  FDecorSpeeds[6] := 0.35; FDecorSpeeds[7] := 0.55; FDecorSpeeds[8] := 0.40;
+  FDecorSpeeds[9] := 0.48; FDecorSpeeds[10] := 0.28; FDecorSpeeds[11] := 0.52;
+  FDecorSpeeds[12] := 0.35; FDecorSpeeds[13] := 0.45; FDecorSpeeds[14] := 0.38;
   
-  FDecorRotations[0] := 1.5; FDecorRotations[1] := -1.2; FDecorRotations[2] := 2.0;
-  FDecorRotations[3] := -1.8; FDecorRotations[4] := 1.3; FDecorRotations[5] := -2.2;
-  FDecorRotations[6] := 1.7; FDecorRotations[7] := -1.4; FDecorRotations[8] := 2.1;
-  FDecorRotations[9] := -1.6; FDecorRotations[10] := 1.9; FDecorRotations[11] := -1.1;
-  FDecorRotations[12] := 2.3; FDecorRotations[13] := -1.5; FDecorRotations[14] := 1.8;
-  
+  FDecorRotations[0] := 0.38; FDecorRotations[1] := -0.30; FDecorRotations[2] := 0.50;
+  FDecorRotations[3] := -0.45; FDecorRotations[4] := 0.32; FDecorRotations[5] := -0.55;
+  FDecorRotations[6] := 0.42; FDecorRotations[7] := -0.35; FDecorRotations[8] := 0.52;
+  FDecorRotations[9] := -0.40; FDecorRotations[10] := 0.48; FDecorRotations[11] := -0.28;
+  FDecorRotations[12] := 0.57; FDecorRotations[13] := -0.38; FDecorRotations[14] := 0.45;
+
+  var sBase: string := TPath.Combine(ExtractFilePath(ParamStr(0)), 'img');
+  {$IFDEF ANDROID}
+  sBase := TPath.GetDocumentsPath;
+  {$ENDIF}
+  var sArq: string := TPath.Combine(sBase, 'books.png');
+  if not FileExists(sArq) then sArq := TPath.Combine(sBase, 'book.png');
+  if FileExists(sArq) then
+  begin
+    ImgModeloBook.Bitmap.LoadFromFile(sArq);
+    ImgModeloPencil.Bitmap.Assign(ImgModeloBook.Bitmap);
+    ImgModeloEraser.Bitmap.Assign(ImgModeloBook.Bitmap);
+    ImgModeloNotebook.Bitmap.Assign(ImgModeloBook.Bitmap);
+    ImgModeloRuler.Bitmap.Assign(ImgModeloBook.Bitmap);
+  end;
+  sArq := TPath.Combine(sBase, 'pencil.png');
+  if FileExists(sArq) then ImgModeloPencil.Bitmap.LoadFromFile(sArq);
+  sArq := TPath.Combine(sBase, 'eraser.png');
+  if FileExists(sArq) then ImgModeloEraser.Bitmap.LoadFromFile(sArq);
+  sArq := TPath.Combine(sBase, 'notebook.png');
+  if FileExists(sArq) then ImgModeloNotebook.Bitmap.LoadFromFile(sArq);
+  sArq := TPath.Combine(sBase, 'ruler.png');
+  if FileExists(sArq) then ImgModeloRuler.Bitmap.LoadFromFile(sArq);
+
   for I := 0 to 14 do
   begin
     FDecorItems[I] := TImage.Create(Self);
@@ -484,7 +512,7 @@ begin
   LblBtnMenu.Text := '☰';
   TThread.CreateAnonymousThread(procedure begin
     Sleep(260);
-    TThread.Synchronize(nil, procedure begin
+    TThread.Queue(nil, procedure begin
       if not FMenuAberto then RectMenuOverlay.Visible := False;
     end);
   end).Start;
@@ -508,7 +536,7 @@ begin
   FecharMenu;
   TThread.CreateAnonymousThread(procedure begin
     Sleep(300);
-    TThread.Synchronize(nil, procedure begin RectBtnVoltarClick(nil); end);
+    TThread.Queue(nil, procedure begin RectBtnVoltarClick(nil); end);
   end).Start;
 end;
 
@@ -570,13 +598,18 @@ begin
     if FMenuAberto then FecharMenu;
     TThread.CreateAnonymousThread(procedure begin
       if FMenuAberto then Sleep(300);
-      TThread.Synchronize(nil, procedure begin MostrarDetalhe(CardIndex); end);
+      TThread.Queue(nil, procedure begin MostrarDetalhe(CardIndex); end);
     end).Start;
   end;
 end;
 
 procedure TFormAdministrativo.MostrarDetalhe(CardIndex: Integer);
 begin
+  if CardIndex = 13 then
+  begin
+    FormCadastroProfessores.Show;
+    Exit;
+  end;
   LblDetalheTitulo.Text := CARD_TITULOS[CardIndex];
   LimparScrollBox(ScrollBoxDetalhe);
   
@@ -613,7 +646,7 @@ begin
   TAnimator.AnimateFloat(RectDetalhe, 'Scale.Y', 0.95, 0.2);
   TThread.CreateAnonymousThread(procedure begin
     Sleep(220);
-    TThread.Synchronize(nil, procedure begin
+    TThread.Queue(nil, procedure begin
       RectDetalhe.Visible := False;
       ScrollBoxConteudo.Visible := True;
     end);
@@ -636,68 +669,69 @@ var
   MaxVal, BarW, BarH, PosX, PosY, Scale: Single;
   RectContainer, RectBar: TRectangle;
   LblTitulo, LblLabel, LblValor: TLabel;
-  MaxY: Single;
+  MaxY, ContW, ContX: Single;
   Ctrl: TControl;
 begin
   N := Length(Valores);
   if N = 0 then Exit;
-  
+
   MaxVal := 0;
   for I := 0 to N - 1 do
     if Valores[I] > MaxVal then MaxVal := Valores[I];
   if MaxVal = 0 then MaxVal := 1;
-  
-  // Calcula posição Y baseado nos filhos existentes
+
+  ContW := ScrollBoxDetalhe.Width - 10;
+  if ContW < 220 then ContW := 220;
+  ContX := (ScrollBoxDetalhe.Width - ContW) / 2;
+  if ContX < 0 then ContX := 0;
+
   MaxY := 0;
   if Parent is TContent then
-  begin
     for I := 0 to TContent(Parent).ChildrenCount - 1 do
-    begin
       if TContent(Parent).Children[I] is TControl then
       begin
         Ctrl := TControl(TContent(Parent).Children[I]);
         if (Ctrl.Position.Y + Ctrl.Height) > MaxY then
           MaxY := Ctrl.Position.Y + Ctrl.Height;
       end;
-    end;
-  end;
-  
+
   RectContainer := TRectangle.Create(Self);
   RectContainer.Parent := Parent;
-  RectContainer.Position.X := 0;
+  RectContainer.Position.X := ContX;
   RectContainer.Position.Y := MaxY + 10;
-  RectContainer.Width := 395;
+  RectContainer.Width := ContW;
   RectContainer.Height := 220;
   RectContainer.Fill.Color := $15FFFFFF;
   RectContainer.Stroke.Color := COR_BORDA;
   RectContainer.Stroke.Thickness := 1;
   RectContainer.XRadius := 10;
   RectContainer.YRadius := 10;
-  
+
   LblTitulo := TLabel.Create(RectContainer);
   LblTitulo.Parent := RectContainer;
   LblTitulo.Position.X := 10;
   LblTitulo.Position.Y := 8;
-  LblTitulo.Width := 360;
+  LblTitulo.Width := ContW - 20;
   LblTitulo.Height := 22;
   LblTitulo.StyledSettings := [];
-  LblTitulo.TextSettings.Font.Size := 13;
+  LblTitulo.TextSettings.Font.Size := 12;
   LblTitulo.TextSettings.Font.Style := [TFontStyle.fsBold];
   LblTitulo.TextSettings.FontColor := TAlphaColors.White;
   LblTitulo.Text := Titulo;
-  
-  BarW := (360 - (N + 1) * 8) / N;
+
+  BarW := (ContW - 35 - (N + 1) * 8) / N;
   if BarW > 50 then BarW := 50;
-  
+  if BarW < 2  then BarW := 2;
+
   for I := 0 to N - 1 do
   begin
     Scale := Valores[I] / MaxVal;
     BarH := Scale * 120;
     if BarH < 5 then BarH := 5;
-    
+
     PosX := 15 + I * (BarW + 8);
     PosY := 160 - BarH;
-    
+
     RectBar := TRectangle.Create(RectContainer);
     RectBar.Parent := RectContainer;
     RectBar.Position.X := PosX;
@@ -708,7 +742,7 @@ begin
     RectBar.Stroke.Kind := TBrushKind.None;
     RectBar.XRadius := 4;
     RectBar.YRadius := 4;
-    
+
     LblValor := TLabel.Create(RectContainer);
     LblValor.Parent := RectContainer;
     LblValor.Position.X := PosX - 5;
@@ -720,7 +754,7 @@ begin
     LblValor.TextSettings.FontColor := COR_DOURADO;
     LblValor.TextSettings.HorzAlign := TTextAlign.Center;
     LblValor.Text := FormatFloat('#,##0', Valores[I]);
-    
+
     if I < Length(Labels) then
     begin
       LblLabel := TLabel.Create(RectContainer);
@@ -776,35 +810,36 @@ begin
   // Calcula posição Y baseado nos filhos existentes
   MaxY := 0;
   if Parent is TContent then
-  begin
     for I := 0 to TContent(Parent).ChildrenCount - 1 do
-    begin
       if TContent(Parent).Children[I] is TControl then
       begin
         Ctrl := TControl(TContent(Parent).Children[I]);
         if (Ctrl.Position.Y + Ctrl.Height) > MaxY then
           MaxY := Ctrl.Position.Y + Ctrl.Height;
       end;
-    end;
-  end;
-  
+
+  var ContW: Single := ScrollBoxDetalhe.Width - 10;
+  if ContW < 220 then ContW := 220;
+  var ContX: Single := (ScrollBoxDetalhe.Width - ContW) / 2;
+  if ContX < 0 then ContX := 0;
+
   RectContainer := TRectangle.Create(Self);
   RectContainer.Parent := Parent;
-  RectContainer.Position.X := 0;
+  RectContainer.Position.X := ContX;
   RectContainer.Position.Y := MaxY + 10;
-  RectContainer.Width := 395;
+  RectContainer.Width := ContW;
   RectContainer.Height := 280;
   RectContainer.Fill.Color := $15FFFFFF;
   RectContainer.Stroke.Color := COR_BORDA;
   RectContainer.Stroke.Thickness := 1;
   RectContainer.XRadius := 10;
   RectContainer.YRadius := 10;
-  
+
   LblTitulo := TLabel.Create(RectContainer);
   LblTitulo.Parent := RectContainer;
   LblTitulo.Position.X := 10;
   LblTitulo.Position.Y := 8;
-  LblTitulo.Width := 360;
+  LblTitulo.Width := ContW - 20;
   LblTitulo.Height := 22;
   LblTitulo.StyledSettings := [];
   LblTitulo.TextSettings.Font.Size := 13;
@@ -846,12 +881,12 @@ begin
       RectLegendaItem.Stroke.Kind := TBrushKind.None;
       RectLegendaItem.XRadius := 3;
       RectLegendaItem.YRadius := 3;
-      
+
       LblLegenda := TLabel.Create(RectContainer);
       LblLegenda.Parent := RectContainer;
-      LblLegenda.Position.X := 208;
+      LblLegenda.Position.X := 207;
       LblLegenda.Position.Y := 29 + I * 19;
-      LblLegenda.Width := 165;
+      LblLegenda.Width := ContW - 217;  // adapta à largura real
       LblLegenda.Height := 18;
       LblLegenda.StyledSettings := [];
       LblLegenda.TextSettings.Font.Size := 9;
@@ -890,36 +925,37 @@ begin
   MaxVal := MaxVal * 1.1;
   if MaxVal = MinVal then MaxVal := MinVal + 1;
   
-  // Dimensões do gráfico
-  ChartLeft := 55;
-  ChartRight := 370;
-  ChartTop := 45;
+  var ContW: Single := ScrollBoxDetalhe.Width - 10;
+  if ContW < 220 then ContW := 220;
+  var ContX: Single := (ScrollBoxDetalhe.Width - ContW) / 2;
+  if ContX < 0 then ContX := 0;
+
+  // Dimensões do gráfico adaptadas à largura disponível
+  ChartLeft  := 55;
+  ChartRight := ContW - 25;
+  ChartTop   := 45;
   ChartBottom := 175;
-  ChartWidth := ChartRight - ChartLeft;
+  ChartWidth  := ChartRight - ChartLeft;
   ChartHeight := ChartBottom - ChartTop;
   NumGridLines := 5;
-  
+
   // Calcula posição Y baseado nos filhos existentes
   MaxY := 0;
   if Parent is TContent then
-  begin
     for I := 0 to TContent(Parent).ChildrenCount - 1 do
-    begin
       if TContent(Parent).Children[I] is TControl then
       begin
         Ctrl := TControl(TContent(Parent).Children[I]);
         if (Ctrl.Position.Y + Ctrl.Height) > MaxY then
           MaxY := Ctrl.Position.Y + Ctrl.Height;
       end;
-    end;
-  end;
-  
+
   // Container principal
   RectContainer := TRectangle.Create(Self);
   RectContainer.Parent := Parent;
-  RectContainer.Position.X := 0;
+  RectContainer.Position.X := ContX;
   RectContainer.Position.Y := MaxY + 10;
-  RectContainer.Width := 395;
+  RectContainer.Width := ContW;
   RectContainer.Height := 230;
   RectContainer.Fill.Color := $15FFFFFF;
   RectContainer.Stroke.Color := COR_BORDA;
@@ -932,14 +968,14 @@ begin
   LblTitulo.Parent := RectContainer;
   LblTitulo.Position.X := 10;
   LblTitulo.Position.Y := 8;
-  LblTitulo.Width := 365;
+  LblTitulo.Width := ContW - 20;
   LblTitulo.Height := 22;
   LblTitulo.StyledSettings := [];
-  LblTitulo.TextSettings.Font.Size := 13;
+  LblTitulo.TextSettings.Font.Size := 12;
   LblTitulo.TextSettings.Font.Style := [TFontStyle.fsBold];
   LblTitulo.TextSettings.FontColor := TAlphaColors.White;
   LblTitulo.Text := Titulo;
-  
+
   // Linhas de grade horizontais + valores do eixo Y
   for I := 0 to NumGridLines do
   begin
@@ -1078,46 +1114,51 @@ begin
     end;
   end;
   
+  var ContW: Single := ScrollBoxDetalhe.Width - 10;
+  if ContW < 220 then ContW := 220;
+  var ContX: Single := (ScrollBoxDetalhe.Width - ContW) / 2;
+  if ContX < 0 then ContX := 0;
+
   RectCard := TRectangle.Create(Self);
   RectCard.Parent := Parent;
-  RectCard.Position.X := 0;
-  RectCard.Position.Y := MaxY + 10; // 10px de margem
-  RectCard.Width := 395;
+  RectCard.Position.X := ContX;
+  RectCard.Position.Y := MaxY + 10;
+  RectCard.Width := ContW;
   RectCard.Height := 100;
   RectCard.Fill.Color := $20FFFFFF;
   RectCard.Stroke.Color := Cor;
   RectCard.Stroke.Thickness := 2;
   RectCard.XRadius := 12;
   RectCard.YRadius := 12;
-  
+
   LblTitulo := TLabel.Create(RectCard);
   LblTitulo.Parent := RectCard;
   LblTitulo.Position.X := 15;
   LblTitulo.Position.Y := 12;
-  LblTitulo.Width := 350;
+  LblTitulo.Width := ContW - 30;
   LblTitulo.Height := 20;
   LblTitulo.StyledSettings := [];
-  LblTitulo.TextSettings.Font.Size := 13;
+  LblTitulo.TextSettings.Font.Size := 12;
   LblTitulo.TextSettings.FontColor := $CCFFFFFF;
   LblTitulo.Text := Titulo;
-  
+
   LblValor := TLabel.Create(RectCard);
   LblValor.Parent := RectCard;
   LblValor.Position.X := 15;
   LblValor.Position.Y := 35;
-  LblValor.Width := 350;
+  LblValor.Width := ContW - 30;
   LblValor.Height := 35;
   LblValor.StyledSettings := [];
-  LblValor.TextSettings.Font.Size := 26;
+  LblValor.TextSettings.Font.Size := 24;
   LblValor.TextSettings.Font.Style := [TFontStyle.fsBold];
   LblValor.TextSettings.FontColor := Cor;
   LblValor.Text := Valor;
-  
+
   LblSubtitulo := TLabel.Create(RectCard);
   LblSubtitulo.Parent := RectCard;
   LblSubtitulo.Position.X := 15;
   LblSubtitulo.Position.Y := 72;
-  LblSubtitulo.Width := 350;
+  LblSubtitulo.Width := ContW - 30;
   LblSubtitulo.Height := 18;
   LblSubtitulo.StyledSettings := [];
   LblSubtitulo.TextSettings.Font.Size := 11;
@@ -1309,6 +1350,50 @@ begin
   CriarCardResumo(ScrollBoxDetalhe.Content,
     'Saldo Atual (Receber - Pagar)', 'R$ 20.000,00',
     'Situação financeira equilibrada', COR_DOURADO_CLARO, 490);
+end;
+
+procedure TFormAdministrativo.FormResize(Sender: TObject);
+var I, J, Col: Integer; CardW, GridW, StartX: Single;
+begin
+  if ScrollBoxConteudo.Width < 30 then Exit;
+  RectBtnMenu.Position.X := Width - 60;
+  LblTituloHeader.Width := Width - 145;
+  LblSubtituloHeader.Width := Width - 145;
+  RectConteudoHeader.Width := ScrollBoxConteudo.Width;
+  LblConteudoTitulo.Width := ScrollBoxConteudo.Width;
+  LblConteudoSubtitulo.Width := ScrollBoxConteudo.Width;
+
+  // Cards menores e centralizados
+  CardW := (ScrollBoxConteudo.Width - 20) / 2;
+  if CardW > 165 then CardW := 165;
+  GridW  := 2 * CardW + 20;
+  StartX := (ScrollBoxConteudo.Width - GridW) / 2;
+  if StartX < 5 then StartX := 5;
+  for I := 1 to 13 do
+  begin
+    if FCards[I] = nil then Break;
+    Col := (I - 1) mod 2;
+    FCards[I].Position.X := StartX + Col * (CardW + 20);
+    FCards[I].Width := CardW;
+    for J := 0 to FCards[I].ChildrenCount - 1 do
+      if (FCards[I].Children[J] is TLabel) and
+         (TLabel(FCards[I].Children[J]).Position.Y > 30) then
+        TLabel(FCards[I].Children[J]).Width := CardW - 24;
+  end;
+
+  RectDetalhe.Position.X := 0;
+  RectDetalhe.Position.Y := RectHeader.Height;
+  RectDetalhe.Width := Width;
+  RectDetalhe.Height := Height - RectHeader.Height;
+  RectDetalheHeader.Width := RectDetalhe.Width;
+  RectBtnFecharDetalhe.Position.X := RectDetalhe.Width - 65;
+  LblDetalheTitulo.Width := RectDetalhe.Width - 80;
+  RectDetalheConteudo.Width := RectDetalhe.Width - 20;
+  RectDetalheConteudo.Height := RectDetalhe.Height - 70;
+  // Força redimensionamento do ScrollBox interno (necessário no Android)
+  ScrollBoxDetalhe.Width  := RectDetalheConteudo.Width;
+  ScrollBoxDetalhe.Height := RectDetalheConteudo.Height;
+  RectMenuLateral.Height := Height;
 end;
 
 end.

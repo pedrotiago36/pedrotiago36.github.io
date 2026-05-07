@@ -1,0 +1,332 @@
+object FormCadastroProfessores: TFormCadastroProfessores
+  Left = 0
+  Top = 0
+  Caption = 'SGE - Professores'
+  ClientHeight = 750
+  ClientWidth = 450
+  Position = ScreenCenter
+  FullScreen = True
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop, iPhone, iPad]
+  OnResize = FormResize
+  OnShow = FormShow
+  DesignerMasterStyle = 0
+  object RectFundo: TRectangle
+    Align = Contents
+    Fill.Kind = Gradient
+    Fill.Gradient.Points = <
+      item
+        Color = xFFD33327
+        Offset = 0.000000000000000000
+      end
+      item
+        Color = xFF7D2728
+        Offset = 1.000000000000000000
+      end>
+    Fill.Gradient.StartPosition.X = 0.000000000000000000
+    Fill.Gradient.StartPosition.Y = 0.000000000000000000
+    Fill.Gradient.StopPosition.X = 1.000000000000000000
+    Fill.Gradient.StopPosition.Y = 1.000000000000000000
+    Size.Width = 450.000000000000000000
+    Size.Height = 750.000000000000000000
+    Size.PlatformDefault = False
+    Stroke.Kind = None
+    object RectHeader: TRectangle
+      Align = Top
+      Fill.Color = x30000000
+      Size.Width = 450.000000000000000000
+      Size.Height = 80.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Kind = None
+      object ShadowHeader: TShadowEffect
+        Distance = 4.000000000000000000
+        Direction = 90.000000000000000000
+        Softness = 0.300000000000000000
+        Opacity = 0.350000000000000000
+        ShadowColor = claBlack
+      end
+      object RectBtnVoltar: TRectangle
+        Cursor = crHandPoint
+        Fill.Color = x20FFFFFF
+        Position.X = 15.000000000000000000
+        Position.Y = 20.000000000000000000
+        Size.Width = 45.000000000000000000
+        Size.Height = 45.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Color = x40FDCD62
+        Stroke.Thickness = 1.500000000000000000
+        XRadius = 10.000000000000000000
+        YRadius = 10.000000000000000000
+        OnClick = RectBtnVoltarClick
+        object LblBtnVoltar: TLabel
+          Align = Client
+          HitTest = False
+          StyledSettings = []
+          Text = #8592
+          TextSettings.Font.Size = 24.000000000000000000
+          TextSettings.FontColor = claWhite
+          TextSettings.HorzAlign = Center
+        end
+      end
+      object LblTituloHeader: TLabel
+        Position.X = 75.000000000000000000
+        Position.Y = 15.000000000000000000
+        Size.Width = 310.000000000000000000
+        Size.Height = 28.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        Text = 'Cadastro de Professores'
+        TextSettings.Font.Size = 15.000000000000000000
+        TextSettings.Font.Style = [fsBold]
+        TextSettings.FontColor = claWhite
+      end
+      object LblSubtituloHeader: TLabel
+        Position.X = 75.000000000000000000
+        Position.Y = 46.000000000000000000
+        Size.Width = 310.000000000000000000
+        Size.Height = 20.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        Text = 'Gerenciar professores cadastrados'
+        TextSettings.Font.Size = 11.000000000000000000
+        TextSettings.FontColor = xFFFDCD62
+      end
+    end
+    object LblStatus: TLabel
+      Position.X = 15.000000000000000000
+      Position.Y = 92.000000000000000000
+      Size.Width = 420.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      StyledSettings = []
+      Text = 'Carregando professores...'
+      TextSettings.Font.Size = 13.000000000000000000
+      TextSettings.FontColor = xCCFFFFFF
+      TextSettings.HorzAlign = Center
+    end
+    object ScrollBoxLista: TVertScrollBox
+      Align = Client
+      Margins.Left = 10.000000000000000000
+      Margins.Top = 55.000000000000000000
+      Margins.Right = 10.000000000000000000
+      Margins.Bottom = 70.000000000000000000
+      Size.Width = 430.000000000000000000
+      Size.Height = 545.000000000000000000
+      Size.PlatformDefault = False
+      ShowScrollBars = False
+      TabOrder = 0
+    end
+    object RectBtnAdicionar: TRectangle
+      Cursor = crHandPoint
+      Fill.Kind = Gradient
+      Fill.Gradient.Points = <
+        item
+          Color = xFFFDCD62
+          Offset = 0.000000000000000000
+        end
+        item
+          Color = xFFF4B942
+          Offset = 1.000000000000000000
+        end>
+      Fill.Gradient.StopPosition.X = 1.000000000000000000
+      Position.X = 360.000000000000000000
+      Position.Y = 670.000000000000000000
+      Size.Width = 60.000000000000000000
+      Size.Height = 50.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Kind = None
+      XRadius = 25.000000000000000000
+      YRadius = 25.000000000000000000
+      OnClick = RectBtnAdicionarClick
+      object ShadowBtnAdicionar: TShadowEffect
+        Distance = 5.000000000000000000
+        Direction = 45.000000000000000000
+        Softness = 0.300000000000000000
+        Opacity = 0.400000000000000000
+        ShadowColor = claBlack
+      end
+      object LblBtnAdicionar: TLabel
+        Align = Client
+        HitTest = False
+        StyledSettings = []
+        Text = '+'
+        TextSettings.Font.Size = 28.000000000000000000
+        TextSettings.Font.Style = [fsBold]
+        TextSettings.FontColor = xFF7D2728
+        TextSettings.HorzAlign = Center
+      end
+    end
+    object RectOverlayEditor: TRectangle
+      Align = Contents
+      Fill.Color = x99000000
+      Size.Width = 450.000000000000000000
+      Size.Height = 750.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Kind = None
+      Visible = False
+      OnClick = RectBtnCancelarClick
+      object RectFormEditor: TRectangle
+        Fill.Kind = Gradient
+        Fill.Gradient.Points = <
+          item
+            Color = xFF9E1A1A
+            Offset = 0.000000000000000000
+          end
+          item
+            Color = xFF580A0A
+            Offset = 1.000000000000000000
+          end>
+        Fill.Gradient.StartPosition.X = 0.000000000000000000
+        Fill.Gradient.StartPosition.Y = 0.000000000000000000
+        Fill.Gradient.StopPosition.X = 0.000000000000000000
+        Fill.Gradient.StopPosition.Y = 1.000000000000000000
+        Position.X = 25.000000000000000000
+        Position.Y = 235.000000000000000000
+        Size.Width = 400.000000000000000000
+        Size.Height = 280.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Color = x4DFDCD62
+        Stroke.Thickness = 1.500000000000000000
+        XRadius = 15.000000000000000000
+        YRadius = 15.000000000000000000
+        object LblEditorTitulo: TLabel
+          Position.X = 15.000000000000000000
+          Position.Y = 12.000000000000000000
+          Size.Width = 370.000000000000000000
+          Size.Height = 30.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Novo Professor'
+          TextSettings.Font.Size = 18.000000000000000000
+          TextSettings.Font.Style = [fsBold]
+          TextSettings.FontColor = claWhite
+          TextSettings.HorzAlign = Center
+        end
+        object LblNomeLabel: TLabel
+          Position.X = 15.000000000000000000
+          Position.Y = 54.000000000000000000
+          Size.Width = 370.000000000000000000
+          Size.Height = 18.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Nome do Professor'
+          TextSettings.Font.Size = 12.000000000000000000
+          TextSettings.FontColor = xCCFFFFFF
+        end
+        object EditNome: TEdit
+          Touch.InteractiveGestures = [LongTap, DoubleTap]
+          TabOrder = 0
+          ControlType = Platform
+          Position.X = 15.000000000000000000
+          Position.Y = 74.000000000000000000
+          Size.Width = 370.000000000000000000
+          Size.Height = 44.000000000000000000
+          Size.PlatformDefault = False
+          TextPrompt = 'Nome completo'
+        end
+        object LblSerieLabel: TLabel
+          Position.X = 15.000000000000000000
+          Position.Y = 128.000000000000000000
+          Size.Width = 175.000000000000000000
+          Size.Height = 18.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'S'#233'rie'
+          TextSettings.Font.Size = 12.000000000000000000
+          TextSettings.FontColor = xCCFFFFFF
+        end
+        object EditSerie: TEdit
+          Touch.InteractiveGestures = [LongTap, DoubleTap]
+          TabOrder = 1
+          ControlType = Platform
+          Position.X = 15.000000000000000000
+          Position.Y = 148.000000000000000000
+          Size.Width = 175.000000000000000000
+          Size.Height = 44.000000000000000000
+          Size.PlatformDefault = False
+          TextPrompt = 'ex: 5'#186' Ano'
+        end
+        object LblTurmaLabel: TLabel
+          Position.X = 205.000000000000000000
+          Position.Y = 128.000000000000000000
+          Size.Width = 180.000000000000000000
+          Size.Height = 18.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Turma'
+          TextSettings.Font.Size = 12.000000000000000000
+          TextSettings.FontColor = xCCFFFFFF
+        end
+        object EditTurma: TEdit
+          Touch.InteractiveGestures = [LongTap, DoubleTap]
+          TabOrder = 2
+          ControlType = Platform
+          Position.X = 205.000000000000000000
+          Position.Y = 148.000000000000000000
+          Size.Width = 180.000000000000000000
+          Size.Height = 44.000000000000000000
+          Size.PlatformDefault = False
+          TextPrompt = 'ex: A'
+        end
+        object RectBtnSalvar: TRectangle
+          Cursor = crHandPoint
+          Fill.Kind = Gradient
+          Fill.Gradient.Points = <
+            item
+              Color = xFFFDCD62
+              Offset = 0.000000000000000000
+            end
+            item
+              Color = xFFF4B942
+              Offset = 1.000000000000000000
+            end>
+          Fill.Gradient.StopPosition.X = 1.000000000000000000
+          Position.X = 15.000000000000000000
+          Position.Y = 212.000000000000000000
+          Size.Width = 175.000000000000000000
+          Size.Height = 50.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Kind = None
+          XRadius = 10.000000000000000000
+          YRadius = 10.000000000000000000
+          OnClick = RectBtnSalvarClick
+          object LblBtnSalvar: TLabel
+            Align = Client
+            HitTest = False
+            StyledSettings = []
+            Text = 'SALVAR'
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.Font.Style = [fsBold]
+            TextSettings.FontColor = xFF7D2728
+            TextSettings.HorzAlign = Center
+          end
+        end
+        object RectBtnCancelar: TRectangle
+          Cursor = crHandPoint
+          Fill.Color = x30FFFFFF
+          Position.X = 205.000000000000000000
+          Position.Y = 212.000000000000000000
+          Size.Width = 180.000000000000000000
+          Size.Height = 50.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = x40FFFFFF
+          Stroke.Thickness = 1.000000000000000000
+          XRadius = 10.000000000000000000
+          YRadius = 10.000000000000000000
+          OnClick = RectBtnCancelarClick
+          object LblBtnCancelar: TLabel
+            Align = Client
+            HitTest = False
+            StyledSettings = []
+            Text = 'CANCELAR'
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.Font.Style = [fsBold]
+            TextSettings.FontColor = claWhite
+            TextSettings.HorzAlign = Center
+          end
+        end
+      end
+    end
+  end
+end

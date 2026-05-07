@@ -1,15 +1,16 @@
-﻿object FormLogin: TFormLogin
+object FormLogin: TFormLogin
   Left = 0
   Top = 0
-  Caption = 'SGE - Sistema de Gestão Escolar'
+  Caption = 'SGE - Sistema de Gest'#227'o Escolar'
   ClientHeight = 750
   ClientWidth = 450
   Position = ScreenCenter
-  FullScreen = True
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop, iPhone, iPad]
+  FullScreen = True
   OnCreate = FormCreate
+  OnResize = FormResize
   OnShow = FormShow
   DesignerMasterStyle = 0
   object RectFundo: TRectangle
@@ -24,10 +25,7 @@
         Color = xFF7D2728
         Offset = 1.000000000000000000
       end>
-    Fill.Gradient.StartPosition.X = 0.000000000000000000
-    Fill.Gradient.StartPosition.Y = 0.000000000000000000
     Fill.Gradient.StopPosition.X = 1.000000000000000000
-    Fill.Gradient.StopPosition.Y = 1.000000000000000000
     Size.Width = 450.000000000000000000
     Size.Height = 750.000000000000000000
     Size.PlatformDefault = False
@@ -37,10 +35,10 @@
       Size.Width = 450.000000000000000000
       Size.Height = 750.000000000000000000
       Size.PlatformDefault = False
-      HitTest = False
     end
     object LayoutCentral: TLayout
-      Align = Center
+      Position.X = 35.000000000000000000
+      Position.Y = 35.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 680.000000000000000000
       Size.PlatformDefault = False
@@ -60,10 +58,7 @@
             Color = x08A40303
             Offset = 1.000000000000000000
           end>
-        Fill.Gradient.StartPosition.X = 0.000000000000000000
-        Fill.Gradient.StartPosition.Y = 0.000000000000000000
         Fill.Gradient.StopPosition.X = 1.000000000000000000
-        Fill.Gradient.StopPosition.Y = 1.000000000000000000
         Size.Width = 380.000000000000000000
         Size.Height = 680.000000000000000000
         Size.PlatformDefault = False
@@ -75,7 +70,7 @@
           Distance = 15.000000000000000000
           Direction = 45.000000000000000000
           Softness = 0.500000000000000000
-          Opacity = 0.400000005960464480
+          Opacity = 0.400000005960464500
           ShadowColor = claBlack
         end
         object RectLogoBorder: TRectangle
@@ -101,10 +96,7 @@
               Color = xFF7D2728
               Offset = 1.000000000000000000
             end>
-          Fill.Gradient.StartPosition.X = 0.000000000000000000
-          Fill.Gradient.StartPosition.Y = 0.000000000000000000
           Fill.Gradient.StopPosition.X = 1.000000000000000000
-          Fill.Gradient.StopPosition.Y = 1.000000000000000000
           Position.X = 155.000000000000000000
           Position.Y = 30.000000000000000000
           Size.Width = 70.000000000000000000
@@ -115,44 +107,80 @@
           object ShadowLogo: TShadowEffect
             Distance = 8.000000000000000000
             Direction = 45.000000000000000000
-            Softness = 0.400000000000000000
-            Opacity = 0.350000000000000000
+            Softness = 0.400000005960464500
+            Opacity = 0.349999994039535500
             ShadowColor = xFFD33327
           end
           object ImgCapelo: TImage
+            MultiResBitmap.Height = 64
+            MultiResBitmap.Width = 64
+            MultiResBitmap = <
+              item
+                Width = 64
+                Height = 64
+                PNG = {
+                  89504E470D0A1A0A0000000D4948445200000040000000400806000000AA6971
+                  DE0000000473424954080808087C0864880000034B49444154789CED9A3D6814
+                  411886DF4982BF48E21F8846C5484404055111B410C4424B05B1100382A41021
+                  2088AD9568A9366AA1A008925641C4420B110209169A281849130B1535449228
+                  9A3C16B3E76DEEF6B29BBB9D1B31F3408AECCEED7EEF3BDF7DF3CD2452201008
+                  0402814020100804EA0BD00C9C01EE000700E33BA6BA00EC006E00DF99CE3BE0
+                  3CB0D2778CB9032C008E02CF49E727D0FD5F6405B019B8047CC9203C89B75156
+                  2CF7AD2533C0FC68B69F54293A8909A2ACF0ADAF22C026EC6C7FCE51781203D8
+                  AC58EA5BB3807914677BCAB1F05246B1C574BB0FE1ADC005E0639D4557A217E8
+                  0416BB14DD80ADCCDDC06F9F6A6760049B15DBB268CAB4C400AB259D90745AD2
+                  BA1A3CAC377D926E4ABA6B8C99481A50D100A041D27E499D920E4B6A7211619D
+                  1891D42DE98A3166207534701C18F298C6AE98021E031B0A5A133380E9B37F44
+                  52632EF3E0975149F7255D35C6F4172EA6D60060A3A4D79216B88BCD292F255D
+                  9774CF183356D51328B6B127C9D6CBFBE6EF5E22170B291AB02CFABDB09B1BF3
+                  24B0121FB0BD49BEBB494A0C885D6F01BA80F79E04832D6C4FB0DDA89B958A0A
+                  06C4EEFB68900A0DCF1627A2676340C9D836DC6E88FA70DDF226884ACB8095C0
+                  6562EB2BC52D711E45B3ACA861B3EE2070AE1E067C4B31A035BA3F49F1FBD818
+                  BB5F6DD11CA6A4A861CF113B81FE68CC23D7E2BB62015D4B3120CE20708ED849
+                  4E147C5AD18C9BD814FBEC4EE016305E32DEB90143B1974D9150692B18506002
+                  B80DEC8A8D4F2A9A65450D7B8ED801F4CCF07CE7068C96BC70C52C0D8853D8B3
+                  2F8A7DB60D38062C8C5D5B834DFD4F199EE9CE00A091F2539EF61A0C289034DB
+                  D52EA5351990D638B4A87CBF90C7395CB3EC46EB14F058528FA40E496D393C7B
+                  56A419902436CF83C8064987A21F2F34A4DC776D8077AA31A0C54520BE081990
+                  723F69B6E794015933603C8758AAA5BA539E88B455E08DECB1729CDED241C698
+                  AFC00B497B6A09A64A1E7A786739C07A666E59F3E61770917FE9CFE7D86EAE93
+                  6C2D6C2D3C05B6FAD65B11EC594007F02A47D193C00360AF6F7D99010CB00FB8
+                  82FDF797D9F20378069C05D6BA88B1AEDF1F6095A4DD92DA256D94B45CD212D9
+                  623C26BB9A0C4B1A943420A9D718F3A39E3106028140201008040281C09CE00F
+                  89B6C5A5CBB36F910000000049454E44AE426082}
+                FileName = 'D:\Exemplos em Delphi\#App SGEB\img\graduated.png'
+              end>
             HitTest = False
             Position.X = 10.000000000000000000
             Position.Y = 10.000000000000000000
             Size.Width = 50.000000000000000000
             Size.Height = 50.000000000000000000
             Size.PlatformDefault = False
-            WrapMode = Fit
           end
         end
         object LblTitulo: TLabel
+          StyledSettings = []
           Position.X = 20.000000000000000000
           Position.Y = 115.000000000000000000
           Size.Width = 340.000000000000000000
           Size.Height = 28.000000000000000000
           Size.PlatformDefault = False
-          StyledSettings = []
-          Text = 'Sistema de Gestão Escolar'
           TextSettings.Font.Size = 19.000000000000000000
-          TextSettings.Font.Style = [fsBold]
+          TextSettings.Font.StyleExt = {00070000000000000004000000}
           TextSettings.FontColor = claWhite
           TextSettings.HorzAlign = Center
+          Text = 'Sistema de Gest'#227'o Escolar'
         end
         object LblSubtitulo: TLabel
+          StyledSettings = []
           Position.X = 20.000000000000000000
           Position.Y = 143.000000000000000000
           Size.Width = 340.000000000000000000
           Size.Height = 20.000000000000000000
           Size.PlatformDefault = False
-          StyledSettings = []
-          Text = 'Bem-vindo ao portal educacional'
-          TextSettings.Font.Size = 12.000000000000000000
           TextSettings.FontColor = xCCFFFFFF
           TextSettings.HorzAlign = Center
+          Text = 'Bem-vindo ao portal educacional'
         end
         object RectBadge: TRectangle
           Fill.Kind = Gradient
@@ -165,7 +193,6 @@
               Color = xFFF4B942
               Offset = 1.000000000000000000
             end>
-          Fill.Gradient.StartPosition.X = 0.000000000000000000
           Fill.Gradient.StopPosition.X = 1.000000000000000000
           Position.X = 150.000000000000000000
           Position.Y = 170.000000000000000000
@@ -178,11 +205,14 @@
           object LblBadge: TLabel
             Align = Client
             StyledSettings = []
-            Text = 'SGE v2.0'
+            Size.Width = 80.000000000000000000
+            Size.Height = 24.000000000000000000
+            Size.PlatformDefault = False
             TextSettings.Font.Size = 10.000000000000000000
-            TextSettings.Font.Style = [fsBold]
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
             TextSettings.FontColor = xFF7D2728
             TextSettings.HorzAlign = Center
+            Text = 'SGE v2.0'
           end
         end
         object LayoutAreas: TLayout
@@ -194,8 +224,6 @@
           object RectAreaAluno: TRectangle
             Cursor = crHandPoint
             Fill.Color = x15FFFFFF
-            Position.X = 0.000000000000000000
-            Position.Y = 0.000000000000000000
             Size.Width = 165.000000000000000000
             Size.Height = 45.000000000000000000
             Size.PlatformDefault = False
@@ -207,34 +235,32 @@
             OnMouseEnter = AreaMouseEnter
             OnMouseLeave = AreaMouseLeave
             object ImgAreaAluno: TImage
+              MultiResBitmap = <
+                item
+                end>
               HitTest = False
               Position.X = 12.000000000000000000
               Position.Y = 8.000000000000000000
               Size.Width = 28.000000000000000000
               Size.Height = 28.000000000000000000
               Size.PlatformDefault = False
-              WrapMode = Fit
             end
             object LblAreaAluno: TLabel
-              HitTest = False
+              StyledSettings = []
               Position.X = 48.000000000000000000
-              Position.Y = 0.000000000000000000
               Size.Width = 112.000000000000000000
               Size.Height = 45.000000000000000000
               Size.PlatformDefault = False
-              StyledSettings = []
-              Text = 'Aluno'
               TextSettings.Font.Size = 13.000000000000000000
-              TextSettings.Font.Style = [fsBold]
+              TextSettings.Font.StyleExt = {00070000000000000004000000}
               TextSettings.FontColor = claWhite
-              TextSettings.VertAlign = Center
+              Text = 'Aluno'
             end
           end
           object RectAreaProfessor: TRectangle
             Cursor = crHandPoint
             Fill.Color = x15FFFFFF
             Position.X = 175.000000000000000000
-            Position.Y = 0.000000000000000000
             Size.Width = 165.000000000000000000
             Size.Height = 45.000000000000000000
             Size.PlatformDefault = False
@@ -246,33 +272,30 @@
             OnMouseEnter = AreaMouseEnter
             OnMouseLeave = AreaMouseLeave
             object ImgAreaProfessor: TImage
+              MultiResBitmap = <
+                item
+                end>
               HitTest = False
               Position.X = 12.000000000000000000
               Position.Y = 8.000000000000000000
               Size.Width = 28.000000000000000000
               Size.Height = 28.000000000000000000
               Size.PlatformDefault = False
-              WrapMode = Fit
             end
             object LblAreaProfessor: TLabel
-              HitTest = False
+              StyledSettings = []
               Position.X = 48.000000000000000000
-              Position.Y = 0.000000000000000000
               Size.Width = 112.000000000000000000
               Size.Height = 45.000000000000000000
               Size.PlatformDefault = False
-              StyledSettings = []
-              Text = 'Responsáveis'
-              TextSettings.Font.Size = 12.000000000000000000
-              TextSettings.Font.Style = [fsBold]
+              TextSettings.Font.StyleExt = {00070000000000000004000000}
               TextSettings.FontColor = claWhite
-              TextSettings.VertAlign = Center
+              Text = 'Respons'#225'veis'
             end
           end
           object RectAreaAdmin: TRectangle
             Cursor = crHandPoint
             Fill.Color = x15FFFFFF
-            Position.X = 0.000000000000000000
             Position.Y = 55.000000000000000000
             Size.Width = 165.000000000000000000
             Size.Height = 45.000000000000000000
@@ -285,27 +308,26 @@
             OnMouseEnter = AreaMouseEnter
             OnMouseLeave = AreaMouseLeave
             object ImgAreaAdmin: TImage
+              MultiResBitmap = <
+                item
+                end>
               HitTest = False
               Position.X = 12.000000000000000000
               Position.Y = 8.000000000000000000
               Size.Width = 28.000000000000000000
               Size.Height = 28.000000000000000000
               Size.PlatformDefault = False
-              WrapMode = Fit
             end
             object LblAreaAdmin: TLabel
-              HitTest = False
+              StyledSettings = []
               Position.X = 48.000000000000000000
-              Position.Y = 0.000000000000000000
               Size.Width = 112.000000000000000000
               Size.Height = 45.000000000000000000
               Size.PlatformDefault = False
-              StyledSettings = []
-              Text = 'Professor'
               TextSettings.Font.Size = 13.000000000000000000
-              TextSettings.Font.Style = [fsBold]
+              TextSettings.Font.StyleExt = {00070000000000000004000000}
               TextSettings.FontColor = claWhite
-              TextSettings.VertAlign = Center
+              Text = 'Professor'
             end
           end
           object RectAreaUniv: TRectangle
@@ -324,33 +346,30 @@
             OnMouseEnter = AreaMouseEnter
             OnMouseLeave = AreaMouseLeave
             object ImgAreaUniv: TImage
+              MultiResBitmap = <
+                item
+                end>
               HitTest = False
               Position.X = 12.000000000000000000
               Position.Y = 8.000000000000000000
               Size.Width = 28.000000000000000000
               Size.Height = 28.000000000000000000
               Size.PlatformDefault = False
-              WrapMode = Fit
             end
             object LblAreaUniv: TLabel
-              HitTest = False
+              StyledSettings = []
               Position.X = 48.000000000000000000
-              Position.Y = 0.000000000000000000
               Size.Width = 112.000000000000000000
               Size.Height = 45.000000000000000000
               Size.PlatformDefault = False
-              StyledSettings = []
-              Text = 'Administrativo'
-              TextSettings.Font.Size = 12.000000000000000000
-              TextSettings.Font.Style = [fsBold]
+              TextSettings.Font.StyleExt = {00070000000000000004000000}
               TextSettings.FontColor = claWhite
-              TextSettings.VertAlign = Center
+              Text = 'Administrativo'
             end
           end
           object RectAreaInfantil: TRectangle
             Cursor = crHandPoint
             Fill.Color = x15FFFFFF
-            Position.X = 0.000000000000000000
             Position.Y = 110.000000000000000000
             Size.Width = 165.000000000000000000
             Size.Height = 45.000000000000000000
@@ -363,27 +382,25 @@
             OnMouseEnter = AreaMouseEnter
             OnMouseLeave = AreaMouseLeave
             object ImgAreaInfantil: TImage
+              MultiResBitmap = <
+                item
+                end>
               HitTest = False
               Position.X = 12.000000000000000000
               Position.Y = 8.000000000000000000
               Size.Width = 28.000000000000000000
               Size.Height = 28.000000000000000000
               Size.PlatformDefault = False
-              WrapMode = Fit
             end
             object LblAreaInfantil: TLabel
-              HitTest = False
+              StyledSettings = []
               Position.X = 48.000000000000000000
-              Position.Y = 0.000000000000000000
               Size.Width = 112.000000000000000000
               Size.Height = 45.000000000000000000
               Size.PlatformDefault = False
-              StyledSettings = []
-              Text = 'Educ.Infantil'
-              TextSettings.Font.Size = 12.000000000000000000
-              TextSettings.Font.Style = [fsBold]
+              TextSettings.Font.StyleExt = {00070000000000000004000000}
               TextSettings.FontColor = claWhite
-              TextSettings.VertAlign = Center
+              Text = 'Educ.Infantil'
             end
           end
           object RectAreaUniversidade: TRectangle
@@ -402,27 +419,25 @@
             OnMouseEnter = AreaMouseEnter
             OnMouseLeave = AreaMouseLeave
             object ImgAreaUniversidade: TImage
+              MultiResBitmap = <
+                item
+                end>
               HitTest = False
               Position.X = 12.000000000000000000
               Position.Y = 8.000000000000000000
               Size.Width = 28.000000000000000000
               Size.Height = 28.000000000000000000
               Size.PlatformDefault = False
-              WrapMode = Fit
             end
             object LblAreaUniversidade: TLabel
-              HitTest = False
+              StyledSettings = []
               Position.X = 48.000000000000000000
-              Position.Y = 0.000000000000000000
               Size.Width = 112.000000000000000000
               Size.Height = 45.000000000000000000
               Size.PlatformDefault = False
-              StyledSettings = []
-              Text = 'Universidade'
-              TextSettings.Font.Size = 12.000000000000000000
-              TextSettings.Font.Style = [fsBold]
+              TextSettings.Font.StyleExt = {00070000000000000004000000}
               TextSettings.FontColor = claWhite
-              TextSettings.VertAlign = Center
+              Text = 'Universidade'
             end
           end
         end
@@ -437,24 +452,26 @@
           Stroke.Thickness = 2.000000000000000000
           XRadius = 12.000000000000000000
           YRadius = 12.000000000000000000
+          OnClick = RectUsuarioClick
           object ImgIconUser: TImage
+            MultiResBitmap = <
+              item
+              end>
             Position.X = 12.000000000000000000
             Position.Y = 12.000000000000000000
             Size.Width = 30.000000000000000000
             Size.Height = 30.000000000000000000
             Size.PlatformDefault = False
-            WrapMode = Fit
           end
           object EdtUsuario: TEdit
             Touch.InteractiveGestures = [LongTap, DoubleTap]
             TabOrder = 0
+            ControlType = Platform
             Position.X = 50.000000000000000000
             Position.Y = 7.000000000000000000
             Size.Width = 280.000000000000000000
             Size.Height = 42.000000000000000000
             Size.PlatformDefault = False
-            StyledSettings = [Family, Size, Style]
-            TextSettings.FontColor = claWhite
             TextPrompt = 'Digite seu usuario'
           end
         end
@@ -469,26 +486,28 @@
           Stroke.Thickness = 2.000000000000000000
           XRadius = 12.000000000000000000
           YRadius = 12.000000000000000000
+          OnClick = RectSenhaClick
           object ImgIconSenha: TImage
+            MultiResBitmap = <
+              item
+              end>
             Position.X = 12.000000000000000000
             Position.Y = 12.000000000000000000
             Size.Width = 30.000000000000000000
             Size.Height = 30.000000000000000000
             Size.PlatformDefault = False
-            WrapMode = Fit
           end
           object EdtSenha: TEdit
             Touch.InteractiveGestures = [LongTap, DoubleTap]
             TabOrder = 1
-            Password = True
+            ControlType = Platform
             Position.X = 50.000000000000000000
             Position.Y = 7.000000000000000000
             Size.Width = 280.000000000000000000
             Size.Height = 42.000000000000000000
             Size.PlatformDefault = False
-            StyledSettings = [Family, Size, Style]
-            TextSettings.FontColor = claWhite
             TextPrompt = 'Digite sua senha'
+            OnChangeTracking = EdtSenhaChangeTracking
             OnKeyDown = EdtSenhaKeyDown
           end
         end
@@ -504,7 +523,6 @@
               Color = xFF7D2728
               Offset = 1.000000000000000000
             end>
-          Fill.Gradient.StartPosition.X = 0.000000000000000000
           Fill.Gradient.StopPosition.X = 1.000000000000000000
           Position.X = 20.000000000000000000
           Position.Y = 510.000000000000000000
@@ -520,52 +538,52 @@
           object ShadowBtn: TShadowEffect
             Distance = 6.000000000000000000
             Direction = 45.000000000000000000
-            Softness = 0.350000000000000000
-            Opacity = 0.350000000000000000
+            Softness = 0.349999994039535500
+            Opacity = 0.349999994039535500
             ShadowColor = xFFD33327
           end
           object LblBtnEntrar: TLabel
             Align = Client
-            HitTest = False
             StyledSettings = []
-            Text = 'ENTRAR'
+            Size.Width = 340.000000000000000000
+            Size.Height = 55.000000000000000000
+            Size.PlatformDefault = False
             TextSettings.Font.Size = 16.000000000000000000
-            TextSettings.Font.Style = [fsBold]
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
             TextSettings.FontColor = claWhite
             TextSettings.HorzAlign = Center
+            Text = 'ENTRAR'
           end
         end
         object LblEsqueceuSenha: TLabel
           Cursor = crHandPoint
+          StyledSettings = []
           Position.X = 20.000000000000000000
           Position.Y = 575.000000000000000000
           Size.Width = 340.000000000000000000
           Size.Height = 22.000000000000000000
           Size.PlatformDefault = False
-          StyledSettings = []
-          Text = 'Esqueceu sua senha?  |  Suporte'
-          TextSettings.Font.Size = 12.000000000000000000
           TextSettings.FontColor = xFFFDCD62
           TextSettings.HorzAlign = Center
+          Text = 'Esqueceu sua senha?  |  Suporte'
         end
         object LblFooter: TLabel
+          StyledSettings = []
           Position.X = 20.000000000000000000
           Position.Y = 605.000000000000000000
           Size.Width = 340.000000000000000000
           Size.Height = 45.000000000000000000
           Size.PlatformDefault = False
-          StyledSettings = []
-          Text = '2024 Sistema de Gestão Escolar'#13#10'Todos os direitos reservados'
           TextSettings.Font.Size = 10.000000000000000000
           TextSettings.FontColor = xAAFFFFFF
           TextSettings.HorzAlign = Center
+          Text = '2024 Sistema de Gest'#227'o Escolar'#13#10'Todos os direitos reservados'
         end
       end
     end
   end
   object TimerPulse: TTimer
     Enabled = False
-    Interval = 1000
     OnTimer = TimerPulseTimer
     Left = 16
     Top = 16
@@ -578,48 +596,58 @@
     Top = 16
   end
   object ImgModeloBook: TImage
+    MultiResBitmap = <
+      item
+      end>
     Position.X = -100.000000000000000000
     Position.Y = -100.000000000000000000
     Size.Width = 40.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
     Visible = False
-    WrapMode = Fit
   end
   object ImgModeloPencil: TImage
+    MultiResBitmap = <
+      item
+      end>
     Position.X = -100.000000000000000000
     Position.Y = -100.000000000000000000
     Size.Width = 40.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
     Visible = False
-    WrapMode = Fit
   end
   object ImgModeloEraser: TImage
+    MultiResBitmap = <
+      item
+      end>
     Position.X = -100.000000000000000000
     Position.Y = -100.000000000000000000
     Size.Width = 40.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
     Visible = False
-    WrapMode = Fit
   end
   object ImgModeloNotebook: TImage
+    MultiResBitmap = <
+      item
+      end>
     Position.X = -100.000000000000000000
     Position.Y = -100.000000000000000000
     Size.Width = 40.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
     Visible = False
-    WrapMode = Fit
   end
   object ImgModeloRuler: TImage
+    MultiResBitmap = <
+      item
+      end>
     Position.X = -100.000000000000000000
     Position.Y = -100.000000000000000000
     Size.Width = 40.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
     Visible = False
-    WrapMode = Fit
   end
 end

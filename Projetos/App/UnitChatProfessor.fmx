@@ -1,0 +1,332 @@
+object FormChatProfessor: TFormChatProfessor
+  Left = 0
+  Top = 0
+  Caption = 'SGE - Mensagens'
+  ClientHeight = 750
+  ClientWidth = 450
+  Position = ScreenCenter
+  FullScreen = True
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop, iPhone, iPad]
+  OnResize = FormResize
+  OnShow = FormShow
+  DesignerMasterStyle = 0
+  object RectFundo: TRectangle
+    Align = Contents
+    Fill.Kind = Gradient
+    Fill.Gradient.Points = <
+      item
+        Color = xFFD33327
+        Offset = 0.000000000000000000
+      end
+      item
+        Color = xFF7D2728
+        Offset = 1.000000000000000000
+      end>
+    Fill.Gradient.StartPosition.X = 0.000000000000000000
+    Fill.Gradient.StartPosition.Y = 0.000000000000000000
+    Fill.Gradient.StopPosition.X = 1.000000000000000000
+    Fill.Gradient.StopPosition.Y = 1.000000000000000000
+    Size.Width = 450.000000000000000000
+    Size.Height = 750.000000000000000000
+    Size.PlatformDefault = False
+    Stroke.Kind = None
+    object RectHeader: TRectangle
+      Align = Top
+      Fill.Color = x30000000
+      Size.Width = 450.000000000000000000
+      Size.Height = 80.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Kind = None
+      object ShadowHeader: TShadowEffect
+        Distance = 4.000000000000000000
+        Direction = 90.000000000000000000
+        Softness = 0.300000000000000000
+        Opacity = 0.350000000000000000
+        ShadowColor = claBlack
+      end
+      object RectBtnVoltar: TRectangle
+        Cursor = crHandPoint
+        Fill.Color = x20FFFFFF
+        Position.X = 15.000000000000000000
+        Position.Y = 20.000000000000000000
+        Size.Width = 45.000000000000000000
+        Size.Height = 45.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Color = x40FDCD62
+        Stroke.Thickness = 1.500000000000000000
+        XRadius = 10.000000000000000000
+        YRadius = 10.000000000000000000
+        OnClick = RectBtnVoltarClick
+        object LblBtnVoltar: TLabel
+          Align = Client
+          HitTest = False
+          StyledSettings = []
+          Text = #8592
+          TextSettings.Font.Size = 24.000000000000000000
+          TextSettings.FontColor = claWhite
+          TextSettings.HorzAlign = Center
+        end
+      end
+      object LblTituloHeader: TLabel
+        Position.X = 75.000000000000000000
+        Position.Y = 15.000000000000000000
+        Size.Width = 310.000000000000000000
+        Size.Height = 28.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        Text = 'Mensagens'
+        TextSettings.Font.Size = 15.000000000000000000
+        TextSettings.Font.Style = [fsBold]
+        TextSettings.FontColor = claWhite
+      end
+      object LblSubtituloHeader: TLabel
+        Position.X = 75.000000000000000000
+        Position.Y = 46.000000000000000000
+        Size.Width = 310.000000000000000000
+        Size.Height = 20.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        Text = 'Conversas com alunos'
+        TextSettings.Font.Size = 11.000000000000000000
+        TextSettings.FontColor = xFFFDCD62
+      end
+    end
+    object RectPanelAlunos: TRectangle
+      Fill.Kind = None
+      Position.X = 0.000000000000000000
+      Position.Y = 80.000000000000000000
+      Size.Width = 450.000000000000000000
+      Size.Height = 670.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Kind = None
+      object LblAlunosStatus: TLabel
+        Position.X = 15.000000000000000000
+        Position.Y = 10.000000000000000000
+        Size.Width = 420.000000000000000000
+        Size.Height = 30.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        Text = 'Carregando mensagens...'
+        TextSettings.Font.Size = 13.000000000000000000
+        TextSettings.FontColor = xCCFFFFFF
+        TextSettings.HorzAlign = Center
+      end
+      object ScrollBoxAlunos: TVertScrollBox
+        Align = Client
+        Margins.Left = 10.000000000000000000
+        Margins.Top = 45.000000000000000000
+        Margins.Right = 10.000000000000000000
+        Margins.Bottom = 5.000000000000000000
+        Size.Width = 430.000000000000000000
+        Size.Height = 620.000000000000000000
+        Size.PlatformDefault = False
+        ShowScrollBars = False
+        TabOrder = 0
+      end
+    end
+    object RectPanelChat: TRectangle
+      Fill.Kind = None
+      Position.X = 0.000000000000000000
+      Position.Y = 80.000000000000000000
+      Size.Width = 450.000000000000000000
+      Size.Height = 670.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Kind = None
+      Visible = False
+      object RectChatSubHeader: TRectangle
+        Align = Top
+        Fill.Color = x40000000
+        Size.Width = 450.000000000000000000
+        Size.Height = 55.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Kind = None
+        object RectBtnVoltarLista: TRectangle
+          Cursor = crHandPoint
+          Fill.Color = x20FFFFFF
+          Position.X = 8.000000000000000000
+          Position.Y = 8.000000000000000000
+          Size.Width = 40.000000000000000000
+          Size.Height = 40.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = x40FDCD62
+          Stroke.Thickness = 1.000000000000000000
+          XRadius = 8.000000000000000000
+          YRadius = 8.000000000000000000
+          OnClick = RectBtnVoltarListaClick
+          object LblBtnVoltarLista: TLabel
+            Align = Client
+            HitTest = False
+            StyledSettings = []
+            Text = #8592
+            TextSettings.Font.Size = 20.000000000000000000
+            TextSettings.FontColor = claWhite
+            TextSettings.HorzAlign = Center
+          end
+        end
+        object LblAlunoNome: TLabel
+          Position.X = 58.000000000000000000
+          Position.Y = 8.000000000000000000
+          Size.Width = 330.000000000000000000
+          Size.Height = 24.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Aluno'
+          TextSettings.Font.Size = 14.000000000000000000
+          TextSettings.Font.Style = [fsBold]
+          TextSettings.FontColor = claWhite
+        end
+        object LblAlunoInfo: TLabel
+          Position.X = 58.000000000000000000
+          Position.Y = 34.000000000000000000
+          Size.Width = 330.000000000000000000
+          Size.Height = 18.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = ''
+          TextSettings.Font.Size = 11.000000000000000000
+          TextSettings.FontColor = xFFFDCD62
+        end
+      end
+      object RectInputBar: TRectangle
+        Align = Bottom
+        Fill.Color = x50000000
+        Size.Width = 450.000000000000000000
+        Size.Height = 62.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Kind = None
+        object EditMensagem: TEdit
+          Touch.InteractiveGestures = [LongTap, DoubleTap]
+          TabOrder = 0
+          ControlType = Platform
+          Position.X = 10.000000000000000000
+          Position.Y = 10.000000000000000000
+          Size.Width = 360.000000000000000000
+          Size.Height = 42.000000000000000000
+          Size.PlatformDefault = False
+          TextPrompt = 'Responder ao aluno...'
+        end
+        object RectBtnEnviar: TRectangle
+          Cursor = crHandPoint
+          Fill.Kind = Gradient
+          Fill.Gradient.Points = <
+            item
+              Color = xFFFDCD62
+              Offset = 0.000000000000000000
+            end
+            item
+              Color = xFFF4B942
+              Offset = 1.000000000000000000
+            end>
+          Fill.Gradient.StopPosition.X = 1.000000000000000000
+          Position.X = 378.000000000000000000
+          Position.Y = 8.000000000000000000
+          Size.Width = 62.000000000000000000
+          Size.Height = 46.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Kind = None
+          XRadius = 10.000000000000000000
+          YRadius = 10.000000000000000000
+          OnClick = RectBtnEnviarClick
+          object LblBtnEnviar: TLabel
+            Align = Client
+            HitTest = False
+            StyledSettings = []
+            Text = #9658
+            TextSettings.Font.Size = 20.000000000000000000
+            TextSettings.FontColor = xFF7D2728
+            TextSettings.HorzAlign = Center
+          end
+        end
+      end
+      object ScrollBoxMensagens: TVertScrollBox
+        Align = Client
+        Margins.Left = 5.000000000000000000
+        Margins.Top = 5.000000000000000000
+        Margins.Right = 5.000000000000000000
+        Margins.Bottom = 5.000000000000000000
+        Size.Width = 440.000000000000000000
+        Size.Height = 548.000000000000000000
+        Size.PlatformDefault = False
+        ShowScrollBars = False
+        TabOrder = 1
+      end
+    end
+    object RectOverlaySeletor: TRectangle
+      Align = Contents
+      Fill.Color = x99000000
+      Size.Width = 450.000000000000000000
+      Size.Height = 750.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Kind = None
+      Visible = True
+      object RectCardSeletor: TRectangle
+        Fill.Kind = Gradient
+        Fill.Gradient.Points = <
+          item
+            Color = xFF9E1A1A
+            Offset = 0.000000000000000000
+          end
+          item
+            Color = xFF580A0A
+            Offset = 1.000000000000000000
+          end>
+        Fill.Gradient.StartPosition.X = 0.000000000000000000
+        Fill.Gradient.StartPosition.Y = 0.000000000000000000
+        Fill.Gradient.StopPosition.X = 0.000000000000000000
+        Fill.Gradient.StopPosition.Y = 1.000000000000000000
+        Position.X = 25.000000000000000000
+        Position.Y = 180.000000000000000000
+        Size.Width = 400.000000000000000000
+        Size.Height = 390.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Color = x4DFDCD62
+        Stroke.Thickness = 1.500000000000000000
+        XRadius = 15.000000000000000000
+        YRadius = 15.000000000000000000
+        object LblSeletorTitulo: TLabel
+          Position.X = 15.000000000000000000
+          Position.Y = 15.000000000000000000
+          Size.Width = 370.000000000000000000
+          Size.Height = 28.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Qual professor'#233' voc'#234'?'
+          TextSettings.Font.Size = 18.000000000000000000
+          TextSettings.Font.Style = [fsBold]
+          TextSettings.FontColor = claWhite
+          TextSettings.HorzAlign = Center
+        end
+        object LblSeletorInfo: TLabel
+          Position.X = 15.000000000000000000
+          Position.Y = 48.000000000000000000
+          Size.Width = 370.000000000000000000
+          Size.Height = 20.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          Text = 'Selecione seu nome para ver suas mensagens'
+          TextSettings.Font.Size = 11.000000000000000000
+          TextSettings.FontColor = xCCFFFFFF
+          TextSettings.HorzAlign = Center
+        end
+        object ScrollBoxSeletor: TVertScrollBox
+          Position.X = 10.000000000000000000
+          Position.Y = 78.000000000000000000
+          Size.Width = 380.000000000000000000
+          Size.Height = 300.000000000000000000
+          Size.PlatformDefault = False
+          ShowScrollBars = False
+          TabOrder = 0
+        end
+      end
+    end
+  end
+  object TimerRefresh: TTimer
+    Enabled = False
+    Interval = 10000
+    OnTimer = TimerRefreshTimer
+    Left = 16
+    Top = 16
+  end
+end
