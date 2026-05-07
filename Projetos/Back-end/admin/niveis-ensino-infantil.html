@@ -467,6 +467,17 @@ if (sessionStorage.getItem('adm_ok') !== 'niveis-ensino') {
                     <div class="field-hint">Um componente por linha — aparecem como lista no portal.</div>
                 </div>
             </div>
+            <div class="box">
+                <div class="box-title"><i class="fas fa-bible" style="color:#fdcd62;"></i> Versículo Bíblico</div>
+                <div class="field-group">
+                    <div class="field-label"><i class="fas fa-quote-left"></i> Versículo</div>
+                    <textarea class="field-ta" id="fVersiculo" style="min-height:80px" placeholder="Ex: Ensine a criança no caminho em que deve andar..."></textarea>
+                </div>
+                <div class="field-group">
+                    <div class="field-label"><i class="fas fa-bookmark"></i> Referência</div>
+                    <input type="text" class="field-input" id="fVersiculoRef" placeholder="Ex: Provérbios 22:6">
+                </div>
+            </div>
         </div>
 
         <!-- ═══════ DIFERENCIAIS ═══════ -->
@@ -548,6 +559,12 @@ function ir(sec){
     document.querySelectorAll('.sb-item').forEach(function(i){ i.classList.remove('ativo'); });
     document.getElementById('painel-'+sec).classList.add('ativo');
     document.getElementById('nav-'+sec).classList.add('ativo');
+    if(sec === 'banner')   carregarBanner();
+    if(sec === 'galeria')  carregarGaleria();
+    if(sec === 'lazer')    carregarLazer();
+    if(sec === 'proposta') carregarProposta();
+    if(sec === 'textos')   carregarConteudo();
+    if(sec === 'difs')     carregarDiferenciais();
 }
 
 // ── BANNER ──
@@ -1124,12 +1141,14 @@ function carregarConteudo(){
     fetch('/files/'+PASTA_CONTEUDO+'/conteudo.json?v='+Date.now())
         .then(function(r){ if(!r.ok) throw 0; return r.json(); })
         .then(function(d){
-            if(d.titulo)       document.getElementById('fTitulo').value      = d.titulo;
-            if(d.subtitulo)    document.getElementById('fSubtitulo').value   = d.subtitulo;
-            if(d.faixaEtaria)  document.getElementById('fFaixa').value       = d.faixaEtaria;
-            if(d.turno)        document.getElementById('fTurno').value       = d.turno;
-            if(d.descricao)    document.getElementById('fDescricao').value   = d.descricao;
-            if(d.componentes)  document.getElementById('fComponentes').value = d.componentes;
+            if(d.titulo)       document.getElementById('fTitulo').value       = d.titulo;
+            if(d.subtitulo)    document.getElementById('fSubtitulo').value    = d.subtitulo;
+            if(d.faixaEtaria)  document.getElementById('fFaixa').value        = d.faixaEtaria;
+            if(d.turno)        document.getElementById('fTurno').value        = d.turno;
+            if(d.descricao)    document.getElementById('fDescricao').value    = d.descricao;
+            if(d.componentes)  document.getElementById('fComponentes').value  = d.componentes;
+            if(d.versiculo)    document.getElementById('fVersiculo').value    = d.versiculo;
+            if(d.versiculoRef) document.getElementById('fVersiculoRef').value = d.versiculoRef;
         })
         .catch(function(){
             document.getElementById('fTitulo').value       = DEF_TITULO;
@@ -1137,6 +1156,8 @@ function carregarConteudo(){
             document.getElementById('fFaixa').value        = DEF_FAIXA;
             document.getElementById('fTurno').value        = DEF_TURNO;
             document.getElementById('fComponentes').value  = 'Língua Portuguesa, Matemática, Ciências da Natureza, Ciências Humanas, Artes, Educação Física, Língua Inglesa, Ensino Religioso';
+            document.getElementById('fVersiculo').value    = 'Ensine a criança no caminho em que deve andar, e quando envelhecer não se desviará dele.';
+            document.getElementById('fVersiculoRef').value = 'Provérbios 22:6';
         });
 }
 
@@ -1148,6 +1169,8 @@ function salvarConteudo(){
         turno:        document.getElementById('fTurno').value.trim(),
         descricao:    document.getElementById('fDescricao').value.trim(),
         componentes:  document.getElementById('fComponentes').value.trim(),
+        versiculo:    document.getElementById('fVersiculo').value.trim(),
+        versiculoRef: document.getElementById('fVersiculoRef').value.trim()
     };
     var b64;
     try { b64 = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))); }
