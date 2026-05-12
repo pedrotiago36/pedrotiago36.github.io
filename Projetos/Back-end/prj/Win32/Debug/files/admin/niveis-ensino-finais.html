@@ -499,7 +499,7 @@ function carregarLazer(){
         return fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER)+'&raw=1')
         .then(function(r){return r.json();})
         .then(function(lista){
-            _lazerItens=lista.map(function(img){ var k=img.nome.toLowerCase(); var def=img.nome.replace(/\.[^.]+$/,'').replace(/_/g,' '); var t=(k in tituloMap)?tituloMap[k]:def; if(/^[0-9a-f]{8}[-_ ]/i.test(t)||/^[0-9a-f]{8}[-_]/i.test(img.nome))t=''; return{nome:img.nome,titulo:t,descricao:descMap[k]||'',icone:iconeMap[k]||''}; });
+            _lazerItens=lista.map(function(img){ var k=img.nome.toLowerCase(); var def=img.nome.replace(/\.[^.]+$/,'').replace(/_/g,' '); var t=(k in tituloMap)?tituloMap[k]:def; if(/^[0-9a-f]{8}[-_ ]/i.test(t))t=''; return{nome:img.nome,titulo:t,descricao:descMap[k]||'',icone:iconeMap[k]||''}; });
             document.getElementById('cnt-lazer').textContent=_lazerItens.length;
             renderLazerAdmin();
         });
