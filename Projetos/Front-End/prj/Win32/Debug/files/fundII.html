@@ -187,6 +187,23 @@
         .lb-counter { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.7); font-size: 0.9rem; background: rgba(0,0,0,0.5); padding: 0.4rem 1.2rem; border-radius: 2rem; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* ── MODAL DIFERENCIAL ── */
+        .dif-card { cursor: pointer; }
+        .dif-card-hint { font-size: 0.7rem; color: rgba(253,205,98,0.5); margin-top: 0.7rem; display: flex; align-items: center; gap: 0.3rem; }
+        @keyframes scaleIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-dif-overlay { display: none; position: fixed; inset: 0; background: rgba(61,26,27,0.7); backdrop-filter: blur(8px); z-index: 8000; align-items: center; justify-content: center; }
+        .modal-dif-overlay.ativo { display: flex; animation: fadeIn 0.2s ease; }
+        .modal-dif-box { background: white; max-width: 480px; width: 92%; border-radius: 2rem; overflow: hidden; position: relative; animation: scaleIn 0.22s ease-out; box-shadow: 0 30px 60px rgba(0,0,0,0.35); }
+        .btn-fechar-dif { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.9); border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 1rem; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; color: #7d2728; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .modal-dif-foto { width: 100%; height: 220px; background: linear-gradient(135deg, #fff2e3, #ffe6cc); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+        .modal-dif-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .modal-dif-foto-ph { color: rgba(125,39,40,0.2); font-size: 3.5rem; }
+        .modal-dif-corpo { padding: 1.5rem 1.8rem 2rem; }
+        .modal-dif-icone { font-size: 2rem; display: block; margin-bottom: 0.4rem; }
+        .modal-dif-icone img { width: 52px; height: 52px; object-fit: contain; display: block; }
+        .modal-dif-titulo { font-family: 'Poppins', sans-serif; font-size: 1.25rem; font-weight: 800; color: #7d2728; margin-bottom: 0.7rem; }
+        .modal-dif-texto { color: #5a3a2e; font-size: 0.92rem; line-height: 1.75; white-space: pre-line; }
     </style>
 </head>
 <body>
@@ -233,7 +250,7 @@
         <div class="container">
             <div class="proposta-bloco">
                 <div class="proposta-img">
-                    <img src="/files/fundII/proposta.png" alt="Proposta pedagógica" onerror="this.src='/files/fundII/capa.png';">
+                    <img id="cj-proposta-img" src="" alt="Proposta pedagógica" style="display:none;" onload="this.style.display='block';" onerror="this.style.display='none';">
                 </div>
                 <div class="proposta-texto">
                     <span class="proposta-icone">📖</span>
@@ -245,13 +262,13 @@
             </div>
             <div class="proposta-bloco reverse">
                 <div class="proposta-img">
-                    <img src="/files/fundII/formacao.png" alt="Formação integral" onerror="this.src='/files/fundII/capa.png';">
+                    <img id="cj-formacao-img" src="" alt="Formação integral" style="display:none;" onload="this.style.display='block';" onerror="this.style.display='none';">
                 </div>
                 <div class="proposta-texto">
                     <span class="proposta-icone">🙏</span>
                     <div class="sec-title">Formação <span>Integral</span><br>e Valores</div>
                     <div class="sec-line"></div>
-                    <p class="sec-sub">Acreditamos que educação vai além do conteúdo. Formamos jovens íntegros, com identidade, propósito e senso de responsabilidade social.<br><br>
+                    <p class="sec-sub" id="cj-formacao">Acreditamos que educação vai além do conteúdo. Formamos jovens íntegros, com identidade, propósito e senso de responsabilidade social.<br><br>
                     Os princípios bíblicos permeiam todas as disciplinas, e a parceria com a família garante que escola e lar caminhem juntos na formação de cada aluno.</p>
                 </div>
             </div>
@@ -260,8 +277,8 @@
 
     <!-- QUOTE -->
     <div class="quote-section">
-        <p class="quote-texto">Porque eu bem sei os planos que tenho para vós, diz o Senhor; planos de paz e não de mal, para vos dar um futuro e uma esperança.</p>
-        <p class="quote-autor">Jeremias 29:11</p>
+        <p class="quote-texto" id="cj-versiculo">Porque eu bem sei os planos que tenho para vós, diz o Senhor; planos de paz e não de mal, para vos dar um futuro e uma esperança.</p>
+        <p class="quote-autor" id="cj-versiculo-ref">Jeremias 29:11</p>
     </div>
 
     <!-- GALERIA -->
@@ -351,14 +368,7 @@
             <div class="sec-title">Nossos <span style="color:#fdcd62;">Diferenciais</span></div>
             <div class="sec-line"></div>
             <p class="sec-sub" style="color:rgba(255,255,255,0.7);">Educação de excelência com base nos valores que transformam vidas</p>
-            <div class="dif-grid">
-                <div class="dif-card"><span class="dif-icone">🔬</span><h3>Laboratório de Ciências</h3><p>Experimentos práticos que aprofundam os conceitos de física, química e biologia.</p></div>
-                <div class="dif-card"><span class="dif-icone">💡</span><h3>Pensamento Crítico</h3><p>Projetos de debate, análise e argumentação que desenvolvem a visão de mundo.</p></div>
-                <div class="dif-card"><span class="dif-icone">🇺🇸</span><h3>Inglês Avançado</h3><p>Imersão linguística com certificações internacionais e foco na comunicação real.</p></div>
-                <div class="dif-card"><span class="dif-icone">💻</span><h3>Tecnologia & Inovação</h3><p>Programação, robótica e uso ético das tecnologias para resolver problemas reais.</p></div>
-                <div class="dif-card"><span class="dif-icone">🤝</span><h3>Protagonismo Juvenil</h3><p>Grêmio estudantil, projetos sociais e iniciativas que formam líderes responsáveis.</p></div>
-                <div class="dif-card"><span class="dif-icone">🙏</span><h3>Valores Cristãos</h3><p>Princípios bíblicos que formam caráter, propósito e integridade nos alunos.</p></div>
-            </div>
+            <div class="dif-grid" id="difGrid"><!-- preenchido dinamicamente --></div>
         </div>
     </div>
 
@@ -378,6 +388,22 @@
         <img id="lbImg" src="" alt="">
         <button class="lb-nav lb-next" id="lbNext"><i class="fas fa-chevron-right"></i></button>
         <div class="lb-counter" id="lbCounter"></div>
+    </div>
+
+    <!-- MODAL DIFERENCIAL -->
+    <div class="modal-dif-overlay" id="modalDif">
+        <div class="modal-dif-box">
+            <button class="btn-fechar-dif" id="fecharModalDif"><i class="fas fa-times"></i></button>
+            <div class="modal-dif-foto" id="modalDifFotoArea">
+                <i class="fas fa-image modal-dif-foto-ph" id="modalDifFotoPh"></i>
+                <img id="modalDifImg" src="" alt="" style="display:none;" onload="this.style.display='block';document.getElementById('modalDifFotoPh').style.display='none';" onerror="this.style.display='none';document.getElementById('modalDifFotoPh').style.display='block';">
+            </div>
+            <div class="modal-dif-corpo">
+                <span class="modal-dif-icone" id="modalDifIcone"></span>
+                <div class="modal-dif-titulo" id="modalDifTitulo"></div>
+                <div class="modal-dif-texto" id="modalDifTexto"></div>
+            </div>
+        </div>
     </div>
 
 </div>
@@ -404,7 +430,6 @@ function renderGaleria(dados) {
 document.getElementById('galPrev').addEventListener('click', function() { _galIr(_galOffset - 1); });
 document.getElementById('galNext').addEventListener('click', function() { _galIr(_galOffset + 1); });
 
-
 // ── LIGHTBOX ──
 window._abrirLb = function(idx) { _lbIdx = idx; _lbAtualizar(); document.getElementById('lightbox').classList.add('aberto'); };
 function _lbAtualizar() {
@@ -428,9 +453,14 @@ var _estruturaLista = [], _estruturaIdx = 0, _estruturaTimer = null;
 function _estruturaHtml(dados) {
     return dados.map(function(item) {
         var nome = item.imagem.split('/').pop().replace(/\.[^.]+$/, '').replace(/_/g, ' ');
+        var titulo = item.titulo || nome;
+        var desc = item.descricao || '';
         return '<div class="estrutura-slide-item">' +
-               '<img src="/files/' + item.imagem + '" alt="' + nome + '" loading="lazy">' +
-               '<div class="estrutura-slide-capa"><div class="estrutura-slide-titulo">' + (item.titulo || nome) + '</div></div></div>';
+               '<img src="/files/' + item.imagem + '" alt="' + titulo + '" loading="lazy">' +
+               '<div class="estrutura-slide-capa">' +
+               '<div class="estrutura-slide-titulo">' + titulo + '</div>' +
+               (desc ? '<div class="estrutura-slide-desc">' + desc + '</div>' : '') +
+               '</div></div>';
     }).join('');
 }
 function renderEstrutura(dados) {
@@ -446,11 +476,12 @@ function renderEstrutura(dados) {
     var icons = ['🏫','📚','⚽','🔬','💻','🎨','🏃','🎭','🌿','🎵'];
     var itemsHtml = dados.map(function(item, i) {
         var nome = item.imagem.split('/').pop().replace(/\.[^.]+$/, '').replace(/_/g, ' ');
+        var titulo = item.titulo || nome;
         var chave = nome.toLowerCase().replace(/\s/g, '');
         var icone = icons[i % icons.length];
         return '<div class="estrutura-item' + (i===0?' ativo':'') + '" data-chave="' + chave + '" data-idx="' + i + '" onclick="_estruturaIrIdx(this)">' +
                '<div class="estrutura-item-icon">' + icone + '</div>' +
-               '<div><h4>' + nome + '</h4></div></div>';
+               '<div><h4>' + titulo + '</h4>' + (item.descricao ? '<p>' + item.descricao + '</p>' : '') + '</div></div>';
     }).join('');
     document.getElementById('estruturaItems').innerHTML = itemsHtml;
 
@@ -508,7 +539,7 @@ function abrirNoPortal(acao) {
     } catch(e) {}
 }
 
-// ── CARREGAR FOTOS fundII/ ──
+// ── CARREGAR DADOS ──
 function carregarDados(pasta, cb) {
     var uni = null;
     try { uni = window.parent.parent; } catch(e) {}
@@ -548,25 +579,134 @@ function carregarViaBridge(pasta, cb) {
     }, 200);
 }
 
-// Carrega banner e atualiza automaticamente a cada 30 segundos
-(function(){ var el=document.getElementById('heroBg'); function f(){ if(el) el.src='/files/fundII/capa.png?v='+Date.now(); } f(); setInterval(f,30000); })();
+// ── DIFERENCIAIS DINÂMICOS ──
+var _difsPortal = [];
+var _difsCache = '';
 
-carregarDados('fundII/galeria',   renderGaleria);
-setInterval(function(){ carregarDados('fundII/galeria', renderGaleria); carregarDados('fundII/estrutura', renderEstrutura); }, 30000);
-(function(){
+function carregarDiferenciais() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/files/fundII/diferenciais.json?t=' + Date.now(), true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState !== 4) return;
+        if (xhr.status === 200 && xhr.responseText) {
+            try {
+                var raw = xhr.responseText.replace(/^﻿/, '');
+                var d = JSON.parse(raw);
+                if (d && d.length && raw !== _difsCache) { _difsCache = raw; _difsPortal = d; renderDiferenciaisPortal(); }
+            } catch(e) {}
+        }
+    };
+    xhr.send();
+}
+
+function renderDiferenciaisPortal() {
+    var g = document.getElementById('difGrid');
+    if (!g) return;
+    g.innerHTML = _difsPortal.map(function(d, i) {
+        var iconeHtml = d.iconeImg
+            ? '<span class="dif-icone"><img src="/files/' + d.iconeImg + '" alt="" style="width:2.4rem;height:2.4rem;object-fit:contain;"></span>'
+            : '<span class="dif-icone">' + d.icone + '</span>';
+        return '<div class="dif-card" onclick="abrirModalDif(' + i + ')">' +
+            iconeHtml +
+            '<h3>' + d.titulo + '</h3>' +
+            '<p>' + d.descricao + '</p>' +
+            '<div class="dif-card-hint"><i class="fas fa-expand-alt"></i> Saiba mais</div>' +
+            '</div>';
+    }).join('');
+}
+
+function abrirModalDif(idx) {
+    var d = _difsPortal[idx];
+    if (!d) return;
+    var iconeEl = document.getElementById('modalDifIcone');
+    if (d.iconeImg) {
+        iconeEl.innerHTML = '<img src="/files/' + d.iconeImg + '" alt="" style="width:52px;height:52px;object-fit:contain;">';
+    } else {
+        iconeEl.textContent = d.icone;
+    }
+    document.getElementById('modalDifTitulo').textContent = d.titulo;
+    document.getElementById('modalDifTexto').textContent = d.textoModal || d.descricao;
+    var img = document.getElementById('modalDifImg');
+    var ph = document.getElementById('modalDifFotoPh');
+    if (d.foto) {
+        img.src = '/files/' + d.foto;
+        img.style.display = 'block';
+        ph.style.display = 'none';
+    } else {
+        img.style.display = 'none';
+        ph.style.display = 'block';
+    }
+    document.getElementById('modalDif').classList.add('ativo');
+}
+
+(function() {
+    function fecharDif() { document.getElementById('modalDif').classList.remove('ativo'); }
+    document.getElementById('fecharModalDif').addEventListener('click', fecharDif);
+    document.getElementById('modalDif').addEventListener('click', function(e) { if (e.target === this) fecharDif(); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') fecharDif(); });
+})();
+
+// ── INIT: espaçado para não sobrecarregar ──
+// 0ms — banner (1x, sem auto-refresh)
+(function(){ var el=document.getElementById('heroBg'); if(el) el.src='/files/fundII/capa.png?v='+Date.now(); })();
+
+// 400ms — galeria
+setTimeout(function(){ carregarDados('fundII/galeria', renderGaleria); }, 400);
+
+// 800ms — proposta.json + imagens proposta/formação (1x, poll de texto a cada 30s)
+setTimeout(function(){
+    function pollProposta(){
+        var x=new XMLHttpRequest();
+        x.open('GET','/files/fundII/proposta.json?t='+Date.now(),true);
+        x.onreadystatechange=function(){
+            if(x.readyState!==4||x.status!==200) return;
+            try{
+                var d=JSON.parse(x.responseText);
+                if(d.descricaoProposta){var e=document.getElementById('cj-descricao');if(e)e.innerHTML=d.descricaoProposta;}
+                if(d.descricaoFormacao){var e=document.getElementById('cj-formacao');if(e)e.innerHTML=d.descricaoFormacao;}
+            }catch(e){}
+        };
+        x.send();
+    }
+    var pi=document.getElementById('cj-proposta-img');
+    var fi=document.getElementById('cj-formacao-img');
+    if(pi) pi.src='/files/fundII/proposta.png?v='+Date.now();
+    if(fi) fi.src='/files/fundII/formacao.png?v='+Date.now();
+    pollProposta();
+    setInterval(pollProposta, 30000);
+}, 800);
+
+// 1200ms — conteudo.json (versículo, a cada 30s)
+setTimeout(function(){
     function pollConteudo(){
         var x=new XMLHttpRequest();
         x.open('GET','/files/fundII/conteudo.json?t='+Date.now(),true);
         x.onreadystatechange=function(){
             if(x.readyState!==4||x.status!==200) return;
-            try{ var d=JSON.parse(x.responseText); if(d.descricao){var el=document.getElementById('cj-descricao');if(el)el.innerHTML=d.descricao;} }catch(e){}
+            try{
+                var d=JSON.parse(x.responseText);
+                if(d.versiculo){var e=document.getElementById('cj-versiculo');if(e)e.textContent=d.versiculo;}
+                if(d.versiculoRef){var e=document.getElementById('cj-versiculo-ref');if(e)e.textContent=d.versiculoRef;}
+            }catch(e){}
         };
         x.send();
     }
     pollConteudo();
-    setInterval(pollConteudo,30000);
-})();
-carregarDados('fundII/estrutura', renderEstrutura);
+    setInterval(pollConteudo, 30000);
+}, 1200);
+
+// 2000ms — estrutura (JSON direto para preservar titulo e descricao)
+setTimeout(function(){ _carregarJSON('fundII/estrutura', renderEstrutura); }, 2000);
+
+// 2400ms — diferenciais
+setTimeout(carregarDiferenciais, 2400);
+
+// Intervalo consolidado (30s)
+setInterval(function(){
+    carregarDados('fundII/galeria', renderGaleria);
+    setTimeout(function(){ _carregarJSON('fundII/estrutura', renderEstrutura); }, 2000);
+    setTimeout(carregarDiferenciais, 4000);
+}, 30000);
 </script>
 <button class="btn-indicar-float-sub" onclick="try{window.parent.abrirModalIndicar();}catch(e){}"><i class="fas fa-user-friends"></i> Indique um Amigo</button>
 <style>.btn-indicar-float-sub{position:fixed;bottom:2rem;right:2rem;z-index:999;display:flex;align-items:center;gap:.55rem;background:linear-gradient(135deg,#d33327,#7d2728);color:#fff;padding:.9rem 1.5rem;border-radius:3rem;font-weight:700;font-size:.95rem;font-family:'Inter',sans-serif;box-shadow:0 8px 24px rgba(211,51,39,.5);cursor:pointer;border:2px solid rgba(253,205,98,.4);white-space:nowrap;animation:pulse-ind 2.8s infinite;}@keyframes pulse-ind{0%,100%{box-shadow:0 8px 24px rgba(211,51,39,.5);}50%{box-shadow:0 10px 38px rgba(211,51,39,.8),0 0 0 6px rgba(211,51,39,.12);}}.btn-indicar-float-sub:hover{transform:scale(1.07) translateY(-3px);}</style>
