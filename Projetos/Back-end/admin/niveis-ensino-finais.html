@@ -3,161 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anos Finais — Gerenciar</title>
+    <title>Fundamental II — Gerenciar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; }
         body { font-family: 'Inter', sans-serif; background: #f5f0eb; color: #2d2d2d; }
-
-        /* ── TOPBAR ── */
-        .topbar {
-            background: linear-gradient(135deg, #7d2728, #3d1a1b);
-            padding: 0 2rem; height: 64px;
-            display: flex; align-items: center; justify-content: space-between;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-            position: sticky; top: 0; z-index: 100;
-        }
+        .topbar { background: linear-gradient(135deg, #7d2728, #3d1a1b); padding: 0 2rem; height: 64px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,0.25); position: sticky; top: 0; z-index: 100; }
         .topbar-left { display: flex; align-items: center; gap: 1rem; }
-        .btn-voltar {
-            width: 38px; height: 38px; border-radius: 0.7rem;
-            background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
-            color: #fff; font-size: 0.9rem; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; text-decoration: none; transition: all 0.25s;
-        }
+        .btn-voltar { width: 38px; height: 38px; border-radius: 0.7rem; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; transition: all 0.25s; }
         .btn-voltar:hover { background: rgba(255,255,255,0.22); }
         .topbar-title h1 { font-family: 'Poppins', sans-serif; font-size: 1.1rem; font-weight: 700; color: #fff; }
         .topbar-title span { font-size: 0.72rem; color: rgba(255,255,255,0.55); }
         .topbar-right { display: flex; align-items: center; gap: 0.8rem; }
-        .topbar-badge {
-            background: rgba(253,205,98,0.2); border: 1px solid rgba(253,205,98,0.4);
-            color: #fdcd62; font-size: 0.75rem; font-weight: 600;
-            padding: 0.3rem 0.9rem; border-radius: 2rem; display: flex; align-items: center; gap: 5px;
-        }
-        .btn-sair {
-            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-            color: rgba(255,255,255,0.7); font-size: 0.8rem; font-weight: 600;
-            padding: 0.4rem 1rem; border-radius: 0.7rem; cursor: pointer;
-            text-decoration: none; transition: all 0.25s; display: flex; align-items: center; gap: 6px;
-        }
+        .topbar-badge { background: rgba(253,205,98,0.2); border: 1px solid rgba(253,205,98,0.4); color: #fdcd62; font-size: 0.75rem; font-weight: 600; padding: 0.3rem 0.9rem; border-radius: 2rem; display: flex; align-items: center; gap: 5px; }
+        .btn-sair { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); font-size: 0.8rem; font-weight: 600; padding: 0.4rem 1rem; border-radius: 0.7rem; cursor: pointer; text-decoration: none; transition: all 0.25s; display: flex; align-items: center; gap: 6px; }
         .btn-sair:hover { background: rgba(255,255,255,0.2); color: #fff; }
-
-        /* ── LAYOUT ── */
         .layout { display: flex; min-height: calc(100vh - 64px); }
-
-        /* ── SIDEBAR ── */
-        .sidebar {
-            width: 224px; flex-shrink: 0; background: #fff;
-            border-right: 1px solid rgba(125,39,40,0.1);
-            padding: 1.5rem 0;
-            position: sticky; top: 64px; height: calc(100vh - 64px); overflow-y: auto;
-        }
-        .sb-nivel-tag {
-            margin: 0 0.9rem 1.2rem;
-            background: linear-gradient(135deg,#2ECC71,#1E9E56);
-            border-radius: 0.9rem; padding: 0.75rem 1rem;
-            display: flex; align-items: center; gap: 10px; color: #fff;
-        }
+        .sidebar { width: 224px; flex-shrink: 0; background: #fff; border-right: 1px solid rgba(125,39,40,0.1); padding: 1.5rem 0; position: sticky; top: 64px; height: calc(100vh - 64px); overflow-y: auto; z-index: 10; }
+        .sb-nivel-tag { margin: 0 0.9rem 1.2rem; background: linear-gradient(135deg,#3FA9F5,#1A78CF); border-radius: 0.9rem; padding: 0.75rem 1rem; display: flex; align-items: center; gap: 10px; color: #fff; }
         .sb-nivel-tag i { font-size: 1.3rem; }
         .sb-nivel-tag span { font-family:'Poppins',sans-serif; font-size:0.85rem; font-weight:700; line-height:1.2; }
         .sb-nivel-tag small { font-size:0.65rem; opacity:0.8; display:block; }
         .sb-group { font-size: 0.63rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; padding: 1rem 1.2rem 0.4rem; }
-        .sb-item {
-            display: flex; align-items: center; gap: 10px;
-            padding: 0.78rem 1.2rem; margin: 0.08rem 0.6rem;
-            border-radius: 0.8rem; cursor: pointer; font-size: 0.88rem; font-weight: 500; color: #5a3a2e;
-            transition: all 0.2s; text-decoration: none; user-select: none;
-        }
+        .sb-item { display: flex; align-items: center; gap: 10px; padding: 0.78rem 1.2rem; margin: 0.08rem 0.6rem; border-radius: 0.8rem; cursor: pointer; font-size: 0.88rem; font-weight: 500; color: #5a3a2e; transition: all 0.2s; text-decoration: none; user-select: none; }
         .sb-item i { width: 18px; text-align: center; color: #d33327; font-size: 0.95rem; }
         .sb-item:hover { background: rgba(211,51,39,0.07); color: #d33327; }
-        .sb-item.ativo {
-            background: linear-gradient(135deg, rgba(211,51,39,0.12), rgba(125,39,40,0.06));
-            color: #7d2728; font-weight: 700;
-            border-left: 3px solid #d33327; padding-left: calc(1.2rem - 3px);
-        }
-        .sb-item .cnt {
-            margin-left: auto; background: rgba(211,51,39,0.1); color: #d33327;
-            font-size: 0.68rem; font-weight: 800; padding: 0.15rem 0.55rem; border-radius: 2rem;
-        }
+        .sb-item.ativo { background: linear-gradient(135deg, rgba(211,51,39,0.12), rgba(125,39,40,0.06)); color: #7d2728; font-weight: 700; border-left: 3px solid #d33327; padding-left: calc(1.2rem - 3px); }
+        .sb-item .cnt { margin-left: auto; background: rgba(211,51,39,0.1); color: #d33327; font-size: 0.68rem; font-weight: 800; padding: 0.15rem 0.55rem; border-radius: 2rem; }
         .sb-divider { height: 1px; background: rgba(125,39,40,0.08); margin: 0.8rem 1rem; }
-
-        /* ── MAIN ── */
         .main { flex: 1; padding: 2rem; overflow-x: hidden; max-width: calc(100vw - 224px); }
-
-        /* ── PANELS ── */
         .panel { display: none; }
         .panel.ativo { display: block; animation: fadein 0.28s ease; }
         @keyframes fadein { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
-
-        /* ── PAGE HEADER ── */
         .ph { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.8rem; flex-wrap: wrap; gap: 1rem; }
         .ph h2 { font-family: 'Poppins', sans-serif; font-size: 1.55rem; font-weight: 800; color: #7d2728; margin-bottom: 0.2rem; }
         .ph p { color: #999; font-size: 0.87rem; }
-
-        /* ── BUTTONS ── */
-        .btn-add {
-            display: inline-flex; align-items: center; gap: 7px;
-            background: linear-gradient(135deg, #d33327, #7d2728);
-            color: #fff; border: none; border-radius: 0.9rem;
-            padding: 0.7rem 1.4rem; font-size: 0.88rem; font-weight: 700;
-            cursor: pointer; transition: all 0.25s; white-space: nowrap; font-family: 'Inter', sans-serif;
-            text-decoration: none;
-        }
+        .btn-add { display: inline-flex; align-items: center; gap: 7px; background: linear-gradient(135deg, #d33327, #7d2728); color: #fff; border: none; border-radius: 0.9rem; padding: 0.7rem 1.4rem; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.25s; white-space: nowrap; font-family: 'Inter', sans-serif; text-decoration: none; }
         .btn-add:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(211,51,39,0.35); }
-        .btn-save {
-            display: inline-flex; align-items: center; gap: 7px;
-            background: linear-gradient(135deg, #27ae60, #1e8449);
-            color: #fff; border: none; border-radius: 0.9rem;
-            padding: 0.7rem 1.4rem; font-size: 0.88rem; font-weight: 700;
-            cursor: pointer; transition: all 0.25s; white-space: nowrap; font-family: 'Inter', sans-serif;
-        }
+        .btn-save { display: inline-flex; align-items: center; gap: 7px; background: linear-gradient(135deg, #27ae60, #1e8449); color: #fff; border: none; border-radius: 0.9rem; padding: 0.7rem 1.4rem; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.25s; white-space: nowrap; font-family: 'Inter', sans-serif; }
         .btn-save:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(39,174,96,0.35); }
-        .btn-del {
-            display: inline-flex; align-items: center; gap: 5px;
-            background: rgba(211,51,39,0.08); color: #c0392b;
-            border: 1px solid rgba(211,51,39,0.2); border-radius: 0.6rem;
-            padding: 0.42rem 0.8rem; font-size: 0.78rem; font-weight: 700;
-            cursor: pointer; transition: all 0.22s; font-family: 'Inter', sans-serif;
-        }
+        .btn-del { display: inline-flex; align-items: center; gap: 5px; background: rgba(211,51,39,0.08); color: #c0392b; border: 1px solid rgba(211,51,39,0.2); border-radius: 0.6rem; padding: 0.42rem 0.8rem; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.22s; font-family: 'Inter', sans-serif; }
         .btn-del:hover { background: #d33327; color: #fff; border-color: #d33327; }
-        .btn-swap {
-            display: inline-flex; align-items: center; gap: 5px;
-            background: rgba(125,39,40,0.07); color: #7d2728;
-            border: 1px solid rgba(125,39,40,0.18); border-radius: 0.6rem;
-            padding: 0.42rem 0.8rem; font-size: 0.78rem; font-weight: 700;
-            cursor: pointer; transition: all 0.22s; font-family: 'Inter', sans-serif;
-        }
+        .btn-swap { display: inline-flex; align-items: center; gap: 5px; background: rgba(125,39,40,0.07); color: #7d2728; border: 1px solid rgba(125,39,40,0.18); border-radius: 0.6rem; padding: 0.42rem 0.8rem; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.22s; font-family: 'Inter', sans-serif; }
         .btn-swap:hover { background: #7d2728; color: #fff; }
-
-        /* ── BOX ── */
-        .box {
-            background: #fff; border-radius: 1.4rem;
-            padding: 1.5rem; box-shadow: 0 2px 16px rgba(125,39,40,0.07);
-            margin-bottom: 1.5rem;
-        }
-        .box-title {
-            font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 700; color: #7d2728;
-            margin-bottom: 1.2rem; display: flex; align-items: center; gap: 8px;
-            padding-bottom: 0.9rem; border-bottom: 2px solid rgba(253,205,98,0.3);
-        }
+        .box { background: #fff; border-radius: 1.4rem; padding: 1.5rem; box-shadow: 0 2px 16px rgba(125,39,40,0.07); margin-bottom: 1.5rem; }
+        .box-title { font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 700; color: #7d2728; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 8px; padding-bottom: 0.9rem; border-bottom: 2px solid rgba(253,205,98,0.3); }
         .box-title i { color: #fdcd62; }
         .box-title .lbl { margin-left: auto; font-size: 0.75rem; font-weight: 600; color: #bbb; background: #f5f0eb; padding: 0.2rem 0.65rem; border-radius: 2rem; }
-
-        /* ── BANNER ── */
         .banner-wrap { border-radius: 1rem; overflow: hidden; position: relative; margin-bottom: 1rem; border: 2px solid rgba(125,39,40,0.1); }
         .banner-wrap img { width: 100%; aspect-ratio: 16/6; object-fit: cover; display: block; }
-        .banner-empty {
-            width: 100%; aspect-ratio: 16/6;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: linear-gradient(135deg, #f0e8e8, #fdf5f5); gap: 0.6rem;
-        }
+        .banner-empty { width: 100%; aspect-ratio: 16/6; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #f0e8e8, #fdf5f5); gap: 0.6rem; }
         .banner-empty i { font-size: 3rem; color: #d33327; opacity: 0.12; }
         .banner-empty p { color: #ccc; font-size: 0.88rem; }
         .banner-actions { position: absolute; top: 0.7rem; right: 0.7rem; display: flex; gap: 0.4rem; }
-
-        /* ── GALERIA ── */
         .gal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+        #lazerGrid { grid-template-columns: repeat(auto-fill, minmax(195px, 1fr)); }
         .gal-card { border-radius: 0.9rem; overflow: hidden; border: 2px solid rgba(125,39,40,0.1); background: #fdfafa; transition: all 0.25s; }
         .gal-card:hover { border-color: rgba(211,51,39,0.35); box-shadow: 0 6px 18px rgba(211,51,39,0.1); }
         .gal-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
@@ -165,55 +67,24 @@
         .gal-ph i { font-size:1.8rem; color:#d33327; opacity:0.15; }
         .gal-info { padding: 0.55rem; }
         .gal-name { font-size: 0.72rem; font-weight: 600; color: #5a3a2e; margin-bottom: 0.35rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-        /* ── DROP ZONE ── */
-        .drop-zone {
-            border: 2px dashed rgba(211,51,39,0.22); border-radius: 1rem;
-            padding: 1.6rem; text-align: center; cursor: pointer;
-            transition: all 0.3s; background: rgba(211,51,39,0.015);
-        }
+        .drop-zone { border: 2px dashed rgba(211,51,39,0.22); border-radius: 1rem; padding: 1.6rem; text-align: center; cursor: pointer; transition: all 0.3s; background: rgba(211,51,39,0.015); }
         .drop-zone:hover, .drop-zone.drag-over { border-color: #d33327; background: rgba(211,51,39,0.06); }
         .drop-zone i { font-size: 1.9rem; color: rgba(211,51,39,0.22); display: block; margin-bottom: 0.5rem; }
         .drop-zone p { font-size: 0.87rem; color: #bbb; margin-bottom: 0.18rem; }
         .drop-zone small { font-size: 0.73rem; color: #ccc; }
-
-        /* ── CAMPOS ── */
         .field-group { margin-bottom: 1.2rem; }
-        .field-label {
-            font-size: 0.72rem; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
-            color: #7d2728; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 6px;
-        }
+        .field-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: #7d2728; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 6px; }
         .field-label i { color: #fdcd62; }
-        .field-input, .field-ta {
-            width: 100%; padding: 0.75rem 1rem;
-            border: 2px solid rgba(125,39,40,0.13); border-radius: 0.8rem;
-            font-size: 0.9rem; font-family: 'Inter', sans-serif; color: #2d2d2d;
-            background: #fdfafa; transition: border-color 0.25s; outline: none;
-        }
+        .field-input, .field-ta { width: 100%; padding: 0.75rem 1rem; border: 2px solid rgba(125,39,40,0.13); border-radius: 0.8rem; font-size: 0.9rem; font-family: 'Inter', sans-serif; color: #2d2d2d; background: #fdfafa; transition: border-color 0.25s; outline: none; }
         .field-input:focus, .field-ta:focus { border-color: #d33327; background: #fff; }
         .field-ta { min-height: 110px; resize: vertical; line-height: 1.6; }
         .field-hint { font-size: 0.72rem; color: #bbb; margin-top: 0.3rem; }
         .fields-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         @media (max-width: 700px) { .fields-2 { grid-template-columns: 1fr; } }
-
-        /* ── DIFERENCIAIS ── */
-        .dif-item { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.65rem; }
-        .dif-icon { color: #fdcd62; flex-shrink: 0; font-size: 0.9rem; }
-
-        /* ── EMPTY ── */
         .empty { text-align: center; padding: 2.5rem 1rem; color: #ccc; }
         .empty i { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; }
         .empty p { font-size: 0.88rem; }
-
-        /* ── TOAST ── */
-        .toast {
-            position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999;
-            background: #fff; border-radius: 1rem; padding: 0.85rem 1.3rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.13); border-left: 4px solid #2ecc71;
-            display: flex; align-items: center; gap: 10px;
-            font-size: 0.87rem; font-weight: 600; color: #2d2d2d;
-            transform: translateX(200%); transition: transform 0.35s ease;
-        }
+        .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; background: #fff; border-radius: 1rem; padding: 0.85rem 1.3rem; box-shadow: 0 10px 30px rgba(0,0,0,0.13); border-left: 4px solid #2ecc71; display: flex; align-items: center; gap: 10px; font-size: 0.87rem; font-weight: 600; color: #2d2d2d; transform: translateX(200%); transition: transform 0.35s ease; }
         .toast.ativo { transform: translateX(0); }
         .toast i { color: #2ecc71; }
         .toast.erro { border-left-color: #e74c3c; }
@@ -222,184 +93,166 @@
 </head>
 <body>
 <script>
-// Verificação de acesso — redireciona se não autenticado
-if (sessionStorage.getItem('adm_ok') !== 'niveis-ensino') {
-    window.location.replace('index.html');
-}
+if (sessionStorage.getItem('adm_ok') !== 'niveis-ensino') { window.location.replace('index.html'); }
 </script>
 
 <div class="topbar">
     <div class="topbar-left">
         <a href="niveis-ensino.html" class="btn-voltar" title="Voltar"><i class="fas fa-arrow-left"></i></a>
         <div class="topbar-title">
-            <h1><i class="fas fa-book" style="color:#fdcd62;margin-right:6px;"></i>Anos Finais</h1>
+            <h1><i class="fas fa-book-open" style="color:#fdcd62;margin-right:6px;"></i>Fundamental II</h1>
             <span>Níveis de Ensino — Gerenciar Conteúdo</span>
         </div>
     </div>
     <div class="topbar-right">
         <div class="topbar-badge"><i class="fas fa-user-circle"></i> Marketing</div>
-        <a href="#" onclick="window.top.location.replace('/');return false;" class="btn-sair">
-            <i class="fas fa-sign-out-alt"></i> Sair
-        </a>
+        <a href="#" onclick="window.top.location.replace('/');return false;" class="btn-sair"><i class="fas fa-sign-out-alt"></i> Sair</a>
     </div>
 </div>
 
 <div class="layout">
-
-    <!-- SIDEBAR -->
     <aside class="sidebar">
         <div class="sb-nivel-tag">
-            <i class="fas fa-book"></i>
-            <div><span>Anos Finais</span><small>11 — 14 anos</small></div>
+            <i class="fas fa-book-open"></i>
+            <div><span>Fundamental II</span><small>6º ao 9º Ano</small></div>
         </div>
 
-        <div class="sb-group">Imagens</div>
-        <a class="sb-item ativo" id="nav-banner" onclick="ir('banner')">
-            <i class="fas fa-image"></i> Banner Principal
-        </a>
-        <a class="sb-item" id="nav-galeria" onclick="ir('galeria')">
-            <i class="fas fa-images"></i> Galeria de Fotos
-            <span class="cnt" id="cnt-galeria">0</span>
-        </a>
+        <div class="sb-group">Início</div>
+        <div class="sb-item ativo" id="nav-banner" onclick="ir('banner')"><i class="fas fa-image"></i> Banner Principal</div>
 
         <div class="sb-divider"></div>
-        <div class="sb-group">Conteúdo</div>
-        <a class="sb-item" id="nav-textos" onclick="ir('textos')">
-            <i class="fas fa-pen-nib"></i> Textos e Informações
-        </a>
-        <a class="sb-item" id="nav-difs" onclick="ir('difs')">
-            <i class="fas fa-star"></i> Diferenciais
-            <span class="cnt" id="cnt-difs">0</span>
-        </a>
+        <div class="sb-group">Textos e Conteúdo</div>
+        <div class="sb-item" id="nav-proposta" onclick="ir('proposta')"><i class="fas fa-graduation-cap"></i> Proposta e Formação</div>
+        <div class="sb-item" id="nav-textos" onclick="ir('textos')"><i class="fas fa-pen-nib"></i> Textos e Informações</div>
+
+        <div class="sb-divider"></div>
+        <div class="sb-group">Imagens</div>
+        <div class="sb-item" id="nav-galeria" onclick="ir('galeria')"><i class="fas fa-images"></i> Nossa Galeria<span class="cnt" id="cnt-galeria">0</span></div>
+        <div class="sb-item" id="nav-lazer" onclick="ir('lazer')"><i class="fas fa-building"></i> Nossa Estrutura<span class="cnt" id="cnt-lazer">0</span></div>
+        <div class="sb-item" id="nav-difs" onclick="ir('difs')"><i class="fas fa-star"></i> Nossos Diferenciais<span class="cnt" id="cnt-difs">0</span></div>
     </aside>
 
     <main class="main">
 
-        <!-- ═══════ BANNER ═══════ -->
+        <!-- BANNER -->
         <div class="panel ativo" id="painel-banner">
             <div class="ph">
-                <div>
-                    <h2><i class="fas fa-image" style="color:#fdcd62;margin-right:8px;"></i>Banner Principal</h2>
-                    <p>Imagem de destaque exibida no topo da página de Anos Finais</p>
-                </div>
-                <button class="btn-add" onclick="document.getElementById('upBanner').click()">
-                    <i class="fas fa-camera"></i> Trocar Banner
-                </button>
+                <div><h2><i class="fas fa-image" style="color:#fdcd62;margin-right:8px;"></i>Banner Principal</h2><p>imagem de destaque exibida no topo da página de Fundamental II</p></div>
+                <button class="btn-add" onclick="document.getElementById('upBanner').click()"><i class="fas fa-camera"></i> Trocar Banner</button>
                 <input type="file" id="upBanner" accept="image/*" style="display:none" onchange="uploadBanner(this)">
             </div>
             <div class="box">
                 <div class="box-title"><i class="fas fa-image"></i> Banner Atual</div>
-                <div id="bannerPreview">
-                    <div class="banner-empty">
-                        <i class="fas fa-panorama"></i>
-                        <p>Nenhum banner cadastrado — clique em "Trocar Banner" para adicionar</p>
-                    </div>
-                </div>
+                <div id="bannerPreview"><div class="banner-empty"><i class="fas fa-panorama"></i><p>Nenhum banner cadastrado — clique em "Trocar Banner" para adicionar</p></div></div>
                 <div class="drop-zone" id="dropBanner" onclick="document.getElementById('upBanner').click()" style="margin-top:1rem;">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <p>Arraste a imagem aqui ou clique para selecionar</p>
-                    <small>JPG, PNG, WEBP — Recomendado 1920 × 600 px</small>
+                    <i class="fas fa-cloud-upload-alt"></i><p>Arraste a imagem aqui ou clique para selecionar</p><small>JPG, PNG, WEBP — Recomendado 1920 × 600 px</small>
                 </div>
             </div>
         </div>
 
-        <!-- ═══════ GALERIA ═══════ -->
+        <!-- GALERIA -->
         <div class="panel" id="painel-galeria">
             <div class="ph">
-                <div>
-                    <h2><i class="fas fa-images" style="color:#fdcd62;margin-right:8px;"></i>Galeria de Fotos</h2>
-                    <p>Fotos que aparecem na seção de galeria da página de Anos Finais</p>
-                </div>
-                <button class="btn-add" onclick="document.getElementById('upGal').click()">
-                    <i class="fas fa-plus"></i> Adicionar Fotos
-                </button>
+                <div><h2><i class="fas fa-images" style="color:#fdcd62;margin-right:8px;"></i>Galeria de Fotos</h2><p>Fotos que aparecem na seção de galeria da página de Fundamental II</p></div>
+                <button class="btn-add" onclick="document.getElementById('upGal').click()"><i class="fas fa-plus"></i> Adicionar Fotos</button>
                 <input type="file" id="upGal" accept="image/*" multiple style="display:none" onchange="addGaleria(this)">
             </div>
             <div class="box">
-                <div class="box-title">
-                    <i class="fas fa-th"></i> Fotos Cadastradas
-                    <span class="lbl" id="lbl-galeria">0 imagens</span>
-                </div>
+                <div class="box-title"><i class="fas fa-th"></i> Fotos Cadastradas<span class="lbl" id="lbl-galeria">0 imagens</span></div>
                 <div class="gal-grid" id="galeriaGrid"></div>
                 <div class="drop-zone" id="dropGal" onclick="document.getElementById('upGal').click()">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <p>Arraste as fotos aqui ou clique para selecionar</p>
-                    <small>JPG, PNG, WEBP — Múltiplas imagens aceitas</small>
+                    <i class="fas fa-cloud-upload-alt"></i><p>Arraste as fotos aqui ou clique para selecionar</p><small>JPG, PNG, WEBP — Múltiplas imagens aceitas</small>
                 </div>
             </div>
         </div>
 
-        <!-- ═══════ TEXTOS ═══════ -->
+        <!-- LAZER / ESTRUTURA -->
+        <div class="panel" id="painel-lazer">
+            <div class="ph">
+                <div><h2><i class="fas fa-building" style="color:#fdcd62;margin-right:8px;"></i>Estrutura</h2><p>Cada card tem imagem, nome e descrição — aparecem no slide do portal</p></div>
+                <button class="btn-add" onclick="abrirModalLazer()"><i class="fas fa-plus"></i> Adicionar Espaço</button>
+            </div>
+            <div class="box">
+                <div class="box-title"><i class="fas fa-images"></i> Espaços Cadastrados<span class="lbl" id="lbl-lazer">0 itens</span></div>
+                <div class="gal-grid" id="lazerGrid"></div>
+                <p id="lazerDica" style="display:none;color:#bbb;font-size:0.82rem;text-align:center;padding:1rem 0;">Nenhum espaço cadastrado ainda. Clique em "Adicionar Espaço" para começar.</p>
+            </div>
+        </div>
+
+        <!-- PROPOSTA E FORMAÇÃO -->
+        <div class="panel" id="painel-proposta">
+            <div class="ph">
+                <div><h2><i class="fas fa-graduation-cap" style="color:#fdcd62;margin-right:8px;"></i>Proposta e Formação</h2><p>Textos e imagens das duas seções de apresentação do Fundamental II</p></div>
+                <button class="btn-save" onclick="salvarProposta()"><i class="fas fa-save"></i> Salvar Textos</button>
+            </div>
+            <div class="box">
+                <div class="box-title"><i class="fas fa-graduation-cap"></i> Nossa Proposta Pedagógica</div>
+                <div class="fields-2" style="margin-bottom:1rem;">
+                    <div class="field-group" style="grid-column:1/-1">
+                        <div class="field-label"><i class="fas fa-heading"></i> Título</div>
+                        <input type="text" class="field-input" id="fTituloPropostaTexto" placeholder="Ex: Nossa Proposta Pedagógica">
+                    </div>
+                    <div class="field-group" style="grid-column:1/-1">
+                        <div class="field-label"><i class="fas fa-align-left"></i> Texto</div>
+                        <textarea class="field-ta" id="fDescricaoProposta" style="min-height:130px" placeholder="Descreva a proposta pedagógica..."></textarea>
+                    </div>
+                </div>
+                <div class="box-title" style="margin-top:.5rem;"><i class="fas fa-image"></i> Imagem da Proposta</div>
+                <div id="propostaImgPreview"><div class="banner-empty"><i class="fas fa-panorama"></i><p>Carregando...</p></div></div>
+                <div class="drop-zone" id="dropProposta" onclick="document.getElementById('upProposta').click()" style="margin-top:1rem;">
+                    <i class="fas fa-cloud-upload-alt"></i><p>Arraste a imagem aqui ou clique para selecionar</p><small>JPG, PNG, WEBP — Recomendado 600 × 500 px</small>
+                </div>
+                <input type="file" id="upProposta" accept="image/*" style="display:none" onchange="uploadProposta(this)">
+            </div>
+            <div class="box">
+                <div class="box-title"><i class="fas fa-pray"></i> Formação Integral e Valores</div>
+                <div class="fields-2" style="margin-bottom:1rem;">
+                    <div class="field-group" style="grid-column:1/-1">
+                        <div class="field-label"><i class="fas fa-heading"></i> Título</div>
+                        <input type="text" class="field-input" id="fTituloFormacaoTexto" placeholder="Ex: Formação Integral e Valores">
+                    </div>
+                    <div class="field-group" style="grid-column:1/-1">
+                        <div class="field-label"><i class="fas fa-align-left"></i> Texto</div>
+                        <textarea class="field-ta" id="fDescricaoFormacao" style="min-height:130px" placeholder="Descreva os valores e formação integral..."></textarea>
+                    </div>
+                </div>
+                <div class="box-title" style="margin-top:.5rem;"><i class="fas fa-image"></i> Imagem da Formação</div>
+                <div id="formacaoImgPreview"><div class="banner-empty"><i class="fas fa-panorama"></i><p>Carregando...</p></div></div>
+                <div class="drop-zone" id="dropFormacao" onclick="document.getElementById('upFormacao').click()" style="margin-top:1rem;">
+                    <i class="fas fa-cloud-upload-alt"></i><p>Arraste a imagem aqui ou clique para selecionar</p><small>JPG, PNG, WEBP — Recomendado 600 × 500 px</small>
+                </div>
+                <input type="file" id="upFormacao" accept="image/*" style="display:none" onchange="uploadFormacao(this)">
+            </div>
+        </div>
+
+        <!-- TEXTOS -->
         <div class="panel" id="painel-textos">
             <div class="ph">
-                <div>
-                    <h2><i class="fas fa-pen-nib" style="color:#fdcd62;margin-right:8px;"></i>Textos e Informações</h2>
-                    <p>Conteúdo exibido na página de Anos Finais do portal</p>
-                </div>
-                <button class="btn-save" onclick="salvarConteudo()">
-                    <i class="fas fa-save"></i> Salvar
-                </button>
+                <div><h2><i class="fas fa-pen-nib" style="color:#fdcd62;margin-right:8px;"></i>Textos e Informações</h2><p>Conteúdo exibido na página de Fundamental II do portal</p></div>
+                <button class="btn-save" onclick="salvarConteudo()"><i class="fas fa-save"></i> Salvar</button>
             </div>
             <div class="box">
-                <div class="box-title"><i class="fas fa-heading"></i> Identificação</div>
-                <div class="fields-2">
-                    <div class="field-group" style="grid-column:1/-1">
-                        <div class="field-label"><i class="fas fa-tag"></i> Título Principal</div>
-                        <input type="text" class="field-input" id="fTitulo" placeholder="Ex: Educação Infantil">
-                    </div>
-                    <div class="field-group" style="grid-column:1/-1">
-                        <div class="field-label"><i class="fas fa-pen"></i> Subtítulo</div>
-                        <input type="text" class="field-input" id="fSubtitulo" placeholder="Ex: 6º ao 9º Ano">
-                    </div>
-                    <div class="field-group">
-                        <div class="field-label"><i class="fas fa-birthday-cake"></i> Faixa Etária</div>
-                        <input type="text" class="field-input" id="fFaixa" placeholder="Ex: 0 a 5 anos">
-                    </div>
-                    <div class="field-group">
-                        <div class="field-label"><i class="fas fa-clock"></i> Turno</div>
-                        <input type="text" class="field-input" id="fTurno" placeholder="Ex: Manhã, Tarde e Integral">
-                    </div>
-                </div>
-            </div>
-            <div class="box">
-                <div class="box-title"><i class="fas fa-align-left"></i> Descrição</div>
+                <div class="box-title"><i class="fas fa-bible" style="color:#fdcd62;"></i> Versículo Bíblico</div>
                 <div class="field-group">
-                    <div class="field-label"><i class="fas fa-quote-left"></i> Texto de Apresentação</div>
-                    <textarea class="field-ta" id="fDescricao" style="min-height:140px"
-                        placeholder="Descreva a proposta pedagógica e os diferenciais deste nível de ensino..."></textarea>
-                    <div class="field-hint">Exibido como parágrafo principal na página do portal.</div>
+                    <div class="field-label"><i class="fas fa-quote-left"></i> Versículo</div>
+                    <textarea class="field-ta" id="fVersiculo" style="min-height:80px" placeholder="Ex: Instrui o menino no caminho em que deve andar..."></textarea>
                 </div>
-            </div>
-            <div class="box">
-                <div class="box-title"><i class="fas fa-list-ul"></i> Grade Curricular</div>
                 <div class="field-group">
-                    <div class="field-label"><i class="fas fa-book"></i> Componentes Curriculares</div>
-                    <textarea class="field-ta" id="fComponentes" style="min-height:120px"
-                        placeholder="Ex:&#10;Linguagem e Comunicação&#10;Pensamento Matemático&#10;Ciências da Natureza&#10;Arte e Cultura&#10;Movimento e Expressão Corporal"></textarea>
-                    <div class="field-hint">Um componente por linha — aparecem como lista no portal.</div>
+                    <div class="field-label"><i class="fas fa-bookmark"></i> Referência</div>
+                    <input type="text" class="field-input" id="fVersiculoRef" placeholder="Ex: Provérbios 22:6">
                 </div>
             </div>
         </div>
 
-        <!-- ═══════ DIFERENCIAIS ═══════ -->
+        <!-- DIFERENCIAIS -->
         <div class="panel" id="painel-difs">
             <div class="ph">
-                <div>
-                    <h2><i class="fas fa-star" style="color:#fdcd62;margin-right:8px;"></i>Diferenciais</h2>
-                    <p>Pontos de destaque de Anos Finais exibidos no portal</p>
-                </div>
-                <div style="display:flex;gap:0.7rem;">
-                    <button class="btn-add" onclick="addDiferencial()"><i class="fas fa-plus"></i> Adicionar</button>
-                    <button class="btn-save" onclick="salvarConteudo()"><i class="fas fa-save"></i> Salvar</button>
-                </div>
+                <div><h2><i class="fas fa-star" style="color:#fdcd62;margin-right:8px;"></i>Diferenciais</h2><p>Cards exibidos na seção "Nossos Diferenciais" do portal</p></div>
+                <button class="btn-add" onclick="abrirModalDifAdmin(-1)"><i class="fas fa-plus"></i> Adicionar</button>
             </div>
             <div class="box">
-                <div class="box-title"><i class="fas fa-star"></i> Itens de Destaque</div>
-                <div id="difContainer"></div>
-                <div id="difEmpty" class="empty">
-                    <i class="fas fa-star"></i>
-                    <p>Nenhum diferencial cadastrado.<br>Clique em "Adicionar" para criar.</p>
-                </div>
+                <div class="box-title"><i class="fas fa-star"></i> Cards Cadastrados<span class="lbl" id="lbl-difs">0</span></div>
+                <div class="gal-grid" id="difGrid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));"></div>
             </div>
         </div>
 
@@ -410,16 +263,17 @@ if (sessionStorage.getItem('adm_ok') !== 'niveis-ensino') {
 
 <script>
 // ── CONFIGURAÇÕES ──
-var PASTA_BANNER   = 'fundII';
-var PASTA_GAL      = 'fundII/galeria';
-var GAL_PREFIX     = 'fundII/galeria/';
-var GAL_JSON_PASTA = 'fundII';
-var GAL_JSON_NOME  = 'galeria.json';
-var PASTA_CONTEUDO = 'fundII';
-var DEF_TITULO     = 'Anos Finais';
-var DEF_SUBTITULO  = '6º ao 9º Ano';
-var DEF_FAIXA      = '11 a 14 anos';
-var DEF_TURNO      = 'Manhã e Tarde';
+var PASTA_BANNER      = 'fundII';
+var PASTA_GAL         = 'fundII/galeria';
+var GAL_PREFIX        = 'fundII/galeria/';
+var GAL_JSON_PASTA    = 'fundII';
+var GAL_JSON_NOME     = 'galeria.json';
+var PASTA_CONTEUDO    = 'fundII';
+var PASTA_LAZER       = 'fundII/estrutura';
+var LAZER_JSON_PASTA  = 'fundII';
+var LAZER_JSON_NOME   = 'estrutura.json';
+var LAZER_PREFIX      = 'fundII/estrutura/';
+
 // ── HELPERS ──
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function escJ(s){ return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
@@ -439,10 +293,8 @@ function toast(msg, err){
 function confirmar(titulo, nome, cb){
     var ov = document.createElement('div');
     ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center;';
-    ov.innerHTML =
-        '<div style="background:#fff;border-radius:1.3rem;padding:2rem;max-width:340px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);">'+
-        '<div style="width:52px;height:52px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">'+
-        '<i class="fas fa-trash" style="color:#c0392b;font-size:1.3rem;"></i></div>'+
+    ov.innerHTML = '<div style="background:#fff;border-radius:1.3rem;padding:2rem;max-width:340px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);">'+
+        '<div style="width:52px;height:52px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;"><i class="fas fa-trash" style="color:#c0392b;font-size:1.3rem;"></i></div>'+
         '<h3 style="font-family:Poppins,sans-serif;font-size:1.1rem;margin:0 0 .4rem;color:#2d2d2d;">'+titulo+'</h3>'+
         (nome?'<p style="color:#888;font-size:.85rem;margin:0 0 1.4rem;">'+nome+'</p>':'<div style="margin-bottom:1.4rem;"></div>')+
         '<div style="display:flex;gap:.8rem;">'+
@@ -456,221 +308,519 @@ function confirmar(titulo, nome, cb){
     ov.onclick = function(e){ if(e.target===ov) fechar(false); };
 }
 
-// ─ NAVEGAÇÃO ──
+// ── NAVEGAÇÃO ──
 function ir(sec){
     document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('ativo'); });
     document.querySelectorAll('.sb-item').forEach(function(i){ i.classList.remove('ativo'); });
     document.getElementById('painel-'+sec).classList.add('ativo');
     document.getElementById('nav-'+sec).classList.add('ativo');
+    if(sec === 'proposta')    { carregarPropostaImg(); carregarFormacaoImg(); }
+    if(sec === 'textos')      carregarConteudo();
+    if(sec === 'galeria')     carregarGaleria();
+    if(sec === 'lazer')       carregarLazer();
+    if(sec === 'difs')        carregarDiferenciais();
 }
 
 // ── BANNER ──
 function carregarBanner(){
-    var exts = ['png','jpg','jpeg','webp'], idx = 0;
+    var exts=['png','jpg','jpeg','webp'], idx=0;
     function tentar(){
-        if(idx >= exts.length){ renderBanner(null); return; }
-        var nome = 'capa.' + exts[idx++];
-        var url  = '/files/' + PASTA_BANNER + '/' + nome;
-        var img  = new Image();
-        img.onload  = function(){ renderBanner({nome:nome, url:url}); };
-        img.onerror = tentar;
-        img.src = url + '?v=' + Date.now();
+        if(idx>=exts.length){ renderBanner(null); return; }
+        var nome='capa.'+exts[idx++], url='/files/'+PASTA_BANNER+'/'+nome;
+        var img=new Image();
+        img.onload=function(){ renderBanner({nome:nome, url:url}); };
+        img.onerror=tentar;
+        img.src=url+'?v='+Date.now();
     }
     tentar();
 }
-
 function renderBanner(banner){
-    var el = document.getElementById('bannerPreview');
-    if(!banner){
-        el.innerHTML = '<div class="banner-empty"><i class="fas fa-panorama"></i><p>Nenhum banner encontrado — clique em "Trocar Banner" para adicionar</p></div>';
-        return;
-    }
-    el.innerHTML =
-        '<div class="banner-wrap">'+
-        '<img src="'+esc(banner.url)+'?v='+Date.now()+'" alt="Banner">'+
-        '<div class="banner-actions">'+
-        '<button class="btn-swap" onclick="document.getElementById(\'upBanner\').click()"><i class="fas fa-camera"></i> Trocar</button>'+
-        '</div></div>';
+    var el=document.getElementById('bannerPreview');
+    if(!banner){ el.innerHTML='<div class="banner-empty"><i class="fas fa-panorama"></i><p>Nenhum banner encontrado — clique em "Trocar Banner" para adicionar</p></div>'; return; }
+    el.innerHTML='<div class="banner-wrap"><img src="'+esc(banner.url)+'?v='+Date.now()+'" alt="Banner"><div class="banner-actions"><button class="btn-swap" onclick="document.getElementById(\'upBanner\').click()"><i class="fas fa-camera"></i> Trocar</button></div></div>';
 }
-
 function uploadBanner(inp){
     if(!inp.files||!inp.files[0]) return;
-    lerArq(inp.files[0], function(src){
-        fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({nome:'capa.png', pasta:PASTA_BANNER, rawmode:'1', base64:src})
-        }).then(function(r){return r.json();})
-          .then(function(){ try{inp.value='';}catch(e){} carregarBanner(); toast('Banner atualizado!'); })
-          .catch(function(){ toast('Erro ao enviar banner',true); });
+    lerArq(inp.files[0],function(src){
+        fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:'capa.png',pasta:PASTA_BANNER,rawmode:'1',base64:src})})
+        .then(function(r){return r.json();})
+        .then(function(){ try{inp.value='';}catch(e){} carregarBanner(); toast('Banner atualizado!'); })
+        .catch(function(){ toast('Erro ao enviar banner',true); });
     });
 }
 
 // ── GALERIA ──
 function carregarGaleria(){
     fetch('/listar?pasta='+encodeURIComponent(PASTA_GAL)+'&raw=1')
-        .then(function(r){ return r.json(); })
-        .then(function(lista){
-            var fotos = lista.filter(function(img){ return !/^capa\./i.test(img.nome); });
-            document.getElementById('cnt-galeria').textContent = fotos.length;
-            renderGaleria(fotos);
-        })
-        .catch(function(){ renderGaleria([]); });
+    .then(function(r){return r.json();})
+    .then(function(lista){
+        var fotos=lista.filter(function(img){ return !/^capa\./i.test(img.nome); });
+        document.getElementById('cnt-galeria').textContent=fotos.length;
+        renderGaleria(fotos);
+    }).catch(function(){ renderGaleria([]); });
 }
-
 function renderGaleria(lista){
-    var cnt = lista.length;
-    document.getElementById('lbl-galeria').textContent = cnt + (cnt===1?' imagem':' imagens');
-    var g = document.getElementById('galeriaGrid');
-    if(!cnt){
-        g.innerHTML = '<div class="empty" style="grid-column:1/-1"><i class="fas fa-images"></i><p>Nenhuma foto cadastrada.</p></div>';
-        return;
-    }
-    g.innerHTML = lista.map(function(img){
-        var url = '/files/'+PASTA_GAL+'/'+img.nome;
-        return '<div class="gal-card">'+
-            '<img class="gal-img" src="'+esc(url)+'?v='+Date.now()+'" alt="'+esc(img.nome)+'" '+
-                'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'+
-            '<div class="gal-ph" style="display:none"><i class="fas fa-image"></i></div>'+
-            '<div class="gal-info">'+
-            '<div class="gal-name">'+esc(img.nome)+'</div>'+
-            '<button class="btn-del" onclick="excluirGaleria(\''+escJ(img.nome)+'\')" style="width:100%"><i class="fas fa-trash"></i> Excluir</button>'+
-            '</div></div>';
+    var cnt=lista.length;
+    document.getElementById('lbl-galeria').textContent=cnt+(cnt===1?' imagem':' imagens');
+    var g=document.getElementById('galeriaGrid');
+    if(!cnt){ g.innerHTML='<div class="empty" style="grid-column:1/-1"><i class="fas fa-images"></i><p>Nenhuma foto cadastrada.</p></div>'; return; }
+    g.innerHTML=lista.map(function(img){
+        var url='/files/'+PASTA_GAL+'/'+img.nome;
+        return '<div class="gal-card"><img class="gal-img" src="'+esc(url)+'?v='+Date.now()+'" alt="'+esc(img.nome)+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="gal-ph" style="display:none"><i class="fas fa-image"></i></div><div class="gal-info"><div class="gal-name">'+esc(img.nome)+'</div><button class="btn-del" onclick="excluirGaleria(\''+escJ(img.nome)+'\')" style="width:100%"><i class="fas fa-trash"></i> Excluir</button></div></div>';
     }).join('');
 }
-
 function atualizarGaleriaJSON(){
     fetch('/listar?pasta='+encodeURIComponent(PASTA_GAL)+'&raw=1')
-        .then(function(r){ return r.json(); })
-        .then(function(lista){
-            var entries = lista.map(function(img){ return {imagem: GAL_PREFIX + img.nome}; });
-            var b64;
-            try { b64 = btoa(unescape(encodeURIComponent(JSON.stringify(entries)))); } catch(e){ return; }
-            fetch('/salvar-texto',{method:'POST',headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({pasta:GAL_JSON_PASTA, nome:GAL_JSON_NOME, rawmode:'1', base64:b64})
-            }).catch(function(){});
-        }).catch(function(){});
+    .then(function(r){return r.json();})
+    .then(function(lista){
+        var entries=lista.map(function(img){return{imagem:GAL_PREFIX+img.nome};});
+        var b64; try{b64=btoa(unescape(encodeURIComponent(JSON.stringify(entries))));}catch(e){return;}
+        fetch('/salvar-texto',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pasta:GAL_JSON_PASTA,nome:GAL_JSON_NOME,rawmode:'1',base64:b64})}).catch(function(){});
+    }).catch(function(){});
 }
-
 function addGaleria(inp){
     if(!inp.files||!inp.files.length) return;
     var files=Array.prototype.slice.call(inp.files), cnt=0, tot=files.length;
     files.forEach(function(f){
         lerArq(f,function(src){
-            fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({nome:f.name, pasta:PASTA_GAL, rawmode:'1', base64:src})
-            }).then(function(r){return r.json();})
-              .then(function(){
-                  if(++cnt===tot){
-                      try{inp.value='';}catch(e){}
-                      carregarGaleria();
-                      atualizarGaleriaJSON();
-                      toast(tot+' foto(s) adicionada(s)!');
-                  }
-              })
-              .catch(function(){ toast('Erro ao enviar foto',true); });
+            fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:f.name,pasta:PASTA_GAL,rawmode:'1',base64:src})})
+            .then(function(r){return r.json();})
+            .then(function(){ if(++cnt===tot){ try{inp.value='';}catch(e){} carregarGaleria(); atualizarGaleriaJSON(); toast(tot+' foto(s) adicionada(s)!'); } })
+            .catch(function(){ toast('Erro ao enviar foto',true); });
         });
     });
 }
-
 function excluirGaleria(nome){
-    confirmar('Excluir esta foto?', nome, function(){
-        fetch('/deletar',{method:'POST',headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({nome:nome, pasta:PASTA_GAL, rawmode:'1'})
-        }).then(function(){
-            carregarGaleria();
-            atualizarGaleriaJSON();
-            toast('Foto excluída!');
-        }).catch(function(){ toast('Erro ao excluir',true); });
+    confirmar('Excluir esta foto?',nome,function(){
+        fetch('/deletar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:nome,pasta:PASTA_GAL,rawmode:'1'})})
+        .then(function(){ carregarGaleria(); atualizarGaleriaJSON(); toast('Foto excluída!'); })
+        .catch(function(){ toast('Erro ao excluir',true); });
     });
 }
 
+// ── DRAG & DROP ──
 (function(){
-    function dzSetup(id, fn){
-        var dz=document.getElementById(id);
-        if(!dz) return;
+    function dzSetup(id,fn){
+        var dz=document.getElementById(id); if(!dz) return;
         dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('drag-over');});
         dz.addEventListener('dragleave',function(){dz.classList.remove('drag-over');});
         dz.addEventListener('drop',function(e){e.preventDefault();dz.classList.remove('drag-over');fn({files:e.dataTransfer.files});});
     }
-    dzSetup('dropBanner', uploadBanner);
-    dzSetup('dropGal',    addGaleria);
+    dzSetup('dropBanner',uploadBanner);
+    dzSetup('dropGal',addGaleria);
+    dzSetup('dropProposta',uploadProposta);
+    dzSetup('dropFormacao',uploadFormacao);
 })();
 
-// ── DIFERENCIAIS ──
-var _difs = [];
-function getDiferenciais(){ return _difs.filter(function(d){return d.trim()!==''; }); }
-function setDiferenciais(arr){ _difs=arr||[]; renderDiferenciais(); }
-function addDiferencial(){ _difs.push(''); renderDiferenciais(); setTimeout(function(){ var ins=document.querySelectorAll('.dif-item input'); if(ins.length) ins[ins.length-1].focus(); },50); }
-function removeDiferencial(i){ _difs.splice(i,1); renderDiferenciais(); }
-function updateDif(i,v){ _difs[i]=v; }
-function renderDiferenciais(){
-    var cnt=getDiferenciais().length;
-    document.getElementById('cnt-difs').textContent=cnt;
-    var c=document.getElementById('difContainer');
-    var emp=document.getElementById('difEmpty');
-    if(!_difs.length){ c.innerHTML=''; emp.style.display=''; return; }
-    emp.style.display='none';
-    c.innerHTML=_difs.map(function(d,i){
-        return '<div class="dif-item">'+
-            '<i class="fas fa-star dif-icon"></i>'+
-            '<input type="text" class="field-input" value="'+esc(d)+'" '+
-                'oninput="updateDif('+i+',this.value)" placeholder="Ex: Sala ambiente e lúdica">'+
-            '<button class="btn-del" onclick="removeDiferencial('+i+')" title="Remover"><i class="fas fa-times"></i></button>'+
-        '</div>';
+// ── PROPOSTA E FORMAÇÃO ──
+function _mostrarImgOuFallback(elId, nomeEspecifico, altTxt, inputId){
+    var exts=['png','jpg','jpeg','webp'], idx=0;
+    var el=document.getElementById(elId);
+    function tentar(){
+        if(idx>=exts.length){
+            el.innerHTML='<div style="width:100%;aspect-ratio:16/6;background:linear-gradient(135deg,#3d1a1b,#7d2728);border-radius:0.8rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.6rem;">'
+                +'<i class="fas fa-image" style="font-size:2.5rem;color:rgba(255,255,255,0.15);"></i>'
+                +'<p style="color:rgba(255,255,255,0.4);font-size:0.85rem;">Nenhuma imagem definida</p>'
+                +'<button class="btn-swap" onclick="document.getElementById(\''+inputId+'\').click()" style="margin-top:0.3rem;"><i class="fas fa-camera"></i> Adicionar imagem</button>'
+                +'</div>';
+            return;
+        }
+        var nome=nomeEspecifico+'.'+exts[idx++], url='/files/'+PASTA_BANNER+'/'+nome;
+        var img=new Image();
+        img.onload=function(){
+            el.innerHTML='<div class="banner-wrap"><img src="'+esc(url)+'?v='+Date.now()+'" alt="'+altTxt+'">'
+                +'<div class="banner-actions"><button class="btn-swap" onclick="document.getElementById(\''+inputId+'\').click()"><i class="fas fa-camera"></i> Trocar</button></div></div>';
+        };
+        img.onerror=tentar; img.src=url+'?v='+Date.now();
+    }
+    tentar();
+}
+function carregarPropostaImg(){ _mostrarImgOuFallback('propostaImgPreview','proposta','Proposta','upProposta'); }
+function carregarFormacaoImg(){ _mostrarImgOuFallback('formacaoImgPreview','formacao','Formação','upFormacao'); }
+function uploadProposta(inp){
+    if(!inp.files||!inp.files[0]) return;
+    lerArq(inp.files[0],function(src){
+        fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:'proposta.png',pasta:PASTA_BANNER,rawmode:'1',base64:src})})
+        .then(function(r){return r.json();})
+        .then(function(){ try{inp.value='';}catch(e){} carregarPropostaImg(); toast('Imagem da proposta atualizada!'); })
+        .catch(function(){ toast('Erro ao enviar imagem',true); });
+    });
+}
+function uploadFormacao(inp){
+    if(!inp.files||!inp.files[0]) return;
+    lerArq(inp.files[0],function(src){
+        fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:'formacao.png',pasta:PASTA_BANNER,rawmode:'1',base64:src})})
+        .then(function(r){return r.json();})
+        .then(function(){ try{inp.value='';}catch(e){} carregarFormacaoImg(); toast('Imagem da formação atualizada!'); })
+        .catch(function(){ toast('Erro ao enviar imagem',true); });
+    });
+}
+function carregarProposta(){
+    fetch('/files/'+PASTA_CONTEUDO+'/proposta.json?v='+Date.now())
+    .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+    .then(function(d){
+        if(d.tituloPropostaTexto) document.getElementById('fTituloPropostaTexto').value=d.tituloPropostaTexto;
+        if(d.descricaoProposta)   document.getElementById('fDescricaoProposta').value=d.descricaoProposta;
+        if(d.tituloFormacaoTexto) document.getElementById('fTituloFormacaoTexto').value=d.tituloFormacaoTexto;
+        if(d.descricaoFormacao)   document.getElementById('fDescricaoFormacao').value=d.descricaoFormacao;
+    }).catch(function(){
+        document.getElementById('fTituloPropostaTexto').value='Nossa Proposta Pedagógica';
+        document.getElementById('fDescricaoProposta').value='Os Anos Finais do Ensino Fundamental — do 6º ao 9º ano — são um período de grande transformação. O aluno aprofunda conhecimentos, desenvolve pensamento crítico e se prepara para os desafios do Ensino Médio.\n\nOferecemos metodologias ativas, projetos interdisciplinares e acompanhamento pedagógico individualizado, sempre com base nos valores cristãos que norteiam nossa instituição.';
+        document.getElementById('fTituloFormacaoTexto').value='Formação Integral e Valores';
+        document.getElementById('fDescricaoFormacao').value='Acreditamos que educação vai além do conteúdo. Formamos jovens íntegros, com identidade, propósito e senso de responsabilidade social.\n\nOs princípios bíblicos permeiam todas as disciplinas, e a parceria com a família garante que escola e lar caminhem juntos na formação de cada aluno.';
+    });
+    carregarPropostaImg();
+    carregarFormacaoImg();
+}
+function salvarProposta(){
+    var data={
+        tituloPropostaTexto: document.getElementById('fTituloPropostaTexto').value.trim(),
+        descricaoProposta:   document.getElementById('fDescricaoProposta').value.trim(),
+        tituloFormacaoTexto: document.getElementById('fTituloFormacaoTexto').value.trim(),
+        descricaoFormacao:   document.getElementById('fDescricaoFormacao').value.trim()
+    };
+    var b64; try{b64=btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2))));}catch(e){toast('Erro ao codificar',true);return;}
+    fetch('/salvar-texto',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pasta:PASTA_CONTEUDO,nome:'proposta.json',rawmode:'1',base64:b64})})
+    .then(function(r){return r.json();})
+    .then(function(res){ if(res.ok) toast('Salvo! O portal atualiza em até 30 segundos.'); else toast('Erro: '+(res.erro||'?'),true); })
+    .catch(function(){ toast('Erro ao salvar',true); });
+}
+
+// ── LAZER / ESTRUTURA ──
+var _lazerItens=[];
+function carregarLazer(){
+    fetch('/files/'+LAZER_JSON_PASTA+'/'+LAZER_JSON_NOME+'?v='+Date.now())
+    .then(function(r){return r.ok?r.json():[];}).catch(function(){return[];})
+    .then(function(jsonEntries){
+        var tituloMap={}, descMap={};
+        if(Array.isArray(jsonEntries)){ jsonEntries.forEach(function(e){ var nome=(e.imagem||'').split('/').pop(); tituloMap[nome]=e.titulo||''; descMap[nome]=e.descricao||''; }); }
+        return fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER)+'&raw=1')
+        .then(function(r){return r.json();})
+        .then(function(lista){
+            _lazerItens=lista.map(function(img){ var def=img.nome.replace(/\.[^.]+$/,'').replace(/_/g,' '); return{nome:img.nome,titulo:tituloMap[img.nome]||def,descricao:descMap[img.nome]||''}; });
+            document.getElementById('cnt-lazer').textContent=_lazerItens.length;
+            renderLazerAdmin();
+            atualizarLazerJSON();
+        });
+    }).catch(function(){ _lazerItens=[]; renderLazerAdmin(); });
+}
+function renderLazerAdmin(){
+    var cnt=_lazerItens.length;
+    document.getElementById('cnt-lazer').textContent=cnt;
+    document.getElementById('lbl-lazer').textContent=cnt+(cnt===1?' item':' itens');
+    var g=document.getElementById('lazerGrid');
+    var dica=document.getElementById('lazerDica'); if(dica) dica.style.display=cnt?'none':'block';
+    g.innerHTML=_lazerItens.map(function(item,i){
+        var url='/files/'+PASTA_LAZER+'/'+item.nome;
+        return '<div class="gal-card"><img src="'+esc(url)+'?v='+Date.now()+'" alt="'+esc(item.titulo)+'" style="width:100%;height:160px;object-fit:contain;background:#f5f0eb;display:block;" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="gal-ph" style="display:none"><i class="fas fa-image"></i></div><div class="gal-info"><div style="font-weight:700;font-size:0.85rem;color:#3d1a1b;margin-bottom:3px;">'+esc(item.titulo||'(sem título)')+'</div>'+(item.descricao?'<div style="font-size:0.78rem;color:#7d5a3a;margin-bottom:8px;line-height:1.4;">'+esc(item.descricao)+'</div>':'<div style="font-size:0.75rem;color:#bbb;margin-bottom:8px;font-style:italic;">sem descrição</div>')+'<div style="display:flex;gap:5px;"><button class="btn-swap" onclick="editarLazer('+i+')" style="flex:1"><i class="fas fa-edit"></i> Editar</button><button class="btn-del" onclick="excluirLazer(\''+escJ(item.nome)+'\')" style="flex:1"><i class="fas fa-trash"></i> Excluir</button></div></div></div>';
     }).join('');
+}
+function atualizarLazerJSON(){
+    var entries=_lazerItens.map(function(item){return{imagem:LAZER_PREFIX+item.nome,titulo:item.titulo,descricao:item.descricao||''};});
+    var b64; try{b64=btoa(unescape(encodeURIComponent(JSON.stringify(entries))));}catch(e){return;}
+    fetch('/salvar-texto',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pasta:LAZER_JSON_PASTA,nome:LAZER_JSON_NOME,rawmode:'1',base64:b64})}).catch(function(){});
+}
+
+// ── MODAL LAZER ──
+var _lazerEditIdx=-1;
+function abrirModalLazer(){
+    _lazerEditIdx=-1;
+    document.getElementById('mLazerTitle').textContent='Novo Espaço';
+    document.getElementById('mLazerNome').value='';
+    document.getElementById('mLazerDesc').value='';
+    document.getElementById('mLazerFile').value='';
+    document.getElementById('mLazerPreviewBox').style.display='none';
+    document.getElementById('mLazerFileLabel').textContent='Selecionar Imagem';
+    document.getElementById('mLazerImgLabel').textContent='Imagem *';
+    document.getElementById('mLazerBtn').innerHTML='<i class="fas fa-plus"></i> Criar Espaço';
+    document.getElementById('modalLazerOv').style.display='flex';
+    setTimeout(function(){document.getElementById('mLazerNome').focus();},80);
+}
+function editarLazer(idx){
+    _lazerEditIdx=idx; var item=_lazerItens[idx];
+    document.getElementById('mLazerTitle').textContent='Editar Espaço';
+    document.getElementById('mLazerNome').value=item.titulo||'';
+    document.getElementById('mLazerDesc').value=item.descricao||'';
+    document.getElementById('mLazerFile').value='';
+    document.getElementById('mLazerPreview').src='/files/'+PASTA_LAZER+'/'+item.nome+'?v='+Date.now();
+    document.getElementById('mLazerPreviewBox').style.display='block';
+    document.getElementById('mLazerFileLabel').textContent='Trocar Imagem (opcional)';
+    document.getElementById('mLazerImgLabel').textContent='Imagem';
+    document.getElementById('mLazerBtn').innerHTML='<i class="fas fa-save"></i> Salvar Alterações';
+    document.getElementById('modalLazerOv').style.display='flex';
+    setTimeout(function(){document.getElementById('mLazerNome').focus();},80);
+}
+function fecharModalLazer(){ document.getElementById('modalLazerOv').style.display='none'; }
+function _lazerPreview(inp){
+    if(!inp.files||!inp.files[0]) return;
+    document.getElementById('mLazerFileLabel').textContent=inp.files[0].name;
+    var r=new FileReader(); r.onload=function(e){ document.getElementById('mLazerPreview').src=e.target.result; document.getElementById('mLazerPreviewBox').style.display='block'; }; r.readAsDataURL(inp.files[0]);
+}
+function confirmarModalLazer(){
+    var titulo=document.getElementById('mLazerNome').value.trim();
+    var desc=document.getElementById('mLazerDesc').value.trim();
+    var inp=document.getElementById('mLazerFile');
+    if(!titulo){ document.getElementById('mLazerNome').focus(); toast('Informe o nome do espaço',true); return; }
+    if(_lazerEditIdx===-1){
+        if(!inp.files||!inp.files[0]){ toast('Selecione uma imagem',true); return; }
+        var f=inp.files[0];
+        lerArq(f,function(src){
+            fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:f.name,pasta:PASTA_LAZER,rawmode:'1',base64:src})})
+            .then(function(r){return r.json();})
+            .then(function(){ fecharModalLazer(); _lazerItens.push({nome:f.name,titulo:titulo,descricao:desc}); atualizarLazerJSON(); renderLazerAdmin(); toast('"'+titulo+'" adicionado! O portal atualiza em até 30 segundos.'); })
+            .catch(function(){ toast('Erro ao enviar imagem',true); });
+        });
+    } else {
+        var idx=_lazerEditIdx, item=_lazerItens[idx];
+        item.titulo=titulo; item.descricao=desc;
+        if(inp.files&&inp.files[0]){
+            var f=inp.files[0], oldNome=item.nome;
+            lerArq(f,function(src){
+                fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:f.name,pasta:PASTA_LAZER,rawmode:'1',base64:src})})
+                .then(function(r){return r.json();})
+                .then(function(){
+                    if(oldNome!==f.name){ fetch('/deletar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:oldNome,pasta:PASTA_LAZER,rawmode:'1'})}).catch(function(){}); item.nome=f.name; }
+                    fecharModalLazer(); atualizarLazerJSON(); renderLazerAdmin(); toast('Alterações salvas!');
+                }).catch(function(){ toast('Erro ao trocar imagem',true); });
+            });
+        } else { fecharModalLazer(); atualizarLazerJSON(); renderLazerAdmin(); toast('Alterações salvas!'); }
+    }
+}
+function excluirLazer(nome){
+    confirmar('Excluir este espaço?',nome,function(){
+        fetch('/deletar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:nome,pasta:PASTA_LAZER,rawmode:'1'})})
+        .then(function(){ _lazerItens=_lazerItens.filter(function(i){return i.nome!==nome;}); atualizarLazerJSON(); document.getElementById('cnt-lazer').textContent=_lazerItens.length; renderLazerAdmin(); toast('Espaço excluído!'); })
+        .catch(function(){ toast('Erro ao excluir',true); });
+    });
+}
+
+// ── DIFERENCIAIS ──
+var _difsData=[], _difEditIdx=-1, _difFotoAtual='', _difIconeImgAtual='';
+
+function carregarDiferenciais(){
+    fetch('/files/'+PASTA_CONTEUDO+'/diferenciais.json?v='+Date.now())
+    .then(function(r){if(!r.ok) throw 0; return r.json();})
+    .then(function(d){_difsData=Array.isArray(d)?d:[]; renderDiferenciais();})
+    .catch(function(){_difsData=[]; renderDiferenciais();});
+}
+function renderDiferenciais(){
+    document.getElementById('lbl-difs').textContent=_difsData.length;
+    var cnt=document.getElementById('cnt-difs'); if(cnt) cnt.textContent=_difsData.length;
+    var g=document.getElementById('difGrid');
+    if(!_difsData.length){ g.innerHTML='<div class="empty" style="grid-column:1/-1"><i class="fas fa-star"></i><p>Nenhum diferencial cadastrado.</p></div>'; return; }
+    g.innerHTML=_difsData.map(function(d,i){
+        var iconeHtml=d.iconeImg
+            ?'<img src="/files/'+esc(d.iconeImg)+'" style="width:2.4rem;height:2.4rem;object-fit:contain;display:block;margin:1rem auto 0.3rem;">'
+            :'<div style="font-size:2.4rem;padding:1rem 0 0.3rem;">'+(d.icone||'⭐')+'</div>';
+        return '<div class="gal-card" style="text-align:center;">'+iconeHtml+
+            '<div style="font-weight:800;color:#7d2728;font-size:0.85rem;padding:0 0.7rem 0.3rem;">'+esc(d.titulo||'')+'</div>'+
+            '<div style="font-size:0.75rem;color:#999;padding:0 0.7rem 0.8rem;line-height:1.4;">'+esc((d.descricao||'').substring(0,70))+((d.descricao||'').length>70?'...':'')+'</div>'+
+            '<div class="gal-info" style="display:flex;gap:0.4rem;"><button class="btn-swap" style="flex:1" onclick="abrirModalDifAdmin('+i+')"><i class="fas fa-edit"></i> Editar</button><button class="btn-del" style="flex:1" onclick="excluirDif('+i+')"><i class="fas fa-trash"></i> Excluir</button></div></div>';
+    }).join('');
+}
+function abrirModalDifAdmin(idx){
+    _difEditIdx=idx; var d=idx>=0?_difsData[idx]:{};
+    _difFotoAtual=d.foto||''; _difIconeImgAtual=d.iconeImg||'';
+    document.getElementById('mDifTitle').textContent=idx>=0?'Editar Diferencial':'Novo Diferencial';
+    document.getElementById('mDifIcone').value=d.icone||'';
+    document.getElementById('mDifTitulo').value=d.titulo||'';
+    document.getElementById('mDifDesc').value=d.descricao||'';
+    document.getElementById('mDifTexto').value=d.textoModal||'';
+    document.getElementById('mDifFile').value='';
+    document.getElementById('mDifFileLabel').textContent=_difFotoAtual?'Trocar Foto (opcional)':'Selecionar Foto';
+    var pb=document.getElementById('mDifPreviewBox'), pi=document.getElementById('mDifPreview');
+    if(_difFotoAtual){pi.src='/files/'+_difFotoAtual+'?v='+Date.now();pb.style.display='block';}else{pb.style.display='none';pi.src='';}
+    document.getElementById('mDifIconeFile').value='';
+    document.getElementById('mDifIconeFileLabel').textContent=_difIconeImgAtual?'Trocar Ícone (opcional)':'Selecionar Imagem';
+    var ipb=document.getElementById('mDifIconePreviewBox'), ipi=document.getElementById('mDifIconePreview');
+    if(_difIconeImgAtual){ipi.src='/files/'+_difIconeImgAtual+'?v='+Date.now();ipb.style.display='flex';}else{ipb.style.display='none';ipi.src='';}
+    document.getElementById('modalDifAdmOv').style.display='flex';
+}
+function _difPreviewFoto(inp){
+    if(!inp.files||!inp.files[0]) return;
+    document.getElementById('mDifFileLabel').textContent=inp.files[0].name;
+    var r=new FileReader(); r.onload=function(e){document.getElementById('mDifPreview').src=e.target.result;document.getElementById('mDifPreviewBox').style.display='block';}; r.readAsDataURL(inp.files[0]);
+}
+function _difPreviewIcone(inp){
+    if(!inp.files||!inp.files[0]) return;
+    document.getElementById('mDifIconeFileLabel').textContent=inp.files[0].name;
+    var r=new FileReader(); r.onload=function(e){document.getElementById('mDifIconePreview').src=e.target.result;document.getElementById('mDifIconePreviewBox').style.display='flex';}; r.readAsDataURL(inp.files[0]);
+}
+function removerIconeImg(){
+    _difIconeImgAtual=''; document.getElementById('mDifIconeFile').value='';
+    document.getElementById('mDifIconeFileLabel').textContent='Selecionar Imagem';
+    document.getElementById('mDifIconePreviewBox').style.display='none';
+    document.getElementById('mDifIconePreview').src='';
+}
+function fecharModalDifAdmin(){ document.getElementById('modalDifAdmOv').style.display='none'; }
+function confirmarModalDifAdmin(){
+    var icone=document.getElementById('mDifIcone').value.trim();
+    var titulo=document.getElementById('mDifTitulo').value.trim();
+    var desc=document.getElementById('mDifDesc').value.trim();
+    var texto=document.getElementById('mDifTexto').value.trim();
+    var inpFoto=document.getElementById('mDifFile'), inpIcone=document.getElementById('mDifIconeFile');
+    if(!titulo){toast('Informe o título do diferencial',true);return;}
+    var fotoPath=_difFotoAtual, iconeImgPath=_difIconeImgAtual, pendentes=0;
+    function salvar(){
+        var obj={icone:icone||'⭐',titulo:titulo,descricao:desc,textoModal:texto};
+        if(fotoPath) obj.foto=fotoPath;
+        if(iconeImgPath) obj.iconeImg=iconeImgPath;
+        if(_difEditIdx>=0){_difsData[_difEditIdx]=obj;}else{_difsData.push(obj);}
+        fecharModalDifAdmin(); renderDiferenciais(); salvarDiferenciaisJSON();
+    }
+    if(inpIcone.files&&inpIcone.files[0]){
+        pendentes++; var fi=inpIcone.files[0];
+        lerArq(fi,function(src){
+            fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:fi.name,pasta:'fundII/diferenciais/icones',rawmode:'1',base64:src})})
+            .then(function(r){return r.json();}).then(function(){iconeImgPath='fundII/diferenciais/icones/'+fi.name;if(--pendentes===0)salvar();}).catch(function(){toast('Erro ao enviar ícone',true);});
+        });
+    }
+    if(inpFoto.files&&inpFoto.files[0]){
+        pendentes++; var ff=inpFoto.files[0];
+        lerArq(ff,function(src){
+            fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:ff.name,pasta:'fundII/diferenciais',rawmode:'1',base64:src})})
+            .then(function(r){return r.json();}).then(function(){fotoPath='fundII/diferenciais/'+ff.name;if(--pendentes===0)salvar();}).catch(function(){toast('Erro ao enviar foto',true);});
+        });
+    }
+    if(pendentes===0) salvar();
+}
+function excluirDif(i){
+    confirmar('Excluir este diferencial?',_difsData[i].titulo,function(){
+        _difsData.splice(i,1); renderDiferenciais(); salvarDiferenciaisJSON(); toast('Diferencial excluído!');
+    });
+}
+function salvarDiferenciaisJSON(){
+    var b64; try{b64=btoa(unescape(encodeURIComponent(JSON.stringify(_difsData,null,2))));}catch(e){toast('Erro ao codificar',true);return;}
+    fetch('/salvar-texto',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pasta:PASTA_CONTEUDO,nome:'diferenciais.json',rawmode:'1',base64:b64})})
+    .then(function(r){if(!r.ok) throw 0; toast('Diferenciais salvos!');}).catch(function(){toast('Erro ao salvar diferenciais',true);});
 }
 
 // ── CONTEÚDO JSON ──
 function carregarConteudo(){
     fetch('/files/'+PASTA_CONTEUDO+'/conteudo.json?v='+Date.now())
-        .then(function(r){ if(!r.ok) throw 0; return r.json(); })
-        .then(function(d){
-            if(d.titulo)       document.getElementById('fTitulo').value      = d.titulo;
-            if(d.subtitulo)    document.getElementById('fSubtitulo').value   = d.subtitulo;
-            if(d.faixaEtaria)  document.getElementById('fFaixa').value       = d.faixaEtaria;
-            if(d.turno)        document.getElementById('fTurno').value       = d.turno;
-            if(d.descricao)    document.getElementById('fDescricao').value   = d.descricao;
-            if(d.componentes)  document.getElementById('fComponentes').value = d.componentes;
-            if(d.diferenciais) setDiferenciais(d.diferenciais);
-        })
-        .catch(function(){
-            document.getElementById('fTitulo').value      = DEF_TITULO;
-            document.getElementById('fSubtitulo').value   = DEF_SUBTITULO;
-            document.getElementById('fFaixa').value       = DEF_FAIXA;
-            document.getElementById('fTurno').value       = DEF_TURNO;
-            document.getElementById('fDescricao').value   = 'Os Anos Finais do Ensino Fundamental — do 6º ao 9º ano — são um período de grande transformação. O aluno aprofunda conhecimentos, desenvolve pensamento crítico e se prepara para os desafios do Ensino Médio.\n\nOferecemos metodologias ativas, projetos interdisciplinares e acompanhamento pedagógico individualizado, sempre com base nos valores cristãos que norteiam nossa instituição.';
-            document.getElementById('fComponentes').value = 'Língua Portuguesa, Matemática, Ciências da Natureza, Ciências Humanas, Artes, Educação Física, Língua Inglesa, Ensino Religioso';
-        });
+    .then(function(r){if(!r.ok) throw 0; return r.json();})
+    .then(function(d){
+        if(d.versiculo)    document.getElementById('fVersiculo').value=d.versiculo;
+        if(d.versiculoRef) document.getElementById('fVersiculoRef').value=d.versiculoRef;
+    }).catch(function(){
+        document.getElementById('fVersiculo').value='Porque eu bem sei os planos que tenho para vós, diz o Senhor; planos de paz e não de mal, para vos dar um futuro e uma esperança.';
+        document.getElementById('fVersiculoRef').value='Jeremias 29:11';
+    });
 }
-
 function salvarConteudo(){
-    var data = {
-        titulo:       document.getElementById('fTitulo').value.trim(),
-        subtitulo:    document.getElementById('fSubtitulo').value.trim(),
-        faixaEtaria:  document.getElementById('fFaixa').value.trim(),
-        turno:        document.getElementById('fTurno').value.trim(),
-        descricao:    document.getElementById('fDescricao').value.trim(),
-        componentes:  document.getElementById('fComponentes').value.trim(),
-        diferenciais: getDiferenciais()
-    };
-    var b64;
-    try { b64 = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))); }
-    catch(e){ toast('Erro ao codificar conteúdo', true); return; }
-    fetch('/salvar-texto',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({pasta:PASTA_CONTEUDO, nome:'conteudo.json', rawmode:'1', base64:b64})
-    }).then(function(r){return r.json();})
-      .then(function(res){
-          if(res.ok) toast('Salvo! O portal atualiza em até 30 segundos.');
-          else toast('Erro: '+(res.erro||'?'), true);
-      })
-      .catch(function(){ toast('Erro ao salvar', true); });
+    var data={versiculo:document.getElementById('fVersiculo').value.trim(),versiculoRef:document.getElementById('fVersiculoRef').value.trim()};
+    var b64; try{b64=btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2))));}catch(e){toast('Erro ao codificar conteúdo',true);return;}
+    fetch('/salvar-texto',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pasta:PASTA_CONTEUDO,nome:'conteudo.json',rawmode:'1',base64:b64})})
+    .then(function(r){return r.json();})
+    .then(function(res){if(res.ok) toast('Salvo! O portal atualiza em até 30 segundos.'); else toast('Erro: '+(res.erro||'?'),true);})
+    .catch(function(){toast('Erro ao salvar',true);});
 }
 
-// ── INIT ──
+// ── INIT (escalonado para não sobrecarregar o servidor) ──
+(function(){
+    var emojis=['🎨','📖','🕐','🏃','🙏','🎵','🔬','🏆','🌱','💡','🎯','🤝','📚','✏️','🎭','🏅','🌟','💪','🎲','🖼️','🎓','🌍','🤸','🧩'];
+    var grid=document.getElementById('mDifEmojisGrid');
+    if(grid){ emojis.forEach(function(e){ var btn=document.createElement('button'); btn.type='button'; btn.title=e; btn.textContent=e; btn.style.cssText='width:34px;height:34px;border-radius:.5rem;border:1.5px solid rgba(125,39,40,.15);background:#fdf8f5;font-size:1.2rem;cursor:pointer;transition:.15s;line-height:1;'; btn.onmouseover=function(){this.style.background='rgba(211,51,39,.1)';this.style.borderColor='#d33327';}; btn.onmouseout=function(){this.style.background='#fdf8f5';this.style.borderColor='rgba(125,39,40,.15)';}; btn.onclick=function(){document.getElementById('mDifIcone').value=e;}; grid.appendChild(btn); }); }
+})();
 carregarBanner();
-carregarGaleria();
-carregarConteudo();
-renderDiferenciais();</script>
+setTimeout(carregarGaleria,    600);
+setTimeout(carregarLazer,     1200);
+setTimeout(carregarProposta,  2400);
+setTimeout(carregarConteudo,  3000);
+setTimeout(carregarDiferenciais, 3600);
+</script>
+
+<!-- MODAL DIFERENCIAL -->
+<div id="modalDifAdmOv" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:1.4rem;padding:2rem;max-width:460px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:90vh;overflow-y:auto;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+            <h3 id="mDifTitle" style="font-family:'Poppins',sans-serif;font-size:1.1rem;font-weight:800;color:#7d2728;"><i class="fas fa-star" style="color:#fdcd62;margin-right:8px;"></i>Novo Diferencial</h3>
+            <button onclick="fecharModalDifAdmin()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#aaa;line-height:1;">✕</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:1rem;">
+            <div>
+                <label style="font-size:.82rem;font-weight:700;color:#5a3a2e;display:block;margin-bottom:.3rem;">Ícone (emoji)</label>
+                <div style="display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;">
+                    <input id="mDifIcone" type="text" class="field-input" placeholder="🎨" style="width:70px;font-size:1.6rem;text-align:center;padding:.4rem;">
+                    <div id="mDifEmojisGrid" style="display:flex;flex-wrap:wrap;gap:.3rem;"></div>
+                </div>
+                <div style="font-size:.7rem;color:#bbb;margin-top:.3rem;">Clique num emoji ou cole/digite outro no campo</div>
+                <div style="display:flex;align-items:center;gap:.6rem;margin-top:.8rem;">
+                    <div style="flex:1;height:1px;background:rgba(125,39,40,.12);"></div>
+                    <span style="font-size:.72rem;color:#bbb;font-weight:600;white-space:nowrap;">OU use uma imagem como ícone</span>
+                    <div style="flex:1;height:1px;background:rgba(125,39,40,.12);"></div>
+                </div>
+                <div style="font-size:.7rem;color:#888;margin:.4rem 0 .5rem;">Dimensões recomendadas: <strong>80 × 80 px</strong> — PNG com fundo transparente</div>
+                <div id="mDifIconePreviewBox" style="display:none;align-items:center;gap:.6rem;margin-bottom:.5rem;">
+                    <div style="width:72px;height:72px;border-radius:.7rem;border:1.5px solid #e0d4cb;background:#fdf8f5;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+                        <img id="mDifIconePreview" src="" style="width:100%;height:100%;object-fit:contain;">
+                    </div>
+                    <button type="button" onclick="removerIconeImg()" style="font-size:.75rem;color:#c0392b;background:none;border:none;cursor:pointer;font-weight:700;"><i class="fas fa-times"></i> Remover</button>
+                </div>
+                <button type="button" onclick="document.getElementById('mDifIconeFile').click()" style="width:100%;padding:8px;border:2px dashed rgba(211,51,39,.3);border-radius:0.8rem;background:rgba(211,51,39,.04);color:#d33327;font-weight:700;cursor:pointer;font-size:0.85rem;font-family:'Inter',sans-serif;transition:.2s;" onmouseover="this.style.background='rgba(211,51,39,.09)'" onmouseout="this.style.background='rgba(211,51,39,.04)'">
+                    <i class="fas fa-upload"></i> <span id="mDifIconeFileLabel">Selecionar Imagem</span>
+                </button>
+                <input type="file" id="mDifIconeFile" accept="image/*" style="display:none" onchange="_difPreviewIcone(this)">
+            </div>
+            <div>
+                <label style="font-size:.82rem;font-weight:700;color:#5a3a2e;display:block;margin-bottom:.3rem;">Título *</label>
+                <input id="mDifTitulo" type="text" class="field-input" placeholder="Ex: Ciências na Prática">
+            </div>
+            <div>
+                <label style="font-size:.82rem;font-weight:700;color:#5a3a2e;display:block;margin-bottom:.3rem;">Descrição curta (exibida no card)</label>
+                <textarea id="mDifDesc" class="field-input" rows="2" placeholder="Breve descrição para o card do portal" style="resize:vertical;"></textarea>
+            </div>
+            <div>
+                <label style="font-size:.82rem;font-weight:700;color:#5a3a2e;display:block;margin-bottom:.3rem;">Texto completo (modal "Saiba mais")</label>
+                <textarea id="mDifTexto" class="field-input" rows="4" placeholder="Texto detalhado exibido ao clicar em Saiba mais" style="resize:vertical;"></textarea>
+            </div>
+            <div>
+                <label style="font-size:.82rem;font-weight:700;color:#5a3a2e;display:block;margin-bottom:.3rem;">Foto do modal (opcional)</label>
+                <div id="mDifPreviewBox" style="display:none;margin-bottom:8px;border-radius:0.8rem;overflow:hidden;border:1.5px solid #e0d4cb;">
+                    <img id="mDifPreview" src="" style="width:100%;max-height:180px;object-fit:cover;display:block;">
+                </div>
+                <button type="button" onclick="document.getElementById('mDifFile').click()" style="width:100%;padding:10px;border:2px dashed rgba(211,51,39,.3);border-radius:0.8rem;background:rgba(211,51,39,.04);color:#d33327;font-weight:700;cursor:pointer;font-size:0.88rem;font-family:'Inter',sans-serif;transition:.2s;" onmouseover="this.style.background='rgba(211,51,39,.09)'" onmouseout="this.style.background='rgba(211,51,39,.04)'">
+                    <i class="fas fa-image"></i> <span id="mDifFileLabel">Selecionar Foto</span>
+                </button>
+                <input type="file" id="mDifFile" accept="image/*" style="display:none" onchange="_difPreviewFoto(this)">
+            </div>
+            <div style="display:flex;gap:.7rem;margin-top:.5rem;">
+                <button onclick="fecharModalDifAdmin()" style="flex:1;padding:.75rem;border-radius:.8rem;border:2px solid #ddd;background:#f9f9f9;cursor:pointer;font-weight:700;color:#888;">Cancelar</button>
+                <button onclick="confirmarModalDifAdmin()" style="flex:2;padding:.75rem;border-radius:.8rem;border:none;background:linear-gradient(135deg,#d33327,#7d2728);color:#fff;cursor:pointer;font-weight:800;font-size:1rem;"><i class="fas fa-save"></i> Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL ESPAÇO (LAZER/ESTRUTURA) -->
+<div id="modalLazerOv" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:1.4rem;padding:2rem;max-width:460px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:90vh;overflow-y:auto;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+            <h3 id="mLazerTitle" style="font-family:'Poppins',sans-serif;font-size:1.1rem;font-weight:800;color:#7d2728;"><i class="fas fa-building" style="color:#fdcd62;margin-right:8px;"></i>Novo Espaço</h3>
+            <button onclick="fecharModalLazer()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#aaa;line-height:1;">✕</button>
+        </div>
+        <div style="margin-bottom:1rem;">
+            <label style="display:block;font-size:0.82rem;font-weight:700;color:#7d2728;margin-bottom:5px;">Título do espaço <span style="color:#d33327;">*</span></label>
+            <input id="mLazerNome" type="text" placeholder="Ex: Laboratório, Biblioteca, Quadra..." style="width:100%;padding:10px 12px;border:1.5px solid #e0d4cb;border-radius:0.8rem;font-size:0.92rem;font-family:'Inter',sans-serif;color:#2d2d2d;outline:none;transition:.2s;" onfocus="this.style.borderColor='#d33327'" onblur="this.style.borderColor='#e0d4cb'">
+        </div>
+        <div style="margin-bottom:1rem;">
+            <label style="display:block;font-size:0.82rem;font-weight:700;color:#7d2728;margin-bottom:5px;">Descrição</label>
+            <textarea id="mLazerDesc" rows="3" placeholder="Descreva o espaço..." style="width:100%;padding:10px 12px;border:1.5px solid #e0d4cb;border-radius:0.8rem;font-size:0.88rem;font-family:'Inter',sans-serif;color:#2d2d2d;resize:vertical;outline:none;transition:.2s;" onfocus="this.style.borderColor='#d33327'" onblur="this.style.borderColor='#e0d4cb'"></textarea>
+        </div>
+        <div style="margin-bottom:1.5rem;">
+            <label id="mLazerImgLabel" style="display:block;font-size:0.82rem;font-weight:700;color:#7d2728;margin-bottom:5px;">Imagem *</label>
+            <div id="mLazerPreviewBox" style="display:none;margin-bottom:8px;border-radius:0.8rem;overflow:hidden;border:1.5px solid #e0d4cb;"><img id="mLazerPreview" src="" style="width:100%;max-height:180px;object-fit:cover;display:block;"></div>
+            <button onclick="document.getElementById('mLazerFile').click()" style="width:100%;padding:10px;border:2px dashed rgba(211,51,39,.3);border-radius:0.8rem;background:rgba(211,51,39,.04);color:#d33327;font-weight:700;cursor:pointer;font-size:0.88rem;font-family:'Inter',sans-serif;transition:.2s;" onmouseover="this.style.background='rgba(211,51,39,.09)'" onmouseout="this.style.background='rgba(211,51,39,.04)'">
+                <i class="fas fa-image"></i> <span id="mLazerFileLabel">Selecionar Imagem</span>
+            </button>
+            <input type="file" id="mLazerFile" accept="image/*" style="display:none" onchange="_lazerPreview(this)">
+        </div>
+        <div style="display:flex;gap:0.8rem;justify-content:flex-end;">
+            <button onclick="fecharModalLazer()" style="padding:0.65rem 1.4rem;border-radius:0.8rem;border:1.5px solid #ddd;background:#fff;color:#666;font-weight:700;cursor:pointer;font-size:0.88rem;font-family:'Inter',sans-serif;">Cancelar</button>
+            <button id="mLazerBtn" onclick="confirmarModalLazer()" style="padding:0.65rem 1.4rem;border-radius:0.8rem;border:none;background:linear-gradient(135deg,#d33327,#7d2728);color:#fff;font-weight:700;cursor:pointer;font-size:0.88rem;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:7px;"><i class="fas fa-plus"></i> Criar Espaço</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
-
 
