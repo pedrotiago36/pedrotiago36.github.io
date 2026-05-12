@@ -811,12 +811,11 @@ function carregarLazer(){
                     _lazerItens = lista.map(function(img){
                         var k = img.nome.toLowerCase();
                         var defaultTitulo = img.nome.replace(/\.[^.]+$/, '').replace(/_/g, ' ');
-                        var t = tituloMap[k] || defaultTitulo; if(/^[0-9a-f]{8}[-_ ]/i.test(t)||/^[0-9a-f]{8}[-_]/i.test(img.nome)) t = '';
+                        var t = (k in tituloMap) ? tituloMap[k] : defaultTitulo; if(/^[0-9a-f]{8}[-_ ]/i.test(t)||/^[0-9a-f]{8}[-_]/i.test(img.nome)) t = '';
                         return {nome: img.nome, titulo: t, descricao: descMap[k] || ''};
                     });
                     document.getElementById('cnt-lazer').textContent = _lazerItens.length;
                     renderLazerAdmin();
-                    atualizarLazerJSON();
                 });
         })
         .catch(function(){ _lazerItens=[]; renderLazerAdmin(); });
