@@ -452,8 +452,8 @@ document.addEventListener('keydown', function(e) {
 var _estruturaLista = [], _estruturaIdx = 0, _estruturaTimer = null;
 function _estruturaHtml(dados) {
     return dados.map(function(item) {
-        var nome = item.imagem.split('/').pop().replace(/\.[^.]+$/, '').replace(/_/g, ' ');
-        var titulo = item.titulo || nome; if(/^[0-9a-f]{8}-/i.test(titulo)) titulo = 'Espaço';
+        var nomeArq = item.imagem.split('/').pop().replace(/\.[^.]+$/, '');
+        var titulo = item.titulo || ''; if(!titulo || /^[0-9a-f]{8}[-_ ]/i.test(titulo) || /^[0-9a-f]{8}[-_]/i.test(nomeArq)) titulo = 'Espaço';
         var desc = item.descricao || '';
         return '<div class="estrutura-slide-item">' +
                '<img src="/files/' + item.imagem + '" alt="' + titulo + '" loading="lazy">' +
@@ -475,9 +475,9 @@ function renderEstrutura(dados) {
 
     var icons = ['🏫','📚','⚽','🔬','💻','🎨','🏃','🎭','🌿','🎵'];
     var itemsHtml = dados.map(function(item, i) {
-        var nome = item.imagem.split('/').pop().replace(/\.[^.]+$/, '').replace(/_/g, ' ');
-        var titulo = item.titulo || nome; if(/^[0-9a-f]{8}-/i.test(titulo)) titulo = 'Espaço';
-        var chave = nome.toLowerCase().replace(/\s/g, '');
+        var nomeArq = item.imagem.split('/').pop().replace(/\.[^.]+$/, '');
+        var titulo = item.titulo || ''; if(!titulo || /^[0-9a-f]{8}[-_ ]/i.test(titulo) || /^[0-9a-f]{8}[-_]/i.test(nomeArq)) titulo = 'Espaço';
+        var chave = nomeArq.toLowerCase().replace(/[-_\s]/g, '');
         var icone = icons[i % icons.length];
         return '<div class="estrutura-item' + (i===0?' ativo':'') + '" data-chave="' + chave + '" data-idx="' + i + '" onclick="_estruturaIrIdx(this)">' +
                '<div class="estrutura-item-icon">' + icone + '</div>' +
