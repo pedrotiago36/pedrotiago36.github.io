@@ -597,16 +597,20 @@ function confirmarModalLazer(){
         if(_lazerIconeRemover){ cb(''); return; }
         if(!inpIcone.files||!inpIcone.files[0]){ cb(iconeAtual||''); return; }
         var fi=inpIcone.files[0];
-        var oldIconeNomes=_lazerItens.map(function(x){return x.icone?(x.icone).split('/').pop():'';}).filter(Boolean);
-        lerArq(fi,function(src){
-            fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:fi.name,pasta:PASTA_LAZER_ICONES,rawmode:'1',base64:src})})
-            .then(function(r){return r.json();})
-            .then(function(){
-                fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER_ICONES)+'&raw=1')
+        fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER_ICONES)+'&raw=1')
+        .then(function(r){return r.ok?r.json():[];}).catch(function(){return[];})
+        .then(function(antesLista){
+            var antesNomes=antesLista.map(function(x){return x.nome;});
+            lerArq(fi,function(src){
+                fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:fi.name,pasta:PASTA_LAZER_ICONES,rawmode:'1',base64:src})})
                 .then(function(r){return r.json();})
-                .then(function(lista){ var novo=null;for(var i=0;i<lista.length;i++){if(oldIconeNomes.indexOf(lista[i].nome)<0){novo=lista[i].nome;break;}} cb(novo?LAZER_ICONES_PREFIX+novo:LAZER_ICONES_PREFIX+fi.name); })
-                .catch(function(){ cb(LAZER_ICONES_PREFIX+fi.name); });
-            }).catch(function(){ cb(iconeAtual||''); });
+                .then(function(){
+                    fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER_ICONES)+'&raw=1')
+                    .then(function(r){return r.json();})
+                    .then(function(lista){ var novo=null;for(var i=0;i<lista.length;i++){if(antesNomes.indexOf(lista[i].nome)<0){novo=lista[i].nome;break;}} cb(novo?LAZER_ICONES_PREFIX+novo:iconeAtual||''); })
+                    .catch(function(){ cb(iconeAtual||''); });
+                }).catch(function(){ cb(iconeAtual||''); });
+            });
         });
     }
     function _salvar(item, isNew){
