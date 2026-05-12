@@ -493,11 +493,11 @@ function carregarLazer(){
     .then(function(r){return r.ok?r.json():[];}).catch(function(){return[];})
     .then(function(jsonEntries){
         var tituloMap={}, descMap={};
-        if(Array.isArray(jsonEntries)){ jsonEntries.forEach(function(e){ var nome=(e.imagem||'').split('/').pop(); tituloMap[nome]=e.titulo||''; descMap[nome]=e.descricao||''; }); }
+        if(Array.isArray(jsonEntries)){ jsonEntries.forEach(function(e){ var nome=(e.imagem||'').split('/').pop().toLowerCase(); tituloMap[nome]=e.titulo||''; descMap[nome]=e.descricao||''; }); }
         return fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER)+'&raw=1')
         .then(function(r){return r.json();})
         .then(function(lista){
-            _lazerItens=lista.map(function(img){ var def=img.nome.replace(/\.[^.]+$/,'').replace(/_/g,' '); var t=tituloMap[img.nome]||def; if(/^[0-9a-f]{8}-/i.test(t))t=''; return{nome:img.nome,titulo:t,descricao:descMap[img.nome]||''}; });
+            _lazerItens=lista.map(function(img){ var k=img.nome.toLowerCase(); var def=img.nome.replace(/\.[^.]+$/,'').replace(/_/g,' '); var t=tituloMap[k]||def; if(/^[0-9a-f]{8}[-_ ]/i.test(t)||/^[0-9a-f]{8}[-_]/i.test(img.nome))t=''; return{nome:img.nome,titulo:t,descricao:descMap[k]||''}; });
             document.getElementById('cnt-lazer').textContent=_lazerItens.length;
             renderLazerAdmin();
             atualizarLazerJSON();

@@ -800,7 +800,7 @@ function carregarLazer(){
             var tituloMap = {}, descMap = {};
             if(Array.isArray(jsonEntries)){
                 jsonEntries.forEach(function(e){
-                    var nome = (e.imagem||'').split('/').pop();
+                    var nome = (e.imagem||'').split('/').pop().toLowerCase();
                     tituloMap[nome] = e.titulo || '';
                     descMap[nome]   = e.descricao || '';
                 });
@@ -809,9 +809,10 @@ function carregarLazer(){
                 .then(function(r){ return r.json(); })
                 .then(function(lista){
                     _lazerItens = lista.map(function(img){
+                        var k = img.nome.toLowerCase();
                         var defaultTitulo = img.nome.replace(/\.[^.]+$/, '').replace(/_/g, ' ');
-                        var t = tituloMap[img.nome] || defaultTitulo; if(/^[0-9a-f]{8}-/i.test(t)) t = '';
-                        return {nome: img.nome, titulo: t, descricao: descMap[img.nome] || ''};
+                        var t = tituloMap[k] || defaultTitulo; if(/^[0-9a-f]{8}[-_ ]/i.test(t)||/^[0-9a-f]{8}[-_]/i.test(img.nome)) t = '';
+                        return {nome: img.nome, titulo: t, descricao: descMap[k] || ''};
                     });
                     document.getElementById('cnt-lazer').textContent = _lazerItens.length;
                     renderLazerAdmin();
