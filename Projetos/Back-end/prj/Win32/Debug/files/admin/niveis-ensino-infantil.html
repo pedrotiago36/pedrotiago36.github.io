@@ -810,7 +810,8 @@ function carregarLazer(){
                 .then(function(lista){
                     _lazerItens = lista.map(function(img){
                         var defaultTitulo = img.nome.replace(/\.[^.]+$/, '').replace(/_/g, ' ');
-                        return {nome: img.nome, titulo: tituloMap[img.nome] || defaultTitulo, descricao: descMap[img.nome] || ''};
+                        var t = tituloMap[img.nome] || defaultTitulo; if(/^[0-9a-f]{8}-/i.test(t)) t = '';
+                        return {nome: img.nome, titulo: t, descricao: descMap[img.nome] || ''};
                     });
                     document.getElementById('cnt-lazer').textContent = _lazerItens.length;
                     renderLazerAdmin();
