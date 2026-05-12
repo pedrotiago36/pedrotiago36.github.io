@@ -489,8 +489,9 @@ function salvarProposta(){
 }
 
 // ── LAZER / ESTRUTURA ──
-var _lazerItens=[];
+var _lazerItens=[], _lazerSeq=0;
 function carregarLazer(){
+    var seq=++_lazerSeq;
     fetch('/files/'+LAZER_JSON_PASTA+'/'+LAZER_JSON_NOME+'?v='+Date.now())
     .then(function(r){return r.ok?r.json():[];}).catch(function(){return[];})
     .then(function(jsonEntries){
@@ -499,11 +500,12 @@ function carregarLazer(){
         return fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER)+'&raw=1')
         .then(function(r){return r.json();})
         .then(function(lista){
+            if(seq!==_lazerSeq) return;
             _lazerItens=lista.map(function(img){ var k=img.nome.toLowerCase(); var def=img.nome.replace(/\.[^.]+$/,'').replace(/_/g,' '); var t=(k in tituloMap)?tituloMap[k]:def; if(/^[0-9a-f]{8}[-_ ]/i.test(t))t=''; return{nome:img.nome,titulo:t,descricao:descMap[k]||'',icone:iconeMap[k]||''}; });
             document.getElementById('cnt-lazer').textContent=_lazerItens.length;
             renderLazerAdmin();
         });
-    }).catch(function(){ _lazerItens=[]; renderLazerAdmin(); });
+    }).catch(function(){ if(seq!==_lazerSeq)return; _lazerItens=[]; renderLazerAdmin(); });
 }
 function renderLazerAdmin(){
     var cnt=_lazerItens.length;
@@ -614,10 +616,12 @@ function confirmarModalLazer(){
         });
     }
     function _salvar(item, isNew){
+        _lazerSeq++;
         fecharModalLazer();
         if(isNew) _lazerItens.push(item);
         atualizarLazerJSON(); renderLazerAdmin();
         toast(isNew?'"'+item.titulo+'" adicionado! O portal atualiza em até 30 segundos.':'Alterações salvas!');
+        carregarLazer();
     }
 
     if(_lazerEditIdx===-1){

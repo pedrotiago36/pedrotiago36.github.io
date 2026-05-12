@@ -791,10 +791,11 @@ function salvarProposta(){
 }
 
 // ── LAZER ──
-var _lazerItens = [];
+var _lazerItens = [], _lazerSeq = 0;
 var _lazerSaveTimer = null;
 
 function carregarLazer(){
+    var seq = ++_lazerSeq;
     fetch('/files/'+LAZER_JSON_PASTA+'/'+LAZER_JSON_NOME+'?v='+Date.now())
         .then(function(r){ return r.ok ? r.json() : []; })
         .catch(function(){ return []; })
@@ -811,6 +812,7 @@ function carregarLazer(){
             return fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER)+'&raw=1')
                 .then(function(r){ return r.json(); })
                 .then(function(lista){
+                    if(seq !== _lazerSeq) return;
                     _lazerItens = lista.map(function(img){
                         var k = img.nome.toLowerCase();
                         var defaultTitulo = img.nome.replace(/\.[^.]+$/, '').replace(/_/g, ' ');
@@ -821,7 +823,7 @@ function carregarLazer(){
                     renderLazerAdmin();
                 });
         })
-        .catch(function(){ _lazerItens=[]; renderLazerAdmin(); });
+        .catch(function(){ if(seq !== _lazerSeq) return; _lazerItens=[]; renderLazerAdmin(); });
 }
 
 function renderLazerAdmin(){
@@ -963,10 +965,12 @@ function confirmarModalLazer(){
         });
     }
     function _salvar(item, isNew){
+        _lazerSeq++;
         fecharModalLazer();
         if(isNew) _lazerItens.push(item);
         atualizarLazerJSON(); renderLazerAdmin();
         toast(isNew?'"'+item.titulo+'" adicionado! O portal atualiza em até 30 segundos.':'Alterações salvas! O portal atualiza em até 30 segundos.');
+        carregarLazer();
     }
 
     if(_lazerEditIdx === -1){
