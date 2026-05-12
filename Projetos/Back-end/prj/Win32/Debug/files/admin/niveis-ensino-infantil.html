@@ -910,16 +910,18 @@ function confirmarModalLazer(){
         // ── ADICIONAR ──
         if(!inp.files||!inp.files[0]){ toast('Selecione uma imagem',true); return; }
         var f = inp.files[0];
+        var oldNomes = _lazerItens.map(function(i){return i.nome;});
         lerArq(f,function(src){
             fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},
                 body:JSON.stringify({nome:f.name, pasta:PASTA_LAZER, rawmode:'1', base64:src})
             }).then(function(r){return r.json();})
               .then(function(){
-                  fecharModalLazer();
-                  _lazerItens.push({nome:f.name, titulo:titulo, descricao:desc});
-                  atualizarLazerJSON();
-                  renderLazerAdmin();
-                  toast('"'+titulo+'" adicionado! O portal atualiza em até 30 segundos.');
+                  fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER)+'&raw=1')
+                  .then(function(r){return r.json();})
+                  .then(function(lista){
+                      var novo=null;for(var i=0;i<lista.length;i++){if(oldNomes.indexOf(lista[i].nome)<0){novo=lista[i].nome;break;}}
+                      fecharModalLazer();_lazerItens.push({nome:novo||f.name,titulo:titulo,descricao:desc});atualizarLazerJSON();renderLazerAdmin();toast('"'+titulo+'" adicionado! O portal atualiza em até 30 segundos.');
+                  }).catch(function(){fecharModalLazer();_lazerItens.push({nome:f.name,titulo:titulo,descricao:desc});atualizarLazerJSON();renderLazerAdmin();toast('"'+titulo+'" adicionado! O portal atualiza em até 30 segundos.');});
               })
               .catch(function(){ toast('Erro ao enviar imagem',true); });
         });
@@ -931,21 +933,22 @@ function confirmarModalLazer(){
         item.descricao = desc;
         if(inp.files && inp.files[0]){
             var f = inp.files[0], oldNome = item.nome;
+            var existNomes = _lazerItens.map(function(i){return i.nome;});
             lerArq(f,function(src){
                 fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},
                     body:JSON.stringify({nome:f.name, pasta:PASTA_LAZER, rawmode:'1', base64:src})
                 }).then(function(r){return r.json();})
                   .then(function(){
-                      if(oldNome !== f.name){
-                          fetch('/deletar',{method:'POST',headers:{'Content-Type':'application/json'},
-                              body:JSON.stringify({nome:oldNome, pasta:PASTA_LAZER, rawmode:'1'})
-                          }).catch(function(){});
-                          item.nome = f.name;
-                      }
-                      fecharModalLazer();
-                      atualizarLazerJSON();
-                      renderLazerAdmin();
-                      toast('Alterações salvas! O portal atualiza em até 30 segundos.');
+                      fetch('/deletar',{method:'POST',headers:{'Content-Type':'application/json'},
+                          body:JSON.stringify({nome:oldNome, pasta:PASTA_LAZER, rawmode:'1'})
+                      }).catch(function(){});
+                      fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER)+'&raw=1')
+                      .then(function(r){return r.json();})
+                      .then(function(lista){
+                          var novo=null;for(var i=0;i<lista.length;i++){if(existNomes.indexOf(lista[i].nome)<0){novo=lista[i].nome;break;}}
+                          if(novo)item.nome=novo;
+                          fecharModalLazer();atualizarLazerJSON();renderLazerAdmin();toast('Alterações salvas! O portal atualiza em até 30 segundos.');
+                      }).catch(function(){fecharModalLazer();atualizarLazerJSON();renderLazerAdmin();toast('Alterações salvas! O portal atualiza em até 30 segundos.');});
                   })
                   .catch(function(){ toast('Erro ao trocar imagem',true); });
             });
