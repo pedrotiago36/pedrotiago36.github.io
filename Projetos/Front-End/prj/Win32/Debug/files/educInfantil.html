@@ -703,8 +703,11 @@ function renderLazer(dados) {
     var cardsHtml = dados.map(function(item, i) {
         var titulo = item.titulo || '';
         var desc = item.descricao || '';
+        var icone = item.icone
+            ? '<img src="/files/'+item.icone+'" alt="" style="width:28px;height:28px;object-fit:contain;">'
+            : icons[i % icons.length];
         return '<div class="lazer-item' + (i === 0 ? ' ativo' : '') + '" data-idx="' + i + '" onclick="_lazerIrIdx(this)">' +
-               '<div class="lazer-item-icon">' + icons[i % icons.length] + '</div>' +
+               '<div class="lazer-item-icon">' + icone + '</div>' +
                '<div><h4>' + titulo + '</h4>' + (desc ? '<p>' + desc + '</p>' : '') + '</div></div>';
     }).join('');
     document.getElementById('lazerCards').innerHTML = cardsHtml || '<p style="color:rgba(125,39,40,0.3);font-size:0.85rem;padding:1rem 0;">Nenhum espaço cadastrado.</p>';

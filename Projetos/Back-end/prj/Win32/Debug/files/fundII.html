@@ -478,7 +478,9 @@ function renderEstrutura(dados) {
         var nomeArq = item.imagem.split('/').pop().replace(/\.[^.]+$/, '');
         var titulo = item.titulo || ''; if(!titulo || /^[0-9a-f]{8}[-_ ]/i.test(titulo) || /^[0-9a-f]{8}[-_]/i.test(nomeArq)) titulo = 'Espaço';
         var chave = nomeArq.toLowerCase().replace(/[-_\s]/g, '');
-        var icone = icons[i % icons.length];
+        var icone = item.icone
+            ? '<img src="/files/'+item.icone+'" alt="" style="width:28px;height:28px;object-fit:contain;">'
+            : icons[i % icons.length];
         return '<div class="estrutura-item' + (i===0?' ativo':'') + '" data-chave="' + chave + '" data-idx="' + i + '" onclick="_estruturaIrIdx(this)">' +
                '<div class="estrutura-item-icon">' + icone + '</div>' +
                '<div><h4>' + titulo + '</h4>' + (item.descricao ? '<p>' + item.descricao + '</p>' : '') + '</div></div>';

@@ -269,10 +269,12 @@ var GAL_PREFIX        = 'fundI/galeria/';
 var GAL_JSON_PASTA    = 'fundI';
 var GAL_JSON_NOME     = 'galeria.json';
 var PASTA_CONTEUDO    = 'fundI';
-var PASTA_LAZER       = 'fundI/estrutura';
-var LAZER_JSON_PASTA  = 'fundI';
-var LAZER_JSON_NOME   = 'estrutura.json';
-var LAZER_PREFIX      = 'fundI/estrutura/';
+var PASTA_LAZER         = 'fundI/estrutura';
+var LAZER_JSON_PASTA    = 'fundI';
+var LAZER_JSON_NOME     = 'estrutura.json';
+var LAZER_PREFIX        = 'fundI/estrutura/';
+var PASTA_LAZER_ICONES  = 'fundI/estrutura/icones';
+var LAZER_ICONES_PREFIX = 'fundI/estrutura/icones/';
 
 // ── HELPERS ──
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -492,12 +494,12 @@ function carregarLazer(){
     fetch('/files/'+LAZER_JSON_PASTA+'/'+LAZER_JSON_NOME+'?v='+Date.now())
     .then(function(r){return r.ok?r.json():[];}).catch(function(){return[];})
     .then(function(jsonEntries){
-        var tituloMap={}, descMap={};
-        if(Array.isArray(jsonEntries)){ jsonEntries.forEach(function(e){ var nome=(e.imagem||'').split('/').pop().toLowerCase(); tituloMap[nome]=e.titulo||''; descMap[nome]=e.descricao||''; }); }
+        var tituloMap={}, descMap={}, iconeMap={};
+        if(Array.isArray(jsonEntries)){ jsonEntries.forEach(function(e){ var nome=(e.imagem||'').split('/').pop().toLowerCase(); tituloMap[nome]=e.titulo||''; descMap[nome]=e.descricao||''; iconeMap[nome]=e.icone||''; }); }
         return fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER)+'&raw=1')
         .then(function(r){return r.json();})
         .then(function(lista){
-            _lazerItens=lista.map(function(img){ var k=img.nome.toLowerCase(); var def=img.nome.replace(/\.[^.]+$/,'').replace(/_/g,' '); var t=(k in tituloMap)?tituloMap[k]:def; if(/^[0-9a-f]{8}[-_ ]/i.test(t)||/^[0-9a-f]{8}[-_]/i.test(img.nome))t=''; return{nome:img.nome,titulo:t,descricao:descMap[k]||''}; });
+            _lazerItens=lista.map(function(img){ var k=img.nome.toLowerCase(); var def=img.nome.replace(/\.[^.]+$/,'').replace(/_/g,' '); var t=(k in tituloMap)?tituloMap[k]:def; if(/^[0-9a-f]{8}[-_ ]/i.test(t)||/^[0-9a-f]{8}[-_]/i.test(img.nome))t=''; return{nome:img.nome,titulo:t,descricao:descMap[k]||'',icone:iconeMap[k]||''}; });
             document.getElementById('cnt-lazer').textContent=_lazerItens.length;
             renderLazerAdmin();
         });
@@ -511,17 +513,25 @@ function renderLazerAdmin(){
     var dica=document.getElementById('lazerDica'); if(dica) dica.style.display=cnt?'none':'block';
     g.innerHTML=_lazerItens.map(function(item,i){
         var url='/files/'+PASTA_LAZER+'/'+item.nome;
-        return '<div class="gal-card"><img src="'+esc(url)+'?v='+Date.now()+'" alt="'+esc(item.titulo)+'" style="width:100%;height:160px;object-fit:contain;background:#f5f0eb;display:block;" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="gal-ph" style="display:none"><i class="fas fa-image"></i></div><div class="gal-info"><div style="font-weight:700;font-size:0.85rem;color:#3d1a1b;margin-bottom:3px;">'+esc(item.titulo||'(sem título)')+'</div>'+(item.descricao?'<div style="font-size:0.78rem;color:#7d5a3a;margin-bottom:8px;line-height:1.4;">'+esc(item.descricao)+'</div>':'<div style="font-size:0.75rem;color:#bbb;margin-bottom:8px;font-style:italic;">sem descrição</div>')+'<div style="display:flex;gap:5px;"><button class="btn-swap" onclick="editarLazer('+i+')" style="flex:1"><i class="fas fa-edit"></i> Editar</button><button class="btn-del" onclick="excluirLazer(\''+escJ(item.nome)+'\')" style="flex:1"><i class="fas fa-trash"></i> Excluir</button></div></div></div>';
+        var iconeTag=item.icone?'<img src="/files/'+esc(item.icone)+'?v='+Date.now()+'" style="width:22px;height:22px;object-fit:contain;vertical-align:middle;margin-left:5px;" title="Ícone personalizado">':'';
+        return '<div class="gal-card"><img src="'+esc(url)+'?v='+Date.now()+'" alt="'+esc(item.titulo)+'" style="width:100%;height:160px;object-fit:contain;background:#f5f0eb;display:block;" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="gal-ph" style="display:none"><i class="fas fa-image"></i></div><div class="gal-info"><div style="font-weight:700;font-size:0.85rem;color:#3d1a1b;margin-bottom:3px;">'+esc(item.titulo||'(sem título)')+iconeTag+'</div>'+(item.descricao?'<div style="font-size:0.78rem;color:#7d5a3a;margin-bottom:8px;line-height:1.4;">'+esc(item.descricao)+'</div>':'<div style="font-size:0.75rem;color:#bbb;margin-bottom:8px;font-style:italic;">sem descrição</div>')+'<div style="display:flex;gap:5px;"><button class="btn-swap" onclick="editarLazer('+i+')" style="flex:1"><i class="fas fa-edit"></i> Editar</button><button class="btn-del" onclick="excluirLazer(\''+escJ(item.nome)+'\')" style="flex:1"><i class="fas fa-trash"></i> Excluir</button></div></div></div>';
     }).join('');
 }
 function atualizarLazerJSON(){
-    var entries=_lazerItens.map(function(item){return{imagem:LAZER_PREFIX+item.nome,titulo:item.titulo,descricao:item.descricao||''};});
+    var entries=_lazerItens.map(function(item){return{imagem:LAZER_PREFIX+item.nome,titulo:item.titulo,descricao:item.descricao||'',icone:item.icone||''};});
     var b64; try{b64=btoa(unescape(encodeURIComponent(JSON.stringify(entries))));}catch(e){return;}
     fetch('/salvar-texto',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pasta:LAZER_JSON_PASTA,nome:LAZER_JSON_NOME,rawmode:'1',base64:b64})}).catch(function(){});
 }
 
 // ── MODAL LAZER ──
-var _lazerEditIdx=-1;
+var _lazerEditIdx=-1, _lazerIconeRemover=false;
+function _resetIconeModal(){
+    document.getElementById('mLazerIconeFile').value='';
+    document.getElementById('mLazerIconePreviewBox').style.display='none';
+    document.getElementById('mLazerIconeRemoverBox').style.display='none';
+    document.getElementById('mLazerIconeLabel').textContent='Selecionar Ícone (opcional)';
+    _lazerIconeRemover=false;
+}
 function abrirModalLazer(){
     _lazerEditIdx=-1;
     document.getElementById('mLazerTitle').textContent='Novo Espaço';
@@ -532,6 +542,7 @@ function abrirModalLazer(){
     document.getElementById('mLazerFileLabel').textContent='Selecionar Imagem';
     document.getElementById('mLazerImgLabel').textContent='Imagem *';
     document.getElementById('mLazerBtn').innerHTML='<i class="fas fa-plus"></i> Criar Espaço';
+    _resetIconeModal();
     document.getElementById('modalLazerOv').style.display='flex';
     setTimeout(function(){document.getElementById('mLazerNome').focus();},80);
 }
@@ -546,6 +557,13 @@ function editarLazer(idx){
     document.getElementById('mLazerFileLabel').textContent='Trocar Imagem (opcional)';
     document.getElementById('mLazerImgLabel').textContent='Imagem';
     document.getElementById('mLazerBtn').innerHTML='<i class="fas fa-save"></i> Salvar Alterações';
+    _resetIconeModal();
+    if(item.icone){
+        document.getElementById('mLazerIconePreview').src='/files/'+item.icone+'?v='+Date.now();
+        document.getElementById('mLazerIconePreviewBox').style.display='block';
+        document.getElementById('mLazerIconeLabel').textContent='Trocar Ícone (opcional)';
+        document.getElementById('mLazerIconeRemoverBox').style.display='block';
+    }
     document.getElementById('modalLazerOv').style.display='flex';
     setTimeout(function(){document.getElementById('mLazerNome').focus();},80);
 }
@@ -555,14 +573,53 @@ function _lazerPreview(inp){
     document.getElementById('mLazerFileLabel').textContent=inp.files[0].name;
     var r=new FileReader(); r.onload=function(e){ document.getElementById('mLazerPreview').src=e.target.result; document.getElementById('mLazerPreviewBox').style.display='block'; }; r.readAsDataURL(inp.files[0]);
 }
+function _lazerIconePreview(inp){
+    if(!inp.files||!inp.files[0]) return;
+    _lazerIconeRemover=false;
+    document.getElementById('mLazerIconeLabel').textContent=inp.files[0].name;
+    var r=new FileReader(); r.onload=function(e){ document.getElementById('mLazerIconePreview').src=e.target.result; document.getElementById('mLazerIconePreviewBox').style.display='block'; document.getElementById('mLazerIconeRemoverBox').style.display='block'; }; r.readAsDataURL(inp.files[0]);
+}
+function _lazerRemoverIcone(){
+    _lazerIconeRemover=true;
+    document.getElementById('mLazerIconeFile').value='';
+    document.getElementById('mLazerIconePreviewBox').style.display='none';
+    document.getElementById('mLazerIconeRemoverBox').style.display='none';
+    document.getElementById('mLazerIconeLabel').textContent='Ícone removido (emoji padrão será usado)';
+}
 function confirmarModalLazer(){
     var titulo=document.getElementById('mLazerNome').value.trim();
     var desc=document.getElementById('mLazerDesc').value.trim();
     var inp=document.getElementById('mLazerFile');
+    var inpIcone=document.getElementById('mLazerIconeFile');
     if(!titulo){ document.getElementById('mLazerNome').focus(); toast('Informe o nome do espaço',true); return; }
+
+    function _uploadIcone(iconeAtual, cb){
+        if(_lazerIconeRemover){ cb(''); return; }
+        if(!inpIcone.files||!inpIcone.files[0]){ cb(iconeAtual||''); return; }
+        var fi=inpIcone.files[0];
+        var oldIconeNomes=_lazerItens.map(function(x){return x.icone?(x.icone).split('/').pop():'';}).filter(Boolean);
+        lerArq(fi,function(src){
+            fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:fi.name,pasta:PASTA_LAZER_ICONES,rawmode:'1',base64:src})})
+            .then(function(r){return r.json();})
+            .then(function(){
+                fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER_ICONES)+'&raw=1')
+                .then(function(r){return r.json();})
+                .then(function(lista){ var novo=null;for(var i=0;i<lista.length;i++){if(oldIconeNomes.indexOf(lista[i].nome)<0){novo=lista[i].nome;break;}} cb(novo?LAZER_ICONES_PREFIX+novo:LAZER_ICONES_PREFIX+fi.name); })
+                .catch(function(){ cb(LAZER_ICONES_PREFIX+fi.name); });
+            }).catch(function(){ cb(iconeAtual||''); });
+        });
+    }
+    function _salvar(item, isNew){
+        fecharModalLazer();
+        if(isNew) _lazerItens.push(item);
+        atualizarLazerJSON(); renderLazerAdmin();
+        toast(isNew?'"'+item.titulo+'" adicionado! O portal atualiza em até 30 segundos.':'Alterações salvas!');
+    }
+
     if(_lazerEditIdx===-1){
         if(!inp.files||!inp.files[0]){ toast('Selecione uma imagem',true); return; }
         var f=inp.files[0];
+        var oldNomes=_lazerItens.map(function(i){return i.nome;});
         lerArq(f,function(src){
             fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:f.name,pasta:PASTA_LAZER,rawmode:'1',base64:src})})
             .then(function(r){return r.json();})
@@ -571,16 +628,18 @@ function confirmarModalLazer(){
                 .then(function(r){return r.json();})
                 .then(function(lista){
                     var novo=null;for(var i=0;i<lista.length;i++){if(oldNomes.indexOf(lista[i].nome)<0){novo=lista[i].nome;break;}}
-                    fecharModalLazer();_lazerItens.push({nome:novo||f.name,titulo:titulo,descricao:desc});atualizarLazerJSON();renderLazerAdmin();toast('"'+titulo+'" adicionado! O portal atualiza em até 30 segundos.');
-                }).catch(function(){fecharModalLazer();_lazerItens.push({nome:f.name,titulo:titulo,descricao:desc});atualizarLazerJSON();renderLazerAdmin();toast('"'+titulo+'" adicionado! O portal atualiza em até 30 segundos.');});
-            })
-            .catch(function(){ toast('Erro ao enviar imagem',true); });
+                    _uploadIcone('',function(icone){ _salvar({nome:novo||f.name,titulo:titulo,descricao:desc,icone:icone},true); });
+                }).catch(function(){
+                    _uploadIcone('',function(icone){ _salvar({nome:f.name,titulo:titulo,descricao:desc,icone:icone},true); });
+                });
+            }).catch(function(){ toast('Erro ao enviar imagem',true); });
         });
     } else {
         var idx=_lazerEditIdx, item=_lazerItens[idx];
         item.titulo=titulo; item.descricao=desc;
         if(inp.files&&inp.files[0]){
             var f=inp.files[0], oldNome=item.nome;
+            var existNomes=_lazerItens.map(function(i){return i.nome;});
             lerArq(f,function(src){
                 fetch('/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:f.name,pasta:PASTA_LAZER,rawmode:'1',base64:src})})
                 .then(function(r){return r.json();})
@@ -591,11 +650,13 @@ function confirmarModalLazer(){
                     .then(function(lista){
                         var novo=null;for(var i=0;i<lista.length;i++){if(existNomes.indexOf(lista[i].nome)<0){novo=lista[i].nome;break;}}
                         if(novo)item.nome=novo;
-                        fecharModalLazer();atualizarLazerJSON();renderLazerAdmin();toast('Alterações salvas!');
-                    }).catch(function(){fecharModalLazer();atualizarLazerJSON();renderLazerAdmin();toast('Alterações salvas!');});
+                        _uploadIcone(item.icone,function(icone){ item.icone=icone; _salvar(item,false); });
+                    }).catch(function(){ _uploadIcone(item.icone,function(icone){ item.icone=icone; _salvar(item,false); }); });
                 }).catch(function(){ toast('Erro ao trocar imagem',true); });
             });
-        } else { fecharModalLazer(); atualizarLazerJSON(); renderLazerAdmin(); toast('Alterações salvas!'); }
+        } else {
+            _uploadIcone(item.icone,function(icone){ item.icone=icone; _salvar(item,false); });
+        }
     }
 }
 function excluirLazer(nome){
@@ -818,6 +879,17 @@ setTimeout(carregarDiferenciais, 3600);
         <div style="margin-bottom:1rem;">
             <label style="display:block;font-size:0.82rem;font-weight:700;color:#7d2728;margin-bottom:5px;">Descrição</label>
             <textarea id="mLazerDesc" rows="3" placeholder="Descreva o espaço..." style="width:100%;padding:10px 12px;border:1.5px solid #e0d4cb;border-radius:0.8rem;font-size:0.88rem;font-family:'Inter',sans-serif;color:#2d2d2d;resize:vertical;outline:none;transition:.2s;" onfocus="this.style.borderColor='#d33327'" onblur="this.style.borderColor='#e0d4cb'"></textarea>
+        </div>
+        <div style="margin-bottom:1rem;">
+            <label style="display:block;font-size:0.82rem;font-weight:700;color:#7d2728;margin-bottom:5px;">Ícone do card <span style="font-weight:400;color:#999;font-size:0.78rem;">(opcional — se não enviado usa emoji)</span></label>
+            <div id="mLazerIconePreviewBox" style="display:none;margin-bottom:8px;text-align:center;"><img id="mLazerIconePreview" src="" style="width:56px;height:56px;object-fit:contain;border-radius:0.6rem;border:1.5px solid #e0d4cb;padding:6px;background:#f9f5f1;"></div>
+            <button onclick="document.getElementById('mLazerIconeFile').click()" style="width:100%;padding:9px;border:2px dashed rgba(125,39,40,.2);border-radius:0.8rem;background:rgba(125,39,40,.03);color:#7d2728;font-weight:700;cursor:pointer;font-size:0.85rem;font-family:'Inter',sans-serif;transition:.2s;" onmouseover="this.style.background='rgba(125,39,40,.08)'" onmouseout="this.style.background='rgba(125,39,40,.03)'">
+                <i class="fas fa-star"></i> <span id="mLazerIconeLabel">Selecionar Ícone (opcional)</span>
+            </button>
+            <input type="file" id="mLazerIconeFile" accept="image/*" style="display:none" onchange="_lazerIconePreview(this)">
+            <div id="mLazerIconeRemoverBox" style="display:none;text-align:right;margin-top:4px;">
+                <button onclick="_lazerRemoverIcone()" style="background:none;border:none;color:#d33327;font-size:0.78rem;cursor:pointer;font-family:'Inter',sans-serif;text-decoration:underline;">✕ Remover ícone (usar emoji)</button>
+            </div>
         </div>
         <div style="margin-bottom:1.5rem;">
             <label id="mLazerImgLabel" style="display:block;font-size:0.82rem;font-weight:700;color:#7d2728;margin-bottom:5px;">Imagem *</label>
