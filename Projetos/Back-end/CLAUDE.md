@@ -53,7 +53,8 @@ Cada nível de ensino tem uma seção "Nossa Estrutura" com cards de imagem + t�
 
 ### JSONs de dados
 - Localização: `Front-End/prj/Win32/Debug/files/<nivel>/estrutura.json`
-- Formato: `[{"imagem":"<nivel>/estrutura/UUID.jpg","titulo":"...","descricao":"...","icone":"<nivel>/estrutura/icones/UUID.png"}]`
+- Formato: `[{"imagem":"<nivel>/estrutura/UUID.jpg","titulo":"...","descricao":"...","icone":"data:image/png;base64,..."}]`
+- **O campo `icone` armazena um data URL base64** — NÃO um caminho de arquivo no servidor.
 
 ### Pastas de constantes nos admins
 ```javascript
@@ -61,8 +62,8 @@ var PASTA_LAZER        = '<nivel>/estrutura';
 var LAZER_PREFIX       = '<nivel>/estrutura/';
 var LAZER_JSON_PASTA   = '<nivel>';
 var LAZER_JSON_NOME    = 'estrutura.json';
-var PASTA_LAZER_ICONES = '<nivel>/estrutura/icones';
-var LAZER_ICONES_PREFIX = '<nivel>/estrutura/icones/';
+var PASTA_LAZER_ICONES = '<nivel>/estrutura/icones';   // declarado mas NÃO usado para upload
+var LAZER_ICONES_PREFIX = '<nivel>/estrutura/icones/'; // só usado para deletar ícones antigos (path format)
 ```
 
 ### tituloMap — regra obrigatória
@@ -71,7 +72,7 @@ var LAZER_ICONES_PREFIX = '<nivel>/estrutura/icones/';
 - UUID check: `if(/^[0-9a-f]{8}[-_ ]/i.test(t)) t = '';` — só no **título**, nunca no nome do arquivo
 - Portal usa `'Espaço'` como fallback (não o nome do arquivo)
 
-### Race condition — _lazerSeq (FIX APLICADO em todos os 4 admins)
+### Race condition — _lazerSeq (FIX APLICADO em todos os admins)
 O servidor Delphi renomeia arquivos uploaded para UUID. `carregarLazer()` é assíncrono e pode completar depois que o usuário já salvou, sobrescrevendo `_lazerItens` com dados obsoletos.
 
 **Padrão correto obrigatório:**
@@ -80,45 +81,171 @@ var _lazerItens = [], _lazerSeq = 0;
 
 function carregarLazer(){
     var seq = ++_lazerSeq;
-    fetch(...)
-    .then(function(lista){
-        if(seq !== _lazerSeq) return;  // ← aborta se stale
-        _lazerItens = lista.map(...);
-        renderLazerAdmin();
-    })
-    .catch(function(){ if(seq !== _lazerSeq) return; _lazerItens = []; renderLazerAdmin(); });
+    fetch('/files/'+LAZER_JSON_PASTA+'/'+LAZER_JSON_NOME+'?v='+Date.now())
+    .then(function(r){return r.ok?r.json():[];}).catch(function(){return[];})
+    .then(function(jsonEntries){
+        var tituloMap={}, descMap={}, iconeMap={};
+        if(Array.isArray(jsonEntries)){ jsonEntries.forEach(function(e){
+            var nome=(e.imagem||'').split('/').pop().toLowerCase();
+            tituloMap[nome]=e.titulo||''; descMap[nome]=e.descricao||''; iconeMap[nome]=e.icone||'';
+        }); }
+        return fetch('/listar?pasta='+encodeURIComponent(PASTA_LAZER)+'&raw=1')
+        .then(function(r){return r.json();})
+        .then(function(lista){
+            if(seq !== _lazerSeq) return;  // ← aborta se stale
+            _lazerItens = lista.map(function(img){
+                var k=img.nome.toLowerCase();
+                var def=img.nome.replace(/\.[^.]+$/,'').replace(/_/g,' ');
+                var t=(k in tituloMap)?tituloMap[k]:def;
+                if(/^[0-9a-f]{8}[-_ ]/i.test(t)) t='';
+                return {nome:img.nome, titulo:t, descricao:descMap[k]||'', icone:iconeMap[k]||''};
+            });
+            document.getElementById('cnt-lazer').textContent=_lazerItens.length;
+            renderLazerAdmin();
+        });
+    }).catch(function(){ if(seq!==_lazerSeq)return; _lazerItens=[]; renderLazerAdmin(); });
+}
+```
+
+**`_salvar` — ATENÇÃO: NÃO chamar `carregarLazer()` dentro de `_salvar`.**
+Motivo: o ícone é um data URL base64 guardado em memória. Se chamarmos `carregarLazer()` após salvar, há risco de o GET do JSON chegar antes do POST do save terminar no servidor, lendo o JSON antigo (sem ícone) e sobrescrevendo `_lazerItens`. O `_lazerSeq++` em `_salvar` já é suficiente para invalidar a carga do page-init.
+
+```javascript
+function atualizarLazerJSON(){
+    var entries=_lazerItens.map(function(item){
+        return {imagem:LAZER_PREFIX+item.nome, titulo:item.titulo, descricao:item.descricao||'', icone:item.icone||''};
+    });
+    var b64; try{b64=btoa(unescape(encodeURIComponent(JSON.stringify(entries))));}catch(e){return Promise.resolve();}
+    return fetch('/salvar-texto',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({pasta:LAZER_JSON_PASTA,nome:LAZER_JSON_NOME,rawmode:'1',base64:b64})
+    }).catch(function(){});
 }
 
 function _salvar(item, isNew){
     _lazerSeq++;              // ← invalida cargas em voo
     fecharModalLazer();
     if(isNew) _lazerItens.push(item);
-    atualizarLazerJSON(); renderLazerAdmin();
-    toast('...');
-    carregarLazer();          // ← relança com JSON já atualizado
+    renderLazerAdmin();
+    toast(isNew?'"'+item.titulo+'" adicionado! O portal atualiza em até 30 segundos.':'Alterações salvas!');
+    atualizarLazerJSON();     // ← SEM .then(carregarLazer) — intencional
 }
 ```
 
-### Upload de ícone — list-before (FIX APLICADO)
-O servidor retorna sucesso mas o nome do arquivo na resposta não é confiável. Para descobrir o UUID gerado pelo servidor, listar a pasta ANTES do upload e comparar com DEPOIS:
+---
+
+## Ícones da Nossa Estrutura — padrão base64 (FIX APLICADO em fundI)
+
+### Por que base64 e não upload para o servidor
+A abordagem anterior (upload para `<nivel>/estrutura/icones/`) falhava silenciosamente porque a subpasta `icones/` pode não existir no servidor Delphi, e o servidor não auto-cria subdiretórios. O upload retornava erro, o `.catch` chamava `cb('')`, e o item era salvo sem ícone.
+
+**Solução adotada:** ler o arquivo de ícone como data URL (`FileReader.readAsDataURL`) e guardar o base64 diretamente no campo `icone` do JSON. Nenhuma pasta no servidor é necessária.
+
+### `_uploadIcone` — padrão correto (admin)
 ```javascript
 function _uploadIcone(iconeAtual, cb){
-    fetch('/listar?pasta=...&raw=1')
-    .then(function(antesLista){
-        var antesNomes = antesLista.map(function(x){ return x.nome; });
-        // faz upload...
+    if(_lazerIconeRemover){ cb(''); return; }
+    if(!inpIcone.files||!inpIcone.files[0]){ cb(iconeAtual||''); return; }
+    var fi=inpIcone.files[0];
+    if(fi.size>307200){ toast('Ícone muito grande — máximo 300 KB',true); cb(iconeAtual||''); return; }
+    lerArq(fi, function(src){ cb(src); });  // src = "data:image/png;base64,..."
+}
+```
+
+### `renderLazerAdmin` — exibir ícone no card do admin
+O ícone pode ser data URL ou caminho de arquivo (itens antigos). Verificar com `indexOf('data:')`:
+```javascript
+var iconeTag='';
+if(item.icone){
+    var _is = item.icone.indexOf('data:')===0
+        ? item.icone
+        : '/files/'+esc(item.icone)+'?v='+Date.now();
+    iconeTag='<img src="'+_is+'" style="width:22px;height:22px;object-fit:contain;vertical-align:middle;margin-left:5px;" title="Ícone personalizado">';
+}
+```
+
+### `editarLazer` — carregar preview do ícone existente
+```javascript
+if(item.icone){
+    var _is = item.icone.indexOf('data:')===0
+        ? item.icone
+        : '/files/'+item.icone+'?v='+Date.now();
+    document.getElementById('mLazerIconePreview').src = _is;
+    document.getElementById('mLazerIconePreviewBox').style.display='block';
+    document.getElementById('mLazerIconeLabel').textContent='Trocar Ícone (opcional)';
+    document.getElementById('mLazerIconeRemoverBox').style.display='block';
+}
+```
+
+### `excluirLazer` — deletar ícone do servidor só se for caminho (não data URL)
+```javascript
+function excluirLazer(nome){
+    var _excItem=_lazerItens.filter(function(i){return i.nome===nome;})[0];
+    var _excIcone=_excItem&&_excItem.icone?_excItem.icone:'';
+    confirmar('Excluir este espaço?',nome,function(){
+        fetch('/deletar',{...nome:nome,pasta:PASTA_LAZER...})
         .then(function(){
-            fetch('/listar?pasta=...&raw=1')
-            .then(function(lista){
-                var novo = null;
-                for(var i=0;i<lista.length;i++){
-                    if(antesNomes.indexOf(lista[i].nome) < 0){ novo = lista[i].nome; break; }
-                }
-                cb(novo ? PREFIX + novo : iconeAtual || '');
-            });
-        });
+            // só tenta deletar do servidor se for caminho de arquivo (não data URL)
+            if(_excIcone && _excIcone.indexOf('data:')!==0){
+                var _ic=_excIcone.split('/').pop();
+                fetch('/deletar',{...nome:_ic,pasta:PASTA_LAZER_ICONES...}).catch(function(){});
+            }
+            _lazerItens=_lazerItens.filter(function(i){return i.nome!==nome;});
+            atualizarLazerJSON();
+            document.getElementById('cnt-lazer').textContent=_lazerItens.length;
+            renderLazerAdmin();
+            toast('Espaço excluído!');
+        })
+        .catch(function(){ toast('Erro ao excluir',true); });
     });
 }
+```
+
+---
+
+## Ícones da Nossa Estrutura — portal
+
+### Renderização do ícone no portal (`renderEstrutura`)
+```javascript
+var iconeHasImg = !!item.icone;
+var icone = iconeHasImg
+    ? '<img src="'+(item.icone.indexOf('data:')===0 ? item.icone : '/files/'+item.icone)+'" alt="" style="width:44px;height:44px;object-fit:contain;">'
+    : icons[i % icons.length];  // emoji padrão: ['🏫','📚','⚽','🔬','💻','🎨','🏃','🎭','🌿','🎵']
+
+// Quando há ícone personalizado: remove o círculo colorido do container
+var iconeWrap = iconeHasImg
+    ? '<div class="estrutura-item-icon" style="background:none;">'
+    : '<div class="estrutura-item-icon">';
+
+return '<div class="estrutura-item...">' +
+       iconeWrap + icone + '</div>' + ...
+```
+
+**Regra visual:**
+- **Sem ícone** → círculo dourado com emoji padrão (comportamento original)
+- **Com ícone** → `background:none` no container, imagem 44×44px sem moldura colorida
+
+---
+
+## Padrão portal — Nossa Estrutura (slider + cards)
+
+### Divisão de informação entre slider e cards (fundI e fundII)
+- **Slider (foto passando)** → exibe a **descrição** sobreposta à imagem (fundo amarelo, `estrutura-slide-titulo`)
+- **Card lateral (lista)** → exibe só o **título** (sem descrição)
+
+Regra: o overlay do slider só renderiza se houver descrição; se não houver, a foto aparece limpa.
+
+```javascript
+// _estruturaHtml — slider mostra descrição
+var desc = item.descricao || '';
+return '<div class="estrutura-slide-item">' +
+       '<img src="/files/' + item.imagem + '" ...>' +
+       (desc ? '<div class="estrutura-slide-capa"><div class="estrutura-slide-titulo">' + desc + '</div></div>' : '') +
+       '</div>';
+
+// renderEstrutura — card lateral mostra só título
+return '<div class="estrutura-item...">' +
+       iconeWrap + icone + '</div>' +
+       '<div><h4>' + titulo + '</h4></div></div>';
 ```
 
 ---
@@ -148,14 +275,14 @@ Passar dados do Delphi para o iframe via `window.parent.AddJS(...)`.
 
 ## Estado atual dos admins (maio 2026)
 
-| Admin           | Status                                      |
-|-----------------|---------------------------------------------|
-| Educação Infantil | ✅ completo — estrutura + ícone + race fix |
-| Fundamental I   | ✅ completo — estrutura + ícone + race fix  |
-| Fundamental II  | ✅ completo — estrutura + ícone + race fix  |
-| Anos Finais     | ✅ completo — estrutura + ícone + race fix  |
-| Ensino Médio    | ⏳ pendente                                 |
-| Pré-vestibular  | ⏳ pendente                                 |
+| Admin             | Status                                                        |
+|-------------------|---------------------------------------------------------------|
+| Educação Infantil | ✅ estrutura + race fix — ⚠️ ícone base64 pendente           |
+| Fundamental I     | ✅ completo — estrutura + ícone base64 + race fix             |
+| Fundamental II    | ✅ completo — estrutura + ícone base64 + race fix             |
+| Anos Finais       | ✅ estrutura + race fix — ⚠️ ícone base64 pendente           |
+| Ensino Médio      | ⏳ pendente                                                   |
+| Pré-vestibular    | ⏳ pendente                                                   |
 
 ---
 

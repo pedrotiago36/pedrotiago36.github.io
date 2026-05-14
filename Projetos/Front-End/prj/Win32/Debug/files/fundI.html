@@ -460,10 +460,8 @@ function _estruturaHtml(dados) {
         var desc = item.descricao || '';
         return '<div class="estrutura-slide-item">' +
                '<img src="/files/' + item.imagem + '" alt="' + titulo + '" loading="lazy">' +
-               '<div class="estrutura-slide-capa">' +
-               '<div class="estrutura-slide-titulo">' + titulo + '</div>' +
-               (desc ? '<div class="estrutura-slide-desc">' + desc + '</div>' : '') +
-               '</div></div>';
+               (desc ? '<div class="estrutura-slide-capa"><div class="estrutura-slide-titulo">' + desc + '</div></div>' : '') +
+               '</div>';
     }).join('');
 }
 function renderEstrutura(dados) {
@@ -482,12 +480,14 @@ function renderEstrutura(dados) {
         var nomeArq = item.imagem.split('/').pop().replace(/\.[^.]+$/, '');
         var titulo = item.titulo || ''; if(!titulo || /^[0-9a-f]{8}[-_ ]/i.test(titulo)) titulo = 'Espaço';
         var chave = nomeArq.toLowerCase().replace(/[-_\s]/g, '');
-        var icone = item.icone
-            ? '<img src="/files/'+item.icone+'" alt="" style="width:28px;height:28px;object-fit:contain;">'
+        var iconeHasImg = !!item.icone;
+        var icone = iconeHasImg
+            ? '<img src="'+(item.icone.indexOf('data:')===0?item.icone:'/files/'+item.icone)+'" alt="" style="width:44px;height:44px;object-fit:contain;">'
             : icons[i % icons.length];
+        var iconeWrap = iconeHasImg ? '<div class="estrutura-item-icon" style="background:none;">' : '<div class="estrutura-item-icon">';
         return '<div class="estrutura-item' + (i===0?' ativo':'') + '" data-chave="' + chave + '" data-idx="' + i + '" onclick="_estruturaIrIdx(this)">' +
-               '<div class="estrutura-item-icon">' + icone + '</div>' +
-               '<div><h4>' + titulo + '</h4>' + (item.descricao ? '<p>' + item.descricao + '</p>' : '') + '</div></div>';
+               iconeWrap + icone + '</div>' +
+               '<div><h4>' + titulo + '</h4></div></div>';
     }).join('');
     document.getElementById('estruturaItems').innerHTML = itemsHtml;
 
