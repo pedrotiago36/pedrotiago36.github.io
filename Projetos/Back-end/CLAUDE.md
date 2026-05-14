@@ -1,5 +1,23 @@
 # Projeto GEB — Contexto para Claude Code
 
+---
+
+## Regras obrigatórias de comportamento
+
+1. **Compilação Delphi** — Após cada alteração, informar claramente:
+   - Se a mudança é só em HTML/JS/JSON: _"Não precisa compilar nada — basta atualizar as páginas no navegador."_
+   - Se a mudança exige recompilação do servidor: _"Precisa compilar o projeto Delphi: `<nome do projeto>`."_
+
+2. **Commits** — Nunca fazer commit sem o usuário pedir explicitamente. Só commitar após o usuário validar e solicitar.
+
+3. **Idioma** — Sempre responder em português brasileiro. Traduzir tudo que for possível.
+
+4. **Escopo** — Nunca fazer nada que não foi pedido. Sem refatorações extras, sem limpezas não solicitadas, sem "melhorias" por conta própria.
+
+5. **Dúvidas** — Se algo estiver confuso ou ambíguo, perguntar antes de fazer qualquer coisa. Nunca assumir e agir.
+
+---
+
 ## Visão geral
 Sistema web para o Grupo Escolar Batista (GEB). Servidor Delphi (UniGUI) serve o HTML/JS a partir de pastas locais. O conteúdo é editado por um painel admin e consumido por páginas de portal. Não há framework JS — tudo é JS vanilla puro.
 
